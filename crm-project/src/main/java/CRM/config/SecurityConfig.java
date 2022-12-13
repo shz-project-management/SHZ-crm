@@ -19,7 +19,6 @@ public class SecurityConfig {
         corsConfiguration.setAllowCredentials(true);
         corsConfiguration.setExposedHeaders(List.of("Authorization"));
 
-        // You can customize the following part based on your project, it's only a sample
         http.authorizeRequests().antMatchers("/**").permitAll().anyRequest()
                 .authenticated().and().csrf().disable().cors().configurationSource(request -> corsConfiguration);
 

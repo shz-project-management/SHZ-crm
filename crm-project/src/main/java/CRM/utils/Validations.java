@@ -1,5 +1,8 @@
 package CRM.utils;
 
+import CRM.entity.Comment;
+import CRM.entity.Item;
+import CRM.entity.User;
 import CRM.utils.enums.ExceptionMessage;
 import io.jsonwebtoken.Claims;
 import org.apache.logging.log4j.LogManager;
@@ -34,6 +37,19 @@ public class Validations {
         }
     }
 
+    public static void validateRegisteredUser(User user){
+        // validate each field of the user using validate(regex, field)
+    }
+    public static void validateLoginUser(User user){
+        // validate each field of the user using validate(regex, field)
+    }
+    public static void validateCreatedItem(Item item){
+        // validate each field of the item using validate(regex, field)
+    }
+    public static void validateCreatedComment(Comment comment){
+        // validate each field of the comment using validate(regex, field)
+    }
+
     /**
      * validateToken is a function that check given token if it actual valid token and return id.
      *
@@ -58,4 +74,6 @@ public class Validations {
         Claims claims = ConfirmationToken.decodeJWT(token);
         return Long.valueOf(claims.getId());
     }
+
+
 }

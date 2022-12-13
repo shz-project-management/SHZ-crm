@@ -1,9 +1,10 @@
 package CRM.service;
 
+import CRM.controller.facades.AuthFacade;
 import CRM.entity.Comment;
 import CRM.entity.Item;
 import CRM.entity.SharedContent;
-import CRM.repository.ItemRepository;
+import CRM.repository.CommentRepository;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,28 +15,12 @@ import java.util.NoSuchElementException;
 import java.util.Optional;
 
 @Service
-public class ItemService implements ServiceInterface {
+public class CommentService implements ServiceInterface {
 
-    private static Logger logger = LogManager.getLogger(ItemService.class.getName());
+    private static Logger logger = LogManager.getLogger(AuthFacade.class.getName());
 
     @Autowired
-    private ItemRepository itemRepository;
-
-    /**
-     * getUser called from userController to send back to client an UserRes which is a response
-     * with name mail and id.
-     *
-     * @param itemId - user id in database.
-     * @return - entity of UserODT that contains name, email and id.
-     */
-    public Item get(Long itemId) {
-        // Ask for the repo to find the item, by the given id input -> checkIfExists()
-        // Since the repo returns an option, check if this option is not empty
-        // If it is empty, throw "FileNotFound"
-
-        // Return the item back to the controller
-        return null;
-    }
+    private CommentRepository commentRepository;
 
     @Override
     public int delete(long id) {
@@ -69,10 +54,18 @@ public class ItemService implements ServiceInterface {
         return null;
     }
 
-    private Item checkIfExists(long id){
-        Optional<Item> item = itemRepository.findById(id);
-        if(!item.isPresent()) throw new NoSuchElementException("Couldn't find this item in the database!");
+    public Comment create(Comment comment){
+        // I don't think there are any validations needed to be here, since we
+        // don't have any unique or primary values in an item.
 
-        return item.get();
+        // save the item in the database -> commentRepository
+        return null;
+    }
+
+    private Comment checkIfExists(long id){
+        Optional<Comment> comment = commentRepository.findById(id);
+        if(!comment.isPresent()) throw new NoSuchElementException("Couldn't find this comment in the database!");
+
+        return comment.get();
     }
 }

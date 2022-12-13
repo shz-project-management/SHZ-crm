@@ -1,7 +1,8 @@
-package CRM.controller;
+package CRM.controller.controllers;
 
-import docSharing.entity.User;
-import docSharing.response.Response;
+import CRM.controller.facades.AuthFacade;
+import CRM.entity.User;
+import CRM.response.Response;
 import lombok.AllArgsConstructor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -20,7 +21,7 @@ public class AuthController {
     private static Logger logger = LogManager.getLogger(AuthController.class.getName());
 
     @Autowired
-    FacadeAuthController facadeAuthController;
+    AuthFacade authFacade;
 
     /**
      * Register function is responsible for creating new users and adding them to the database.
@@ -32,7 +33,9 @@ public class AuthController {
     @RequestMapping(value = "register", method = RequestMethod.POST, consumes = "application/json")
     public ResponseEntity<Response> register(@RequestBody User user) {
         logger.info("in AuthController -> register");
-        Response response = facadeAuthController.register(user);
+
+        // call facadeAuthController to register the user, and get a response back
+        Response response = authFacade.register(user);
         return new ResponseEntity<>(response, response.getStatus());
     }
 
@@ -48,7 +51,7 @@ public class AuthController {
     @RequestMapping(value = "login", method = RequestMethod.POST, consumes = "application/json")
     public ResponseEntity<Response> login(@RequestBody User user) {
         logger.info("in AuthController -> login");
-        Response response = facadeAuthController.login(user);
+        Response response = authFacade.login(user);
         return new ResponseEntity<>(response, response.getStatus());
     }
 
@@ -60,11 +63,11 @@ public class AuthController {
      * @param token - A link with activation token
      * @return ResponseEntity<Response>  with data and status 200 if good or 400 if something went wrong.
      */
-    @RequestMapping(value = "activate", method = RequestMethod.POST)
-    public ResponseEntity<Response> activate(@RequestParam String token) {
-        logger.info("in AuthController -> activate");
-        Response response = facadeAuthController.activate(token);
-        return new ResponseEntity<>(response, response.getStatus());
-    }
+//    @RequestMapping(value = "activate", method = RequestMethod.POST)
+//    public ResponseEntity<Response> activate(@RequestParam String token) {
+//        logger.info("in AuthController -> activate");
+//        Response response = facadeAuth.activate(token);
+//        return new ResponseEntity<>(response, response.getStatus());
+//    }
 
 }

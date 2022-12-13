@@ -1,7 +1,11 @@
 package CRM.service;
 
+import CRM.entity.User;
+import CRM.repository.UserInBoardRepository;
+import CRM.repository.UserRepository;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.security.auth.login.AccountNotFoundException;
@@ -11,12 +15,10 @@ public class UserService {
 
     private static Logger logger = LogManager.getLogger(UserService.class.getName());
 
-//    @Autowired
-//    private UserRepository userRepository;
-//    @Autowired
-//    private UserDocumentRepository userDocumentRepository;
-//    @Autowired
-//    private DocumentRepository documentRepository;
+    @Autowired
+    private UserRepository userRepository;
+    @Autowired
+    private UserInBoardRepository serInBoardRepository;
 
     /**
      * findByEmail search in the database for a user based on the email we have.
@@ -28,7 +30,7 @@ public class UserService {
         // Ask for the repo to find the user, by the given email address input
         // Since the repo returns an option, check if this option is not empty
 
-        // If it is empty, throw "AccountNotFound"
+        // If it is empty, throw "AccountNotFound" exception
 
         // Return the user back to the controller
         return null;
@@ -45,7 +47,7 @@ public class UserService {
         // Ask for the repo to find the user, by the given id input
         // Since the repo returns an option, check if this option is not empty
 
-        // If it is empty, throw "AccountNotFound"
+        // If it is empty, throw "AccountNotFound" exception
 
         // Return the user back to the controller
         return null;
