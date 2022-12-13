@@ -1,0 +1,61 @@
+package CRM.utils;
+
+import CRM.utils.enums.ExceptionMessage;
+import io.jsonwebtoken.Claims;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+public class Validations {
+    private static Logger logger = LogManager.getLogger(Validations.class.getName());
+
+    /**
+     * validate is called from AuthController when we need to validate a given input such as email or password,
+     * the validation process is according to enum regex we created.
+     *
+     * @param regex - the type we check on from email or password.
+     * @param data  - the input to check on.
+     */
+    public static void validate(String data, String regex) throws IllegalArgumentException, NullPointerException {
+        logger.info("in Validations -> validate");
+
+        if (data == null) {
+            logger.error("in Validations -> validate -> data == null ->" + ExceptionMessage.EMPTY_NOTNULL_FIELD);
+            throw new NullPointerException(ExceptionMessage.EMPTY_NOTNULL_FIELD.toString());
+        }
+
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(data);
+        if (!matcher.matches()) {
+            logger.error("in Validations -> validate -> !matcher.matches()->" + ExceptionMessage.VALIDATION_FAILED);
+            throw new IllegalArgumentException(ExceptionMessage.VALIDATION_FAILED.toString() + data);
+        }
+    }
+
+    /**
+     * validateToken is a function that check given token if it actual valid token and return id.
+     *
+     * @param token - the token input.
+     * @return - id of user.
+     */
+    public static Long validateToken(String token) {
+        logger.info("in Validations -> validateToken");
+
+        if (token == null) {
+            logger.error("in Validations -> validateToken -> " + ExceptionMessage.NULL_INPUT);
+            throw new NullPointerException(ExceptionMessage.NULL_INPUT.toString());
+        }
+        if (!token.startsWith("Bearer ")) {
+            logger.error("in Validations -> validateToken -> " + ExceptionMessage.ILLEGAL_AUTH_HEADER);
+            throw new IllegalArgumentException(ExceptionMessage.ILLEGAL_AUTH_HEADER.toString());
+        }
+
+        //FIXME: instead of validating here, use our "validate" function, giving it a token and a regex that checks its validity
+
+        token = token.substring(7, token.length());
+        Claims claims = ConfirmationToken.decodeJWT(token);
+        return Long.valueOf(claims.getId());
+    }
+}
