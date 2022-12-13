@@ -1,7 +1,7 @@
 package CRM.controller.facades;
 
 import CRM.entity.User;
-import CRM.response.Response;
+import CRM.entity.response.Response;
 import CRM.service.AuthService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

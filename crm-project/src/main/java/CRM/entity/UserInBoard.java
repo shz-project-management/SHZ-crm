@@ -1,20 +1,33 @@
 package CRM.entity;
 
+import CRM.utils.enums.Permission;
 import lombok.*;
+import org.hibernate.annotations.Cascade;
 
 import javax.persistence.*;
 
+@Entity
+@Data
 @AllArgsConstructor
-@NoArgsConstructor
 @Getter
 @Setter
-@ToString
-@Entity
-@Table(name = "users_in_board")
-@IdClass(UserInBoard.class)
+@NoArgsConstructor
 public class UserInBoard {
-    @Id
-    private Long userId;
-    @Id
-    private Long boardId;
+    @EmbeddedId
+    private UserInBoardPK id = new UserInBoardPK();
+
+    @ManyToOne()
+    @MapsId("userId")
+    @Cascade(org.hibernate.annotations.CascadeType.ALL)
+    private User user;
+
+    @ManyToOne()
+    @MapsId("boardId")
+    @Cascade(org.hibernate.annotations.CascadeType.ALL)
+    private Board board;
+
+    @Enumerated
+    @Column(name = "permission")
+    @Cascade(org.hibernate.annotations.CascadeType.ALL)
+    private Permission permission;
 }

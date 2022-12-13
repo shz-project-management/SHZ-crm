@@ -2,7 +2,7 @@ package CRM.controller.controllers;
 
 import CRM.controller.facades.AuthFacade;
 import CRM.entity.User;
-import CRM.response.Response;
+import CRM.entity.response.Response;
 import lombok.AllArgsConstructor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

@@ -2,7 +2,6 @@ package CRM.service;
 
 import CRM.controller.facades.AuthFacade;
 import CRM.entity.Comment;
-import CRM.entity.Item;
 import CRM.entity.SharedContent;
 import CRM.repository.CommentRepository;
 import org.apache.logging.log4j.LogManager;

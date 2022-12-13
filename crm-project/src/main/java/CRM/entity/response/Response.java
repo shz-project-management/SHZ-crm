@@ -1,4 +1,4 @@
-package CRM.response;
+package CRM.entity.response;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;

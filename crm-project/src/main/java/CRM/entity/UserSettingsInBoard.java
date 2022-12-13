@@ -1,27 +1,36 @@
 package CRM.entity;
 
 import lombok.*;
+import org.hibernate.annotations.Cascade;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.IdClass;
-import javax.persistence.Table;
+import javax.persistence.*;
 
+@Entity
+@Data
 @AllArgsConstructor
-@NoArgsConstructor
 @Getter
 @Setter
-@ToString
-@Entity
-@Table(name = "user_settings_in_board")
-@IdClass(UserSettingsInBoard.class)
+@NoArgsConstructor
 public class UserSettingsInBoard {
-    @Id
-    private Long userId;
-    @Id
-    private Long boardId;
-    @Id
-    private Long settingId;
+    @EmbeddedId
+    private UserSettingsInBoardPK id = new UserSettingsInBoardPK();
 
+    @ManyToOne()
+    @MapsId("userId")
+    @Cascade(org.hibernate.annotations.CascadeType.ALL)
+    private User user;
+
+    @ManyToOne()
+    @MapsId("boardId")
+    @Cascade(org.hibernate.annotations.CascadeType.ALL)
+    private Board board;
+
+    @ManyToOne()
+    @MapsId("settingId")
+    @Cascade(org.hibernate.annotations.CascadeType.ALL)
+    private NotificationSetting setting;
+
+    @Column(name = "is_active")
+    @Cascade(org.hibernate.annotations.CascadeType.ALL)
     private boolean isActive;
 }

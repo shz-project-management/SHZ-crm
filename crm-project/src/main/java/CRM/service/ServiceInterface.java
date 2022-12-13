@@ -2,7 +2,6 @@ package CRM.service;
 
 import CRM.entity.SharedContent;
 
-import java.io.FileNotFoundException;
 import java.util.List;
 
 public interface ServiceInterface {

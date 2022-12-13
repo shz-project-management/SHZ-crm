@@ -1,8 +1,7 @@
 package CRM.service;
 
-import CRM.entity.Setting;
+import CRM.entity.NotificationSetting;
 import CRM.repository.UserInBoardRepository;
-import CRM.repository.UserRepository;
 import CRM.repository.UserSettingsInBoardRepository;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -21,7 +20,7 @@ public class SettingsService {
     @Autowired
     private UserInBoardRepository userInBoardRepository;
 
-    public List<Setting> getAllUserSettingsInBoard(Long userId, Long boardID){
+    public List<NotificationSetting> getAllUserSettingsInBoard(Long userId, Long boardID){
         // make sure there is such a user in board in the db -> checkIfExists
         // if so, return all the settings for this user. else, throw NoSuchElement exception
         return null;

@@ -1,4 +1,4 @@
-package CRM.requests;
+package CRM.entity.requests;
 
 import lombok.NoArgsConstructor;
 

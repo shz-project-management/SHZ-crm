@@ -1,7 +1,7 @@
 package CRM.controller.controllers;
 
 import CRM.controller.facades.SettingsFacade;
-import CRM.response.Response;
+import CRM.entity.response.Response;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;

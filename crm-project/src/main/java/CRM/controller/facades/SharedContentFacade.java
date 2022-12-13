@@ -2,7 +2,7 @@ package CRM.controller.facades;
 
 import CRM.entity.Comment;
 import CRM.entity.Item;
-import CRM.response.Response;
+import CRM.entity.response.Response;
 import CRM.service.CommentService;
 import CRM.service.ItemService;
 import CRM.service.ServiceInterface;

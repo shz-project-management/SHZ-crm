@@ -4,7 +4,7 @@ import lombok.*;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
-import java.util.List;
+import java.util.Set;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -14,12 +14,25 @@ import java.util.List;
 @Entity
 @Table(name = "items")
 public class Item extends SharedContent {
-    private Long boardId;
-    private String status;
-    private String type;
+    @ManyToOne
+    @JoinColumn(name = "board_id")
+    private Board board;
+
+    @ManyToOne
+    @JoinColumn(name = "status_id")
+    private Status status;
+    @ManyToOne
+    @JoinColumn(name = "type_id")
+    private Type type;
+
     private String section;
-    private List<Long> assignedTo;
+    private Long assignedToUserId;
     private LocalDateTime dueDate;
     private int importance;
-    private List<Comment> comments;
+
+    @OneToMany(mappedBy = "parentItem", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Comment> comments;
+
+    @OneToMany(mappedBy = "parentItem", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Item> items;
 }

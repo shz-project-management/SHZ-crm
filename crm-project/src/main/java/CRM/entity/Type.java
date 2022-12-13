@@ -10,7 +10,7 @@ import javax.persistence.*;
 @Setter
 @ToString
 @Entity
-@Table(name = "comments")
-public class Comment extends SharedContent {
-    private Long relateToUserId;
+@Table(name = "types")
+public class Type extends Attribute{
+
 }
