@@ -74,6 +74,4 @@ public class Validations {
         Claims claims = ConfirmationToken.decodeJWT(token);
         return Long.valueOf(claims.getId());
     }
-
-
 }
