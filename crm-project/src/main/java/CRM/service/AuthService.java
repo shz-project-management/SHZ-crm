@@ -40,12 +40,11 @@ public class AuthService {
     /**
      * login function method is used to log-in users to the app and check if inputs was correct according to database.
      * first check if we have the email in the database and then proceed to generate token.
-     *
      * @param email    - mail of user
      * @param password - password
      * @return - token for user to be unique on app
      */
-    public String login(String email, String password) throws AccountNotFoundException {
+    public String login(String email, String password) {
 
         // make sure the email exists in the database. If not, throw an AccountNotFoundException exception.
 
@@ -61,7 +60,6 @@ public class AuthService {
      * activate function meant to change the user column isActivated from originated value false to true.
      * Repository go to the unique row that has user email and changed that value.
      * Method used after a user clicks on the link he got on email.
-     *
      * @param id - user email
      * @return - should be always 1, which is rows affected in the database.
      */

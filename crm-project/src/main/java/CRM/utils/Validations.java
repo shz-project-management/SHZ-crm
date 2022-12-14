@@ -33,7 +33,7 @@ public class Validations {
         Matcher matcher = pattern.matcher(data);
         if (!matcher.matches()) {
             logger.error("in Validations -> validate -> !matcher.matches()->" + ExceptionMessage.VALIDATION_FAILED);
-            throw new IllegalArgumentException(ExceptionMessage.VALIDATION_FAILED.toString() + data);
+            throw new IllegalArgumentException(ExceptionMessage.VALIDATION_FAILED + data);
         }
     }
 

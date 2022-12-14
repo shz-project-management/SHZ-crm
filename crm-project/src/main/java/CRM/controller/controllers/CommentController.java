@@ -44,7 +44,8 @@ public class CommentController {
     }
 
     @GetMapping(value = "all-in-item/{id}")
-    public ResponseEntity<Response> getAllCommentsInItem(@DestinationVariable Long parentId){
+    public ResponseEntity<Response> getAllCommentsInItem(@DestinationVariable Long id){
+        sharedContentFacade.getAllInItem(id, Comment.class);
         return null;
     }
 

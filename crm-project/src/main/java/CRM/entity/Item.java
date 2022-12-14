@@ -21,6 +21,7 @@ public class Item extends SharedContent {
     @ManyToOne
     @JoinColumn(name = "status_id")
     private Status status;
+
     @ManyToOne
     @JoinColumn(name = "type_id")
     private Type type;

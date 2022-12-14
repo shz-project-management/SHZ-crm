@@ -62,7 +62,8 @@ public class ItemController {
     }
 
     @GetMapping(value = "all-in-item/{itemId}")
-    public ResponseEntity<Response> getAllItemsInItem(@DestinationVariable Long parentId){
+    public ResponseEntity<Response> getAllItemsInItem(@DestinationVariable Long itemId){
+        sharedContentFacade.getAllInItem(itemId, Item.class);
         return null;
     }
 

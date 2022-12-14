@@ -3,9 +3,12 @@ package CRM.controller.facades;
 import CRM.entity.User;
 import CRM.entity.response.Response;
 import CRM.service.AuthService;
+import CRM.utils.Validations;
+import CRM.utils.enums.Regex;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -48,6 +51,15 @@ public class AuthFacade {
      */
     public Response login(User user) {
         logger.info("in FacadeAuthController -> login");
+
+        // EXAMPLE
+//        try{
+//            Validations.validate(user.getEmail(), Regex.EMAIL.getRegex());
+//            authService.login()
+//
+//        }catch(NullPointerException | IllegalArgumentException |  e){
+//            return new Response.Builder().message(e.getMessage()).status(HttpStatus.BAD_REQUEST).statusCode(400).build();
+//        }
 
         // validate the data given e.g. user.getEmail -> Validations.validate(Regex.EMAIL.getRegex(), email);
         // reminder: Validations.validate function throws an exception if failed, and doesn't return anything.

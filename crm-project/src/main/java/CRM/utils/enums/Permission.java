@@ -1,9 +1,7 @@
 package CRM.utils.enums;
 
 public enum Permission{
-    VIEWER,
-    EDITOR,
-    MODERATOR,
+    USER,
+    LEADER,
     ADMIN,
-    UNAUTHORIZED
 }
