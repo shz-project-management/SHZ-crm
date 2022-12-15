@@ -7,10 +7,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 @Controller
 @RequestMapping(value = "/board")
@@ -31,6 +28,18 @@ public class BoardController {
     @PostMapping(consumes = "application/json")
     public ResponseEntity<Response> create(@RequestBody BoardRequest boardRequest) {
         Response response = boardFacade.create(boardRequest);
+        return new ResponseEntity<>(response, response.getStatus());
+    }
+
+    /**
+     * Handle HTTP DELETE requests to delete a board.
+     *
+     * @param boardID The ID of the board to delete.
+     * @return A ResponseEntity with the appropriate status and response body.
+     */
+    @DeleteMapping()
+    public ResponseEntity<Response> create(@RequestParam long boardID) {
+        Response response = boardFacade.delete(boardID);
         return new ResponseEntity<>(response, response.getStatus());
     }
 }
