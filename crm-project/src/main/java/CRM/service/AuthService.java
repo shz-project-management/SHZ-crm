@@ -27,25 +27,28 @@ public class AuthService {
 
     /**
      * register   method is used to register new users to the app with given inputs
-     * @param user    - user entity with the user's information
+     * @param registerUser    - user entity with the user's information
      * @return - entity of the user we have just registered.
      */
-    public User register(RegisterUserRequest user) {
+    public User register(RegisterUserRequest registerUser) {
         logger.info("in AuthService -> register");
 
         // make sure the email doesn't already exist in the database. If so, throw an IllegalArgument exception.
-        // save the user in the database.
+        Optional<User> doesUserExist = userRepository.findByEmail(registerUser.getEmail());
+        if(doesUserExist.isPresent()){
+            throw new IllegalArgumentException(ExceptionMessage.EMAIL_IN_USE.toString());
+        }
 
-        // return the user back to the facadeAuth
-
-        return null;
+        // save and the user in the database.
+        return userRepository.save(User.newUser(registerUser));
     }
 
     /**
-     * login function method is used to log-in users to the app and check if inputs was correct according to database.
-     * first check if we have the email in the database and then proceed to generate token.
-     * @param user - the user credentials we want to log in
-     * @return - token for user to be unique on app
+     * Attempts to login the user with the provided email and password.
+     * @param user The LoginUserRequest containing the user's email and password.
+     * @return A token to be used for subsequent requests.
+     * @throws AccountNotFoundException If the provided email does not exist in the database.
+     * @throws AuthenticationException If the provided password does not match the stored password.
      */
     public String login(LoginUserRequest user) throws AccountNotFoundException, AuthenticationException {
         // make sure the email exists in the database. If not, throw an AccountNotFoundException exception.
