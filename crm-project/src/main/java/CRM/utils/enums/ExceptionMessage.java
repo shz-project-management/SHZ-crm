@@ -25,6 +25,7 @@ public enum ExceptionMessage {
     ACCOUNT_EXISTS("This user email already exists: "),
     ACCOUNT_DOES_NOT_EXISTS("This user email does not exists in database: "),
     ILLEGAL_AUTH_HEADER("Authorization header is not legal"),
+    PASSWORD_DOESNT_MATCH("The given password doesn't match our database's"),
 
     DOCUMENT_EXISTS("This document ID already exist in the database: "),
     DOCUMENT_DOES_NOT_EXISTS("This document ID does not exist in the database: "),

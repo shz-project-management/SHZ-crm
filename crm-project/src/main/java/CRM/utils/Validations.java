@@ -3,6 +3,8 @@ package CRM.utils;
 import CRM.entity.Comment;
 import CRM.entity.Item;
 import CRM.entity.User;
+import CRM.entity.requests.LoginUserRequest;
+import CRM.entity.requests.RegisterUserRequest;
 import CRM.utils.enums.ExceptionMessage;
 import CRM.utils.enums.Regex;
 import io.jsonwebtoken.Claims;
@@ -38,14 +40,14 @@ public class Validations {
         }
     }
 
-    public static void validateRegisteredUser(User user){
+    public static void validateRegisteredUser(RegisterUserRequest user){
         validate(user.getEmail(), Regex.EMAIL.getRegex());
         validate(user.getPassword(), Regex.PASSWORD.getRegex());
         validate(user.getFirstName(), Regex.NAME.getRegex());
         validate(user.getLastName(), Regex.NAME.getRegex());
     }
 
-    public static void validateLoginUser(User user){
+    public static void validateLoginUser(LoginUserRequest user){
         validate(user.getEmail(), Regex.EMAIL.getRegex());
         validate(user.getPassword(), Regex.PASSWORD.getRegex());
     }

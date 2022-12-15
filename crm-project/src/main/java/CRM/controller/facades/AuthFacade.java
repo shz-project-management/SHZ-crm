@@ -2,6 +2,7 @@ package CRM.controller.facades;
 
 import CRM.entity.User;
 import CRM.entity.requests.LoginUserRequest;
+import CRM.entity.requests.RegisterUserRequest;
 import CRM.entity.response.Response;
 import CRM.service.AuthService;
 import CRM.utils.Validations;
@@ -12,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
+import javax.naming.AuthenticationException;
 import javax.security.auth.login.AccountNotFoundException;
 
 @Component
@@ -29,7 +31,7 @@ public class AuthFacade {
      * @param user - User with email, name and password
      * @return Response with status 201 if good or 400 if something went wrong.
      */
-    public Response register(User user) {
+    public Response register(RegisterUserRequest user) {
         logger.info("in FacadeAuthController -> register");
         try {
             // validate the data given e.g. user.getEmail -> Validations.validate(Regex.EMAIL.getRegex(), email);
@@ -68,7 +70,7 @@ public class AuthFacade {
     public Response login(LoginUserRequest user) {
         logger.info("in FacadeAuthController -> login");
 
-        try{
+        try {
             // validate the data given e.g. user.getEmail -> Validations.validate(Regex.EMAIL.getRegex(), email);
             // reminder: Validations.validate function throws an exception if failed, and doesn't return anything.
             //           so make sure to put it in a try/catch
@@ -83,7 +85,8 @@ public class AuthFacade {
                     .statusCode(200)
                     .build();
 
-        }catch(NullPointerException | IllegalArgumentException | AccountNotFoundException e){
+        } catch (NullPointerException | IllegalArgumentException | AuthenticationException |
+                 AccountNotFoundException e) {
             return new Response.Builder()
                     .message(e.getMessage())
                     .status(HttpStatus.BAD_REQUEST)

@@ -1,6 +1,8 @@
 package CRM.service;
 
 import CRM.entity.User;
+import CRM.entity.requests.LoginUserRequest;
+import CRM.entity.requests.RegisterUserRequest;
 import CRM.repository.UserRepository;
 import CRM.utils.ConfirmationToken;
 import CRM.utils.Validations;
@@ -11,7 +13,9 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.naming.AuthenticationException;
 import javax.security.auth.login.AccountNotFoundException;
+import java.util.Optional;
 
 @Service
 @AllArgsConstructor
@@ -26,7 +30,7 @@ public class AuthService {
      * @param user    - user entity with the user's information
      * @return - entity of the user we have just registered.
      */
-    public User register(User user) {
+    public User register(RegisterUserRequest user) {
         logger.info("in AuthService -> register");
 
         // make sure the email doesn't already exist in the database. If so, throw an IllegalArgument exception.
@@ -40,20 +44,24 @@ public class AuthService {
     /**
      * login function method is used to log-in users to the app and check if inputs was correct according to database.
      * first check if we have the email in the database and then proceed to generate token.
-     * @param email    - mail of user
-     * @param password - password
+     * @param user - the user credentials we want to log in
      * @return - token for user to be unique on app
      */
-    public String login(String email, String password) {
-
+    public String login(LoginUserRequest user) throws AccountNotFoundException, AuthenticationException {
         // make sure the email exists in the database. If not, throw an AccountNotFoundException exception.
+        Optional<User> doesUserExist = userRepository.findByEmail(user.getEmail());
+        if(!doesUserExist.isPresent()){
+            throw new AccountNotFoundException(ExceptionMessage.NO_USER_IN_DATABASE.toString());
+        }
 
         // make sure the given password and the stored password are equal. TODO: maybe this is our time to use password hashing+salting?
-        // if the passwords are not equal, return IllegalArgument exception.
+        // if the passwords are not equal, return Unauthorized exception.
+        if(!doesUserExist.get().getPassword().equals(user.getPassword())){
+            throw new AuthenticationException(ExceptionMessage.PASSWORD_DOESNT_MATCH.toString());
+        }
 
         // return a token back to facadeAuth -> user generateToken(userId) function.
-
-        return null;
+        return generateToken(doesUserExist.get().getId());
     }
 
     /**
@@ -71,11 +79,11 @@ public class AuthService {
 
     /**
      * generateToken is a function that creates a unique JWT token for every logged-in user.
-     * @param user - user
+     * @param id - the ID of the login user
      * @return generated token according to: io.jsonwebtoken.Jwts library
      */
-    private String generateToken(User user) {
-        return ConfirmationToken.createJWT(String.valueOf(user.getId()), "SHZ project management", "login", 0);
+    private String generateToken(Long id) {
+        return ConfirmationToken.createJWT(String.valueOf(id), "SHZ project management", "login", 0);
     }
 
     /**
