@@ -9,7 +9,10 @@ import CRM.utils.enums.Regex;
 import io.jsonwebtoken.Claims;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -52,7 +55,6 @@ public class Validations {
 
     /**
      * Validates the provided LoginUserRequest object.
-     *
      * @param user The LoginUserRequest object to validate.
      */
     public static void validateLoginUser(LoginUserRequest user){
@@ -68,10 +70,24 @@ public class Validations {
         // validate each field of the comment using validate(regex, field)
     }
 
+    /**
+     * Checks if an item with the specified ID exists in the given repository.
+     * @param id the ID of the item to check for
+     * @param repo the repository to search for the item in
+     * @return the item with the specified ID if it exists
+     * @throws NoSuchElementException if no item with the specified ID exists in the repository
+     */
+    public static <T> T doesIdExists(Long id, JpaRepository repo){
+        Optional<T> item = repo.findById(id);
+        if(!item.isPresent())
+            throw new NoSuchElementException(ExceptionMessage.NO_SUCH_ID.toString());
+
+        return item.get();
+    }
+
 
     /**
      * Validates the provided token and returns the user id associated with it.
-     *
      * @param token The token to validate.
      * @return The user id associated with the token.
      * @throws NullPointerException If the provided token is null.
