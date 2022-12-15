@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.security.auth.login.AccountNotFoundException;
+import java.util.List;
 import java.util.NoSuchElementException;
 
 @Service
@@ -56,6 +57,10 @@ public class UserService {
             // If it is empty, throw "AccountNotFound" exception
             throw new AccountNotFoundException(ExceptionMessage.NO_ACCOUNT_IN_DATABASE.toString());
         }
+    }
+
+    public List<User> getAll(){
+        return userRepository.findAll();
     }
 
 }

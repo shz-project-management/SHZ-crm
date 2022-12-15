@@ -25,11 +25,12 @@ public class AuthFacade {
     private AuthService authService;
 
     /**
-     * Register function is responsible for creating new users and adding them to the database.
-     * Users will use their personal information to create a new account: email, password, name.
-     *
-     * @param user - User with email, name and password
-     * @return Response with status 201 if good or 400 if something went wrong.
+     * Registers a new user in the system.
+     * @param user The registration information for the user.
+     * @return A {@link Response} object containing the saved user, or an error message if the
+     *         registration failed.
+     * @throws IllegalArgumentException if any of the provided registration information is invalid.
+     * @throws NullPointerException if any of the required fields in the user request are missing.
      */
     public Response register(RegisterUserRequest user) {
         logger.info("in FacadeAuthController -> register");
@@ -59,13 +60,14 @@ public class AuthFacade {
     }
 
     /**
-     * Login function is responsible for logging user into the system.
-     * This function accepts only 2 parameters: email, password.
-     * If the credentials match to the database's information, it will allow the user to use its functionalities.
-     * A token will be returned in a successful request.
-     *
-     * @param user - user's details with email and password to check if correct
-     * @return Response with user's token and status 200 if good or 400 if something went wrong.
+     * Logs a user in to the system.
+     * @param user The login credentials for the user.
+     * @return A {@link Response} object containing a JWT token for the user, or an error message if the
+     *         login failed.
+     * @throws NullPointerException if any of the required fields in the user request are missing.
+     * @throws IllegalArgumentException if any of the provided login credentials are invalid.
+     * @throws AuthenticationException if the provided login credentials are incorrect.
+     * @throws AccountNotFoundException if the user with the given login credentials does not exist.
      */
     public Response login(LoginUserRequest user) {
         logger.info("in FacadeAuthController -> login");
