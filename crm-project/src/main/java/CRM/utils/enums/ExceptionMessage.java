@@ -28,7 +28,7 @@ public enum ExceptionMessage {
     PASSWORD_DOESNT_MATCH("The given password doesn't match our database's"),
 
     DOCUMENT_EXISTS("This document ID already exist in the database: "),
-    DOCUMENT_DOES_NOT_EXISTS("This document ID does not exist in the database: "),
+    BOARD_DOES_NOT_EXISTS("This board ID does not exist in the database: "),
     NOT_MATCH("Error: email or password does not match"),
     NO_USER_IN_DATABASE("Could not locate this user in the database."),
     NO_ACCOUNT_IN_DATABASE("Could not locate this email in the database."),
