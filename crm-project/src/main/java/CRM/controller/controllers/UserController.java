@@ -33,4 +33,12 @@ public class UserController {
         return new ResponseEntity<>(response, response.getStatus());
     }
 
+    @GetMapping(value = "getAll")
+    public ResponseEntity<Response> getAll(){
+
+        Response response = userFacade.getAll();
+        return new ResponseEntity<>(response, response.getStatus());
+    }
+
+
 }
