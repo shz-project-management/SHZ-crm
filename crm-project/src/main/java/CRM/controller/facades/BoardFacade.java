@@ -1,9 +1,9 @@
 package CRM.controller.facades;
 
 import CRM.entity.Board;
+import CRM.entity.DTO.BoardDTO;
 import CRM.entity.User;
 import CRM.entity.requests.BoardRequest;
-import CRM.entity.response.BoardDTO;
 import CRM.entity.response.Response;
 import CRM.service.AuthService;
 import CRM.service.BoardService;
