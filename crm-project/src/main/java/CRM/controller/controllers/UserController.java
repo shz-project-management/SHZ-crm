@@ -9,10 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.*;
 
 @Controller
 @RequestMapping(value = "/user")
@@ -27,7 +24,7 @@ public class UserController {
     private UserFacade userFacade;
 
     @GetMapping(value = "{id}")
-    public ResponseEntity<Response> get(@DestinationVariable Long id){
+    public ResponseEntity<Response> get(@PathVariable Long id){
 
         Response response = userFacade.get(id);
         return new ResponseEntity<>(response, response.getStatus());
@@ -41,7 +38,7 @@ public class UserController {
     }
 
     @GetMapping(value = "getAll/{boardId}")
-    public ResponseEntity<Response> getAllInBoard(@DestinationVariable Long boardId){
+    public ResponseEntity<Response> getAllInBoard(@PathVariable Long boardId){
 
         Response response = userFacade.getAllInBoard(boardId);
         return new ResponseEntity<>(response, response.getStatus());
