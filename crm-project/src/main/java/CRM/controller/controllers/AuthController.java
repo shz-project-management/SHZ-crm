@@ -2,6 +2,8 @@ package CRM.controller.controllers;
 
 import CRM.controller.facades.AuthFacade;
 import CRM.entity.User;
+import CRM.entity.requests.LoginUserRequest;
+import CRM.entity.requests.RegisterUserRequest;
 import CRM.entity.response.Response;
 import CRM.utils.Common;
 import lombok.AllArgsConstructor;
@@ -38,7 +40,7 @@ public class AuthController {
      * @return ResponseEntity with our Response with data and status 201 if good or 400 if something went wrong.
      */
     @RequestMapping(value = "register", method = RequestMethod.POST, consumes = "application/json")
-    public ResponseEntity<Response> register(@RequestBody User user) {
+    public ResponseEntity<Response> register(@RequestBody RegisterUserRequest user) {
         logger.info("in AuthController -> register");
 
         Response response = authFacade.register(user);
@@ -55,7 +57,7 @@ public class AuthController {
      * @return ResponseEntity with our Response with user's token and status 200 if good or 400 if something went wrong.
      */
     @RequestMapping(value = "login", method = RequestMethod.POST, consumes = "application/json")
-    public ResponseEntity<Response> login(@RequestBody User user) {
+    public ResponseEntity<Response> login(@RequestBody LoginUserRequest user) {
         logger.info("in AuthController -> login");
 
         Response response = authFacade.login(user);
