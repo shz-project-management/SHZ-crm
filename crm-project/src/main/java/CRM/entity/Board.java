@@ -34,4 +34,13 @@ public class Board {
 
     @OneToMany(mappedBy = "board", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Status> statuses;
+
+
+    public static Board createBoard(User user, String name, String description) {
+        Board board = new Board();
+        board.setCreatorUser(user);
+        board.setName(name);
+        board.setDescription(description);
+        return board;
+    }
 }
