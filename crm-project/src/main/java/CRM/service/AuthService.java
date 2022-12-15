@@ -26,9 +26,10 @@ public class AuthService {
     private UserRepository userRepository;
 
     /**
-     * register   method is used to register new users to the app with given inputs
-     * @param registerUser    - user entity with the user's information
-     * @return - entity of the user we have just registered.
+     * Registers a new user with the provided RegisterUserRequest object.
+     * @param registerUser The RegisterUserRequest object containing the user's information.
+     * @return The registered User object.
+     * @throws IllegalArgumentException If the provided email is already in use.
      */
     public User register(RegisterUserRequest registerUser) {
         logger.info("in AuthService -> register");

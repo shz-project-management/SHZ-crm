@@ -35,7 +35,6 @@ public class AuthController {
     /**
      * Register function is responsible for creating new users and adding them to the database.
      * Users will use their personal information to create a new account: email, password, name.
-     *
      * @param user - User with email, name and password
      * @return ResponseEntity with our Response with data and status 201 if good or 400 if something went wrong.
      */
@@ -52,7 +51,6 @@ public class AuthController {
      * This function accepts only 2 parameters: email, password.
      * If the credentials match to the database's information, it will allow the user to use its functionalities.
      * A token will be returned in a successful request.
-     *
      * @param user - user's details with email and password to check if correct
      * @return ResponseEntity with our Response with user's token and status 200 if good or 400 if something went wrong.
      */
