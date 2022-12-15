@@ -1,5 +1,7 @@
 package CRM.service;
 
+import CRM.entity.Board;
+import CRM.entity.User;
 import CRM.repository.BoardRepository;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -14,4 +16,13 @@ public class BoardService {
     @Autowired
     private BoardRepository boardRepository;
 
+    /**
+     * This function persists a new board to the database by calling the save function in the BoardRepository class.
+     *
+     * @param board The board object to be persisted.
+     * @return The persisted board object.
+     */
+    public Board create(Board board) {
+        return boardRepository.save(board);
+    }
 }
