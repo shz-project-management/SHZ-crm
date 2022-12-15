@@ -26,7 +26,6 @@ public class UserService {
 
     /**
      * findByEmail search in the database for a user based on the email we have.
-     *
      * @param email - user's email
      * @return entity of user that found in database.
      */
@@ -59,6 +58,10 @@ public class UserService {
         }
     }
 
+    /**
+     * Returns a list of all the users that exist in the database.
+     * @return a list of all users in the repository
+     */
     public List<User> getAll(){
         return userRepository.findAll();
     }
