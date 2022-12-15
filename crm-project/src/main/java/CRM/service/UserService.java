@@ -1,6 +1,8 @@
 package CRM.service;
 
+import CRM.entity.Board;
 import CRM.entity.User;
+import CRM.repository.BoardRepository;
 import CRM.repository.UserInBoardRepository;
 import CRM.repository.UserRepository;
 import CRM.utils.Validations;
@@ -22,7 +24,9 @@ public class UserService {
     @Autowired
     private UserRepository userRepository;
     @Autowired
-    private UserInBoardRepository serInBoardRepository;
+    private UserInBoardRepository userInBoardRepository;
+    @Autowired
+    private BoardRepository boardRepository;
 
     /**
      * findByEmail search in the database for a user based on the email we have.
@@ -45,7 +49,7 @@ public class UserService {
      * @return a User object with the specified ID
      * @throws AccountNotFoundException if no user with the specified ID exists in the database
      */
-    public User get(Long userId) throws AccountNotFoundException {
+    public User get(long userId) throws AccountNotFoundException {
 
         try {
             // make sure such an id even exists
@@ -62,8 +66,23 @@ public class UserService {
      * Returns a list of all the users that exist in the database.
      * @return a list of all users in the repository
      */
-    public List<User> getAll(){
+    public List<User> getAll() {
         return userRepository.findAll();
+    }
+
+    /**
+     * Retrieves a list of all users in a specified board.
+     * @param boardId   the ID of the board to retrieve users from
+     * @return          a List of User objects representing the users in the board
+     * @throws NoSuchElementException if the specified board does not exist
+     */
+    public List<User> getAllInBoard(long boardId) {
+        try {
+            Board board = Validations.doesIdExists(boardId, boardRepository);
+            return userInBoardRepository.getUsersInBoard(board);
+        } catch (NoSuchElementException e) {
+            throw new NoSuchElementException(ExceptionMessage.NO_SUCH_ID.toString());
+        }
     }
 
 }

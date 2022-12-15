@@ -40,5 +40,10 @@ public class UserController {
         return new ResponseEntity<>(response, response.getStatus());
     }
 
+    @GetMapping(value = "getAll/{boardId}")
+    public ResponseEntity<Response> getAllInBoard(@DestinationVariable Long boardId){
 
+        Response response = userFacade.getAllInBoard(boardId);
+        return new ResponseEntity<>(response, response.getStatus());
+    }
 }
