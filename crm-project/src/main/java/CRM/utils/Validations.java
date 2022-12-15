@@ -4,6 +4,7 @@ import CRM.entity.Comment;
 import CRM.entity.Item;
 import CRM.entity.User;
 import CRM.utils.enums.ExceptionMessage;
+import CRM.utils.enums.Regex;
 import io.jsonwebtoken.Claims;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -38,14 +39,21 @@ public class Validations {
     }
 
     public static void validateRegisteredUser(User user){
-        // validate each field of the user using validate(regex, field)
+        validate(user.getEmail(), Regex.EMAIL.getRegex());
+        validate(user.getPassword(), Regex.PASSWORD.getRegex());
+        validate(user.getFirstName(), Regex.NAME.getRegex());
+        validate(user.getLastName(), Regex.NAME.getRegex());
     }
+
     public static void validateLoginUser(User user){
-        // validate each field of the user using validate(regex, field)
+        validate(user.getEmail(), Regex.EMAIL.getRegex());
+        validate(user.getPassword(), Regex.PASSWORD.getRegex());
     }
+
     public static void validateCreatedItem(Item item){
         // validate each field of the item using validate(regex, field)
     }
+
     public static void validateCreatedComment(Comment comment){
         // validate each field of the comment using validate(regex, field)
     }
