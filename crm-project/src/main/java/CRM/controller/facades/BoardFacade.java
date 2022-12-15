@@ -54,18 +54,18 @@ public class BoardFacade {
 
     /**
      * Deletes a board with the given ID.
-     * @param boardID the ID of the board to delete
+     * @param id the ID of the board to delete
      * @return a response object indicating the status of the deletion operation
      * @throws NoSuchElementException if no board with the given ID exists
      */
-    public Response delete(long boardID) {
+    public Response delete(long id) {
         try{
-            Board board = boardService.findById(boardID);
+            Board board = boardService.findById(id);
             boardService.delete(board);
             return new Response.Builder()
                     .status(HttpStatus.OK)
                     .statusCode(200)
-                    .message(SuccessMessage.BOARD_DELETED.toString())
+                    .message(SuccessMessage.DELETED.toString())
                     .build();
         }catch(NoSuchElementException e) {
             return new Response.Builder().message(e.getMessage()).status(HttpStatus.BAD_REQUEST).statusCode(400).build();

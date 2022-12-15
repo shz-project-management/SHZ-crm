@@ -78,11 +78,11 @@ public class Validations {
      * @throws NoSuchElementException if no item with the specified ID exists in the repository
      */
     public static <T> T doesIdExists(Long id, JpaRepository repo){
-        Optional<T> item = repo.findById(id);
-        if(!item.isPresent())
+        Optional<T> element = repo.findById(id);
+        if(!element.isPresent())
             throw new NoSuchElementException(ExceptionMessage.NO_SUCH_ID.toString());
 
-        return item.get();
+        return element.get();
     }
 
 
