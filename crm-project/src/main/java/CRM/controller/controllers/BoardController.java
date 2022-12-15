@@ -31,6 +31,12 @@ public class BoardController {
         return new ResponseEntity<>(response, response.getStatus());
     }
 
+    /**
+     * Handle HTTP DELETE requests to delete a board.
+     *
+     * @param boardID The ID of the board to delete.
+     * @return A ResponseEntity with the appropriate status and response body.
+     */
     @DeleteMapping()
     public ResponseEntity<Response> create(@RequestParam long boardID) {
         Response response = boardFacade.delete(boardID);
