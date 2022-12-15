@@ -1,6 +1,7 @@
 package CRM.controller.facades;
 
 import CRM.entity.User;
+import CRM.entity.requests.LoginUserRequest;
 import CRM.entity.response.Response;
 import CRM.service.AuthService;
 import CRM.utils.Validations;
@@ -10,6 +11,8 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
+
+import javax.security.auth.login.AccountNotFoundException;
 
 @Component
 public class AuthFacade {
@@ -49,25 +52,30 @@ public class AuthFacade {
      * @param user - user's details with email and password to check if correct
      * @return Response with user's token and status 200 if good or 400 if something went wrong.
      */
-    public Response login(User user) {
+    public Response login(LoginUserRequest user) {
         logger.info("in FacadeAuthController -> login");
 
-        // EXAMPLE
-//        try{
-//            Validations.validate(user.getEmail(), Regex.EMAIL.getRegex());
-//            authService.login()
-//
-//        }catch(NullPointerException | IllegalArgumentException |  e){
-//            return new Response.Builder().message(e.getMessage()).status(HttpStatus.BAD_REQUEST).statusCode(400).build();
-//        }
+        try{
+            // validate the data given e.g. user.getEmail -> Validations.validate(Regex.EMAIL.getRegex(), email);
+            // reminder: Validations.validate function throws an exception if failed, and doesn't return anything.
+            //           so make sure to put it in a try/catch
+            Validations.validateLoginUser(user);
 
-        // validate the data given e.g. user.getEmail -> Validations.validate(Regex.EMAIL.getRegex(), email);
-        // reminder: Validations.validate function throws an exception if failed, and doesn't return anything.
-        //           so make sure to put it in a try/catch
+            // after all validations are made, call the authService to login the user with the relevant information.
+            // the return data in Response class has to include a JWT token.
+            return new Response.Builder()
+                    .message("Successfully logged in to the system")
+                    .data(authService.login(user))
+                    .status(HttpStatus.OK)
+                    .statusCode(200)
+                    .build();
 
-        // after all validations are made, call the authService to login the user with the relevant information.
-        // the return data in Response class has to include a JWT token.
-        return null;
+        }catch(NullPointerException | IllegalArgumentException | AccountNotFoundException e){
+            return new Response.Builder()
+                    .message(e.getMessage())
+                    .status(HttpStatus.BAD_REQUEST)
+                    .statusCode(400).build();
+        }
     }
 
     /**
