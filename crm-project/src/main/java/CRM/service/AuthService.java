@@ -27,21 +27,20 @@ public class AuthService {
 
     /**
      * Registers a new user with the provided RegisterUserRequest object.
-     * @param registerUser The RegisterUserRequest object containing the user's information.
+     * @param user The RegisterUserRequest object containing the user's information.
      * @return The registered User object.
      * @throws IllegalArgumentException If the provided email is already in use.
      */
-    public User register(RegisterUserRequest registerUser) {
+    public User register(RegisterUserRequest user) {
         logger.info("in AuthService -> register");
 
         // make sure the email doesn't already exist in the database. If so, throw an IllegalArgument exception.
-        Optional<User> doesUserExist = userRepository.findByEmail(registerUser.getEmail());
-        if(doesUserExist.isPresent()){
+        User storedUser = findByEmail(user.getEmail());
+        if (storedUser != null)
             throw new IllegalArgumentException(ExceptionMessage.EMAIL_IN_USE.toString());
-        }
 
         // save and the user in the database.
-        return userRepository.save(User.newUser(registerUser));
+        return userRepository.save(User.newUser(user));
     }
 
     /**
@@ -49,23 +48,21 @@ public class AuthService {
      * @param user The LoginUserRequest containing the user's email and password.
      * @return A token to be used for subsequent requests.
      * @throws AccountNotFoundException If the provided email does not exist in the database.
-     * @throws AuthenticationException If the provided password does not match the stored password.
+     * @throws AuthenticationException  If the provided password does not match the stored password.
      */
-    public String login(LoginUserRequest user) throws AccountNotFoundException, AuthenticationException {
+    public String login(LoginUserRequest user) throws AuthenticationException, AccountNotFoundException {
         // make sure the email exists in the database. If not, throw an AccountNotFoundException exception.
-        Optional<User> doesUserExist = userRepository.findByEmail(user.getEmail());
-        if(!doesUserExist.isPresent()){
-            throw new AccountNotFoundException(ExceptionMessage.NO_USER_IN_DATABASE.toString());
-        }
-
+        User storedUser = findByEmail(user.getEmail());
+        if(storedUser == null)
+            throw new AccountNotFoundException(ExceptionMessage.ACCOUNT_DOES_NOT_EXISTS.toString());
         // make sure the given password and the stored password are equal. TODO: maybe this is our time to use password hashing+salting?
         // if the passwords are not equal, return Unauthorized exception.
-        if(!doesUserExist.get().getPassword().equals(user.getPassword())){
+        if (!storedUser.getPassword().equals(user.getPassword())) {
             throw new AuthenticationException(ExceptionMessage.PASSWORD_DOESNT_MATCH.toString());
         }
 
         // return a token back to facadeAuth -> user generateToken(userId) function.
-        return generateToken(doesUserExist.get().getId());
+        return generateToken(storedUser.getId());
     }
 
     /**
@@ -103,5 +100,21 @@ public class AuthService {
             throw new AccountNotFoundException(ExceptionMessage.NO_USER_IN_DATABASE.toString());
         }
         return id;
+    }
+
+    public User findById(long creatorUserId) throws AccountNotFoundException {
+        Optional<User> user = userRepository.findById(creatorUserId);
+        if (!user.isPresent())
+            throw new AccountNotFoundException(ExceptionMessage.NO_USER_IN_DATABASE.toString());
+
+        return user.get();
+    }
+
+    public User findByEmail(String email) {
+        Optional<User> user = userRepository.findByEmail(email);
+        if (!user.isPresent())
+            return null;
+
+        return user.get();
     }
 }
