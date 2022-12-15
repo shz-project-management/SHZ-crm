@@ -44,7 +44,7 @@ public enum ExceptionMessage {
     VALIDATION_FAILED("Could not approve the given information: "),
     UNAUTHORIZED_USER("You don't have the permission to do that action: "),
     WRONG_SEARCH("Something in the request wasn't properly written, try again"),
-
+    EMAIL_IN_USE("This email address is already in use"),
     CIRCULAR_FOLDERS("The destination folder is subfolder of the source folder"),
     CANT_ASSIGN_PERMISSION("Document ID or user ID or Permission does not exist in the database: "),
     USER_NOT_ACTIVATED("The user is not activated"),
