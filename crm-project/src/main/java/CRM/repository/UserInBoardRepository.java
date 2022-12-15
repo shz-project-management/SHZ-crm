@@ -1,14 +1,22 @@
 package CRM.repository;
 
+import CRM.entity.Board;
+import CRM.entity.User;
 import CRM.entity.UserInBoard;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
+
+import java.util.List;
 
 @Repository
 public interface UserInBoardRepository extends JpaRepository<UserInBoard, Long> {
 //    @Query("SELECT u FROM UserDocument u WHERE (u.document = ?1 and u.user = ?2) ")
 //    Optional<UserDocument> find(Document doc, User user);
 //
+
+    @Query("SELECT u FROM UserInBoard u WHERE u.board = ?1")
+    List<User> getUsersInBoard(Board board);
 //
 //    @Query("SELECT u FROM UserDocument u WHERE u.user = ?1")
 //    List<UserDocument> findByUser(User user);
