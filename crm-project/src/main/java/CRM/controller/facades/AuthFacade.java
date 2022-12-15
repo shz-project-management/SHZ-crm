@@ -28,16 +28,29 @@ public class AuthFacade {
      */
     public Response register(User user) {
         logger.info("in FacadeAuthController -> register");
-        // validate the data given e.g. user.getEmail -> Validations.validate(Regex.EMAIL.getRegex(), email);
-        // reminder: Validations.validate function throws an exception if failed, and doesn't return anything.
-        //           so make sure to put it in a try/catch
+        try {
+            // validate the data given e.g. user.getEmail -> Validations.validate(Regex.EMAIL.getRegex(), email);
+            // reminder: Validations.validate function throws an exception if failed, and doesn't return anything.
+            //           so make sure to put it in a try/catch
+            Validations.validateRegisteredUser(user);
 
-        // after all validations are made, call the authService to register the user with the relevant information.
-        // there's no need to send an activation email at the moment (according to Assaf).
-        // If we have time, we'll add it later on.
+            // after all validations are made, call the authService to register the user with the relevant information.
+            // there's no need to send an activation email at the moment (according to Assaf).
+            // If we have time, we'll add it later on.
+            return new Response.Builder()
+                    .data(authService.register(user))
+                    .message("The user has been successfully saved in the database")
+                    .status(HttpStatus.ACCEPTED)
+                    .statusCode(201)
+                    .build();
 
-        // make sure to return a Response class back to the controller as it doesn't know responseEntities.
-        return null;
+        } catch (IllegalArgumentException | NullPointerException e) {
+            return new Response.Builder()
+                    .message(e.getMessage())
+                    .status(HttpStatus.BAD_REQUEST)
+                    .statusCode(400)
+                    .build();
+        }
     }
 
     /**
