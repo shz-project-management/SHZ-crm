@@ -42,8 +42,9 @@ public class AuthController {
         logger.info("in AuthController -> register");
 
         // call facadeAuthController to register the user, and get a response back
-        Response response = authFacade.register(user);
-        return new ResponseEntity<>(response, response.getStatus());
+//        Response response = authFacade.register(user);
+        System.out.println("I am in register method!");
+        return new ResponseEntity<>(null, HttpStatus.ACCEPTED);
     }
 
     /**
