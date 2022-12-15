@@ -80,7 +80,7 @@ public class Validations {
     public static <T> T doesIdExists(Long id, JpaRepository repo){
         Optional<T> item = repo.findById(id);
         if(!item.isPresent())
-            throw new NoSuchElementException("Could not find this id in the database.");
+            throw new NoSuchElementException(ExceptionMessage.NO_SUCH_ID.toString());
 
         return item.get();
     }

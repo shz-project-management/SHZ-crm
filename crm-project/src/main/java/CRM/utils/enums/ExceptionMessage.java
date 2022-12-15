@@ -40,7 +40,7 @@ public enum ExceptionMessage {
     UNAUTHORIZED("You are unauthorized to create such a action"),
     FOLDER_EXISTS("This folder ID already exist in the database: "),
     FOLDER_DOES_NOT_EXISTS("This folder ID does not exist in the database: "),
-
+    NO_SUCH_ID("Could not locate this ID in the database"),
     VALIDATION_FAILED("Could not approve the given information: "),
     UNAUTHORIZED_USER("You don't have the permission to do that action: "),
     WRONG_SEARCH("Something in the request wasn't properly written, try again"),
