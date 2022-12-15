@@ -32,7 +32,6 @@ public class BoardFacade {
      * This function creates a new board. It validates the board name using the NAME regex from the Regex enum,
      * finds the creator user using the creatorUserId from the BoardRequest object, creates a new Board object,
      * and calls the create function in the BoardService class to persist the board to the database.
-     *
      * @param boardRequest The request body, containing the necessary information to create a new board.
      * @return A Response object with the status of the create operation and the created board object, or an error message if the operation fails.
      */
@@ -55,7 +54,6 @@ public class BoardFacade {
 
     /**
      * Deletes a board with the given ID.
-     *
      * @param boardID the ID of the board to delete
      * @return a response object indicating the status of the deletion operation
      * @throws NoSuchElementException if no board with the given ID exists
