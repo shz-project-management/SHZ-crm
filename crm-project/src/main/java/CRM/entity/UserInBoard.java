@@ -30,4 +30,12 @@ public class UserInBoard {
     @Column(name = "permission")
     @Cascade(org.hibernate.annotations.CascadeType.ALL)
     private Permission permission;
+
+    public static UserInBoard adminUserInBoard(User creatorUser, Board dbBoard) {
+        UserInBoard userInBoard = new UserInBoard();
+        userInBoard.setBoard(dbBoard);
+        userInBoard.setUser(creatorUser);
+        userInBoard.setPermission(Permission.ADMIN);
+        return userInBoard;
+    }
 }

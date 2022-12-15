@@ -2,6 +2,7 @@ package CRM.service;
 
 import CRM.entity.Board;
 import CRM.entity.User;
+import CRM.entity.UserInBoard;
 import CRM.repository.BoardRepository;
 import CRM.repository.UserInBoardRepository;
 import CRM.repository.UserRepository;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Service;
 import javax.security.auth.login.AccountNotFoundException;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.stream.Collectors;
 
 @Service
 public class UserService {
@@ -71,15 +73,18 @@ public class UserService {
     }
 
     /**
-     * Retrieves a list of all users in a specified board.
-     * @param boardId   the ID of the board to retrieve users from
-     * @return          a List of User objects representing the users in the board
-     * @throws NoSuchElementException if the specified board does not exist
+     * This method is used to retrieve all the users in a board with the specified id.
+     * @param boardId The id of the board whose users are to be retrieved.
+     * @return A list containing all the users in the board with the specified id.
+     * @throws NoSuchElementException if the board with the specified id is not found.
+     * @throws IllegalArgumentException if the specified board id is invalid.
+     * @throws NullPointerException if the specified board id is null.
      */
     public List<User> getAllInBoard(long boardId) {
         try {
             Board board = Validations.doesIdExists(boardId, boardRepository);
-            return userInBoardRepository.getUsersInBoard(board);
+            List<UserInBoard> usersInBoard = userInBoardRepository.findAllUserByBoard(board);
+            return usersInBoard.stream().map(UserInBoard::getUser).collect(Collectors.toList());
         } catch (NoSuchElementException e) {
             throw new NoSuchElementException(ExceptionMessage.NO_SUCH_ID.toString());
         }

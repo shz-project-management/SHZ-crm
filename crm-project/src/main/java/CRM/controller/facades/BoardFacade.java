@@ -8,7 +8,6 @@ import CRM.entity.response.Response;
 import CRM.service.AuthService;
 import CRM.service.BoardService;
 import CRM.utils.Validations;
-import CRM.utils.enums.ExceptionMessage;
 import CRM.utils.enums.Regex;
 import CRM.utils.enums.SuccessMessage;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,17 +57,83 @@ public class BoardFacade {
      * @return a response object indicating the status of the deletion operation
      * @throws NoSuchElementException if no board with the given ID exists
      */
-    public Response delete(long id) {
+    public Response delete(Long id) {
+        Validations.validate(String.valueOf(id), Regex.ID.getRegex());
         try{
-            Board board = boardService.findById(id);
-            boardService.delete(board);
+            boardService.delete(id);
             return new Response.Builder()
                     .status(HttpStatus.OK)
                     .statusCode(200)
                     .message(SuccessMessage.DELETED.toString())
                     .build();
-        }catch(NoSuchElementException e) {
+        }catch(NoSuchElementException | NullPointerException | IllegalArgumentException e) {
             return new Response.Builder().message(e.getMessage()).status(HttpStatus.BAD_REQUEST).statusCode(400).build();
+        }
+    }
+
+    /**
+
+     This method is used to retrieve a board with the specified id.
+     @param id The id of the board to be retrieved.
+     @return A Response object containing the retrieved board or an error message if the board is not found or the id is invalid.
+     @throws NoSuchElementException if the board with the specified id is not found.
+     @throws IllegalArgumentException if the specified id is invalid.
+     @throws NullPointerException if the specified id is null.
+     */
+    public Response get(Long id) {
+        try {
+            Validations.validate(String.valueOf(id), Regex.ID.getRegex());
+            return new Response.Builder()
+                    .data(boardService.get(id))
+                    .message(SuccessMessage.FOUND.toString())
+                    .status(HttpStatus.OK)
+                    .statusCode(200)
+                    .build();
+        } catch (NoSuchElementException | IllegalArgumentException | NullPointerException e) {
+            return new Response.Builder()
+                    .message(e.getMessage())
+                    .status(HttpStatus.BAD_REQUEST)
+                    .statusCode(400)
+                    .build();
+        }
+    }
+
+    /**
+     This method is used to retrieve all the boards.
+     @return A Response object containing all the retrieved boards.
+     */
+    public Response getAll() {
+        return new Response.Builder()
+                .data(boardService.getAll())
+                .message(SuccessMessage.FOUND.toString())
+                .status(HttpStatus.OK)
+                .statusCode(200)
+                .build();
+    }
+
+    /**
+     This method is used to retrieve all the boards created by a user with the specified id.
+     @param userId The id of the user whose boards are to be retrieved.
+     @return A Response object containing all the retrieved boards or an error message if the user is not found or the id is invalid.
+     @throws IllegalArgumentException if the specified user id is invalid.
+     @throws NullPointerException if the specified user id is null.
+     @throws NoSuchElementException if the user with the specified id is not found.
+     */
+    public Response getAllBoardsOfUser(Long userId) {
+        try {
+            Validations.validate(String.valueOf(userId), Regex.ID.getRegex());
+            return new Response.Builder()
+                    .data(boardService.getAllBoardsOfUser(userId))
+                    .message(SuccessMessage.FOUND.toString())
+                    .status(HttpStatus.OK)
+                    .statusCode(200)
+                    .build();
+        } catch (IllegalArgumentException | NullPointerException | NoSuchElementException e){
+            return new Response.Builder()
+                    .message(e.getMessage())
+                    .status(HttpStatus.BAD_REQUEST)
+                    .statusCode(400)
+                    .build();
         }
     }
 }
