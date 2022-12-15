@@ -57,6 +57,7 @@ public class AuthController {
     @RequestMapping(value = "login", method = RequestMethod.POST, consumes = "application/json")
     public ResponseEntity<Response> login(@RequestBody User user) {
         logger.info("in AuthController -> login");
+
         Response response = authFacade.login(user);
         return new ResponseEntity<>(response, response.getStatus());
     }
