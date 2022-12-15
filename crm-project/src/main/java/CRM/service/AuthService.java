@@ -80,7 +80,6 @@ public class AuthService {
 
     /**
      * generateToken is a function that creates a unique JWT token for every logged-in user.
-     *
      * @param id - the ID of the login user
      * @return generated token according to: io.jsonwebtoken.Jwts library
      */
@@ -91,7 +90,6 @@ public class AuthService {
     /**
      * called by functions to check if the token is a valid user token
      * and checks if we have the user id we got from the Validations.validateToken(token) in the database.
-     *
      * @return - id of user
      */
     public Long checkTokenToUserInDB(String token) throws AccountNotFoundException {
