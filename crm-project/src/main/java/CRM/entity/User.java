@@ -1,5 +1,6 @@
 package CRM.entity;
 
+import CRM.entity.requests.RegisterUserRequest;
 import lombok.*;
 
 import javax.persistence.*;
@@ -28,6 +29,16 @@ public class User {
 
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Item> items;
+
+
+    public static User newUser(RegisterUserRequest registerUser){
+        User user = new User();
+        user.setEmail(registerUser.getEmail());
+        user.setPassword(registerUser.getPassword());
+        user.setFirstName(registerUser.getFirstName());
+        user.setLastName(registerUser.getLastName());
+        return user;
+    }
 
     @Override
     public boolean equals(Object o) {
