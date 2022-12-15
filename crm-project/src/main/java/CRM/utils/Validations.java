@@ -2,7 +2,6 @@ package CRM.utils;
 
 import CRM.entity.Comment;
 import CRM.entity.Item;
-import CRM.entity.User;
 import CRM.entity.requests.LoginUserRequest;
 import CRM.entity.requests.RegisterUserRequest;
 import CRM.utils.enums.ExceptionMessage;
@@ -18,11 +17,11 @@ public class Validations {
     private static Logger logger = LogManager.getLogger(Validations.class.getName());
 
     /**
-     * validate is called from AuthController when we need to validate a given input such as email or password,
-     * the validation process is according to enum regex we created.
-     *
-     * @param regex - the type we check on from email or password.
-     * @param data  - the input to check on.
+     * Validates the provided data against the given regular expression.
+     * @param data The data to validate.
+     * @param regex The regular expression to use for validation.
+     * @throws IllegalArgumentException If the provided data does not match the regular expression.
+     * @throws NullPointerException If the provided data is null.
      */
     public static void validate(String data, String regex) throws IllegalArgumentException, NullPointerException {
         logger.info("in Validations -> validate");
@@ -40,6 +39,10 @@ public class Validations {
         }
     }
 
+    /**
+     * Validates the provided RegisterUserRequest object.
+     * @param user The RegisterUserRequest object to validate.
+     */
     public static void validateRegisteredUser(RegisterUserRequest user){
         validate(user.getEmail(), Regex.EMAIL.getRegex());
         validate(user.getPassword(), Regex.PASSWORD.getRegex());
@@ -47,6 +50,11 @@ public class Validations {
         validate(user.getLastName(), Regex.NAME.getRegex());
     }
 
+    /**
+     * Validates the provided LoginUserRequest object.
+     *
+     * @param user The LoginUserRequest object to validate.
+     */
     public static void validateLoginUser(LoginUserRequest user){
         validate(user.getEmail(), Regex.EMAIL.getRegex());
         validate(user.getPassword(), Regex.PASSWORD.getRegex());
@@ -60,11 +68,14 @@ public class Validations {
         // validate each field of the comment using validate(regex, field)
     }
 
+
     /**
-     * validateToken is a function that check given token if it actual valid token and return id.
+     * Validates the provided token and returns the user id associated with it.
      *
-     * @param token - the token input.
-     * @return - id of user.
+     * @param token The token to validate.
+     * @return The user id associated with the token.
+     * @throws NullPointerException If the provided token is null.
+     * @throws IllegalArgumentException If the provided token is not a valid format.
      */
     public static Long validateToken(String token) {
         logger.info("in Validations -> validateToken");
@@ -77,8 +88,6 @@ public class Validations {
             logger.error("in Validations -> validateToken -> " + ExceptionMessage.ILLEGAL_AUTH_HEADER);
             throw new IllegalArgumentException(ExceptionMessage.ILLEGAL_AUTH_HEADER.toString());
         }
-
-        //FIXME: instead of validating here, use our "validate" function, giving it a token and a regex that checks its validity
 
         token = token.substring(7, token.length());
         Claims claims = ConfirmationToken.decodeJWT(token);
