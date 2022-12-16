@@ -16,7 +16,7 @@ public enum ExceptionMessage {
     NULL_INPUT("cannot set the content of the argument to null"),
     TOKEN_IS_NULL("token is null"),
     EMPTY_NOTNULL_FIELD("Not null fields must be filled out before creation"),
-    FIELDS_OF_OBJECT("Something went wrong when tried to get object's fields..."),
+    FIELD_OBJECT_NOT_EXISTS("Field object doesn't exists"),
     RUNTIME("Runtime exception"),
     NEGATIVE_FIELD("This field can not be negative"),
     TOO_SHORT_STRING("This field can not be as short as inserted"),
@@ -48,6 +48,7 @@ public enum ExceptionMessage {
     CIRCULAR_FOLDERS("The destination folder is subfolder of the source folder"),
     CANT_ASSIGN_PERMISSION("Document ID or user ID or Permission does not exist in the database: "),
     USER_NOT_ACTIVATED("The user is not activated"),
+    WRONG_INPUT_TYPE("Could not insert such input to the field"),
     USER_IS_NOT_THE_ADMIN("The user is not the admin of the document");
 
     private final String message;

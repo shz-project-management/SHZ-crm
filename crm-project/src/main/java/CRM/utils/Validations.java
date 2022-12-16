@@ -9,10 +9,13 @@ import CRM.utils.enums.Regex;
 import io.jsonwebtoken.Claims;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.aspectj.apache.bcel.classfile.ClassFormatException;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.lang.reflect.Field;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -109,4 +112,24 @@ public class Validations {
         Claims claims = ConfirmationToken.decodeJWT(token);
         return Long.valueOf(claims.getId());
     }
+
+
+    public static <T> void checkIfFieldExists(T object, String fieldName, Object content) throws NoSuchFieldException, IllegalAccessException {
+        for (Field field : object.getClass().getDeclaredFields()) {
+            field.setAccessible(true);
+            Object value = field.get(object);
+            if(value == null){
+                continue;
+            }
+            if(!field.getName().equals(fieldName)){
+                continue;
+            }
+            if(!(value.getClass().equals(content.getClass()))){
+                value.getClass().cast(content);
+            }
+            return;
+        }
+        throw new NoSuchFieldException(ExceptionMessage.FIELD_OBJECT_NOT_EXISTS.toString());
+    }
+
 }
