@@ -39,7 +39,7 @@ public class BoardController {
      * @return A ResponseEntity with the appropriate status and response body.
      */
     @DeleteMapping(value = "{id}")
-    public ResponseEntity<Response> create(@PathVariable Long id) {
+    public ResponseEntity<Response> delete(@PathVariable Long id) {
         Response response = boardFacade.delete(id);
         return new ResponseEntity<>(response, response.getStatus());
     }
