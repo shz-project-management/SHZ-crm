@@ -9,6 +9,7 @@ import CRM.repository.BoardRepository;
 import CRM.repository.UserInBoardRepository;
 import CRM.repository.UserRepository;
 import CRM.utils.enums.Permission;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -21,8 +22,7 @@ import org.springframework.dao.DataAccessException;
 
 import javax.security.auth.login.AccountNotFoundException;
 
-import java.util.NoSuchElementException;
-import java.util.Optional;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.BDDMockito.given;
@@ -32,20 +32,15 @@ class BoardServiceTest {
 
     @Mock
     private BoardRepository boardRepository;
-
     @Mock
     private UserInBoardRepository userInBoardRepository;
-
     @Mock
     private UserRepository userRepository;
-
     @InjectMocks
     private BoardService boardService;
-
     private RegisterUserRequest correctRegisterUserRequest;
     private User expectedUser;
     private Board board;
-
 
     @BeforeEach
     void setUp() {
@@ -53,7 +48,6 @@ class BoardServiceTest {
         expectedUser = User.newUser(correctRegisterUserRequest);
         board = Board.createBoard(expectedUser, "board", "nice");
     }
-
 
     @Test
     @DisplayName("Test that create function correctly saves board to repository and returns it")
@@ -76,21 +70,20 @@ class BoardServiceTest {
         assertThrows(NullPointerException.class, () -> boardService.create(board));
     }
 
-
     @Test
     @DisplayName("Test that delete function correctly deletes board from repository and returns true")
     public void testDeleteDeletesBoard() throws AccountNotFoundException {
-        Long boardId = board.getId();
-        given(boardRepository.findById(boardId)).willReturn(Optional.of(board));
-        assertTrue(boardService.delete(boardId));
+        board.setId(1L);
+        given(boardRepository.findById(board.getId())).willReturn(Optional.of(board));
+        assertTrue(boardService.delete(board.getId()));
     }
 
     @Test
     @DisplayName("Test that delete function correctly deletes all UserInBoard objects associated with board from repository")
     public void testDeleteDeletesUserInBoard() throws AccountNotFoundException {
-        Long boardId = board.getId();
-        given(boardRepository.findById(boardId)).willReturn(Optional.of(board));
-        boardService.delete(boardId);
+        board.setId(1L);
+        given(boardRepository.findById(board.getId())).willReturn(Optional.of(board));
+        boardService.delete(board.getId());
         assertTrue(userInBoardRepository.findAllBoardByUser(board.getCreatorUser()).isEmpty());
     }
 
@@ -107,16 +100,69 @@ class BoardServiceTest {
         assertThrows(NullPointerException.class, () -> boardService.delete(null));
     }
 
-
     @Test
-    void get() {
+    @DisplayName("Test that get function correctly retrieves board from repository")
+    public void testGetRetrievesBoard() throws AccountNotFoundException {
+        board.setId(1L);
+        given(boardRepository.findById(board.getId())).willReturn(Optional.of(board));
+        assertEquals(board, boardService.get(board.getId()));
     }
 
     @Test
-    void getAll() {
+    @DisplayName("Test that get function throws AccountNotFoundException if board does not exist in repository")
+    public void testGetWithNonExistentBoardThrowsException() {
+        given(boardRepository.findById(123L)).willReturn(Optional.empty());
+        assertThrows(NoSuchElementException.class, () -> boardService.get(123L));
     }
 
     @Test
-    void getAllBoardsOfUser() {
+    @DisplayName("Test that get function throws NullPointerException if board is null")
+    public void testGetWithNullBoardThrowsException() {
+        assertThrows(NullPointerException.class, () -> boardService.get(null));
+    }
+
+    @Test
+    @DisplayName("Test that getAll function correctly retrieves all boards from repository")
+    public void testGetAllRetrievesAllBoards() {
+        List<Board> boards = Collections.singletonList(board);
+        given(boardRepository.findAll()).willReturn(boards);
+        assertEquals(boards, boardService.getAll());
+    }
+
+    @Test
+    @DisplayName("Test that getAllBoardsOfUser function correctly retrieves all boards that user is a member of")
+    public void testGetAllBoardsOfUserRetrievesCorrectBoards() throws AccountNotFoundException {
+        board.setId(1L);
+        expectedUser.setId(1L);
+        Board boardTwo = Board.createBoard(expectedUser, "second board", "nice");
+        boardTwo.setId(2L);
+        UserInBoard userInBoard1 = UserInBoard.adminUserInBoard(expectedUser, board);
+        UserInBoard userInBoard2 = UserInBoard.adminUserInBoard(expectedUser, boardTwo);
+        List<UserInBoard> userInBoards = Arrays.asList(userInBoard1, userInBoard2);
+        given(userRepository.findById(expectedUser.getId())).willReturn(Optional.of(expectedUser));
+        given(userInBoardRepository.findAllBoardByUser(expectedUser)).willReturn(userInBoards);
+        assertEquals(Arrays.asList(board, boardTwo), boardService.getAllBoardsOfUser(expectedUser.getId()));
+    }
+
+    @Test
+    @DisplayName("Test that getAllBoardsOfUser function returns empty list if user is not a member of any boards")
+    public void testGetAllBoardsOfUserWithNoBoardsReturnsEmptyList() throws AccountNotFoundException {
+        expectedUser.setId(1L);
+        given(userRepository.findById(expectedUser.getId())).willReturn(Optional.of(expectedUser));
+        given(userInBoardRepository.findAllBoardByUser(expectedUser)).willReturn(Collections.emptyList());
+        assertTrue(boardService.getAllBoardsOfUser(expectedUser.getId()).isEmpty());
+    }
+
+    @Test
+    @DisplayName("Test that getAllBoardsOfUser function throws NoSuchElementException if user does not exist in repository")
+    public void testGetAllBoardsOfUserWithNonExistentUserThrowsException() {
+        given(userRepository.findById(123L)).willReturn(Optional.empty());
+        assertThrows(NoSuchElementException.class, () -> boardService.getAllBoardsOfUser(123L));
+    }
+
+    @Test
+    @DisplayName("Test that getAllBoardsOfUser function throws NullPointerException if userId is null")
+    public void testGetAllBoardsOfUserWithNullUserThrowsException() {
+        assertThrows(NullPointerException.class, () -> boardService.getAllBoardsOfUser(null));
     }
 }
