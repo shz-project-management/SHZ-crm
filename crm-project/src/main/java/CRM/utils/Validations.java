@@ -79,8 +79,8 @@ public class Validations {
      * @throws IllegalArgumentException if the board name or creator user id does not match the expected format
      */
     public static boolean validateNewBoard(BoardRequest board) {
-        validate(board.getName(), Regex.BOARD_NAME.getRegex());
         validate(board.getCreatorUserId().toString(), Regex.ID.getRegex());
+        validate(board.getName(), Regex.BOARD_NAME.getRegex());
         return true;
     }
 

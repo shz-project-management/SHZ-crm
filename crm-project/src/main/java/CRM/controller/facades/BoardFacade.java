@@ -76,7 +76,7 @@ public class BoardFacade {
                     .statusCode(204)
                     .message(SuccessMessage.DELETED.toString())
                     .build();
-        }catch(NoSuchElementException | IllegalArgumentException e) {
+        }catch(AccountNotFoundException | NoSuchElementException | IllegalArgumentException e) {
             return new Response.Builder()
                     .message(e.getMessage())
                     .status(HttpStatus.BAD_REQUEST)
@@ -109,7 +109,7 @@ public class BoardFacade {
                     .status(HttpStatus.OK)
                     .statusCode(200)
                     .build();
-        } catch (NoSuchElementException | IllegalArgumentException e) {
+        } catch (AccountNotFoundException | NoSuchElementException | IllegalArgumentException e) {
             return new Response.Builder()
                     .message(e.getMessage())
                     .status(HttpStatus.BAD_REQUEST)
@@ -154,7 +154,7 @@ public class BoardFacade {
                     .status(HttpStatus.OK)
                     .statusCode(200)
                     .build();
-        } catch (IllegalArgumentException | NoSuchElementException e){
+        } catch (AccountNotFoundException | IllegalArgumentException | NoSuchElementException e){
             return new Response.Builder()
                     .message(e.getMessage())
                     .status(HttpStatus.BAD_REQUEST)
