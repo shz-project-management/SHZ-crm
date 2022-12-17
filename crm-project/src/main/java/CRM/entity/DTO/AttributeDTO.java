@@ -18,6 +18,7 @@ public class AttributeDTO {
 
     public static AttributeDTO createAttributeDTO(Attribute attribute){
         AttributeDTO attributeDTO = new AttributeDTO();
+        attributeDTO.setId(attributeDTO.getId());
         attributeDTO.setBelongsTo(attribute.getBoard());
         attributeDTO.setName(attribute.getName());
         attributeDTO.setDescription(attributeDTO.getDescription());

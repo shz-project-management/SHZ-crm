@@ -17,6 +17,11 @@ public class StatusService implements AttributeService {
         return 0;
     }
 
+    /**
+     * This function persists a new Status to the database by calling the save function in the StatusRepository class.
+     * @param status The status object to be persisted.
+     * @return The persisted status object.
+     */
     @Override
     public Status create(Attribute status) {
         return statusRepository.save((Status) status);

@@ -4,7 +4,6 @@ import CRM.entity.*;
 import CRM.entity.DTO.AttributeDTO;
 import CRM.entity.requests.AttributeRequest;
 import CRM.entity.response.Response;
-import CRM.repository.StatusRepository;
 import CRM.service.AttributeService;
 import CRM.service.BoardService;
 import CRM.service.StatusService;
@@ -23,14 +22,25 @@ public class AttributeFacade {
 
     @Autowired
     private StatusService statusService;
+
     @Autowired
     private TypeService typeService;
 
     @Autowired
     private BoardService boardService;
-    @Autowired
-    private StatusRepository statusRepository;
 
+    /**
+     * This function creates a new attribute which could be status or type, both classes inherit from attribute and have no extra data.
+     * It validates the attribute name using the NAME regex from the Regex enum,
+     * finds the board it belongs to using the getBoardId from the attributeRequest object, creates a new Attribute object,
+     * and calls the create function in the service that matches the class type that we get as a parameter,
+     * with the help of convertFromClassToService function which gives us the relevant service based on clz Class which will hold Status or Type
+     * the create function that we called will persist the attribute into the database.
+     * @param attributeRequest The request body, containing the necessary information to create a new attribute.
+     *                         for info is the same for both classes Status and Type.
+     * @param clz hold the Class type of the attributeRequest details (Status or Type)
+     * @return A Response object with the status of the create operation and the created attribute object, or an error message if the operation fails.
+     */
     public Response create(AttributeRequest attributeRequest, Class clz) {
         try{
             Validations.validate(attributeRequest.getName(), Regex.NAME.getRegex());
