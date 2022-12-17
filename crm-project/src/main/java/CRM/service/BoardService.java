@@ -34,6 +34,7 @@ public class BoardService {
 
     /**
      * This function persists a new board to the database by calling the save function in the BoardRepository class.
+     *
      * @param board The board object to be persisted.
      * @return The persisted board object.
      */
@@ -45,30 +46,33 @@ public class BoardService {
 
     /**
      * Deletes the given board from the repository.
+     *
      * @param boardId the board ID to delete
      */
-    public void delete(Long boardId) {
+    public boolean delete(Long boardId) throws AccountNotFoundException {
         Board board = Validations.doesIdExists(boardId, boardRepository);
         userInBoardRepository.deleteAllByBoard(board);
         boardRepository.delete(board);
-
+        return true;
     }
 
 
     /**
      * This method is used to retrieve a board with the specified id.
+     *
      * @param id The id of the board to be retrieved.
      * @return The retrieved board.
-     * @throws NoSuchElementException if the board with the specified id is not found.
+     * @throws NoSuchElementException   if the board with the specified id is not found.
      * @throws IllegalArgumentException if the specified id is invalid.
-     * @throws NullPointerException if the specified id is null.
+     * @throws NullPointerException     if the specified id is null.
      */
-    public Board get(Long id){
+    public Board get(Long id) throws AccountNotFoundException {
         return Validations.doesIdExists(id, boardRepository);
     }
 
     /**
      * This method is used to retrieve all the boards.
+     *
      * @return A list containing all the boards.
      */
     public List<Board> getAll() {
@@ -77,19 +81,16 @@ public class BoardService {
 
     /**
      * This method is used to retrieve all the boards created by a user with the specified id.
+     *
      * @param userId The id of the user whose boards are to be retrieved.
      * @return A list containing all the boards created by the user with the specified id.
-     * @throws NoSuchElementException if the user with the specified id is not found.
+     * @throws NoSuchElementException   if the user with the specified id is not found.
      * @throws IllegalArgumentException if the specified user id is invalid.
-     * @throws NullPointerException if the specified user id is null.
+     * @throws NullPointerException     if the specified user id is null.
      */
-    public List<Board> getAllBoardsOfUser(Long userId) {
-        try {
-            User user = Validations.doesIdExists(userId, userRepository);
-            List<UserInBoard> userInBoard = userInBoardRepository.findAllBoardByUser(user);
-            return userInBoard.stream().map(UserInBoard::getBoard).collect(Collectors.toList());
-        } catch (NoSuchElementException e) {
-            throw new NoSuchElementException(ExceptionMessage.NO_SUCH_ID.toString());
-        }
+    public List<Board> getAllBoardsOfUser(Long userId) throws AccountNotFoundException {
+        User user = Validations.doesIdExists(userId, userRepository);
+        List<UserInBoard> userInBoard = userInBoardRepository.findAllBoardByUser(user);
+        return userInBoard.stream().map(UserInBoard::getBoard).collect(Collectors.toList());
     }
 }

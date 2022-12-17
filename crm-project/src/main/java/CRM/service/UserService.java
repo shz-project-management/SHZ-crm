@@ -32,6 +32,7 @@ public class UserService {
 
     /**
      * findByEmail search in the database for a user based on the email we have.
+     *
      * @param email - user's email
      * @return entity of user that found in database.
      */
@@ -47,6 +48,7 @@ public class UserService {
 
     /**
      * Retrieves a user from the database by their ID.
+     *
      * @param userId the ID of the user to retrieve
      * @return a User object with the specified ID
      * @throws AccountNotFoundException if no user with the specified ID exists in the database
@@ -66,6 +68,7 @@ public class UserService {
 
     /**
      * Returns a list of all the users that exist in the database.
+     *
      * @return a list of all users in the repository
      */
     public List<User> getAll() {
@@ -74,20 +77,17 @@ public class UserService {
 
     /**
      * This method is used to retrieve all the users in a board with the specified id.
+     *
      * @param boardId The id of the board whose users are to be retrieved.
      * @return A list containing all the users in the board with the specified id.
-     * @throws NoSuchElementException if the board with the specified id is not found.
+     * @throws NoSuchElementException   if the board with the specified id is not found.
      * @throws IllegalArgumentException if the specified board id is invalid.
-     * @throws NullPointerException if the specified board id is null.
+     * @throws NullPointerException     if the specified board id is null.
      */
-    public List<User> getAllInBoard(long boardId) {
-        try {
-            Board board = Validations.doesIdExists(boardId, boardRepository);
-            List<UserInBoard> usersInBoard = userInBoardRepository.findAllUserByBoard(board);
-            return usersInBoard.stream().map(UserInBoard::getUser).collect(Collectors.toList());
-        } catch (NoSuchElementException e) {
-            throw new NoSuchElementException(ExceptionMessage.NO_SUCH_ID.toString());
-        }
+    public List<User> getAllInBoard(long boardId) throws AccountNotFoundException {
+        Board board = Validations.doesIdExists(boardId, boardRepository);
+        List<UserInBoard> usersInBoard = userInBoardRepository.findAllUserByBoard(board);
+        return usersInBoard.stream().map(UserInBoard::getUser).collect(Collectors.toList());
     }
 
 }

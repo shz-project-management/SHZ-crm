@@ -1,11 +1,13 @@
 package CRM.controller.controllers;
 
 import CRM.controller.facades.AuthFacade;
+import CRM.entity.Board;
 import CRM.entity.User;
 import CRM.entity.requests.LoginUserRequest;
 import CRM.entity.requests.RegisterUserRequest;
 import CRM.entity.response.Response;
 import CRM.utils.Common;
+import CRM.utils.Validations;
 import lombok.AllArgsConstructor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -64,7 +66,6 @@ public class AuthController {
 
 //    @RequestMapping(value = "query", method = RequestMethod.GET)
 //    public ResponseEntity<String> query() {
-//
 //        Map<String, List<String>> filters = new HashMap<>();
 //
 //        List<String> types = new ArrayList<>();
@@ -86,7 +87,7 @@ public class AuthController {
 //        filters.put("importance", importances);
 //
 //        return new ResponseEntity<>(Common.generateQuery(filters), HttpStatus.OK);
-//    }
+    }
 
 //    /**
 //     * Activate function is responsible for activating email links.
@@ -102,7 +103,3 @@ public class AuthController {
 //        Response response = facadeAuth.activate(token);
 //        return new ResponseEntity<>(response, response.getStatus());
 //    }
-
-
-
-}
