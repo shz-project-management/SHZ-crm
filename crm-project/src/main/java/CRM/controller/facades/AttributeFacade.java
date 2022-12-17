@@ -55,7 +55,7 @@ public class AttributeFacade {
                     .statusCode(201)
                     .data(AttributeDTO.createAttributeDTO(savedAttribute))
                     .build();
-        }catch(IllegalArgumentException | NonUniqueObjectException | AccountNotFoundException e) {
+        }catch(AccountNotFoundException | IllegalArgumentException | NonUniqueObjectException e) {
             return new Response.Builder()
                     .message(e.getMessage())
                     .status(HttpStatus.BAD_REQUEST)
