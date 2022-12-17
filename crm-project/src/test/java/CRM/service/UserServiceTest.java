@@ -126,9 +126,9 @@ public class UserServiceTest {
         when(boardRepository.findById(1L)).thenReturn(Optional.of(board1));
         when(userInBoardRepository.findAllUserByBoard(board1))
                 .thenReturn(Arrays.asList(
-                 UserInBoard.userInBoardUser(new User(1L, "Ziv1", "Hausler", "ziv123456", "ziv1@gmail.com", null, null), Board.createBoard(user1, "hello", "world"), Permission.ADMIN),
-                 UserInBoard.userInBoardUser(new User(2L, "Ziv2", "Hausler", "ziv123456", "ziv2@gmail.com", null, null), Board.createBoard(user1, "hello", "world"), Permission.USER),
-                 UserInBoard.userInBoardUser(new User(3L, "Ziv3", "Hausler", "ziv123456", "ziv3@gmail.com", null, null), Board.createBoard(user1, "hello", "world"), Permission.USER)
+                 UserInBoard.userInBoardUserChoosePermission(new User(1L, "Ziv1", "Hausler", "ziv123456", "ziv1@gmail.com", null, null), Board.createBoard(user1, "hello", "world"), Permission.ADMIN),
+                 UserInBoard.userInBoardUserChoosePermission(new User(2L, "Ziv2", "Hausler", "ziv123456", "ziv2@gmail.com", null, null), Board.createBoard(user1, "hello", "world"), Permission.USER),
+                 UserInBoard.userInBoardUserChoosePermission(new User(3L, "Ziv3", "Hausler", "ziv123456", "ziv3@gmail.com", null, null), Board.createBoard(user1, "hello", "world"), Permission.USER)
         ));
         List<User> users = userService.getAllInBoard(1L);
 
