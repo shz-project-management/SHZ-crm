@@ -45,7 +45,6 @@ class BoardFacadeTest {
     private BoardFacade boardFacade;
 
     private RegisterUserRequest correctRegisterUserRequest;
-    private BoardRequest correctBoardRequest;
     private User user;
     private Board board;
 
