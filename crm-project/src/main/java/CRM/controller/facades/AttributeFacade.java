@@ -1,6 +1,7 @@
 package CRM.controller.facades;
 
 import CRM.entity.*;
+import CRM.entity.requests.AttributeRequest;
 import CRM.entity.response.Response;
 import CRM.service.AttributeService;
 import CRM.service.StatusService;
@@ -18,6 +19,10 @@ public class AttributeFacade {
     private StatusService statusService;
     @Autowired
     private TypeService typeService;
+
+    public Response create(AttributeRequest statusRequest) {
+        return null;
+    }
 
     public Response updateAttribute(Long itemId, Attribute object){
         // validate the id using Validations.validate
