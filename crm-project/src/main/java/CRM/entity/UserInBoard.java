@@ -38,4 +38,12 @@ public class UserInBoard {
         userInBoard.setPermission(Permission.ADMIN);
         return userInBoard;
     }
+
+    public static UserInBoard userInBoardUser(User user, Board board) {
+        UserInBoard userInBoard = new UserInBoard();
+        userInBoard.setBoard(board);
+        userInBoard.setUser(user);
+        userInBoard.setPermission(Permission.USER);
+        return userInBoard;
+    }
 }
