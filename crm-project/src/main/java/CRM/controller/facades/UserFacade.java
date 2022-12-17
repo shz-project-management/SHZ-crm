@@ -4,17 +4,13 @@ import CRM.entity.DTO.UserInBoardDTO;
 import CRM.entity.response.Response;
 import CRM.service.UserService;
 import CRM.utils.Validations;
-import CRM.utils.enums.ExceptionMessage;
 import CRM.utils.enums.Regex;
 import CRM.utils.enums.SuccessMessage;
-import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
 import javax.security.auth.login.AccountNotFoundException;
-import java.sql.SQLException;
-import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.NoSuchElementException;
 
 @Component
@@ -25,6 +21,7 @@ public class UserFacade {
 
     /**
      * Retrieves a user by their unique ID.
+     *
      * @param id The unique ID of the user to retrieve.
      * @return A {@link Response} object containing the retrieved user, or an error message if the user
      * could not be found.
@@ -56,7 +53,47 @@ public class UserFacade {
     }
 
     /**
+     * Deletes a user from the database.
+     *
+     * @param id the id of the user to delete
+     * @return a Response object with a message, status, and status code indicating the result of the delete operation
+     * if the delete operation was successful, the message field will contain the SuccessMessage.FOUND message,
+     * the status field will be HttpStatus.OK, and the statusCode field will be 200
+     * if the user with the given id does not exist in the database, the message field will contain the
+     * AccountNotFoundException message, the status field will be HttpStatus.BAD_REQUEST, and the statusCode field
+     * will be 400
+     * if the id input is invalid, the message field will contain the IllegalArgumentException message,
+     * the status field will be HttpStatus.BAD_REQUEST, and the statusCode field will be 400
+     * if there is a null pointer exception, the message field will contain the NullPointerException message,
+     * the status field will be HttpStatus.BAD_REQUEST, and the statusCode field will be 500
+     */
+    public Response delete(Long id) {
+        try {
+            Validations.validate(id, Regex.ID.getRegex());
+            return new Response.Builder()
+                    .data(userService.delete(id))
+                    .message(SuccessMessage.FOUND.toString())
+                    .status(HttpStatus.OK)
+                    .statusCode(200)
+                    .build();
+        } catch (AccountNotFoundException | IllegalArgumentException e) {
+            return new Response.Builder()
+                    .message(e.getMessage())
+                    .status(HttpStatus.BAD_REQUEST)
+                    .statusCode(400)
+                    .build();
+        } catch (NullPointerException e) {
+            return new Response.Builder()
+                    .message(e.getMessage())
+                    .status(HttpStatus.BAD_REQUEST)
+                    .statusCode(500)
+                    .build();
+        }
+    }
+
+    /**
      * Retrieves all users.
+     *
      * @return A {@link Response} object containing a list of all users.
      */
     public Response getAll() {
@@ -70,6 +107,7 @@ public class UserFacade {
 
     /**
      * Provides an HTTP response for a request for a list of all users in a specified board.
+     *
      * @param boardId the ID of the board to retrieve users from
      * @return a {@link Response} object containing the list of users or an error message
      */
@@ -98,6 +136,26 @@ public class UserFacade {
         }
     }
 
+    /**
+     * Adds a user to a board.
+     *
+     * @param userId  the id of the user to add to the board
+     * @param boardId the id of the board to add the user to
+     * @return a Response object with a message, status, and status code indicating the result of the add operation
+     * if the add operation was successful, the data field will contain a UserInBoardDTO object representing the
+     * added user in the board, the message field will contain the SuccessMessage.FOUND message,
+     * the status field will be HttpStatus.OK, and the statusCode field will be 200
+     * if the user or board with the given id does not exist in the database, the message field will contain the
+     * AccountNotFoundException message, the status field will be HttpStatus.BAD_REQUEST, and the statusCode field
+     * will be 400
+     * if the combination of the given user and board already exists in the database, the message field will contain
+     * the IllegalArgumentException message, the status field will be HttpStatus.BAD_REQUEST, and the statusCode field
+     * will be 400
+     * if the userId or boardId input is invalid, the message field will contain the NoSuchElementException message,
+     * the status field will be HttpStatus.BAD_REQUEST, and the statusCode field will be 400
+     * if there is a null pointer exception, the message field will contain the NullPointerException message,
+     * the status field will be HttpStatus.BAD_REQUEST, and the statusCode field will be 500
+     */
     public Response addUserToBoard(Long userId, Long boardId) {
         try {
             Validations.validate(userId, Regex.ID.getRegex());
