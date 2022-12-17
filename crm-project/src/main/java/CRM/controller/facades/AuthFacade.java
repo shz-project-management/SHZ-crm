@@ -26,11 +26,12 @@ public class AuthFacade {
 
     /**
      * Registers a new user in the system.
+     *
      * @param user The registration information for the user.
      * @return A {@link Response} object containing the saved user, or an error message if the
-     *         registration failed.
+     * registration failed.
      * @throws IllegalArgumentException if any of the provided registration information is invalid.
-     * @throws NullPointerException if any of the required fields in the user request are missing.
+     * @throws NullPointerException     if any of the required fields in the user request are missing.
      */
     public Response register(RegisterUserRequest user) {
         logger.info("in FacadeAuthController -> register");
@@ -50,23 +51,28 @@ public class AuthFacade {
                     .statusCode(201)
                     .build();
 
-        } catch (IllegalArgumentException | NullPointerException e) {
+        } catch (IllegalArgumentException e) {
             return new Response.Builder()
                     .message(e.getMessage())
                     .status(HttpStatus.BAD_REQUEST)
-                    .statusCode(400)
-                    .build();
+                    .statusCode(400).build();
+        } catch (NullPointerException e) {
+            return new Response.Builder()
+                    .message(e.getMessage())
+                    .status(HttpStatus.BAD_REQUEST)
+                    .statusCode(500).build();
         }
     }
 
     /**
      * Logs a user in to the system.
+     *
      * @param user The login credentials for the user.
      * @return A {@link Response} object containing a JWT token for the user, or an error message if the
-     *         login failed.
-     * @throws NullPointerException if any of the required fields in the user request are missing.
+     * login failed.
+     * @throws NullPointerException     if any of the required fields in the user request are missing.
      * @throws IllegalArgumentException if any of the provided login credentials are invalid.
-     * @throws AuthenticationException if the provided login credentials are incorrect.
+     * @throws AuthenticationException  if the provided login credentials are incorrect.
      * @throws AccountNotFoundException if the user with the given login credentials does not exist.
      */
     public Response login(LoginUserRequest user) {
@@ -87,12 +93,21 @@ public class AuthFacade {
                     .statusCode(200)
                     .build();
 
-        } catch (NullPointerException | IllegalArgumentException | AuthenticationException |
-                 AccountNotFoundException e) {
+        } catch (IllegalArgumentException | AccountNotFoundException e) {
             return new Response.Builder()
                     .message(e.getMessage())
                     .status(HttpStatus.BAD_REQUEST)
                     .statusCode(400).build();
+        } catch (AuthenticationException e) {
+            return new Response.Builder()
+                    .message(e.getMessage())
+                    .status(HttpStatus.BAD_REQUEST)
+                    .statusCode(401).build();
+        } catch (NullPointerException e) {
+            return new Response.Builder()
+                    .message(e.getMessage())
+                    .status(HttpStatus.BAD_REQUEST)
+                    .statusCode(500).build();
         }
     }
 
