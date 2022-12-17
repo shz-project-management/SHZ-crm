@@ -26,4 +26,6 @@ public interface UserInBoardRepository extends JpaRepository<UserInBoard, Long> 
 
     @Query("SELECT uib FROM UserInBoard uib WHERE uib.user = ?1 AND uib.board = ?2")
     Optional<UserInBoard> findByBoardAndUser(User user, Board board);
+
+    void deleteAllByUserId(long userId);
 }
