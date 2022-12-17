@@ -17,6 +17,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
+import javax.security.auth.login.AccountNotFoundException;
+
 @Component
 public class AttributeFacade {
     private static Logger logger = LogManager.getLogger(AttributeFacade.class.getName());
@@ -53,7 +55,7 @@ public class AttributeFacade {
                     .statusCode(201)
                     .data(AttributeDTO.createAttributeDTO(savedAttribute))
                     .build();
-        }catch(IllegalArgumentException | NonUniqueObjectException e) {
+        }catch(AccountNotFoundException | IllegalArgumentException | NonUniqueObjectException e) {
             return new Response.Builder()
                     .message(e.getMessage())
                     .status(HttpStatus.BAD_REQUEST)
