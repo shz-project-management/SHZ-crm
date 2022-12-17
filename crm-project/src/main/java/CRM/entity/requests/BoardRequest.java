@@ -8,7 +8,7 @@ import lombok.*;
 @Setter
 @ToString
 public class BoardRequest {
-    private long creatorUserId;
+    private Long creatorUserId;
     private String name;
     private String description;
 }

@@ -110,7 +110,7 @@ public class UserFacadeTest {
 
     @Test
     @DisplayName("Test getAllInBoard method with valid input")
-    void testGetAllInBoardWithValidInput() {
+    void testGetAllInBoardWithValidInput() throws AccountNotFoundException {
         Long boardId = 1L;
         List<User> users = Arrays.asList(
                 new User(1L, "Ziv", "Hausler", "not-the-same-password-for-sure", "ziv1@gmail.com", null, null),
@@ -129,14 +129,14 @@ public class UserFacadeTest {
 
     @Test
     @DisplayName("Test getAllInBoard method with invalid id")
-    void testGetAllInBoardWithInvalidId() {
+    void testGetAllInBoardWithInvalidId() throws AccountNotFoundException {
         given(userService.getAllInBoard(1L)).willThrow(IllegalArgumentException.class);
         assertEquals(400, userFacade.getAllInBoard(1L).getStatusCode());
     }
 
     @Test
     @DisplayName("Test getAllInBoard method when board is not found")
-    void testGetAllInBoardBoardNotFound() {
+    void testGetAllInBoardBoardNotFound() throws AccountNotFoundException {
         Long boardId = 1L;
         when(userService.getAllInBoard(boardId)).thenThrow(new NoSuchElementException(ExceptionMessage.BOARD_DOES_NOT_EXISTS.toString()));
 
@@ -150,7 +150,7 @@ public class UserFacadeTest {
 
     @Test
     @DisplayName("Test getAllInBoard method when null pointer exception is thrown")
-    void testGetAllInBoardWithNullPointerException() {
+    void testGetAllInBoardWithNullPointerException() throws AccountNotFoundException {
         Long boardId = 1L;
         when(userService.getAllInBoard(boardId)).thenThrow(new NullPointerException());
 

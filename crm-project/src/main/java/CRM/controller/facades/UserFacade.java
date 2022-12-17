@@ -27,7 +27,7 @@ public class UserFacade {
      */
     public Response get(Long id) {
         try {
-            Validations.validate(String.valueOf(id), Regex.ID.getRegex());
+            Validations.validate(id, Regex.ID.getRegex());
             return new Response.Builder()
                     .data(userService.get(id))
                     .message(SuccessMessage.FOUND.toString())
@@ -69,14 +69,14 @@ public class UserFacade {
      */
     public Response getAllInBoard(Long boardId) {
         try {
-            Validations.validate(String.valueOf(boardId), Regex.ID.getRegex());
+            Validations.validate(boardId, Regex.ID.getRegex());
             return new Response.Builder()
                     .data(userService.getAllInBoard(boardId))
                     .message(SuccessMessage.FOUND.toString())
                     .status(HttpStatus.OK)
                     .statusCode(200)
                     .build();
-        } catch (IllegalArgumentException | NoSuchElementException e) {
+        } catch (AccountNotFoundException | IllegalArgumentException | NoSuchElementException e) {
             return new Response.Builder()
                     .message(e.getMessage())
                     .status(HttpStatus.BAD_REQUEST)

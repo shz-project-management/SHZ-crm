@@ -2,8 +2,10 @@ package CRM.utils;
 
 import CRM.entity.Comment;
 import CRM.entity.Item;
+import CRM.entity.requests.BoardRequest;
 import CRM.entity.requests.LoginUserRequest;
 import CRM.entity.requests.RegisterUserRequest;
+import CRM.repository.UserRepository;
 import CRM.utils.enums.ExceptionMessage;
 import CRM.utils.enums.Regex;
 import io.jsonwebtoken.Claims;
@@ -11,6 +13,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import javax.security.auth.login.AccountNotFoundException;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.regex.Matcher;
@@ -26,25 +29,27 @@ public class Validations {
      * @throws IllegalArgumentException If the provided data does not match the regular expression.
      * @throws NullPointerException     If the provided data is null.
      */
-    public static void validate(String data, String regex) throws IllegalArgumentException, NullPointerException {
+    public static void validate(Object data, String regex) throws IllegalArgumentException, NullPointerException {
         logger.info("in Validations -> validate");
 
         if (data == null) {
             logger.error("in Validations -> validate -> " + ExceptionMessage.EMPTY_NOTNULL_FIELD);
             throw new NullPointerException(ExceptionMessage.EMPTY_NOTNULL_FIELD.toString());
         }
-
+        String convertedData = String.valueOf(data);
         Pattern pattern = Pattern.compile(regex);
-        Matcher matcher = pattern.matcher(data);
+        Matcher matcher = pattern.matcher(convertedData);
         if (!matcher.matches()) {
-            logger.error("in Validations -> validate -> Regex -> " + ExceptionMessage.VALIDATION_FAILED  + data);
-            throw new IllegalArgumentException(ExceptionMessage.VALIDATION_FAILED + data);
+            logger.error("in Validations -> validate -> Regex -> " + ExceptionMessage.VALIDATION_FAILED + convertedData);
+            throw new IllegalArgumentException(ExceptionMessage.VALIDATION_FAILED + convertedData);
         }
     }
 
     /**
-     * Validates the provided RegisterUserRequest object.
-     * @param user The RegisterUserRequest object to validate.
+     * Validates the given user registration request.
+     * @param user the user registration request to validate
+     * @return true if the user registration request is valid, false otherwise
+     * @throws IllegalArgumentException if the email, password, first name, or last name does not match the expected format
      */
     public static boolean validateRegisteredUser(RegisterUserRequest user) {
         validate(user.getEmail(), Regex.EMAIL.getRegex());
@@ -63,6 +68,18 @@ public class Validations {
         validate(user.getPassword(), Regex.PASSWORD.getRegex());
     }
 
+    /**
+     * Validates the given board request for creating a new board.
+     * @param board the board request to validate
+     * @return true if the board request is valid, false otherwise
+     * @throws IllegalArgumentException if the board name or creator user id does not match the expected format
+     */
+    public static boolean validateNewBoard(BoardRequest board) {
+        validate(board.getCreatorUserId().toString(), Regex.ID.getRegex());
+        validate(board.getName(), Regex.BOARD_NAME.getRegex());
+        return true;
+    }
+
     public static void validateCreatedItem(Item item) {
         // validate each field of the item using validate(regex, field)
     }
@@ -78,11 +95,14 @@ public class Validations {
      * @return the item with the specified ID if it exists
      * @throws NoSuchElementException if no item with the specified ID exists in the repository
      */
-    public static <T> T doesIdExists(Long id, JpaRepository repo) {
+    public static <T> T doesIdExists(Long id, JpaRepository repo) throws AccountNotFoundException {
         Optional<T> element = repo.findById(id);
-        if (!element.isPresent())
+        if (!element.isPresent()) {
+            if (repo.getClass().getSimpleName().equals(UserRepository.class.getSimpleName())) {
+                throw new AccountNotFoundException(ExceptionMessage.ACCOUNT_DOES_NOT_EXISTS.toString());
+            }
             throw new NoSuchElementException(ExceptionMessage.NO_SUCH_ID.toString());
-
+        }
         return element.get();
     }
 
