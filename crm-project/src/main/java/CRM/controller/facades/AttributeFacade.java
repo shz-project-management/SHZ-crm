@@ -12,6 +12,7 @@ import CRM.utils.Validations;
 import CRM.utils.enums.Regex;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.hibernate.NonUniqueObjectException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
@@ -52,8 +53,18 @@ public class AttributeFacade {
                     .statusCode(201)
                     .data(AttributeDTO.createAttributeDTO(savedAttribute))
                     .build();
-        }catch(NullPointerException | IllegalArgumentException e) {
-            return new Response.Builder().message(e.getMessage()).status(HttpStatus.BAD_REQUEST).statusCode(400).build();
+        }catch(IllegalArgumentException | NonUniqueObjectException e) {
+            return new Response.Builder()
+                    .message(e.getMessage())
+                    .status(HttpStatus.BAD_REQUEST)
+                    .statusCode(400)
+                    .build();
+        }catch(NullPointerException e) {
+            return new Response.Builder()
+                    .message(e.getMessage())
+                    .status(HttpStatus.BAD_REQUEST)
+                    .statusCode(500)
+                    .build();
         }
     }
 

@@ -27,7 +27,8 @@ public class StatusService implements AttributeService {
      */
     @Override
     public Status create(Attribute status) {
-        Validations.validateAttributeIsUniqueInBoard(statusRepository, status);
+        if(statusRepository.existsByBoardAndNameLike(status.getBoard(), status.getName()))
+            Validations.throwAttributeAlreadyExistsForBoard(status, "Status");
         return statusRepository.save((Status.createStatus(status)));
     }
 }

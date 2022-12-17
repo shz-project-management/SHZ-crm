@@ -1,21 +1,14 @@
 package CRM.utils;
 
-import CRM.entity.Attribute;
-import CRM.entity.Comment;
-import CRM.entity.Item;
+import CRM.entity.*;
 import CRM.entity.requests.LoginUserRequest;
 import CRM.entity.requests.RegisterUserRequest;
-import CRM.repository.StatusRepository;
-import CRM.repository.TypeRepository;
 import CRM.utils.enums.ExceptionMessage;
 import CRM.utils.enums.Regex;
 import io.jsonwebtoken.Claims;
-import lombok.experimental.UtilityClass;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.hibernate.NonUniqueObjectException;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.annotation.AccessType;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.NoSuchElementException;
@@ -23,14 +16,8 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-@UtilityClass
 public class Validations {
     private static Logger logger = LogManager.getLogger(Validations.class.getName());
-
-    @Autowired
-    private static StatusRepository statusRepository;
-    @Autowired
-    private static TypeRepository typeRepository;
 
     /**
      * Validates the provided data against the given regular expression.
@@ -122,16 +109,6 @@ public class Validations {
         token = token.substring(7, token.length());
         Claims claims = ConfirmationToken.decodeJWT(token);
         return Long.valueOf(claims.getId());
-    }
-
-    public static void validateAttributeIsUniqueInBoard(JpaRepository repository, Attribute attribute){
-        if(repository.getClass().getSimpleName().equals(statusRepository.getClass().getSimpleName())){
-            if(statusRepository.existsByBoardAndNameLike(attribute.getBoard(), attribute.getName()))
-                throwAttributeAlreadyExistsForBoard(attribute, "Status");
-        } else if (repository.getClass().getSimpleName().equals(typeRepository.getClass().getSimpleName())){
-            if(typeRepository.existsByBoardAndNameLike(attribute.getBoard(), attribute.getName()))
-                throwAttributeAlreadyExistsForBoard(attribute, "Type");
-        }
     }
 
     public static void throwAttributeAlreadyExistsForBoard(Attribute attribute, String className){

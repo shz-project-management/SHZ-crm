@@ -33,7 +33,8 @@ public class TypeService implements AttributeService{
      */
     @Override
     public Type create(Attribute type) {
-        Validations.validateAttributeIsUniqueInBoard(typeRepository, type);
+        if(typeRepository.existsByBoardAndNameLike(type.getBoard(), type.getName()))
+            Validations.throwAttributeAlreadyExistsForBoard(type, "Type");
         return typeRepository.save((Type) type);
     }
 }
