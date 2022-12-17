@@ -7,10 +7,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 @Controller
 @RequestMapping(value = "/status")
@@ -31,6 +28,18 @@ public class StatusController {
     @PostMapping(consumes = "application/json")
     public ResponseEntity<Response> create(@RequestBody AttributeRequest statusRequest) {
         Response response = attributeFacade.create(statusRequest);
+        return new ResponseEntity<>(response, response.getStatus());
+    }
+
+    /**
+     * Handle HTTP DELETE requests to delete a status.
+     *
+     * @param id The ID of the status to delete.
+     * @return A ResponseEntity with the appropriate status and response body.
+     */
+    @DeleteMapping(value = "{id}")
+    public ResponseEntity<Response> delete(@PathVariable Long id) {
+        Response response = attributeFacade.delete(id);
         return new ResponseEntity<>(response, response.getStatus());
     }
 }

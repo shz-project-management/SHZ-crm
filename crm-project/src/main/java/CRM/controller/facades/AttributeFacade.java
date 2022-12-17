@@ -24,6 +24,10 @@ public class AttributeFacade {
         return null;
     }
 
+    public Response delete(Long id) {
+        return null;
+    }
+
     public Response updateAttribute(Long itemId, Attribute object){
         // validate the id using Validations.validate
         return null;
