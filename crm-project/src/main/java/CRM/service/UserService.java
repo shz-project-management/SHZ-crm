@@ -89,7 +89,7 @@ public class UserService {
         return usersInBoard.stream().map(UserInBoard::getUser).collect(Collectors.toList());
     }
 
-    public UserInBoardDTO addUserToBoard(long userId, long boardId) throws AccountNotFoundException {
+    public UserInBoard addUserToBoard(long userId, long boardId) throws AccountNotFoundException {
         User user = Validations.doesIdExists(userId, userRepository);
         Board board = Validations.doesIdExists(boardId, boardRepository);
 
@@ -99,6 +99,6 @@ public class UserService {
 
         // if not, store the new one in the db
         UserInBoard userInBoard = UserInBoard.userInBoardUser(user, board);
-        return UserInBoardDTO.getUserInBoardFromDB(userInBoardRepository.save(userInBoard));
+        return userInBoardRepository.save(userInBoard);
     }
 }
