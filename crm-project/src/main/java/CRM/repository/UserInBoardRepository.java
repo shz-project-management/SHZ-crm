@@ -10,14 +10,11 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 @Transactional
 public interface UserInBoardRepository extends JpaRepository<UserInBoard, Long> {
-//    @Query("SELECT u FROM UserDocument u WHERE (u.document = ?1 and u.user = ?2) ")
-//    Optional<UserDocument> find(Document doc, User user);
-//
-
     List<UserInBoard> findAllUserByBoard(Board board);
 
     List<UserInBoard> findAllBoardByUser(User user);
@@ -27,28 +24,6 @@ public interface UserInBoardRepository extends JpaRepository<UserInBoard, Long> 
     @Query("DELETE UserInBoard uib WHERE uib.board = ?1")
     void deleteAllByBoard(Board board);
 
-    @Transactional
-    @Modifying
-    void deleteAllByUserId(long userId);
-//
-//
-//    @Query("SELECT u FROM UserDocument u WHERE u.document=?1")
-//    List<UserDocument> findAllUsersInDocument(Document document);
-//
-//    @Transactional
-//    @Modifying(clearAutomatically = true)
-//    @Query("UPDATE UserDocument urd SET urd.permission = ?1 WHERE (urd.document = ?2 and urd.user = ?3)")
-//    int updatePermission(Permission permission, Document document, User user);
-//
-//    @Transactional
-//    @Modifying
-//    @Query("DELETE UserDocument urd WHERE urd.document = ?1")
-//    int deleteDocument(Document document);
-//
-//
-//
-//    @Transactional
-//    @Modifying
-//    @Query("DELETE UserDocument urd WHERE urd.user = ?1 AND urd.document = ?2")
-//    int deleteUserFromDocument(User user, Document document);
+    @Query("SELECT uib FROM UserInBoard uib WHERE uib.user = ?1 AND uib.board = ?2")
+    Optional<UserInBoard> findByBoardAndUser(User user, Board board);
 }

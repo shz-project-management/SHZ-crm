@@ -50,4 +50,11 @@ public class UserController {
         Response response = userFacade.getAllInBoard(boardId);
         return new ResponseEntity<>(response, response.getStatus());
     }
+
+    @PostMapping(value = "add/{userId}/toBoard/{boardId}")
+    public ResponseEntity<Response> addUserToBoard(@PathVariable Long userId, @PathVariable Long boardId){
+
+        Response response = userFacade.addUserToBoard(userId, boardId);
+        return new ResponseEntity<>(response, response.getStatus());
+    }
 }

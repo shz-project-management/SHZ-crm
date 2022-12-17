@@ -26,7 +26,7 @@ public enum ExceptionMessage {
     ILLEGAL_AUTH_HEADER("Authorization header is not legal"),
     PASSWORD_DOESNT_MATCH("The given password doesn't match our database's"),
 
-    DOCUMENT_EXISTS("This document ID already exist in the database: "),
+    USER_IN_BOARD_EXISTS("This user is already assigned to this board"),
     BOARD_DOES_NOT_EXISTS("This board ID does not exist in the database: "),
     NOT_MATCH("Error: email or password does not match"),
     NO_USER_IN_DATABASE("Could not locate this user in the database."),

@@ -1,6 +1,7 @@
 package CRM.service;
 
 import CRM.entity.Board;
+import CRM.entity.DTO.UserInBoardDTO;
 import CRM.entity.User;
 import CRM.entity.UserInBoard;
 import CRM.repository.BoardRepository;
@@ -14,6 +15,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.security.auth.login.AccountNotFoundException;
+import java.sql.SQLException;
+import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -111,5 +114,18 @@ public class UserService {
         Board board = Validations.doesIdExists(boardId, boardRepository);
         List<UserInBoard> usersInBoard = userInBoardRepository.findAllUserByBoard(board);
         return usersInBoard.stream().map(UserInBoard::getUser).collect(Collectors.toList());
+    }
+
+    public UserInBoard addUserToBoard(long userId, long boardId) throws AccountNotFoundException {
+        User user = Validations.doesIdExists(userId, userRepository);
+        Board board = Validations.doesIdExists(boardId, boardRepository);
+
+        // make sure this combination of user and board doesn't not exist in the db yet
+        if(userInBoardRepository.findByBoardAndUser(user, board).isPresent())
+            throw new IllegalArgumentException(ExceptionMessage.USER_IN_BOARD_EXISTS.toString());
+
+        // if not, store the new one in the db
+        UserInBoard userInBoard = UserInBoard.userInBoardUser(user, board);
+        return userInBoardRepository.save(userInBoard);
     }
 }
