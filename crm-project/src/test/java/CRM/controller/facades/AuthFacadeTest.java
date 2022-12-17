@@ -4,7 +4,6 @@ import CRM.entity.User;
 import CRM.entity.requests.LoginUserRequest;
 import CRM.entity.requests.RegisterUserRequest;
 import CRM.service.AuthService;
-import CRM.service.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
