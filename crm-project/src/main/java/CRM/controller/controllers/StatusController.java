@@ -1,6 +1,7 @@
 package CRM.controller.controllers;
 
 import CRM.controller.facades.AttributeFacade;
+import CRM.entity.Status;
 import CRM.entity.requests.AttributeRequest;
 import CRM.entity.response.Response;
 import lombok.AllArgsConstructor;
@@ -27,7 +28,7 @@ public class StatusController {
      */
     @PostMapping(consumes = "application/json")
     public ResponseEntity<Response> create(@RequestBody AttributeRequest statusRequest) {
-        Response response = attributeFacade.create(statusRequest);
+        Response response = attributeFacade.create(statusRequest, Status.class);
         return new ResponseEntity<>(response, response.getStatus());
     }
 

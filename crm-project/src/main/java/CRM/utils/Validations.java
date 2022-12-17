@@ -1,5 +1,9 @@
 package CRM.utils;
 
+import CRM.entity.*;
+import CRM.entity.requests.LoginUserRequest;
+import CRM.entity.requests.RegisterUserRequest;
+import CRM.entity.Attribute;
 import CRM.entity.Comment;
 import CRM.entity.Item;
 import CRM.entity.requests.BoardRequest;
@@ -11,6 +15,7 @@ import CRM.utils.enums.Regex;
 import io.jsonwebtoken.Claims;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.hibernate.NonUniqueObjectException;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import javax.security.auth.login.AccountNotFoundException;
@@ -135,5 +140,9 @@ public class Validations {
         token = token.substring(7, token.length());
         Claims claims = ConfirmationToken.decodeJWT(token);
         return Long.valueOf(claims.getId());
+    }
+
+    public static void throwAttributeAlreadyExistsForBoard(Attribute attribute, String className){
+        throw new NonUniqueObjectException(ExceptionMessage.ATTRIBUTE_ALREADY_IN_DB.toString(), attribute.getId(), className);
     }
 }

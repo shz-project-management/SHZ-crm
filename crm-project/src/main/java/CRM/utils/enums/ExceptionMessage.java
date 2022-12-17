@@ -13,6 +13,7 @@ public enum ExceptionMessage {
     TRUNCATE("Couldn't truncate the table properly."),
     ILLEGAL_SQL_QUERY("Sql query is not legal."),
     DUPLICATED_UNIQUE_FIELD("Can not create a duplicate of a unique field: "),
+    ATTRIBUTE_ALREADY_IN_DB("Attribute with the same name already exists in this board"),
     NULL_INPUT("cannot set the content of the argument to null"),
     TOKEN_IS_NULL("token is null"),
     EMPTY_NOTNULL_FIELD("Not null fields must be filled out before creation"),
