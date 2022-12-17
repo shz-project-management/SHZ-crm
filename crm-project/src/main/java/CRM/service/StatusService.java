@@ -3,6 +3,7 @@ package CRM.service;
 import CRM.entity.Attribute;
 import CRM.entity.Status;
 import CRM.repository.StatusRepository;
+import CRM.utils.Validations;
 import CRM.utils.enums.ExceptionMessage;
 import org.hibernate.NonUniqueObjectException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,8 +27,7 @@ public class StatusService implements AttributeService {
      */
     @Override
     public Status create(Attribute status) {
-        if(statusRepository.existsByBoardAndNameLike(status.getBoard(), status.getName()))
-            throw new NonUniqueObjectException(ExceptionMessage.ATTRIBUTE_ALREADY_IN_DB.toString(), status.getId(), "Status");
+        Validations.validateAttributeIsUniqueInBoard(statusRepository, status);
         return statusRepository.save((Status.createStatus(status)));
     }
 }

@@ -5,6 +5,7 @@ import CRM.entity.Attribute;
 import CRM.entity.Status;
 import CRM.entity.Type;
 import CRM.repository.TypeRepository;
+import CRM.utils.Validations;
 import CRM.utils.enums.ExceptionMessage;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -32,8 +33,7 @@ public class TypeService implements AttributeService{
      */
     @Override
     public Type create(Attribute type) {
-        if(typeRepository.existsByBoardAndNameLike(type.getBoard(), type.getName()))
-            throw new NonUniqueObjectException(ExceptionMessage.ATTRIBUTE_ALREADY_IN_DB.toString(), type.getId(), "Type");
+        Validations.validateAttributeIsUniqueInBoard(typeRepository, type);
         return typeRepository.save((Type) type);
     }
 }
