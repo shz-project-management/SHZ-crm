@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.security.auth.login.AccountNotFoundException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
@@ -57,6 +58,32 @@ public class UserService {
             // make sure such an id even exists
             // Ask for the repo to find the user, by the given id input
             return Validations.doesIdExists(userId, userRepository);
+
+        } catch (NoSuchElementException e) {
+            // If it is empty, throw "AccountNotFound" exception
+            throw new AccountNotFoundException(ExceptionMessage.NO_ACCOUNT_IN_DATABASE.toString());
+        }
+    }
+
+    public Boolean delete(long userId) throws AccountNotFoundException {
+
+        try {
+            // make sure such an id even exists
+            // Ask for the repo to find the user, by the given id input
+            User user = Validations.doesIdExists(userId, userRepository);
+
+            // first, find all boards created by this user:
+            List<UserInBoard> userInBoardsList = userInBoardRepository.findAllBoardByUser(user);
+
+            // second, remove all entries of this user from UserInBoard table
+            userInBoardRepository.deleteAllByUserId(userId);
+
+            // third, remove every board created by this user
+            userInBoardsList.forEach(userInBoard -> boardRepository.deleteById(userInBoard.getBoard().getId()));
+
+            // lastly, remove the user from the database
+            userRepository.deleteById(userId);
+            return true;
 
         } catch (NoSuchElementException e) {
             // If it is empty, throw "AccountNotFound" exception

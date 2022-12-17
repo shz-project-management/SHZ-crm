@@ -21,11 +21,15 @@ public interface UserInBoardRepository extends JpaRepository<UserInBoard, Long> 
     List<UserInBoard> findAllUserByBoard(Board board);
 
     List<UserInBoard> findAllBoardByUser(User user);
+
     @Transactional
     @Modifying
     @Query("DELETE UserInBoard uib WHERE uib.board = ?1")
     void deleteAllByBoard(Board board);
 
+    @Transactional
+    @Modifying
+    void deleteAllByUserId(long userId);
 //
 //
 //    @Query("SELECT u FROM UserDocument u WHERE u.document=?1")

@@ -49,6 +49,30 @@ public class UserFacade {
         }
     }
 
+    public Response delete(Long id) {
+        try {
+            Validations.validate(id, Regex.ID.getRegex());
+            return new Response.Builder()
+                    .data(userService.delete(id))
+                    .message(SuccessMessage.FOUND.toString())
+                    .status(HttpStatus.OK)
+                    .statusCode(200)
+                    .build();
+        } catch (AccountNotFoundException | IllegalArgumentException e) {
+            return new Response.Builder()
+                    .message(e.getMessage())
+                    .status(HttpStatus.BAD_REQUEST)
+                    .statusCode(400)
+                    .build();
+        } catch (NullPointerException e) {
+            return new Response.Builder()
+                    .message(e.getMessage())
+                    .status(HttpStatus.BAD_REQUEST)
+                    .statusCode(500)
+                    .build();
+        }
+    }
+
     /**
      * Retrieves all users.
      * @return A {@link Response} object containing a list of all users.
