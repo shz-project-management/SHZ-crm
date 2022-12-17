@@ -109,7 +109,7 @@ public class Validations {
         Optional<T> element = repo.findById(id);
         if (!element.isPresent()) {
             if (repo.getClass().getSimpleName().split("\\$")[0].equals(UserRepository.class.getSimpleName()))
-                throw new AccountNotFoundException(ExceptionMessage.NO_SUCH_ID.toString());
+                throw new AccountNotFoundException(ExceptionMessage.ACCOUNT_DOES_NOT_EXISTS.toString());
 
             throw new NoSuchElementException(ExceptionMessage.NO_SUCH_ID.toString());
         }

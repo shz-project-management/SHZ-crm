@@ -30,6 +30,13 @@ public class UserController {
         return new ResponseEntity<>(response, response.getStatus());
     }
 
+    @DeleteMapping(value = "{id}")
+    public ResponseEntity<Response> delete(@PathVariable Long id){
+
+        Response response = userFacade.delete(id);
+        return new ResponseEntity<>(response, response.getStatus());
+    }
+
     @GetMapping(value = "getAll")
     public ResponseEntity<Response> getAll(){
 
