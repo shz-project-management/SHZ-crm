@@ -33,9 +33,9 @@ public class AuthServiceTest {
     @DisplayName("Test register method with valid input")
     void testRegisterWithValidInput() {
         RegisterUserRequest userRequest = new RegisterUserRequest("Ziv", "Hausler", "ziv123456", "ziv@gmail.com");
-        User expectedUser = User.newUser(userRequest);
-        given(userRepository.findByEmail(userRequest.getEmail())).willReturn(Optional.of(expectedUser));
-        assertThrows(IllegalArgumentException.class, () -> authService.register(userRequest));
+        given(userRepository.findByEmail(userRequest.getEmail())).willReturn(Optional.empty());
+        given(userRepository.save(User.newUser(userRequest))).willReturn(User.newUser(userRequest));
+        assertEquals(userRequest.getEmail(), authService.register(userRequest).getEmail());
     }
 
     @Test
