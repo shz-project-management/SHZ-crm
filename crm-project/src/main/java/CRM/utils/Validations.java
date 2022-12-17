@@ -101,7 +101,7 @@ public class Validations {
             if (repo.getClass().getSimpleName().equals(UserRepository.class.getSimpleName())) {
                 throw new AccountNotFoundException(ExceptionMessage.ACCOUNT_DOES_NOT_EXISTS.toString());
             }
-            throw new NoSuchElementException(ExceptionMessage.NO_SUCH_ID.toString());
+            throw new NoSuchElementException(ExceptionMessage.ACCOUNT_DOES_NOT_EXISTS.toString());
         }
         return element.get();
     }

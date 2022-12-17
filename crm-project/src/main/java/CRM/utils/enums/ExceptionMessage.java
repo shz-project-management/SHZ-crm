@@ -23,7 +23,6 @@ public enum ExceptionMessage {
     CREATE_TABLE("Couldn't create the table properly."),
     NO_PRIMARY_KEY_FOUND("No primary key found."),
     ACCOUNT_EXISTS("This user email already exists: "),
-    ACCOUNT_DOES_NOT_EXISTS("This user email does not exists in database: "),
     ILLEGAL_AUTH_HEADER("Authorization header is not legal"),
     PASSWORD_DOESNT_MATCH("The given password doesn't match our database's"),
 
@@ -40,7 +39,7 @@ public enum ExceptionMessage {
     UNAUTHORIZED("You are unauthorized to create such a action"),
     FOLDER_EXISTS("This folder ID already exist in the database: "),
     FOLDER_DOES_NOT_EXISTS("This folder ID does not exist in the database: "),
-    NO_SUCH_ID("Could not locate this ID in the database"),
+    ACCOUNT_DOES_NOT_EXISTS("Could not locate this account in the database"),
     VALIDATION_FAILED("Could not approve the given information: "),
     UNAUTHORIZED_USER("You don't have the permission to do that action: "),
     WRONG_SEARCH("Something in the request wasn't properly written, try again"),
