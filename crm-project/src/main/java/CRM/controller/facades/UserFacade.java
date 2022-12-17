@@ -20,7 +20,6 @@ public class UserFacade {
 
     /**
      * Retrieves a user by their unique ID.
-     *
      * @param id The unique ID of the user to retrieve.
      * @return A {@link Response} object containing the retrieved user, or an error message if the user
      * could not be found.
@@ -35,11 +34,17 @@ public class UserFacade {
                     .status(HttpStatus.OK)
                     .statusCode(200)
                     .build();
-        } catch (AccountNotFoundException | IllegalArgumentException | NullPointerException e) {
+        } catch (AccountNotFoundException | IllegalArgumentException e) {
             return new Response.Builder()
                     .message(e.getMessage())
                     .status(HttpStatus.BAD_REQUEST)
                     .statusCode(400)
+                    .build();
+        } catch (NullPointerException e) {
+            return new Response.Builder()
+                    .message(e.getMessage())
+                    .status(HttpStatus.BAD_REQUEST)
+                    .statusCode(500)
                     .build();
         }
     }
@@ -59,8 +64,8 @@ public class UserFacade {
 
     /**
      * Provides an HTTP response for a request for a list of all users in a specified board.
-     * @param boardId   the ID of the board to retrieve users from
-     * @return          a {@link Response} object containing the list of users or an error message
+     * @param boardId the ID of the board to retrieve users from
+     * @return a {@link Response} object containing the list of users or an error message
      */
     public Response getAllInBoard(Long boardId) {
         try {
@@ -71,11 +76,17 @@ public class UserFacade {
                     .status(HttpStatus.OK)
                     .statusCode(200)
                     .build();
-        } catch (IllegalArgumentException | NullPointerException | NoSuchElementException e){
+        } catch (IllegalArgumentException | NoSuchElementException e) {
             return new Response.Builder()
                     .message(e.getMessage())
                     .status(HttpStatus.BAD_REQUEST)
                     .statusCode(400)
+                    .build();
+        } catch (NullPointerException e) {
+            return new Response.Builder()
+                    .message(e.getMessage())
+                    .status(HttpStatus.BAD_REQUEST)
+                    .statusCode(500)
                     .build();
         }
     }
