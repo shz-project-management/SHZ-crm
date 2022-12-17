@@ -35,6 +35,7 @@ public class UserService {
 
     /**
      * findByEmail search in the database for a user based on the email we have.
+     *
      * @param email - user's email
      * @return entity of user that found in database.
      */
@@ -50,25 +51,20 @@ public class UserService {
 
     /**
      * Retrieves a user from the database by their ID.
+     *
      * @param userId the ID of the user to retrieve
      * @return a User object with the specified ID
      * @throws AccountNotFoundException if no user with the specified ID exists in the database
      */
     public User get(long userId) throws AccountNotFoundException {
-
-        try {
-            // make sure such an id even exists
-            // Ask for the repo to find the user, by the given id input
-            return Validations.doesIdExists(userId, userRepository);
-
-        } catch (NoSuchElementException e) {
-            // If it is empty, throw "AccountNotFound" exception
-            throw new AccountNotFoundException(ExceptionMessage.NO_ACCOUNT_IN_DATABASE.toString());
-        }
+        // make sure such an id even exists
+        // Ask for the repo to find the user, by the given id input
+        return Validations.doesIdExists(userId, userRepository);
     }
 
     /**
      * Returns a list of all the users that exist in the database.
+     *
      * @return a list of all users in the repository
      */
     public List<User> getAll() {
@@ -77,6 +73,7 @@ public class UserService {
 
     /**
      * This method is used to retrieve all the users in a board with the specified id.
+     *
      * @param boardId The id of the board whose users are to be retrieved.
      * @return A list containing all the users in the board with the specified id.
      * @throws NoSuchElementException   if the board with the specified id is not found.

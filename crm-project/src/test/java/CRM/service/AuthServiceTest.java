@@ -4,9 +4,7 @@ import CRM.entity.User;
 import CRM.entity.requests.LoginUserRequest;
 import CRM.entity.requests.RegisterUserRequest;
 import CRM.repository.UserRepository;
-import CRM.service.AuthService;
 import CRM.utils.enums.ExceptionMessage;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -14,7 +12,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import static org.aspectj.bridge.MessageUtil.fail;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
@@ -22,7 +19,6 @@ import static org.mockito.Mockito.*;
 import javax.naming.AuthenticationException;
 import javax.security.auth.login.AccountNotFoundException;
 import java.util.Optional;
-
 
 @ExtendWith(MockitoExtension.class)
 public class AuthServiceTest {
