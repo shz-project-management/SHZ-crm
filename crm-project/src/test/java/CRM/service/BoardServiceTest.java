@@ -157,7 +157,7 @@ class BoardServiceTest {
     @DisplayName("Test that getAllBoardsOfUser function throws NoSuchElementException if user does not exist in repository")
     public void testGetAllBoardsOfUserWithNonExistentUserThrowsException() {
         given(userRepository.findById(123L)).willReturn(Optional.empty());
-        assertThrows(NoSuchElementException.class, () -> boardService.getAllBoardsOfUser(123L));
+        assertThrows(AccountNotFoundException.class, () -> boardService.getAllBoardsOfUser(123L));
     }
 
     @Test
