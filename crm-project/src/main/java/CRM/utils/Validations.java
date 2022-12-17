@@ -24,7 +24,6 @@ public class Validations {
 
     /**
      * Validates the provided data against the given regular expression.
-     *
      * @param data  The data to validate.
      * @param regex The regular expression to use for validation.
      * @throws IllegalArgumentException If the provided data does not match the regular expression.
@@ -48,7 +47,6 @@ public class Validations {
 
     /**
      * Validates the given user registration request.
-     *
      * @param user the user registration request to validate
      * @return true if the user registration request is valid, false otherwise
      * @throws IllegalArgumentException if the email, password, first name, or last name does not match the expected format
@@ -63,7 +61,6 @@ public class Validations {
 
     /**
      * Validates the provided LoginUserRequest object.
-     *
      * @param user The LoginUserRequest object to validate.
      */
     public static void validateLoginUser(LoginUserRequest user) {
@@ -73,7 +70,6 @@ public class Validations {
 
     /**
      * Validates the given board request for creating a new board.
-     *
      * @param board the board request to validate
      * @return true if the board request is valid, false otherwise
      * @throws IllegalArgumentException if the board name or creator user id does not match the expected format
@@ -94,7 +90,6 @@ public class Validations {
 
     /**
      * Checks if an item with the specified ID exists in the given repository.
-     *
      * @param id   the ID of the item to check for
      * @param repo the repository to search for the item in
      * @return the item with the specified ID if it exists
@@ -114,7 +109,6 @@ public class Validations {
 
     /**
      * Validates the provided token and returns the user id associated with it.
-     *
      * @param token The token to validate.
      * @return The user id associated with the token.
      * @throws NullPointerException     If the provided token is null.
