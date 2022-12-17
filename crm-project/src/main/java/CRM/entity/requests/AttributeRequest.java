@@ -9,7 +9,7 @@ import lombok.*;
 @Setter
 @ToString
 public class AttributeRequest {
-    private Board board;
+    private Long boardId;
     private String name;
     private String description;
 }
