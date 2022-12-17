@@ -9,11 +9,12 @@ public enum SuccessMessage {
     DELETED("The board has been deleted"),
     FOUND("Successfully fetched this element in the database");
 
-
     private final String message;
-    private SuccessMessage(final String message) {
+
+    SuccessMessage(final String message) {
         this.message = message;
     }
+
     public String toString() {
         return message;
     }
