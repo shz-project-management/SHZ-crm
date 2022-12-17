@@ -54,7 +54,6 @@ public class BoardService {
         return true;
     }
 
-
     /**
      * This method is used to retrieve a board with the specified id.
      * @param id The id of the board to be retrieved.
