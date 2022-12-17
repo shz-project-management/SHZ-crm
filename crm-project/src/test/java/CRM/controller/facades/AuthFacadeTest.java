@@ -87,12 +87,6 @@ public class AuthFacadeTest {
     }
 
     @Test
-    @DisplayName("Test that a 200 status code message is returned when authService.login is successful")
-    public void testSuccessResponseReturned_WhenAuthServiceLoginIsSuccessful() throws AuthenticationException, AccountNotFoundException {
-        assertEquals(201, authFacade.register(correctRegisterUserRequest).getStatusCode());
-    }
-
-    @Test
     @DisplayName("Test that a 400 status code is returned when Validations.validateLoginUser throws an IllegalArgumentException")
     public void testErrorResponseReturned_WhenValidateLoginUserThrowsIllegalArgumentException() throws AuthenticationException, AccountNotFoundException {
         given(authService.login(correctLoginUserRequest)).willThrow(IllegalArgumentException.class);

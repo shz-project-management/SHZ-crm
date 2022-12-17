@@ -54,15 +54,9 @@ public class UserService {
      * @throws AccountNotFoundException if no user with the specified ID exists in the database
      */
     public User get(long userId) throws AccountNotFoundException {
-        try {
-            // make sure such an id even exists
-            // Ask for the repo to find the user, by the given id input
-            return Validations.doesIdExists(userId, userRepository);
-
-        } catch (NoSuchElementException e) {
-            // If it is empty, throw "AccountNotFound" exception
-            throw new AccountNotFoundException(ExceptionMessage.NO_ACCOUNT_IN_DATABASE.toString());
-        }
+        // make sure such an id even exists
+        // Ask for the repo to find the user, by the given id input
+        return Validations.doesIdExists(userId, userRepository);
     }
 
     /**
