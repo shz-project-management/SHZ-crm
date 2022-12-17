@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.util.Objects;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -25,4 +26,11 @@ public class Attribute {
     private String name;
     private String description;
 
+    public static Attribute createAttribute(Board board, String name, String description){
+        Attribute attribute = new Attribute();
+        attribute.setBoard(board);
+        attribute.setName(name);
+        attribute.setDescription(Objects.requireNonNullElse(description, ""));
+        return attribute;
+    }
 }
