@@ -31,19 +31,29 @@ public class UserInBoard {
     @Cascade(org.hibernate.annotations.CascadeType.ALL)
     private Permission permission;
 
-    public static UserInBoard adminUserInBoard(User creatorUser, Board board) {
+    public static UserInBoard adminUserInBoard(User user, Board board) {
         UserInBoard userInBoard = new UserInBoard();
         userInBoard.setBoard(board);
-        userInBoard.setUser(creatorUser);
+        userInBoard.setUser(user);
         userInBoard.setPermission(Permission.ADMIN);
         return userInBoard;
     }
 
-    public static UserInBoard userInBoardUser(User creatorUser, Board board, Permission permission){
+    public static UserInBoard userInBoardUser(User user, Board board) {
+        UserInBoard userInBoard = new UserInBoard();
+        userInBoard.setBoard(board);
+        userInBoard.setUser(user);
+        userInBoard.setPermission(Permission.USER);
+        return userInBoard;
+    }
+
+    public static UserInBoard userInBoardUserChoosePermission(User creatorUser, Board board, Permission permission){
         UserInBoard userInBoard = new UserInBoard();
         userInBoard.setBoard(board);
         userInBoard.setUser(creatorUser);
         userInBoard.setPermission(permission);
         return userInBoard;
     }
+
+
 }

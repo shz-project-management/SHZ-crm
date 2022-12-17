@@ -1,12 +1,12 @@
 package CRM.controller.facades;
 
-import CRM.entity.User;
+import CRM.entity.DTO.UserDTO;
 import CRM.entity.requests.LoginUserRequest;
 import CRM.entity.requests.RegisterUserRequest;
 import CRM.entity.response.Response;
 import CRM.service.AuthService;
 import CRM.utils.Validations;
-import CRM.utils.enums.Regex;
+import CRM.utils.enums.SuccessMessage;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,10 +26,9 @@ public class AuthFacade {
 
     /**
      * Registers a new user in the system.
-     *
      * @param user The registration information for the user.
      * @return A {@link Response} object containing the saved user, or an error message if the
-     * registration failed.
+     *          registration failed.
      * @throws IllegalArgumentException if any of the provided registration information is invalid.
      * @throws NullPointerException     if any of the required fields in the user request are missing.
      */
@@ -45,8 +44,8 @@ public class AuthFacade {
             // there's no need to send an activation email at the moment (according to Assaf).
             // If we have time, we'll add it later on.
             return new Response.Builder()
-                    .data(authService.register(user))
-                    .message("The user has been successfully saved in the database")
+                    .data(UserDTO.getUserFromDB(authService.register(user)))
+                    .message(SuccessMessage.REGISTER.toString())
                     .status(HttpStatus.ACCEPTED)
                     .statusCode(201)
                     .build();
@@ -69,7 +68,7 @@ public class AuthFacade {
      *
      * @param user The login credentials for the user.
      * @return A {@link Response} object containing a JWT token for the user, or an error message if the
-     * login failed.
+     *          login failed.
      * @throws NullPointerException     if any of the required fields in the user request are missing.
      * @throws IllegalArgumentException if any of the provided login credentials are invalid.
      * @throws AuthenticationException  if the provided login credentials are incorrect.
@@ -87,7 +86,7 @@ public class AuthFacade {
             // after all validations are made, call the authService to login the user with the relevant information.
             // the return data in Response class has to include a JWT token.
             return new Response.Builder()
-                    .message("Successfully logged in to the system")
+                    .message(SuccessMessage.LOGIN.toString())
                     .data(authService.login(user))
                     .status(HttpStatus.OK)
                     .statusCode(200)
@@ -115,7 +114,6 @@ public class AuthFacade {
      * Activate function is responsible for activating email links.
      * If the link is not expired, make the user activated in the database.
      * If the link is expired, resend a new link to the user with a new token.
-     *
      * @param token - A link with activation token
      * @return Response with data and status 200 if good or 400 if something went wrong.
      */
