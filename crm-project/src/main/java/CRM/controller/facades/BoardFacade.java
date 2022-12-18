@@ -4,6 +4,7 @@ import CRM.entity.Board;
 import CRM.entity.DTO.BoardDTO;
 import CRM.entity.User;
 import CRM.entity.requests.BoardRequest;
+import CRM.entity.requests.UpdateBoardRequest;
 import CRM.entity.response.Response;
 import CRM.service.AuthService;
 import CRM.service.BoardService;
@@ -155,6 +156,35 @@ public class BoardFacade {
                     .statusCode(200)
                     .build();
         } catch (AccountNotFoundException | IllegalArgumentException | NoSuchElementException e){
+            return new Response.Builder()
+                    .message(e.getMessage())
+                    .status(HttpStatus.BAD_REQUEST)
+                    .statusCode(400)
+                    .build();
+        }catch (NullPointerException e){
+            return new Response.Builder()
+                    .message(e.getMessage())
+                    .status(HttpStatus.BAD_REQUEST)
+                    .statusCode(500)
+                    .build();
+        }
+    }
+
+    public Response updateBoard(UpdateBoardRequest board) {
+        try {
+            if(board.getId() != null){
+                Validations.validate(board.getId(), Regex.ID.getRegex());
+            }
+            if(board.getName() != null){
+                Validations.validate(board.getName(), Regex.NAME.getRegex());
+            }
+            return new Response.Builder()
+                    .data(BoardDTO.getListOfBoardsFromDB(boardService.updateBoard(board)))
+                    .message(SuccessMessage.FOUND.toString())
+                    .status(HttpStatus.OK)
+                    .statusCode(200)
+                    .build();
+        } catch (IllegalArgumentException | NoSuchElementException e){
             return new Response.Builder()
                     .message(e.getMessage())
                     .status(HttpStatus.BAD_REQUEST)
