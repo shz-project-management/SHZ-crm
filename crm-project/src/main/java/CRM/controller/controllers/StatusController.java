@@ -65,7 +65,7 @@ public class StatusController {
      */
     @GetMapping(value = "getAll")
     public ResponseEntity<Response> getAll() {
-        Response response = attributeFacade.getAll();
+        Response response = attributeFacade.getAll(Status.class);
         return new ResponseEntity<>(response, response.getStatus());
     }
 }
