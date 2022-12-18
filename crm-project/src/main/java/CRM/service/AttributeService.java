@@ -12,4 +12,6 @@ public interface AttributeService {
     Attribute create(Attribute attribute);
 
     boolean delete(Long id) throws AccountNotFoundException;
+
+    Attribute get(Long id) throws AccountNotFoundException;
 }

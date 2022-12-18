@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.security.auth.login.AccountNotFoundException;
+import java.util.NoSuchElementException;
 
 @Service
 public class StatusService implements AttributeService {
@@ -35,10 +36,27 @@ public class StatusService implements AttributeService {
         return statusRepository.save((Status.createStatus(status)));
     }
 
+    /**
+     * Deletes the given status from the repository.
+     * @param statusId the status ID to delete
+     */
     @Override
     public boolean delete(Long statusId) throws AccountNotFoundException {
         Status status = Validations.doesIdExists(statusId, statusRepository);
         statusRepository.delete(status);
         return true;
+    }
+
+    /**
+     * This method is used to retrieve a status with the specified id.
+     * @param id The id of the status to be retrieved.
+     * @return The retrieved status.
+     * @throws NoSuchElementException   if the status with the specified id is not found.
+     * @throws IllegalArgumentException if the specified id is invalid.
+     * @throws NullPointerException     if the specified id is null.
+     */
+    @Override
+    public Status get(Long id) throws AccountNotFoundException {
+        return Validations.doesIdExists(id, statusRepository);
     }
 }

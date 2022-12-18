@@ -2,6 +2,7 @@ package CRM.controller.facades;
 
 import CRM.entity.*;
 import CRM.entity.DTO.AttributeDTO;
+import CRM.entity.DTO.BoardDTO;
 import CRM.entity.requests.AttributeRequest;
 import CRM.entity.response.Response;
 import CRM.service.AttributeService;
@@ -102,8 +103,36 @@ public class AttributeFacade {
         }
     }
 
+    /**
+     This method is used to retrieve an attribute(status/type) with the specified id.
+     @param id The id of the attribute to be retrieved.
+     @return A Response object containing the retrieved attribute or an error message if the attribute is not found or the id is invalid.
+     @throws NoSuchElementException if the attribute with the specified id is not found.
+     @throws IllegalArgumentException if the specified id is invalid.
+     @throws NullPointerException if the specified id is null.
+     */
     public Response get(Long id, Class clz) {
-        return null;
+        try {
+            Validations.validate(id, Regex.ID.getRegex());
+            return new Response.Builder()
+                    .data(AttributeDTO.createAttributeDTO(convertFromClassToService(clz).get(id)))
+                    .message(SuccessMessage.FOUND.toString())
+                    .status(HttpStatus.OK)
+                    .statusCode(200)
+                    .build();
+        } catch (AccountNotFoundException | NoSuchElementException | IllegalArgumentException e) {
+            return new Response.Builder()
+                    .message(e.getMessage())
+                    .status(HttpStatus.BAD_REQUEST)
+                    .statusCode(400)
+                    .build();
+        } catch (NullPointerException e) {
+            return new Response.Builder()
+                    .message(e.getMessage())
+                    .status(HttpStatus.BAD_REQUEST)
+                    .statusCode(500)
+                    .build();
+        }
     }
 
     public Response updateAttribute(Long itemId, Attribute object){
