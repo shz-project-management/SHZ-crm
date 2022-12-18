@@ -89,4 +89,27 @@ public class AuthServiceTest {
 
         verify(userRepository).findByEmail(loginUser.getEmail());
     }
+
+    @Test
+    @DisplayName("Test findById with existing user")
+    public void testFindByIdExistingUser() throws AccountNotFoundException {
+        long creatorUserId = 1;
+        User expectedUser = new User(creatorUserId, "Ziv", "Hausler","ziv123456","ziv@gmail.com", null, null);
+        when(userRepository.findById(creatorUserId)).thenReturn(Optional.of(expectedUser));
+
+        User actualUser = authService.findById(creatorUserId);
+
+        assertEquals(expectedUser, actualUser);
+        verify(userRepository).findById(creatorUserId);
+    }
+
+    @Test
+    @DisplayName("Test findById with non-existing user")
+    public void testFindByIdNonExistingUser() {
+        long creatorUserId = 2;
+        when(userRepository.findById(creatorUserId)).thenReturn(Optional.empty());
+
+        assertThrows(AccountNotFoundException.class, () -> authService.findById(creatorUserId));
+        verify(userRepository).findById(creatorUserId);
+    }
 }

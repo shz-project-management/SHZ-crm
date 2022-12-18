@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import javax.naming.AuthenticationException;
 import javax.security.auth.login.AccountNotFoundException;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 @Service
@@ -27,6 +28,7 @@ public class AuthService {
 
     /**
      * Registers a new user with the provided RegisterUserRequest object.
+     *
      * @param user The RegisterUserRequest object containing the user's information.
      * @return The registered User object.
      * @throws IllegalArgumentException If the provided email is already in use.
@@ -45,6 +47,7 @@ public class AuthService {
 
     /**
      * Attempts to login the user with the provided email and password.
+     *
      * @param user The LoginUserRequest containing the user's email and password.
      * @return A token to be used for subsequent requests.
      * @throws AccountNotFoundException If the provided email does not exist in the database.
@@ -53,9 +56,9 @@ public class AuthService {
     public String login(LoginUserRequest user) throws AuthenticationException, AccountNotFoundException {
         // make sure the email exists in the database. If not, throw an AccountNotFoundException exception.
         User storedUser = findByEmail(user.getEmail());
-        if(storedUser == null)
+        if (storedUser == null)
             throw new AccountNotFoundException(ExceptionMessage.ACCOUNT_DOES_NOT_EXISTS.toString());
-        // make sure the given password and the stored password are equal. TODO: maybe this is our time to use password hashing+salting?
+        // make sure the given password and the stored password are equal. CONSULT: maybe this is our time to use password hashing+salting?
         // if the passwords are not equal, return Unauthorized exception.
         if (!storedUser.getPassword().equals(user.getPassword())) {
             throw new AuthenticationException(ExceptionMessage.PASSWORD_DOESNT_MATCH.toString());
@@ -80,6 +83,7 @@ public class AuthService {
 
     /**
      * generateToken is a function that creates a unique JWT token for every logged-in user.
+     *
      * @param id - the ID of the login user
      * @return generated token according to: io.jsonwebtoken.Jwts library
      */
@@ -90,6 +94,7 @@ public class AuthService {
     /**
      * called by functions to check if the token is a valid user token
      * and checks if we have the user id we got from the Validations.validateToken(token) in the database.
+     *
      * @return - id of user
      */
     public Long checkTokenToUserInDB(String token) throws AccountNotFoundException {
@@ -103,11 +108,11 @@ public class AuthService {
     }
 
     public User findById(long creatorUserId) throws AccountNotFoundException {
-        Optional<User> user = userRepository.findById(creatorUserId);
-        if (!user.isPresent())
+        try {
+            return Validations.doesIdExists(creatorUserId, userRepository);
+        } catch (NoSuchElementException e) {
             throw new AccountNotFoundException(ExceptionMessage.NO_USER_IN_DATABASE.toString());
-
-        return user.get();
+        }
     }
 
     public User findByEmail(String email) {
