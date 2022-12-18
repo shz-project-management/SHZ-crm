@@ -67,21 +67,13 @@ public class UserService {
      * @throws AccountNotFoundException if the user with the given id does not exist in the database
      */
     public Boolean delete(long userId) throws AccountNotFoundException {
-
-        try {
-            // make sure such an id even exists
-            // Ask for the repo to find the user, by the given id input
-            User user = Validations.doesIdExists(userId, userRepository);
-            // remove all user dependencies from the db
-            removeAllUserDependencies(user);
-            // lastly, remove the user from the database
-            userRepository.delete(user);
-            return true;
-
-        } catch (NoSuchElementException e) {
-            // If it is empty, throw "AccountNotFound" exception
-            throw new AccountNotFoundException(ExceptionMessage.NO_ACCOUNT_IN_DATABASE.toString());
-        }
+        // Make sure such an id even exists. Ask for the repo to find the user, by the given id input
+        User user = Validations.doesIdExists(userId, userRepository);
+        // remove all user dependencies from the db
+        removeAllUserDependencies(user);
+        // lastly, remove the user from the database
+        userRepository.delete(user);
+        return true;
     }
 
     /**
