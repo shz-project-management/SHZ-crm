@@ -56,4 +56,16 @@ public class StatusController {
         Response response = attributeFacade.get(id, Status.class);
         return new ResponseEntity<>(response, response.getStatus());
     }
+
+    /**
+     * This method is used to handle HTTP GET requests to the specified URL (status/getAll).
+     * The method retrieves all the statuses using the attributeFacade object and returns them in a Response object.
+     *
+     * @return A ResponseEntity object containing the Response object with all the statuses information and the HTTP status code.
+     */
+    @GetMapping(value = "getAll")
+    public ResponseEntity<Response> getAll() {
+        Response response = attributeFacade.getAll();
+        return new ResponseEntity<>(response, response.getStatus());
+    }
 }
