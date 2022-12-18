@@ -70,7 +70,7 @@ public class StatusController {
     }
 
     /**
-     * This method is used to handle HTTP GET requests to the specified URL (status/getAll/{userId}).
+     * This method is used to handle HTTP GET requests to the specified URL (status/getAll/{boardId}).
      * The method takes the id of the board as a path variable and uses it to retrieve all the statuses in that board using the attributeFacade object.
      *
      * @param boardId The id of the board whose statuses are to be retrieved.

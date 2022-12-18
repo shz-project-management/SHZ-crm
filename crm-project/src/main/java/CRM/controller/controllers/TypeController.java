@@ -69,4 +69,17 @@ public class TypeController {
         Response response = attributeFacade.getAll(Type.class);
         return new ResponseEntity<>(response, response.getStatus());
     }
+
+    /**
+     * This method is used to handle HTTP GET requests to the specified URL (type/getAll/{boardId}).
+     * The method takes the id of the board as a path variable and uses it to retrieve all the types in that board using the attributeFacade object.
+     *
+     * @param boardId The id of the board whose types are to be retrieved.
+     * @return A ResponseEntity object containing the Response object with the retrieved types and the HTTP status code.
+     */
+    @GetMapping(value = "getAll/{userId}")
+    public ResponseEntity<Response> getAllTypesInBoard(@PathVariable Long boardId) {
+        Response response = attributeFacade.getAllAttributesInBoard(boardId);
+        return new ResponseEntity<>(response, response.getStatus());
+    }
 }
