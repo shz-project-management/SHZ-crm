@@ -2,7 +2,6 @@ package CRM.service;
 
 import CRM.entity.Attribute;
 import CRM.entity.Board;
-import CRM.entity.Status;
 import CRM.entity.Type;
 import CRM.repository.BoardRepository;
 import CRM.repository.TypeRepository;
@@ -11,8 +10,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import javax.security.auth.login.AccountNotFoundException;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -48,7 +45,7 @@ public class TypeService implements AttributeService{
      * @param typeId the type ID to delete
      */
     @Override
-    public boolean delete(Long typeId) throws AccountNotFoundException {
+    public boolean delete(Long typeId) {
         Type type = Validations.doesIdExists(typeId, typeRepository);
         typeRepository.delete(type);
         return true;
@@ -63,7 +60,7 @@ public class TypeService implements AttributeService{
      * @throws NullPointerException     if the specified id is null.
      */
     @Override
-    public Type get(Long id) throws AccountNotFoundException {
+    public Type get(Long id) {
         return Validations.doesIdExists(id, typeRepository);
     }
 
@@ -87,7 +84,7 @@ public class TypeService implements AttributeService{
      * @throws NullPointerException     if the specified board id is null.
      */
     @Override
-    public List<Type> getAllInBoard(Long boardId) throws AccountNotFoundException {
+    public List<Type> getAllInBoard(Long boardId) {
         Board board = Validations.doesIdExists(boardId, boardRepository);
         return typeRepository.findByBoard(board);
     }

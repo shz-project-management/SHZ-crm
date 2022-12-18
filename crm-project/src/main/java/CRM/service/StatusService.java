@@ -8,10 +8,8 @@ import CRM.utils.Validations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.security.auth.login.AccountNotFoundException;
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.stream.Collectors;
 
 @Service
 public class StatusService implements AttributeService {
@@ -43,7 +41,7 @@ public class StatusService implements AttributeService {
      * @param statusId the status ID to delete
      */
     @Override
-    public boolean delete(Long statusId) throws AccountNotFoundException {
+    public boolean delete(Long statusId) {
         Status status = Validations.doesIdExists(statusId, statusRepository);
         statusRepository.delete(status);
         return true;
@@ -58,7 +56,7 @@ public class StatusService implements AttributeService {
      * @throws NullPointerException     if the specified id is null.
      */
     @Override
-    public Status get(Long id) throws AccountNotFoundException {
+    public Status get(Long id) {
         return Validations.doesIdExists(id, statusRepository);
     }
 
@@ -82,7 +80,7 @@ public class StatusService implements AttributeService {
      * @throws NullPointerException     if the specified board id is null.
      */
     @Override
-    public List<Status> getAllInBoard(Long boardId) throws AccountNotFoundException {
+    public List<Status> getAllInBoard(Long boardId) {
         Board board = Validations.doesIdExists(boardId, boardRepository);
         return statusRepository.findByBoard(board);
     }

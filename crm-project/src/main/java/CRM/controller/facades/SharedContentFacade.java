@@ -83,10 +83,10 @@ public class SharedContentFacade {
     }
 
     /**
-     * This function gets an item as a parameter and extracts its class in order to
-     * return the correct service we need to select the action we need.
-     * @param c - class of folder/document
-     * @return the service we need to use according to what file it is.
+     * Converts a given Class object to the corresponding AttributeService object.
+     *
+     * @param c the Class object to be converted
+     * @return the corresponding AttributeService object, or null if no corresponding AttributeService object is found
      */
     private ServiceInterface convertFromClassToService(Class c) {
         logger.info("in FacadeFileController -> convertFromClassToService ,item of Class: " + c);

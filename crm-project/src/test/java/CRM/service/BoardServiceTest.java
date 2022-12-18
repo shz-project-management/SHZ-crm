@@ -5,21 +5,16 @@ import CRM.entity.User;
 import CRM.entity.UserInBoard;
 import CRM.entity.requests.BoardRequest;
 import CRM.entity.requests.RegisterUserRequest;
-import CRM.entity.requests.UpdateBoardRequest;
 import CRM.repository.BoardRepository;
 import CRM.repository.UserInBoardRepository;
 import CRM.repository.UserRepository;
-import CRM.utils.enums.Permission;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.internal.matchers.Null;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.dao.DataAccessException;
 
 import javax.security.auth.login.AccountNotFoundException;
 
@@ -73,7 +68,7 @@ class BoardServiceTest {
 
     @Test
     @DisplayName("Test that delete function correctly deletes board from repository and returns true")
-    public void testDeleteDeletesBoard() throws AccountNotFoundException {
+    public void testDeleteDeletesBoard() {
         board.setId(1L);
         given(boardRepository.findById(board.getId())).willReturn(Optional.of(board));
         assertTrue(boardService.delete(board.getId()));
@@ -81,7 +76,7 @@ class BoardServiceTest {
 
     @Test
     @DisplayName("Test that delete function correctly deletes all UserInBoard objects associated with board from repository")
-    public void testDeleteDeletesUserInBoard() throws AccountNotFoundException {
+    public void testDeleteDeletesUserInBoard() {
         board.setId(1L);
         given(boardRepository.findById(board.getId())).willReturn(Optional.of(board));
         boardService.delete(board.getId());
@@ -97,7 +92,7 @@ class BoardServiceTest {
 
     @Test
     @DisplayName("Test that get function correctly retrieves board from repository")
-    public void testGetRetrievesBoard() throws AccountNotFoundException {
+    public void testGetRetrievesBoard() {
         board.setId(1L);
         given(boardRepository.findById(board.getId())).willReturn(Optional.of(board));
         assertEquals(board, boardService.get(board.getId()));
@@ -151,11 +146,11 @@ class BoardServiceTest {
 
     @Test
     @DisplayName("Test update board with valid input")
-    public void testUpdateBoardWithValidInput() throws AccountNotFoundException {
-        UpdateBoardRequest boardRequest = new UpdateBoardRequest();
-        boardRequest.setId(1L);
+    public void testUpdateBoardWithValidInput() {
+        BoardRequest boardRequest = new BoardRequest();
+        boardRequest.setBoardId(1L);
         boardRequest.setName("Test Board");
-        given(boardRepository.findById(boardRequest.getId())).willReturn(Optional.of(board));
+        given(boardRepository.findById(boardRequest.getBoardId())).willReturn(Optional.of(board));
         given(boardRepository.save(board)).willReturn(board);
         assertNotNull(boardService.updateBoard(boardRequest));
     }
@@ -163,17 +158,17 @@ class BoardServiceTest {
     @Test
     @DisplayName("Test update board with invalid board ID")
     public void testUpdateBoardWithInvalidBoardId() {
-        UpdateBoardRequest boardRequest = new UpdateBoardRequest();
-        boardRequest.setId(-2L);
+        BoardRequest boardRequest = new BoardRequest();
+        boardRequest.setBoardId(-2L);
         boardRequest.setName("Test Board");
         assertThrows(NoSuchElementException.class, () -> boardService.updateBoard(boardRequest));
     }
 
     @Test
     @DisplayName("Test update board with null name")
-    public void testUpdateBoardWithNullName() throws AccountNotFoundException {
-        UpdateBoardRequest boardRequest = new UpdateBoardRequest();
-        boardRequest.setId(1L);
+    public void testUpdateBoardWithNullName() {
+        BoardRequest boardRequest = new BoardRequest();
+        boardRequest.setBoardId(1L);
         boardRequest.setName(null);
         assertThrows(NoSuchElementException.class, () -> boardService.updateBoard(boardRequest));
     }
@@ -181,7 +176,7 @@ class BoardServiceTest {
     @Test
     @DisplayName("Test update board with null request")
     public void testUpdateBoardWithNullRequest() {
-        UpdateBoardRequest boardRequest = null;
+        BoardRequest boardRequest = null;
         assertThrows(NullPointerException.class, () -> boardService.updateBoard(boardRequest));
     }
 }
