@@ -135,8 +135,17 @@ public class AttributeFacade {
         }
     }
 
+    /**
+     This method is used to retrieve all the attributes(statuses/types).
+     @return A Response object containing all the retrieved attributes.
+     */
     public Response getAll(Class clz) {
-        return null;
+        return new Response.Builder()
+                .data(AttributeDTO.getListOfAttributesFromDB(convertFromClassToService(clz).getAll()))
+                .message(SuccessMessage.FOUND.toString())
+                .status(HttpStatus.OK)
+                .statusCode(200)
+                .build();
     }
 
     public Response updateAttribute(Long itemId, Attribute object){
