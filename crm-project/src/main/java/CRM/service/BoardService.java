@@ -3,6 +3,7 @@ package CRM.service;
 import CRM.entity.Board;
 import CRM.entity.User;
 import CRM.entity.UserInBoard;
+import CRM.entity.requests.UpdateBoardRequest;
 import CRM.repository.BoardRepository;
 import CRM.repository.UserInBoardRepository;
 import CRM.repository.UserRepository;
@@ -34,6 +35,7 @@ public class BoardService {
 
     /**
      * This function persists a new board to the database by calling the save function in the BoardRepository class.
+     *
      * @param board The board object to be persisted.
      * @return The persisted board object.
      */
@@ -45,6 +47,7 @@ public class BoardService {
 
     /**
      * Deletes the given board from the repository.
+     *
      * @param boardId the board ID to delete
      */
     public boolean delete(Long boardId) throws AccountNotFoundException {
@@ -56,6 +59,7 @@ public class BoardService {
 
     /**
      * This method is used to retrieve a board with the specified id.
+     *
      * @param id The id of the board to be retrieved.
      * @return The retrieved board.
      * @throws NoSuchElementException   if the board with the specified id is not found.
@@ -68,6 +72,7 @@ public class BoardService {
 
     /**
      * This method is used to retrieve all the boards.
+     *
      * @return A list containing all the boards.
      */
     public List<Board> getAll() {
@@ -76,6 +81,7 @@ public class BoardService {
 
     /**
      * This method is used to retrieve all the boards created by a user with the specified id.
+     *
      * @param userId The id of the user whose boards are to be retrieved.
      * @return A list containing all the boards created by the user with the specified id.
      * @throws NoSuchElementException   if the user with the specified id is not found.
@@ -86,5 +92,16 @@ public class BoardService {
         User user = Validations.doesIdExists(userId, userRepository);
         List<UserInBoard> userInBoard = userInBoardRepository.findAllBoardByUser(user);
         return userInBoard.stream().map(UserInBoard::getBoard).collect(Collectors.toList());
+    }
+
+    public Board updateBoard(UpdateBoardRequest boardReq) throws AccountNotFoundException {
+        Board board = Validations.doesIdExists(boardReq.getId(), boardRepository);
+        if(boardReq.getBoardName() != null){
+            board.setName(boardReq.getName());
+        }
+        if(boardReq.getDescription() != null){
+            board.setDescription(boardReq.getDescription());
+        }
+        return boardRepository.save(board);
     }
 }
