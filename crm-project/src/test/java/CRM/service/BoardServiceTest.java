@@ -5,6 +5,7 @@ import CRM.entity.User;
 import CRM.entity.UserInBoard;
 import CRM.entity.requests.BoardRequest;
 import CRM.entity.requests.RegisterUserRequest;
+import CRM.entity.requests.UpdateBoardRequest;
 import CRM.repository.BoardRepository;
 import CRM.repository.UserInBoardRepository;
 import CRM.repository.UserRepository;
@@ -164,5 +165,41 @@ class BoardServiceTest {
     @DisplayName("Test that getAllBoardsOfUser function throws NullPointerException if userId is null")
     public void testGetAllBoardsOfUserWithNullUserThrowsException() {
         assertThrows(NullPointerException.class, () -> boardService.getAllBoardsOfUser(null));
+    }
+
+    @Test
+    @DisplayName("Test update board with valid input")
+    public void testUpdateBoardWithValidInput() throws AccountNotFoundException {
+        UpdateBoardRequest boardRequest = new UpdateBoardRequest();
+        boardRequest.setId(1L);
+        boardRequest.setName("Test Board");
+        given(boardRepository.findById(boardRequest.getId())).willReturn(Optional.of(board));
+        given(boardRepository.save(board)).willReturn(board);
+        assertNotNull(boardService.updateBoard(boardRequest));
+    }
+
+    @Test
+    @DisplayName("Test update board with invalid board ID")
+    public void testUpdateBoardWithInvalidBoardId() {
+        UpdateBoardRequest boardRequest = new UpdateBoardRequest();
+        boardRequest.setId(-2L);
+        boardRequest.setName("Test Board");
+        assertThrows(NoSuchElementException.class, () -> boardService.updateBoard(boardRequest));
+    }
+
+    @Test
+    @DisplayName("Test update board with null name")
+    public void testUpdateBoardWithNullName() throws AccountNotFoundException {
+        UpdateBoardRequest boardRequest = new UpdateBoardRequest();
+        boardRequest.setId(1L);
+        boardRequest.setName(null);
+        assertThrows(NoSuchElementException.class, () -> boardService.updateBoard(boardRequest));
+    }
+
+    @Test
+    @DisplayName("Test update board with null request")
+    public void testUpdateBoardWithNullRequest() {
+        UpdateBoardRequest boardRequest = null;
+        assertThrows(NullPointerException.class, () -> boardService.updateBoard(boardRequest));
     }
 }

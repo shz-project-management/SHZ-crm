@@ -6,6 +6,7 @@ import CRM.entity.User;
 import CRM.entity.requests.BoardRequest;
 import CRM.entity.requests.LoginUserRequest;
 import CRM.entity.requests.RegisterUserRequest;
+import CRM.entity.requests.UpdateBoardRequest;
 import CRM.entity.response.Response;
 import CRM.service.AuthService;
 import CRM.service.BoardService;
@@ -192,5 +193,49 @@ class BoardFacadeTest {
         Long id = 1L;
         given(boardService.getAllBoardsOfUser(id)).willThrow(AccountNotFoundException.class);
         assertEquals(400, boardFacade.getAllBoardsOfUser(id).getStatusCode());
+    }
+
+    @Test
+    @DisplayName("Test update board with valid input")
+    public void testUpdateBoardWithValidInput() throws AccountNotFoundException {
+        board.setName("Test new board name");
+        board.setDescription("Test new description");
+        UpdateBoardRequest boardRequest = new UpdateBoardRequest();
+        given(boardService.updateBoard(boardRequest)).willReturn(board);
+        assertEquals(200, boardFacade.updateBoard(boardRequest).getStatusCode());
+    }
+
+    @Test
+    @DisplayName("Test update board with invalid board ID")
+    public void testUpdateBoardWithInvalidBoardId() {
+        UpdateBoardRequest boardRequest = new UpdateBoardRequest();
+        boardRequest.setId(-2L);
+        boardRequest.setName("Test Board");
+        assertEquals(400, boardFacade.updateBoard(boardRequest).getStatusCode());
+    }
+
+    @Test
+    @DisplayName("Test update board with invalid board name")
+    public void testUpdateBoardWithInvalidBoardName() {
+        UpdateBoardRequest boardRequest = new UpdateBoardRequest();
+        boardRequest.setId(1L);
+        boardRequest.setName("!@#1");
+        assertEquals(400, boardFacade.updateBoard(boardRequest).getStatusCode());
+    }
+
+    @Test
+    @DisplayName("Test update board with non-existent board")
+    public void testUpdateBoardWithNonExistentBoard() throws AccountNotFoundException {
+        UpdateBoardRequest boardRequest = new UpdateBoardRequest();
+        boardRequest.setName("Test Board");
+        given(boardService.updateBoard(boardRequest)).willThrow(NoSuchElementException.class);
+        assertEquals(400, boardFacade.updateBoard(boardRequest).getStatusCode());
+    }
+
+    @Test
+    @DisplayName("Test update board with null input")
+    public void testUpdateBoardWithNullInput() {
+        UpdateBoardRequest boardRequest = null;
+        assertEquals(500, boardFacade.updateBoard(boardRequest).getStatusCode());
     }
 }
