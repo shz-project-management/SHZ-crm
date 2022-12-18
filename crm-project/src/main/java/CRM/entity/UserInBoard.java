@@ -54,6 +54,4 @@ public class UserInBoard {
         userInBoard.setPermission(permission);
         return userInBoard;
     }
-
-
 }

@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import javax.security.auth.login.AccountNotFoundException;
@@ -126,10 +127,10 @@ public class UserServiceTest {
         when(boardRepository.findById(1L)).thenReturn(Optional.of(board1));
         when(userInBoardRepository.findAllUserByBoard(board1))
                 .thenReturn(Arrays.asList(
-                 UserInBoard.userInBoardUserChoosePermission(new User(1L, "Ziv1", "Hausler", "ziv123456", "ziv1@gmail.com", null, null), Board.createBoard(user1, "hello", "world"), Permission.ADMIN),
-                 UserInBoard.userInBoardUserChoosePermission(new User(2L, "Ziv2", "Hausler", "ziv123456", "ziv2@gmail.com", null, null), Board.createBoard(user1, "hello", "world"), Permission.USER),
-                 UserInBoard.userInBoardUserChoosePermission(new User(3L, "Ziv3", "Hausler", "ziv123456", "ziv3@gmail.com", null, null), Board.createBoard(user1, "hello", "world"), Permission.USER)
-        ));
+                        UserInBoard.userInBoardUserChoosePermission(new User(1L, "Ziv1", "Hausler", "ziv123456", "ziv1@gmail.com", null, null), Board.createBoard(user1, "hello", "world"), Permission.ADMIN),
+                        UserInBoard.userInBoardUserChoosePermission(new User(2L, "Ziv2", "Hausler", "ziv123456", "ziv2@gmail.com", null, null), Board.createBoard(user1, "hello", "world"), Permission.USER),
+                        UserInBoard.userInBoardUserChoosePermission(new User(3L, "Ziv3", "Hausler", "ziv123456", "ziv3@gmail.com", null, null), Board.createBoard(user1, "hello", "world"), Permission.USER)
+                ));
         List<User> users = userService.getAllInBoard(1L);
 
         assertEquals(3, users.size());
@@ -149,6 +150,52 @@ public class UserServiceTest {
     public void testGetAllInBoardMethodWhenBoardDoesNotExist() {
         when(boardRepository.findById(1L)).thenReturn(Optional.empty());
         assertThrows(NoSuchElementException.class, () -> userService.getAllInBoard(1L));
+    }
+
+    @Test
+    @DisplayName("Test valid user ID and board ID values add a new user to an existing board")
+    public void testAddUserToBoard() throws AccountNotFoundException {
+        User user = new User();
+        user.setId(1L);
+        given(userRepository.findById(1L)).willReturn(Optional.of(user));
+
+        Board board = new Board();
+        board.setId(1L);
+        given(boardRepository.findById(1L)).willReturn(Optional.of(board));
+
+        given(userInBoardRepository.findByBoardAndUser(user, board)).willReturn(Optional.empty());
+        given(userInBoardRepository.save(Mockito.any())).willReturn(new UserInBoard());
+
+        UserInBoard userInBoard = userService.addUserToBoard(1L, 1L);
+        assertNotNull(userInBoard);
+    }
+
+    @Test
+    @DisplayName("Test non-existent user ID value throws AccountNotFoundException with USER_NOT_FOUND message")
+    public void testNonExistentUserId() {
+        given(userRepository.findById(100L)).willReturn(Optional.empty());
+        assertThrows(AccountNotFoundException.class, () -> userService.addUserToBoard(100L, 1L));
+    }
+
+    @Test
+    @DisplayName("Test non-existent board ID value throws AccountNotFoundException with BOARD_NOT_FOUND message")
+    public void testNonExistentBoardId() {
+        assertThrows(AccountNotFoundException.class, () -> userService.addUserToBoard(1L, 100L));
+    }
+
+    @Test
+    @DisplayName("Test combination of user and board that already exists in the database throws IllegalArgumentException with USER_IN_BOARD_EXISTS message")
+    public void testUserInBoardAlreadyExists() {
+        User user = new User();
+        user.setId(1L);
+        given(userRepository.findById(1L)).willReturn(Optional.of(user));
+
+        Board board = new Board();
+        board.setId(1L);
+        given(boardRepository.findById(1L)).willReturn(Optional.of(board));
+
+        given(userInBoardRepository.findByBoardAndUser(user, board)).willReturn(Optional.of(new UserInBoard()));
+        assertThrows(IllegalArgumentException.class, () -> userService.addUserToBoard(1L, 1L));
     }
 
     @Test
