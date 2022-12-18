@@ -8,6 +8,7 @@ import CRM.repository.BoardRepository;
 import CRM.repository.UserInBoardRepository;
 import CRM.repository.UserRepository;
 import CRM.utils.Validations;
+import CRM.utils.enums.ExceptionMessage;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,8 +48,7 @@ public class BoardService {
      *
      * @param boardId the board ID to delete
      */
-    // FIXME: don't use Long -> use long since we know for sure it's not null by now.
-    public boolean delete(Long boardId) throws AccountNotFoundException {
+    public boolean delete(long boardId) throws AccountNotFoundException {
         Board board = Validations.doesIdExists(boardId, boardRepository);
         userInBoardRepository.deleteAllByBoard(board);
         boardRepository.delete(board);
@@ -64,8 +64,7 @@ public class BoardService {
      * @throws IllegalArgumentException if the specified id is invalid.
      * @throws NullPointerException     if the specified id is null.
      */
-    // FIXME: don't use Long -> use long since we know for sure it's not null by now.
-    public Board get(Long id) throws AccountNotFoundException {
+    public Board get(long id) throws AccountNotFoundException {
         return Validations.doesIdExists(id, boardRepository);
     }
 
@@ -87,11 +86,14 @@ public class BoardService {
      * @throws IllegalArgumentException if the specified user id is invalid.
      * @throws NullPointerException     if the specified user id is null.
      */
-    // FIXME: don't use Long -> use long since we know for sure it's not null by now.
-    public List<Board> getAllBoardsOfUser(Long userId) throws AccountNotFoundException {
-        User user = Validations.doesIdExists(userId, userRepository);
-        List<UserInBoard> userInBoard = userInBoardRepository.findAllBoardByUser(user);
-        return userInBoard.stream().map(UserInBoard::getBoard).collect(Collectors.toList());
+    public List<Board> getAllBoardsOfUser(long userId) throws AccountNotFoundException {
+        try {
+            User user = Validations.doesIdExists(userId, userRepository);
+            List<UserInBoard> userInBoard = userInBoardRepository.findAllBoardByUser(user);
+            return userInBoard.stream().map(UserInBoard::getBoard).collect(Collectors.toList());
+        } catch (NoSuchElementException e){
+            throw new AccountNotFoundException(ExceptionMessage.ACCOUNT_DOES_NOT_EXISTS.toString());
+        }
     }
 
     /**

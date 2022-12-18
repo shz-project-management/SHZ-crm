@@ -1,8 +1,8 @@
 package CRM.service;
 
-import CRM.controller.facades.AuthFacade;
 import CRM.entity.Comment;
 import CRM.entity.SharedContent;
+import CRM.entity.requests.ItemRequest;
 import CRM.repository.CommentRepository;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -10,8 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Optional;
 
 @Service
 public class CommentService implements ServiceInterface {
