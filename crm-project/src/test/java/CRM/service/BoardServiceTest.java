@@ -96,12 +96,6 @@ class BoardServiceTest {
     }
 
     @Test
-    @DisplayName("Test that delete function throws NullPointerException if board is null")
-    public void testDeleteWithNullBoardThrowsException() {
-        assertThrows(NullPointerException.class, () -> boardService.delete(null));
-    }
-
-    @Test
     @DisplayName("Test that get function correctly retrieves board from repository")
     public void testGetRetrievesBoard() throws AccountNotFoundException {
         board.setId(1L);
@@ -114,12 +108,6 @@ class BoardServiceTest {
     public void testGetWithNonExistentBoardThrowsException() {
         given(boardRepository.findById(123L)).willReturn(Optional.empty());
         assertThrows(NoSuchElementException.class, () -> boardService.get(123L));
-    }
-
-    @Test
-    @DisplayName("Test that get function throws NullPointerException if board is null")
-    public void testGetWithNullBoardThrowsException() {
-        assertThrows(NullPointerException.class, () -> boardService.get(null));
     }
 
     @Test
@@ -159,12 +147,6 @@ class BoardServiceTest {
     public void testGetAllBoardsOfUserWithNonExistentUserThrowsException() {
         given(userRepository.findById(123L)).willReturn(Optional.empty());
         assertThrows(AccountNotFoundException.class, () -> boardService.getAllBoardsOfUser(123L));
-    }
-
-    @Test
-    @DisplayName("Test that getAllBoardsOfUser function throws NullPointerException if userId is null")
-    public void testGetAllBoardsOfUserWithNullUserThrowsException() {
-        assertThrows(NullPointerException.class, () -> boardService.getAllBoardsOfUser(null));
     }
 
     @Test

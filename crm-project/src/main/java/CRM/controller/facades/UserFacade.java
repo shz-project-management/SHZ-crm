@@ -76,7 +76,7 @@ public class UserFacade {
                     .status(HttpStatus.OK)
                     .statusCode(200)
                     .build();
-        } catch (AccountNotFoundException | IllegalArgumentException e) {
+        } catch (AccountNotFoundException | NoSuchElementException | IllegalArgumentException e) {
             return new Response.Builder()
                     .message(e.getMessage())
                     .status(HttpStatus.BAD_REQUEST)

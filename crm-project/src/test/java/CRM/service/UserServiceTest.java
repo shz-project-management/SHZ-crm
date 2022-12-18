@@ -1,8 +1,6 @@
 package CRM.service;
 
-import CRM.entity.Board;
-import CRM.entity.User;
-import CRM.entity.UserInBoard;
+import CRM.entity.*;
 import CRM.repository.BoardRepository;
 import CRM.repository.UserInBoardRepository;
 import CRM.repository.UserRepository;
@@ -197,4 +195,84 @@ public class UserServiceTest {
         given(userInBoardRepository.findByBoardAndUser(user, board)).willReturn(Optional.of(new UserInBoard()));
         assertThrows(IllegalArgumentException.class, () -> userService.addUserToBoard(1L, 1L));
     }
+
+    @Test
+    @DisplayName("Test removal of all user dependencies")
+    public void testRemoveAllUserDependencies() {
+        User user = new User();
+        user.setId(1L);
+        assertTrue(userService.removeAllUserDependencies(user));
+    }
+
+    @Test
+    @DisplayName("Test removal of boards associated with user")
+    public void testRemoveBoardsByUser() {
+        User user = new User();
+        user.setId(1L);
+        List<Board> boardList = Arrays.asList(new Board(), new Board());
+        when(boardRepository.findAllByUser(user)).thenReturn(boardList);
+        assertTrue(userService.removeUserDependenciesFromBoardTable(user));
+    }
+
+    @Test
+    @DisplayName("Test handling of empty list of boards")
+    public void testHandleEmptyBoardList() {
+        User user = new User();
+        user.setId(1L);
+        List<Board> boardList = new ArrayList<>();
+        when(boardRepository.findAllByUser(user)).thenReturn(boardList);
+        assertTrue(userService.removeUserDependenciesFromBoardTable(user));
+    }
+
+    @Test
+    @DisplayName("Test deletion of user and dependencies")
+    public void testDeleteUserAndDependencies() throws AccountNotFoundException {
+        long userId = 1L;
+        User user = new User();
+        user.setId(userId);
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+        assertTrue(userService.delete(userId));
+    }
+
+    @Test
+    @DisplayName("Test handling of non-existent user")
+    public void testHandleNonExistentUser() {
+        long userId = 1L;
+        when(userRepository.findById(userId)).thenReturn(Optional.empty());
+        assertThrows(AccountNotFoundException.class, () -> userService.delete(userId));
+    }
+
+
+    @Test
+    @DisplayName("Test deletion of user with no dependencies")
+    public void testDeleteUserWithNoDependencies() throws AccountNotFoundException {
+        long userId = 1L;
+        User user = new User();
+        user.setId(userId);
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+        assertTrue(userService.delete(userId));
+    }
+
+//    @Test
+//    @DisplayName("Test deletion of user with multiple dependencies")
+//    public void testDeleteUserWithMultipleDependencies() throws AccountNotFoundException {
+//        long userId = 1L;
+//        User user = new User();
+//        user.setId(userId);
+//        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+//        UserInBoard userInBoard = new UserInBoard();
+//        Comment comment = new Comment();
+//        Attribute attribute = new Attribute();
+//        Board board = new Board();
+//        when(userInBoardRepository.findAllByUserId(userId)).thenReturn(Arrays.asList(userInBoard, userInBoard));
+//        when(commentRepository.findAllByUserId(userId)).thenReturn(Arrays.asList(comment, comment));
+//        when(attributeRepository.findAllByUserId(userId)).thenReturn(Arrays.asList(attribute, attribute));
+//        when(boardRepository.findAllByUserId(userId)).thenReturn(Arrays.asList(board, board));
+//        assertTrue(delete(userId));
+//        verify(userInBoardRepository, times(2)).delete(userInBoard);
+//        verify(commentRepository, times(2)).delete(comment);
+//        verify(attributeRepository, times(2)).delete(attribute);
+//        verify(boardRepository, times(2)).delete(board);
+//        verify(userRepository, times(1)).delete(user);
+//    }
 }
