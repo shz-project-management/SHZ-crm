@@ -176,15 +176,15 @@ public class BoardFacade {
                 Validations.validate(board.getId(), Regex.ID.getRegex());
             }
             if(board.getName() != null){
-                Validations.validate(board.getName(), Regex.NAME.getRegex());
+                Validations.validate(board.getName(), Regex.BOARD_NAME.getRegex());
             }
             return new Response.Builder()
-                    .data(BoardDTO.getListOfBoardsFromDB(boardService.updateBoard(board)))
+                    .data(BoardDTO.getBoardFromDB(boardService.updateBoard(board)))
                     .message(SuccessMessage.FOUND.toString())
                     .status(HttpStatus.OK)
                     .statusCode(200)
                     .build();
-        } catch (IllegalArgumentException | NoSuchElementException e){
+        } catch (AccountNotFoundException | IllegalArgumentException | NoSuchElementException e){
             return new Response.Builder()
                     .message(e.getMessage())
                     .status(HttpStatus.BAD_REQUEST)

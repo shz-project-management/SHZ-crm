@@ -96,7 +96,7 @@ public class BoardService {
 
     public Board updateBoard(UpdateBoardRequest boardReq) throws AccountNotFoundException {
         Board board = Validations.doesIdExists(boardReq.getId(), boardRepository);
-        if(boardReq.getBoardName() != null){
+        if(boardReq.getName() != null){
             board.setName(boardReq.getName());
         }
         if(boardReq.getDescription() != null){
