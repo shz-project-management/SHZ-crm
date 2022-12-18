@@ -148,6 +148,10 @@ public class AttributeFacade {
                 .build();
     }
 
+    public Response getAllAttributesInBoard(Long boardId) {
+        return null;
+    }
+
     public Response updateAttribute(Long itemId, Attribute object){
         // validate the id using Validations.validate
         return null;
