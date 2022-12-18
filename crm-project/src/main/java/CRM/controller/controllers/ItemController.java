@@ -2,17 +2,14 @@ package CRM.controller.controllers;
 
 import CRM.controller.facades.AttributeFacade;
 import CRM.controller.facades.SharedContentFacade;
-import CRM.entity.Item;
 import CRM.entity.requests.AttributeRequest;
 import CRM.entity.requests.ItemRequest;
-import CRM.entity.requests.UpdateItemRequest;
 import CRM.entity.response.Response;
 import lombok.AllArgsConstructor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -45,7 +42,7 @@ public class ItemController {
     }
 
     @PatchMapping
-    public ResponseEntity<Response> update(@RequestParam UpdateItemRequest updateItemRequest){
+    public ResponseEntity<Response> update(@RequestParam ItemRequest itemRequest){
         return null;
     }
 
@@ -61,11 +58,6 @@ public class ItemController {
 
     @GetMapping(value = "all-in-board/{itemId}")
     public ResponseEntity<Response> getAllItemsInBoard(@PathVariable Long boardId){
-        return null;
-    }
-
-    @GetMapping(value = "all-in-item/{itemId}")
-    public ResponseEntity<Response> getAllItemsInItem(@PathVariable Long itemId){
         return null;
     }
 

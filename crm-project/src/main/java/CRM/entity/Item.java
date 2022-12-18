@@ -28,7 +28,7 @@ public class Item extends SharedContent {
     private Type type;
 
     private String section;
-    private Set<User> assignedToUsers;
+    private Long assignedToUserId;
     private LocalDateTime dueDate;
     private int importance;
 

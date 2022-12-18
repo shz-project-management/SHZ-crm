@@ -24,8 +24,8 @@ public class ItemRequest {
 
     //Item fields
     private Long boardId;
-    private AttributeRequest status;
-    private AttributeRequest type;
+    private Long statusId;
+    private Long typeId;
     private String section;
     private Long assignedToUserId;
     private LocalDateTime dueDate;

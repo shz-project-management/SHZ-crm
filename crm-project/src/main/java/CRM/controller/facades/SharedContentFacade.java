@@ -3,7 +3,6 @@ package CRM.controller.facades;
 import CRM.entity.Comment;
 import CRM.entity.Item;
 import CRM.entity.requests.ItemRequest;
-import CRM.entity.requests.UpdateItemRequest;
 import CRM.entity.response.Response;
 import CRM.service.CommentService;
 import CRM.service.ItemService;
@@ -48,7 +47,7 @@ public class SharedContentFacade {
         return null;
     }
 
-    public Response update(UpdateItemRequest updateItem){
+    public Response update(ItemRequest updateItem){
         // validate params using the Validations.validate function
         // call the correct service using convertFromClassToService(clz) function
         // with update function in it.

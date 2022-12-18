@@ -20,7 +20,7 @@ public class ItemDTO {
     private AttributeDTO status;
     private AttributeDTO type;
     private String section;
-    private Set<UserDTO> assignedToUser;
+    private Long assignedToUserId;
     private LocalDateTime dueDate;
     private Integer importance;
 }
