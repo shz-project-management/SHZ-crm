@@ -3,6 +3,7 @@ package CRM.service;
 import CRM.controller.facades.AuthFacade;
 import CRM.entity.Comment;
 import CRM.entity.SharedContent;
+import CRM.entity.requests.UpdateItemRequest;
 import CRM.repository.CommentRepository;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -42,6 +43,11 @@ public class CommentService implements ServiceInterface {
         // checkIfExists
         // return the received item
 
+        return null;
+    }
+
+    @Override
+    public SharedContent update(UpdateItemRequest item) {
         return null;
     }
 

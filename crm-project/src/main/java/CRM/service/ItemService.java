@@ -1,8 +1,7 @@
 package CRM.service;
 
-import CRM.entity.Comment;
-import CRM.entity.Item;
-import CRM.entity.SharedContent;
+import CRM.entity.*;
+import CRM.entity.requests.ItemRequest;
 import CRM.repository.ItemRepository;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -21,14 +20,8 @@ public class ItemService implements ServiceInterface {
     @Autowired
     private ItemRepository itemRepository;
 
-    /**
-     * getUser called from userController to send back to client an UserRes which is a response
-     * with name mail and id.
-     *
-     * @param itemId - user id in database.
-     * @return - entity of UserODT that contains name, email and id.
-     */
-    public Item get(Long itemId) {
+
+    public Item get(long itemId) {
         // Ask for the repo to find the item, by the given id input -> checkIfExists()
         // Since the repo returns an option, check if this option is not empty
         // If it is empty, throw "FileNotFound"
@@ -47,19 +40,17 @@ public class ItemService implements ServiceInterface {
 
     @Override
     public SharedContent update(long id, String field, String content) {
+        return null;
+    }
+
+    @Override
+    public Item create(ItemRequest item) {
         // checkIfExists
         // make sure there is such a field in Item -> use reflection!
 
         return null;
     }
 
-    @Override
-    public SharedContent get(long id) {
-        // checkIfExists
-        // return the received item
-
-        return null;
-    }
 
     @Override
     public List<SharedContent> getAllInItem(long itemId) {

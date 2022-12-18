@@ -4,6 +4,7 @@ import lombok.*;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Set;
 
 @AllArgsConstructor
@@ -27,7 +28,7 @@ public class Item extends SharedContent {
     private Type type;
 
     private String section;
-    private Long assignedToUserId;
+    private Set<User> assignedToUsers;
     private LocalDateTime dueDate;
     private int importance;
 

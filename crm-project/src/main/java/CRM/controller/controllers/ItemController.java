@@ -3,6 +3,9 @@ package CRM.controller.controllers;
 import CRM.controller.facades.AttributeFacade;
 import CRM.controller.facades.SharedContentFacade;
 import CRM.entity.Item;
+import CRM.entity.requests.AttributeRequest;
+import CRM.entity.requests.ItemRequest;
+import CRM.entity.requests.UpdateItemRequest;
 import CRM.entity.response.Response;
 import lombok.AllArgsConstructor;
 import org.apache.logging.log4j.LogManager;
@@ -32,7 +35,7 @@ public class ItemController {
     //  ------------------------------------------- //
 
     @PostMapping(consumes = "application/json")
-    public ResponseEntity<Response> create(@RequestBody Item item) {
+    public ResponseEntity<Response> create(@RequestBody ItemRequest item) {
         return null;
     }
 
@@ -42,33 +45,32 @@ public class ItemController {
     }
 
     @PatchMapping
-    public ResponseEntity<Response> update(@RequestParam Long itemId, @RequestParam String field, @RequestParam String content){
+    public ResponseEntity<Response> update(@RequestParam UpdateItemRequest updateItemRequest){
         return null;
     }
 
     @PatchMapping(value = "{itemId}/type")
-    public ResponseEntity<Response> updateType(@DestinationVariable Long itemId, @RequestParam Long typeId){
+    public ResponseEntity<Response> updateType(@PathVariable Long itemId, @RequestParam Long typeId, @RequestBody AttributeRequest attributeRequest){
         return null;
     }
 
     @PatchMapping(value = "{itemId}/status")
-    public ResponseEntity<Response> updateStatus(@DestinationVariable Long itemId, @RequestParam Long statusId){
+    public ResponseEntity<Response> updateStatus(@PathVariable Long itemId, @RequestParam Long statusId, @RequestBody AttributeRequest attributeRequest){
         return null;
     }
 
     @GetMapping(value = "all-in-board/{itemId}")
-    public ResponseEntity<Response> getAllItemsInBoard(@DestinationVariable Long boardId){
+    public ResponseEntity<Response> getAllItemsInBoard(@PathVariable Long boardId){
         return null;
     }
 
     @GetMapping(value = "all-in-item/{itemId}")
-    public ResponseEntity<Response> getAllItemsInItem(@DestinationVariable Long itemId){
-        sharedContentFacade.getAllInItem(itemId, Item.class);
+    public ResponseEntity<Response> getAllItemsInItem(@PathVariable Long itemId){
         return null;
     }
 
     @GetMapping(value = "{itemId}")
-    public ResponseEntity<Response> get(@DestinationVariable Long itemId){
+    public ResponseEntity<Response> get(@PathVariable Long itemId){
         return null;
     }
 }
