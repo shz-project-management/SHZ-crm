@@ -1,6 +1,7 @@
 package CRM.controller.facades;
 
 import CRM.controller.controllers.UserController;
+import CRM.entity.DTO.UserInBoardDTO;
 import CRM.entity.User;
 import CRM.entity.response.Response;
 import CRM.service.UserService;
@@ -34,11 +35,6 @@ public class UserFacadeTest {
 
     @InjectMocks
     private UserFacade userFacade;
-
-    @BeforeEach
-    void setUp() {
-        // set up any necessary mock behavior here
-    }
 
     @Test
     @DisplayName("Test get method with valid input")
@@ -159,5 +155,72 @@ public class UserFacadeTest {
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatus());
         assertEquals(500, response.getStatusCode());
         verify(userService).getAllInBoard(boardId);
+    }
+
+    @Test
+    @DisplayName("Test valid ID value returns OK status")
+    public void testValidId() throws AccountNotFoundException {
+        given(userService.delete(1L)).willReturn(true);
+        Response response = userFacade.delete(1L);
+        assertEquals(200, response.getStatusCode());
+    }
+
+    @Test
+    @DisplayName("Test invalid ID value returns BAD REQUEST status")
+    public void testInvalidId() {
+        Response response = userFacade.delete(-1L);
+        assertEquals(400, response.getStatusCode());
+    }
+
+    @Test
+    @DisplayName("Test null ID value returns BAD REQUEST status")
+    public void testNullId() {
+        Response response = userFacade.delete(null);
+        assertEquals(500, response.getStatusCode());
+    }
+
+    @Test
+    @DisplayName("Test non-existent ID value returns BAD REQUEST status")
+    public void testNonExistentId() throws AccountNotFoundException {
+        given(userService.delete(100L)).willThrow(new AccountNotFoundException());
+        Response response = userFacade.delete(100L);
+        assertEquals(400, response.getStatusCode());
+    }
+
+    @Test
+    @DisplayName("Test invalid user ID value returns BAD REQUEST status and IllegalArgumentException message")
+    public void testInvalidUserId() {
+        Response response = userFacade.addUserToBoard(1L, -1L);
+        assertEquals(400, response.getStatusCode());
+    }
+
+    @Test
+    @DisplayName("Test invalid board ID value returns BAD REQUEST status and IllegalArgumentException message")
+    public void testInvalidBoardId() {
+        Response response = userFacade.addUserToBoard(1L, -1L);
+        assertEquals(400, response.getStatusCode());
+    }
+
+    @Test
+    @DisplayName("Test non-existent user ID value returns BAD REQUEST status and AccountNotFoundException message")
+    public void testNonExistentUserId() throws AccountNotFoundException {
+        given(userService.addUserToBoard(100L, 1L)).willThrow(new AccountNotFoundException());
+        Response response = userFacade.addUserToBoard(100L, 1L);
+        assertEquals(400, response.getStatusCode());
+    }
+
+    @Test
+    @DisplayName("Test non-existent board ID value returns BAD REQUEST status and NoSuchElementException message")
+    public void testNonExistentBoardId() throws AccountNotFoundException {
+        given(userService.addUserToBoard(1L, 100L)).willThrow(new NoSuchElementException());
+        Response response = userFacade.addUserToBoard(1L, 100L);
+        assertEquals(400, response.getStatusCode());
+    }
+
+    @Test
+    @DisplayName("Test null user ID and board ID values return BAD REQUEST status and NullPointerException message")
+    public void testNullIds() {
+        Response response = userFacade.addUserToBoard(null, null);
+        assertEquals(500, response.getStatusCode());
     }
 }
