@@ -1,8 +1,10 @@
 package CRM.service;
 
 import CRM.entity.Attribute;
+import CRM.entity.Board;
 import CRM.entity.Status;
 import CRM.entity.Type;
+import CRM.repository.BoardRepository;
 import CRM.repository.TypeRepository;
 import CRM.utils.Validations;
 import org.apache.logging.log4j.LogManager;
@@ -21,6 +23,8 @@ public class TypeService implements AttributeService{
 
     @Autowired
     private TypeRepository typeRepository;
+    @Autowired
+    private BoardRepository boardRepository;
 
     @Override
     public int update(long id, Attribute object) {
@@ -71,5 +75,20 @@ public class TypeService implements AttributeService{
     @Override
     public List<Type> getAll() {
         return typeRepository.findAll();
+    }
+
+    /**
+     * This method is used to retrieve all the types that belong to the board with the specified id.
+     *
+     * @param boardId The id of the user whose types are to be retrieved.
+     * @return A list containing all the types that belong to the board with the specified id.
+     * @throws NoSuchElementException   if the board with the specified id is not found.
+     * @throws IllegalArgumentException if the specified board id is invalid.
+     * @throws NullPointerException     if the specified board id is null.
+     */
+    @Override
+    public List<Type> getAllInBoard(Long boardId) throws AccountNotFoundException {
+        Board board = Validations.doesIdExists(boardId, boardRepository);
+        return typeRepository.findByBoard(board);
     }
 }

@@ -28,7 +28,7 @@ public class AttributeDTO {
         return attributeDTO;
     }
 
-    public static List<AttributeDTO> getListOfAttributesFromDB(List<Attribute> attributes){
+    public static List<AttributeDTO> createListOfAttributesDTO(List<Attribute> attributes){
         List<AttributeDTO> attributeDTOS = new ArrayList<>();
         for (Attribute attribute: attributes) {
             AttributeDTO attributeDTO = new AttributeDTO();
