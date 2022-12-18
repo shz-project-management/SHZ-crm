@@ -142,7 +142,7 @@ public class UserService {
      *             Removes all attributes of the given user from the database
      *             Removes all boards created by the given user from the database
      */
-    private void removeAllUserDependencies(User user) {
+    void removeAllUserDependencies(User user) {
         // second, remove all entries of this user from UserInBoard table
         removeUserDependenciesFromUserInBoardTable(user);
 

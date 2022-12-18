@@ -20,7 +20,7 @@ import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class UserServiceTest {
@@ -149,5 +149,35 @@ public class UserServiceTest {
     public void testGetAllInBoardMethodWhenBoardDoesNotExist() {
         when(boardRepository.findById(1L)).thenReturn(Optional.empty());
         assertThrows(NoSuchElementException.class, () -> userService.getAllInBoard(1L));
+    }
+
+    @Test
+    @DisplayName("Test removal of all user dependencies")
+    public void testRemoveAllUserDependencies() {
+        User user = new User();
+        user.setId(1L);
+        assertTrue(userService.removeAllUserDependencies(user));
+    }
+
+    @Test
+    @DisplayName("Test removal of boards associated with user")
+    public void testRemoveBoardsByUser() {
+        User user = new User();
+        user.setId(1L);
+        List<Board> boardList = Arrays.asList(new Board(), new Board());
+        when(boardRepository.findAllByUser(user)).thenReturn(boardList);
+        assertTrue(userService.removeUserDependenciesFromBoardTable(user));
+        verify(boardRepository, times(1)).deleteAll(boardList);
+    }
+
+    @Test
+    @DisplayName("Test handling of empty list of boards")
+    public void testHandleEmptyBoardList() {
+        User user = new User();
+        user.setId(1L);
+        List<Board> boardList = new ArrayList<>();
+        when(boardRepository.findAllByUser(user)).thenReturn(boardList);
+        assertTrue(userService.removeUserDependenciesFromBoardTable(user));
+        verify(boardRepository, times(0)).deleteAll(boardList);
     }
 }
