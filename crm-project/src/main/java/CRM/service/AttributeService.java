@@ -17,4 +17,6 @@ public interface AttributeService {
     Attribute get(Long id) throws AccountNotFoundException;
 
     <T> List<T> getAll();
+
+    <T> List<T> getAllInBoard(Long boardId) throws AccountNotFoundException;
 }

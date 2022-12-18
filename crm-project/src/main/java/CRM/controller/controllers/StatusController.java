@@ -76,9 +76,9 @@ public class StatusController {
      * @param boardId The id of the board whose statuses are to be retrieved.
      * @return A ResponseEntity object containing the Response object with the retrieved statuses and the HTTP status code.
      */
-    @GetMapping(value = "getAll/{userId}")
+    @GetMapping(value = "getAll/{boardId}")
     public ResponseEntity<Response> getAllStatusesInBoard(@PathVariable Long boardId) {
-        Response response = attributeFacade.getAllAttributesInBoard(boardId);
+        Response response = attributeFacade.getAllAttributesInBoard(boardId, Status.class);
         return new ResponseEntity<>(response, response.getStatus());
     }
 }
