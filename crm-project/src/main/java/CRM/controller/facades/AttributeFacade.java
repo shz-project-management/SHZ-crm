@@ -135,7 +135,7 @@ public class AttributeFacade {
         }
     }
 
-    public Response getAll() {
+    public Response getAll(Class clz) {
         return null;
     }
 
