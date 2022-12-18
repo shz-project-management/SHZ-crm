@@ -1,17 +1,15 @@
 package CRM.service;
 
-import CRM.controller.facades.AttributeFacade;
 import CRM.entity.Attribute;
-import CRM.entity.Status;
 import CRM.entity.Type;
 import CRM.repository.TypeRepository;
 import CRM.utils.Validations;
-import CRM.utils.enums.ExceptionMessage;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.hibernate.NonUniqueObjectException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import javax.security.auth.login.AccountNotFoundException;
 
 @Service
 public class TypeService implements AttributeService{
@@ -36,5 +34,12 @@ public class TypeService implements AttributeService{
         if(typeRepository.existsByBoardAndNameLike(type.getBoard(), type.getName()))
             Validations.throwAttributeAlreadyExistsForBoard(type, "Type");
         return typeRepository.save(Type.createType(type));
+    }
+
+    @Override
+    public boolean delete(Long typeId) throws AccountNotFoundException {
+        Type type = Validations.doesIdExists(typeId, typeRepository);
+        typeRepository.delete(type);
+        return true;
     }
 }

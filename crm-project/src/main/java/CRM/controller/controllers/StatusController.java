@@ -41,7 +41,7 @@ public class StatusController {
      */
     @DeleteMapping(value = "{id}")
     public ResponseEntity<Response> delete(@PathVariable Long id) {
-        Response response = attributeFacade.delete(id);
+        Response response = attributeFacade.delete(id, Status.class);
         return new ResponseEntity<>(response, response.getStatus());
     }
 }

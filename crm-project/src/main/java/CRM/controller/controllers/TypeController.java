@@ -42,7 +42,7 @@ public class TypeController {
      */
     @DeleteMapping(value = "{id}")
     public ResponseEntity<Response> delete(@PathVariable Long id) {
-        Response response = attributeFacade.delete(id);
+        Response response = attributeFacade.delete(id, Type.class);
         return new ResponseEntity<>(response, response.getStatus());
     }
 }
