@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.security.auth.login.AccountNotFoundException;
+import java.util.NoSuchElementException;
 
 @Service
 public class TypeService implements AttributeService{
@@ -36,10 +37,27 @@ public class TypeService implements AttributeService{
         return typeRepository.save(Type.createType(type));
     }
 
+    /**
+     * Deletes the given type from the repository.
+     * @param typeId the type ID to delete
+     */
     @Override
     public boolean delete(Long typeId) throws AccountNotFoundException {
         Type type = Validations.doesIdExists(typeId, typeRepository);
         typeRepository.delete(type);
         return true;
+    }
+
+    /**
+     * This method is used to retrieve a type with the specified id.
+     * @param id The id of the type to be retrieved.
+     * @return The retrieved type.
+     * @throws NoSuchElementException   if the type with the specified id is not found.
+     * @throws IllegalArgumentException if the specified id is invalid.
+     * @throws NullPointerException     if the specified id is null.
+     */
+    @Override
+    public Type get(Long id) throws AccountNotFoundException {
+        return Validations.doesIdExists(id, typeRepository);
     }
 }
