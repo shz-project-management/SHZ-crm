@@ -20,7 +20,8 @@ public class StatusController {
     private AttributeFacade attributeFacade;
 
     /**
-     * This function maps HTTP POST requests to the /create endpoint to the create function in the statusFacade class.
+     * This function maps HTTP POST requests to the /create endpoint to the create function in the attributeFacade class.
+     * attributeFacade handles Status method and also Type, since they both inherit Attribute
      * It consumes "application/json" and expects a statusRequest object to be passed as the request body.
      *
      * @param statusRequest The request body, containing the necessary information to create a new status.
