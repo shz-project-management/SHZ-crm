@@ -134,15 +134,13 @@ public class UserService {
      * Removes all dependencies related to the given user from the database.
      *
      * @param user the user whose dependencies are to be removed
-     *             <p>
      *             This method performs the following actions:
-     *             <p>
      *             Removes all entries of the given user from the UserInBoard table
      *             Removes all comments made by the given user from the database
      *             Removes all attributes of the given user from the database
      *             Removes all boards created by the given user from the database
      */
-    private void removeAllUserDependencies(User user) {
+    boolean removeAllUserDependencies(User user) {
         // second, remove all entries of this user from UserInBoard table
         removeUserDependenciesFromUserInBoardTable(user);
 
@@ -152,6 +150,7 @@ public class UserService {
 
         // third, remove every board created by this user
         removeUserDependenciesFromBoardTable(user);
+        return true;
     }
 
     /**
@@ -159,9 +158,10 @@ public class UserService {
      *
      * @param user the user whose boards are to be removed from the database
      */
-    private void removeUserDependenciesFromBoardTable(User user) {
+    boolean removeUserDependenciesFromBoardTable(User user) {
         List<Board> boardList = boardRepository.findAllByUser(user);
         boardList.forEach(board -> boardRepository.delete(board));
+        return true;
     }
 
     /**
@@ -169,8 +169,9 @@ public class UserService {
      *
      * @param user the user whose related entries in the UserInBoard table are to be removed
      */
-    private void removeUserDependenciesFromUserInBoardTable(User user) {
+    private boolean removeUserDependenciesFromUserInBoardTable(User user) {
         List<Board> boardList = boardRepository.findAllByUser(user);
         boardList.forEach(board -> userInBoardRepository.deleteAllByUserOrBoard(board.getCreatorUser(), board));
+        return true;
     }
 }
