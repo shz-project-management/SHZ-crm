@@ -72,24 +72,10 @@ public class UserService {
             // make sure such an id even exists
             // Ask for the repo to find the user, by the given id input
             User user = Validations.doesIdExists(userId, userRepository);
-
-            // first, find all boards created by this user:
-            List<Board> boardList = boardRepository.findAllByUser(user);
-
-            // second, remove all entries of this user from UserInBoard table
-            boardList.forEach(board -> userInBoardRepository.deleteAllByUserOrBoard(board.getCreatorUser(), board));
-//            userInBoardRepository.deleteAllByUser(user);
-
-            // remove all user's comments from the db
-
-            // remove all user's attributes from the db
-
-            // third, remove every board created by this user
-            boardList.forEach(board -> boardRepository.delete(board));
-
+            // remove all user dependencies from the db
+            removeAllUserDependencies(user);
             // lastly, remove the user from the database
             userRepository.delete(user);
-
             return true;
 
         } catch (NoSuchElementException e) {
@@ -142,5 +128,49 @@ public class UserService {
         // if not, store the new one in the db
         UserInBoard userInBoard = UserInBoard.userInBoardUser(user, board);
         return userInBoardRepository.save(userInBoard);
+    }
+
+    /**
+     * Removes all dependencies related to the given user from the database.
+     *
+     * @param user the user whose dependencies are to be removed
+     *             <p>
+     *             This method performs the following actions:
+     *             <p>
+     *             Removes all entries of the given user from the UserInBoard table
+     *             Removes all comments made by the given user from the database
+     *             Removes all attributes of the given user from the database
+     *             Removes all boards created by the given user from the database
+     */
+    private void removeAllUserDependencies(User user) {
+        // second, remove all entries of this user from UserInBoard table
+        removeUserDependenciesFromUserInBoardTable(user);
+
+        // remove all user's comments from the db
+
+        // remove all user's attributes from the db
+
+        // third, remove every board created by this user
+        removeUserDependenciesFromBoardTable(user);
+    }
+
+    /**
+     * Removes all boards from the database that were created by the given user.
+     *
+     * @param user the user whose boards are to be removed from the database
+     */
+    private void removeUserDependenciesFromBoardTable(User user) {
+        List<Board> boardList = boardRepository.findAllByUser(user);
+        boardList.forEach(board -> boardRepository.delete(board));
+    }
+
+    /**
+     * Removes all entries in the UserInBoard table that are related to the given user or the boards they have created.
+     *
+     * @param user the user whose related entries in the UserInBoard table are to be removed
+     */
+    private void removeUserDependenciesFromUserInBoardTable(User user) {
+        List<Board> boardList = boardRepository.findAllByUser(user);
+        boardList.forEach(board -> userInBoardRepository.deleteAllByUserOrBoard(board.getCreatorUser(), board));
     }
 }
