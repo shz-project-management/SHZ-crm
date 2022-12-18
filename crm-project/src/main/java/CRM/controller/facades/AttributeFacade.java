@@ -10,6 +10,7 @@ import CRM.service.StatusService;
 import CRM.service.TypeService;
 import CRM.utils.Validations;
 import CRM.utils.enums.Regex;
+import CRM.utils.enums.SuccessMessage;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.hibernate.NonUniqueObjectException;
@@ -18,6 +19,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
 import javax.security.auth.login.AccountNotFoundException;
+import java.util.NoSuchElementException;
 
 @Component
 public class AttributeFacade {
@@ -70,8 +72,34 @@ public class AttributeFacade {
         }
     }
 
-    public Response delete(Long id) {
-        return null;
+    /**
+     * Deletes an attribute(status/type) with the given ID.
+     * @param id the ID of the attribute to delete
+     * @return a response object indicating the status of the deletion operation
+     * @throws NoSuchElementException if no attribute with the given ID exists
+     */
+    public Response delete(Long id, Class clz) {
+        try{
+            Validations.validate(id, Regex.ID.getRegex());
+            convertFromClassToService(clz).delete(id);
+            return new Response.Builder()
+                    .status(HttpStatus.NO_CONTENT)
+                    .statusCode(204)
+                    .message(SuccessMessage.DELETED.toString())
+                    .build();
+        }catch(AccountNotFoundException | NoSuchElementException | IllegalArgumentException e) {
+            return new Response.Builder()
+                    .message(e.getMessage())
+                    .status(HttpStatus.BAD_REQUEST)
+                    .statusCode(400)
+                    .build();
+        }catch (NullPointerException e){
+            return new Response.Builder()
+                    .message(e.getMessage())
+                    .status(HttpStatus.BAD_REQUEST)
+                    .statusCode(500)
+                    .build();
+        }
     }
 
     public Response updateAttribute(Long itemId, Attribute object){

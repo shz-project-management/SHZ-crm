@@ -1,6 +1,7 @@
 package CRM.service;
 
 import CRM.entity.Attribute;
+import CRM.entity.Board;
 import CRM.entity.Status;
 import CRM.repository.StatusRepository;
 import CRM.utils.Validations;
@@ -8,6 +9,8 @@ import CRM.utils.enums.ExceptionMessage;
 import org.hibernate.NonUniqueObjectException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import javax.security.auth.login.AccountNotFoundException;
 
 @Service
 public class StatusService implements AttributeService {
@@ -30,5 +33,12 @@ public class StatusService implements AttributeService {
         if(statusRepository.existsByBoardAndNameLike(status.getBoard(), status.getName()))
             Validations.throwAttributeAlreadyExistsForBoard(status, "Status");
         return statusRepository.save((Status.createStatus(status)));
+    }
+
+    @Override
+    public boolean delete(Long statusId) throws AccountNotFoundException {
+        Status status = Validations.doesIdExists(statusId, statusRepository);
+        statusRepository.delete(status);
+        return true;
     }
 }
