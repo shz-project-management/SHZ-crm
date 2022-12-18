@@ -45,4 +45,16 @@ public class TypeController {
         Response response = attributeFacade.delete(id, Type.class);
         return new ResponseEntity<>(response, response.getStatus());
     }
+
+    /**
+     This method is used to handle HTTP GET requests to the specified URL (type/{id}).
+     The method takes the id of the type as a path variable and uses it to retrieve the type information from the attributeFacade object.
+     @param id The id of the type to retrieve.
+     @return A ResponseEntity object containing the Response object with the type information and the HTTP status code.
+     */
+    @GetMapping(value = "{id}")
+    public ResponseEntity<Response> get(@PathVariable Long id){
+        Response response = attributeFacade.get(id, Type.class);
+        return new ResponseEntity<>(response, response.getStatus());
+    }
 }

@@ -102,7 +102,7 @@ public class AttributeFacade {
         }
     }
 
-    public Response get(Long id, Class<Status> statusClass) {
+    public Response get(Long id, Class clz) {
         return null;
     }
 
