@@ -16,7 +16,7 @@ import java.util.Optional;
 @Service
 public class CommentService implements ServiceInterface {
 
-    private static Logger logger = LogManager.getLogger(AuthFacade.class.getName());
+    private static Logger logger = LogManager.getLogger(CommentService.class.getName());
 
     @Autowired
     private CommentRepository commentRepository;
@@ -30,7 +30,7 @@ public class CommentService implements ServiceInterface {
     }
 
     @Override
-    public SharedContent update(long id, String field, String content) {
+    public Comment update(long id, String field, String content) {
         // checkIfExists
         // make sure there is such a field in Item -> use reflection!
 
@@ -38,7 +38,7 @@ public class CommentService implements ServiceInterface {
     }
 
     @Override
-    public SharedContent get(long id) {
+    public Comment get(long id) {
         // checkIfExists
         // return the received item
 
@@ -59,12 +59,5 @@ public class CommentService implements ServiceInterface {
 
         // save the item in the database -> commentRepository
         return null;
-    }
-
-    private Comment checkIfExists(long id){
-        Optional<Comment> comment = commentRepository.findById(id);
-        if(!comment.isPresent()) throw new NoSuchElementException("Couldn't find this comment in the database!");
-
-        return comment.get();
     }
 }

@@ -8,8 +8,6 @@ import CRM.repository.BoardRepository;
 import CRM.repository.UserInBoardRepository;
 import CRM.repository.UserRepository;
 import CRM.utils.Validations;
-import CRM.utils.enums.ExceptionMessage;
-import CRM.utils.enums.Permission;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +16,6 @@ import org.springframework.stereotype.Service;
 import javax.security.auth.login.AccountNotFoundException;
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -50,6 +47,7 @@ public class BoardService {
      *
      * @param boardId the board ID to delete
      */
+    // FIXME: don't use Long -> use long since we know for sure it's not null by now.
     public boolean delete(Long boardId) throws AccountNotFoundException {
         Board board = Validations.doesIdExists(boardId, boardRepository);
         userInBoardRepository.deleteAllByBoard(board);
@@ -66,6 +64,7 @@ public class BoardService {
      * @throws IllegalArgumentException if the specified id is invalid.
      * @throws NullPointerException     if the specified id is null.
      */
+    // FIXME: don't use Long -> use long since we know for sure it's not null by now.
     public Board get(Long id) throws AccountNotFoundException {
         return Validations.doesIdExists(id, boardRepository);
     }
@@ -88,6 +87,7 @@ public class BoardService {
      * @throws IllegalArgumentException if the specified user id is invalid.
      * @throws NullPointerException     if the specified user id is null.
      */
+    // FIXME: don't use Long -> use long since we know for sure it's not null by now.
     public List<Board> getAllBoardsOfUser(Long userId) throws AccountNotFoundException {
         User user = Validations.doesIdExists(userId, userRepository);
         List<UserInBoard> userInBoard = userInBoardRepository.findAllBoardByUser(user);
