@@ -102,6 +102,10 @@ public class AttributeFacade {
         }
     }
 
+    public Response get(Long id, Class<Status> statusClass) {
+        return null;
+    }
+
     public Response updateAttribute(Long itemId, Attribute object){
         // validate the id using Validations.validate
         return null;
