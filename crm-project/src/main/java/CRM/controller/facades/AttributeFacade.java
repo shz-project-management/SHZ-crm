@@ -141,15 +141,43 @@ public class AttributeFacade {
      */
     public Response getAll(Class clz) {
         return new Response.Builder()
-                .data(AttributeDTO.getListOfAttributesFromDB(convertFromClassToService(clz).getAll()))
+                .data(AttributeDTO.createListOfAttributesDTO(convertFromClassToService(clz).getAll()))
                 .message(SuccessMessage.FOUND.toString())
                 .status(HttpStatus.OK)
                 .statusCode(200)
                 .build();
     }
 
-    public Response getAllAttributesInBoard(Long boardId) {
-        return null;
+    /**
+     This method is used to retrieve all the attributes(statuses/types) that belongs to a board with the specified id.
+     @param boardId The id of the board whose attributes are to be retrieved.
+     @return A Response object containing all the retrieved attributes or an error message if the board is not found or the id is invalid.
+     @throws IllegalArgumentException if the specified board id is invalid.
+     @throws NullPointerException if the specified board id is null.
+     @throws NoSuchElementException if the board with the specified id is not found.
+     */
+    public Response getAllAttributesInBoard(Long boardId, Class clz) {
+        try {
+            Validations.validate(boardId, Regex.ID.getRegex());
+            return new Response.Builder()
+                    .data(AttributeDTO.createListOfAttributesDTO(convertFromClassToService(clz).getAllInBoard(boardId)))
+                    .message(SuccessMessage.FOUND.toString())
+                    .status(HttpStatus.OK)
+                    .statusCode(200)
+                    .build();
+        } catch (AccountNotFoundException | IllegalArgumentException | NoSuchElementException e){
+            return new Response.Builder()
+                    .message(e.getMessage())
+                    .status(HttpStatus.BAD_REQUEST)
+                    .statusCode(400)
+                    .build();
+        }catch (NullPointerException e){
+            return new Response.Builder()
+                    .message(e.getMessage())
+                    .status(HttpStatus.BAD_REQUEST)
+                    .statusCode(500)
+                    .build();
+        }
     }
 
     public Response updateAttribute(Long itemId, Attribute object){

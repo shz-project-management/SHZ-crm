@@ -105,11 +105,8 @@ public class Validations {
      * @return the item with the specified ID if it exists
      * @throws NoSuchElementException if no item with the specified ID exists in the repository
      */
+    // FIXME: always throws NoSuchElement. never throw AccountNotFound!
     public static <T> T doesIdExists(Long id, JpaRepository repo) throws AccountNotFoundException {
-        if(id == null){
-            throw new NullPointerException(ExceptionMessage.NULL_INPUT.toString());
-        }
-
         Optional<T> element = repo.findById(id);
         if (!element.isPresent()) {
             if (repo.getClass().getSimpleName().split("\\$")[0].equals(UserRepository.class.getSimpleName()))

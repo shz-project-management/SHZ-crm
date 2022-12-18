@@ -20,16 +20,6 @@ public class ItemService implements ServiceInterface {
     @Autowired
     private ItemRepository itemRepository;
 
-
-    public Item get(long itemId) {
-        // Ask for the repo to find the item, by the given id input -> checkIfExists()
-        // Since the repo returns an option, check if this option is not empty
-        // If it is empty, throw "FileNotFound"
-
-        // Return the item back to the controller
-        return null;
-    }
-
     @Override
     public int delete(long id) {
         // checkIfExists
@@ -39,18 +29,20 @@ public class ItemService implements ServiceInterface {
     }
 
     @Override
-    public SharedContent update(long id, String field, String content) {
-        return null;
-    }
-
-    @Override
-    public Item create(ItemRequest item) {
+    public Item update(long id, String field, String content) {
         // checkIfExists
         // make sure there is such a field in Item -> use reflection!
 
         return null;
     }
 
+    @Override
+    public Item get(long id) {
+        // checkIfExists
+        // return the received item
+
+        return null;
+    }
 
     @Override
     public List<SharedContent> getAllInItem(long itemId) {
@@ -58,12 +50,5 @@ public class ItemService implements ServiceInterface {
         // returns the list of items retrieved
 
         return null;
-    }
-
-    private Item checkIfExists(long id){
-        Optional<Item> item = itemRepository.findById(id);
-        if(!item.isPresent()) throw new NoSuchElementException("Couldn't find this item in the database!");
-
-        return item.get();
     }
 }

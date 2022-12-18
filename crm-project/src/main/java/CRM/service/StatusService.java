@@ -1,7 +1,8 @@
 package CRM.service;
 
-import CRM.entity.Attribute;
-import CRM.entity.Status;
+import CRM.entity.*;
+import CRM.entity.DTO.AttributeDTO;
+import CRM.repository.BoardRepository;
 import CRM.repository.StatusRepository;
 import CRM.utils.Validations;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,12 +11,15 @@ import org.springframework.stereotype.Service;
 import javax.security.auth.login.AccountNotFoundException;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.stream.Collectors;
 
 @Service
 public class StatusService implements AttributeService {
 
     @Autowired
     private StatusRepository statusRepository;
+    @Autowired
+    private BoardRepository boardRepository;
 
     @Override
     public int update(long id, Attribute object) {
@@ -66,5 +70,20 @@ public class StatusService implements AttributeService {
     @Override
     public List<Status> getAll() {
         return statusRepository.findAll();
+    }
+
+    /**
+     * This method is used to retrieve all the statuses that belong to the board with the specified id.
+     *
+     * @param boardId The id of the user whose statuses are to be retrieved.
+     * @return A list containing all the statuses that belong to the board with the specified id.
+     * @throws NoSuchElementException   if the board with the specified id is not found.
+     * @throws IllegalArgumentException if the specified board id is invalid.
+     * @throws NullPointerException     if the specified board id is null.
+     */
+    @Override
+    public List<Status> getAllInBoard(Long boardId) throws AccountNotFoundException {
+        Board board = Validations.doesIdExists(boardId, boardRepository);
+        return statusRepository.findByBoard(board);
     }
 }
