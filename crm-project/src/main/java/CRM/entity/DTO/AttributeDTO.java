@@ -3,6 +3,9 @@ package CRM.entity.DTO;
 import CRM.entity.*;
 import lombok.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -23,5 +26,18 @@ public class AttributeDTO {
         attributeDTO.setName(attribute.getName());
         attributeDTO.setDescription(attribute.getDescription());
         return attributeDTO;
+    }
+
+    public static List<AttributeDTO> getListOfAttributesFromDB(List<Attribute> attributes){
+        List<AttributeDTO> attributeDTOS = new ArrayList<>();
+        for (Attribute attribute: attributes) {
+            AttributeDTO attributeDTO = new AttributeDTO();
+            attributeDTO.setId(attribute.getId());
+            attributeDTO.setName(attribute.getName());
+            attributeDTO.setDescription(attribute.getDescription());
+            attributeDTO.setBelongsToBoard(attribute.getBoard().getId());
+            attributeDTOS.add(attributeDTO);
+        }
+        return attributeDTOS;
     }
 }

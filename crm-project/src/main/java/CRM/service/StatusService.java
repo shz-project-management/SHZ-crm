@@ -1,16 +1,14 @@
 package CRM.service;
 
 import CRM.entity.Attribute;
-import CRM.entity.Board;
 import CRM.entity.Status;
 import CRM.repository.StatusRepository;
 import CRM.utils.Validations;
-import CRM.utils.enums.ExceptionMessage;
-import org.hibernate.NonUniqueObjectException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.security.auth.login.AccountNotFoundException;
+import java.util.List;
 import java.util.NoSuchElementException;
 
 @Service
@@ -58,5 +56,15 @@ public class StatusService implements AttributeService {
     @Override
     public Status get(Long id) throws AccountNotFoundException {
         return Validations.doesIdExists(id, statusRepository);
+    }
+
+    /**
+     * This method is used to retrieve all the statuses.
+     *
+     * @return A list containing all the statuses.
+     */
+    @Override
+    public List<Status> getAll() {
+        return statusRepository.findAll();
     }
 }

@@ -1,6 +1,7 @@
 package CRM.service;
 
 import CRM.entity.Attribute;
+import CRM.entity.Status;
 import CRM.entity.Type;
 import CRM.repository.TypeRepository;
 import CRM.utils.Validations;
@@ -10,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.security.auth.login.AccountNotFoundException;
+import java.util.List;
 import java.util.NoSuchElementException;
 
 @Service
@@ -59,5 +61,15 @@ public class TypeService implements AttributeService{
     @Override
     public Type get(Long id) throws AccountNotFoundException {
         return Validations.doesIdExists(id, typeRepository);
+    }
+
+    /**
+     * This method is used to retrieve all the types.
+     *
+     * @return A list containing all the types.
+     */
+    @Override
+    public List<Type> getAll() {
+        return typeRepository.findAll();
     }
 }
