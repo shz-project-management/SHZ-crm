@@ -56,7 +56,11 @@ public class UserService {
     public User get(long userId) throws AccountNotFoundException {
         // make sure such an id even exists
         // Ask for the repo to find the user, by the given id input
-        return Validations.doesIdExists(userId, userRepository);
+        try {
+            return Validations.doesIdExists(userId, userRepository);
+        }catch (NoSuchElementException e){
+            throw new AccountNotFoundException(ExceptionMessage.ACCOUNT_DOES_NOT_EXISTS.toString());
+        }
     }
 
     /**
@@ -68,7 +72,12 @@ public class UserService {
      */
     public Boolean delete(long userId) throws AccountNotFoundException {
         // Make sure such an id even exists. Ask for the repo to find the user, by the given id input
-        User user = Validations.doesIdExists(userId, userRepository);
+        User user;
+        try {
+            user = Validations.doesIdExists(userId, userRepository);
+        }catch (NoSuchElementException e){
+            throw new AccountNotFoundException(ExceptionMessage.ACCOUNT_DOES_NOT_EXISTS.toString());
+        }
         // remove all user dependencies from the db
         removeAllUserDependencies(user);
         // lastly, remove the user from the database
@@ -110,7 +119,13 @@ public class UserService {
      * @throws IllegalArgumentException if the combination of the given user and board already exists in the database
      */
     public UserInBoard addUserToBoard(long userId, long boardId) throws AccountNotFoundException {
-        User user = Validations.doesIdExists(userId, userRepository);
+        User user;
+        try {
+            user = Validations.doesIdExists(userId, userRepository);
+        } catch (NoSuchElementException e) {
+            throw new AccountNotFoundException(ExceptionMessage.ACCOUNT_DOES_NOT_EXISTS.toString());
+        }
+
         Board board = Validations.doesIdExists(boardId, boardRepository);
 
         // make sure this combination of user and board doesn't not exist in the db yet
