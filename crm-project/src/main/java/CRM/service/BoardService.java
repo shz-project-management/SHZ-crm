@@ -94,6 +94,13 @@ public class BoardService {
         return userInBoard.stream().map(UserInBoard::getBoard).collect(Collectors.toList());
     }
 
+    /**
+     * Updates a board with the given information.
+     *
+     * @param boardReq the request object containing the update information for the board
+     * @return the updated board
+     * @throws AccountNotFoundException if the board with the given id does not exist
+     */
     public Board updateBoard(UpdateBoardRequest boardReq) throws AccountNotFoundException {
         Board board = Validations.doesIdExists(boardReq.getId(), boardRepository);
         if(boardReq.getName() != null){

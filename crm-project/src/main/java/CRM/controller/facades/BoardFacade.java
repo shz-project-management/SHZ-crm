@@ -170,6 +170,15 @@ public class BoardFacade {
         }
     }
 
+    /**
+     * Updates a board in the database.
+     *
+     * @param board the board to update
+     * @return a response object with a status code and message
+     * @throws IllegalArgumentException if the board name or ID does not match the expected format
+     * @throws NoSuchElementException if the board to update is not found in the database
+     * @throws NullPointerException if the board object is null
+     */
     public Response updateBoard(UpdateBoardRequest board) {
         try {
             if(board.getId() != null){
