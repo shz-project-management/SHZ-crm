@@ -1,13 +1,12 @@
 package CRM.controller.controllers;
 
 import CRM.controller.facades.BoardFacade;
+import CRM.entity.Board;
 import CRM.entity.requests.BoardRequest;
-import CRM.entity.requests.UpdateBoardRequest;
 import CRM.entity.response.Response;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -86,12 +85,12 @@ public class BoardController {
     /**
      * Handles PUT requests to update board.
      *
-     * @param updateRequest An object containing the fields to update for the board.
+     * @param boardRequest An object containing the fields to update for the board.
      * @return A response object indicating the status of the update operation.
      */
     @PutMapping(value = "/update", consumes = "application/json")
-    public ResponseEntity<Response> updateBoard(@RequestBody UpdateBoardRequest updateRequest) {
-        Response response = boardFacade.updateBoard(updateRequest);
+    public ResponseEntity<Response> updateBoard(@RequestBody BoardRequest boardRequest) {
+        Response response = boardFacade.updateBoard(boardRequest);
         return new ResponseEntity<>(response, response.getStatus());
     }
 }

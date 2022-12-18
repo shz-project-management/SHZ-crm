@@ -3,7 +3,7 @@ package CRM.service;
 import CRM.entity.Board;
 import CRM.entity.User;
 import CRM.entity.UserInBoard;
-import CRM.entity.requests.UpdateBoardRequest;
+import CRM.entity.requests.BoardRequest;
 import CRM.repository.BoardRepository;
 import CRM.repository.UserInBoardRepository;
 import CRM.repository.UserRepository;
@@ -48,7 +48,7 @@ public class BoardService {
      *
      * @param boardId the board ID to delete
      */
-    public boolean delete(long boardId) throws AccountNotFoundException {
+    public boolean delete(long boardId) {
         Board board = Validations.doesIdExists(boardId, boardRepository);
         userInBoardRepository.deleteAllByBoard(board);
         boardRepository.delete(board);
@@ -64,7 +64,7 @@ public class BoardService {
      * @throws IllegalArgumentException if the specified id is invalid.
      * @throws NullPointerException     if the specified id is null.
      */
-    public Board get(long id) throws AccountNotFoundException {
+    public Board get(long id) {
         return Validations.doesIdExists(id, boardRepository);
     }
 
@@ -91,7 +91,7 @@ public class BoardService {
             User user = Validations.doesIdExists(userId, userRepository);
             List<UserInBoard> userInBoard = userInBoardRepository.findAllBoardByUser(user);
             return userInBoard.stream().map(UserInBoard::getBoard).collect(Collectors.toList());
-        } catch (NoSuchElementException e){
+        } catch (NoSuchElementException e) {
             throw new AccountNotFoundException(ExceptionMessage.ACCOUNT_DOES_NOT_EXISTS.toString());
         }
     }
@@ -103,12 +103,13 @@ public class BoardService {
      * @return the updated board
      * @throws AccountNotFoundException if the board with the given id does not exist
      */
-    public Board updateBoard(UpdateBoardRequest boardReq) throws AccountNotFoundException {
-        Board board = Validations.doesIdExists(boardReq.getId(), boardRepository);
-        if(boardReq.getName() != null){
+    //FIXME: fieldName and content will replace the actual fields such as: "name" and "description"
+    public Board updateBoard(BoardRequest boardReq) {
+        Board board = Validations.doesIdExists(boardReq.getBoardId(), boardRepository);
+        if (boardReq.getName() != null) {
             board.setName(boardReq.getName());
         }
-        if(boardReq.getDescription() != null){
+        if (boardReq.getDescription() != null) {
             board.setDescription(boardReq.getDescription());
         }
         return boardRepository.save(board);

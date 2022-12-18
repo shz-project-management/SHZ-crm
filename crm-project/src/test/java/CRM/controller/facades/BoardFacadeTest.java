@@ -1,16 +1,11 @@
 package CRM.controller.facades;
 
 import CRM.entity.Board;
-import CRM.entity.DTO.BoardDTO;
 import CRM.entity.User;
 import CRM.entity.requests.BoardRequest;
-import CRM.entity.requests.LoginUserRequest;
 import CRM.entity.requests.RegisterUserRequest;
-import CRM.entity.requests.UpdateBoardRequest;
-import CRM.entity.response.Response;
 import CRM.service.AuthService;
 import CRM.service.BoardService;
-import CRM.service.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -18,15 +13,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.HttpStatus;
-
-import static org.aspectj.bridge.MessageUtil.fail;
 import static org.mockito.BDDMockito.given;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.when;
-
-import javax.naming.AuthenticationException;
 import javax.security.auth.login.AccountNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
@@ -74,7 +62,7 @@ class BoardFacadeTest {
     @DisplayName("Test the case where the boardRequest has an invalid name")
     public void testInvalidNameBoardRequest() {
 //        given(authService.findById(user.getId()));
-        BoardRequest incorrectBoardRequest = new BoardRequest(1L, "@#!1", "nice");
+        BoardRequest incorrectBoardRequest = new BoardRequest(1L,1L ,"@#!1", "nice");
         assertEquals(400, boardFacade.create(incorrectBoardRequest).getStatusCode());
     }
 
@@ -82,21 +70,21 @@ class BoardFacadeTest {
     @Test
     @DisplayName("Test the case where the boardRequest has a null name")
     public void testNullNameBoardRequest() {
-        BoardRequest incorrectBoardRequest = new BoardRequest(1L, null, "nice");
+        BoardRequest incorrectBoardRequest = new BoardRequest(1L,1L , null, "nice");
         assertEquals(500, boardFacade.create(incorrectBoardRequest).getStatusCode());
     }
 
     @Test
     @DisplayName("Test the case where the boardRequest has a null creator user ID")
     public void testNullCreatorUserId() {
-        BoardRequest incorrectBoardRequest = new BoardRequest(null, "board", "nice");
+        BoardRequest incorrectBoardRequest = new BoardRequest(null,1L, "board", "nice");
         assertEquals(500, boardFacade.create(incorrectBoardRequest).getStatusCode());
     }
 
     @Test
     @DisplayName("Test the case where the creator user ID in the boardRequest does not exist")
     public void testNonExistentCreatorBoardRequest() throws AccountNotFoundException {
-        BoardRequest incorrectBoardRequest = new BoardRequest(100L, "board", "nice");
+        BoardRequest incorrectBoardRequest = new BoardRequest(100L,1L, "board", "nice");
         given(authService.findById(incorrectBoardRequest.getCreatorUserId())).willThrow(AccountNotFoundException.class);
         assertEquals(400, boardFacade.create(incorrectBoardRequest).getStatusCode());
     }
@@ -123,14 +111,14 @@ class BoardFacadeTest {
 
     @Test
     @DisplayName("Test delete with non existent board id in database")
-    public void testDeleteWithNonExistentBoard() throws AccountNotFoundException {
+    public void testDeleteWithNonExistentBoard() {
         given(boardService.delete(1L)).willThrow(NoSuchElementException.class);
         assertEquals(400, boardFacade.delete(1L).getStatusCode());
     }
 
     @Test
     @DisplayName("Test get with valid id")
-    public void testGetWithValidId() throws AccountNotFoundException {
+    public void testGetWithValidId() {
         Long id = 1L;
         given(boardService.get(id)).willReturn(board);
         assertEquals(200, boardFacade.get(id).getStatusCode());
@@ -138,7 +126,7 @@ class BoardFacadeTest {
 
     @Test
     @DisplayName("Test get with non-existent id")
-    public void testGetWithNonExistentId() throws AccountNotFoundException {
+    public void testGetWithNonExistentId() {
         Long id = 1L;
         given(boardService.get(id)).willThrow(NoSuchElementException.class);
         assertEquals(400, boardFacade.get(id).getStatusCode());
@@ -197,10 +185,11 @@ class BoardFacadeTest {
 
     @Test
     @DisplayName("Test update board with valid input")
-    public void testUpdateBoardWithValidInput() throws AccountNotFoundException {
+    public void testUpdateBoardWithValidInput() {
         board.setName("Test new board name");
         board.setDescription("Test new description");
-        UpdateBoardRequest boardRequest = new UpdateBoardRequest();
+        BoardRequest boardRequest = new BoardRequest();
+        boardRequest.setBoardId(1L);
         given(boardService.updateBoard(boardRequest)).willReturn(board);
         assertEquals(200, boardFacade.updateBoard(boardRequest).getStatusCode());
     }
@@ -208,8 +197,8 @@ class BoardFacadeTest {
     @Test
     @DisplayName("Test update board with invalid board ID")
     public void testUpdateBoardWithInvalidBoardId() {
-        UpdateBoardRequest boardRequest = new UpdateBoardRequest();
-        boardRequest.setId(-2L);
+        BoardRequest boardRequest = new BoardRequest();
+        boardRequest.setBoardId(-2L);
         boardRequest.setName("Test Board");
         assertEquals(400, boardFacade.updateBoard(boardRequest).getStatusCode());
     }
@@ -217,16 +206,17 @@ class BoardFacadeTest {
     @Test
     @DisplayName("Test update board with invalid board name")
     public void testUpdateBoardWithInvalidBoardName() {
-        UpdateBoardRequest boardRequest = new UpdateBoardRequest();
-        boardRequest.setId(1L);
+        BoardRequest boardRequest = new BoardRequest();
+        boardRequest.setBoardId(1L);
         boardRequest.setName("!@#1");
         assertEquals(400, boardFacade.updateBoard(boardRequest).getStatusCode());
     }
 
     @Test
     @DisplayName("Test update board with non-existent board")
-    public void testUpdateBoardWithNonExistentBoard() throws AccountNotFoundException {
-        UpdateBoardRequest boardRequest = new UpdateBoardRequest();
+    public void testUpdateBoardWithNonExistentBoard() {
+        BoardRequest boardRequest = new BoardRequest();
+        boardRequest.setBoardId(1L);
         boardRequest.setName("Test Board");
         given(boardService.updateBoard(boardRequest)).willThrow(NoSuchElementException.class);
         assertEquals(400, boardFacade.updateBoard(boardRequest).getStatusCode());
@@ -235,7 +225,7 @@ class BoardFacadeTest {
     @Test
     @DisplayName("Test update board with null input")
     public void testUpdateBoardWithNullInput() {
-        UpdateBoardRequest boardRequest = null;
+        BoardRequest boardRequest = null;
         assertEquals(500, boardFacade.updateBoard(boardRequest).getStatusCode());
     }
 }

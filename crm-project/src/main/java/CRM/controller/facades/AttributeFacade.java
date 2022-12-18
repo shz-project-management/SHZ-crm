@@ -2,7 +2,6 @@ package CRM.controller.facades;
 
 import CRM.entity.*;
 import CRM.entity.DTO.AttributeDTO;
-import CRM.entity.DTO.BoardDTO;
 import CRM.entity.requests.AttributeRequest;
 import CRM.entity.response.Response;
 import CRM.service.AttributeService;
@@ -18,8 +17,6 @@ import org.hibernate.NonUniqueObjectException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
-
-import javax.security.auth.login.AccountNotFoundException;
 import java.util.NoSuchElementException;
 
 @Component
@@ -58,7 +55,7 @@ public class AttributeFacade {
                     .statusCode(201)
                     .data(AttributeDTO.createAttributeDTO(savedAttribute))
                     .build();
-        }catch(AccountNotFoundException | IllegalArgumentException | NonUniqueObjectException e) {
+        }catch(IllegalArgumentException | NonUniqueObjectException e) {
             return new Response.Builder()
                     .message(e.getMessage())
                     .status(HttpStatus.BAD_REQUEST)
@@ -88,7 +85,7 @@ public class AttributeFacade {
                     .statusCode(204)
                     .message(SuccessMessage.DELETED.toString())
                     .build();
-        }catch(AccountNotFoundException | NoSuchElementException | IllegalArgumentException e) {
+        }catch(NoSuchElementException | IllegalArgumentException e) {
             return new Response.Builder()
                     .message(e.getMessage())
                     .status(HttpStatus.BAD_REQUEST)
@@ -120,7 +117,7 @@ public class AttributeFacade {
                     .status(HttpStatus.OK)
                     .statusCode(200)
                     .build();
-        } catch (AccountNotFoundException | NoSuchElementException | IllegalArgumentException e) {
+        } catch(NoSuchElementException | IllegalArgumentException e) {
             return new Response.Builder()
                     .message(e.getMessage())
                     .status(HttpStatus.BAD_REQUEST)
@@ -165,7 +162,7 @@ public class AttributeFacade {
                     .status(HttpStatus.OK)
                     .statusCode(200)
                     .build();
-        } catch (AccountNotFoundException | IllegalArgumentException | NoSuchElementException e){
+        } catch (IllegalArgumentException | NoSuchElementException e){
             return new Response.Builder()
                     .message(e.getMessage())
                     .status(HttpStatus.BAD_REQUEST)
@@ -185,6 +182,12 @@ public class AttributeFacade {
         return null;
     }
 
+    /**
+     * Converts a given Class object to the corresponding AttributeService object.
+     *
+     * @param c the Class object to be converted
+     * @return the corresponding AttributeService object, or null if no corresponding AttributeService object is found
+     */
     private AttributeService convertFromClassToService(Class c) {
         logger.info("in AttributeFacade -> convertFromClassToService ,item of Class: " + c);
 

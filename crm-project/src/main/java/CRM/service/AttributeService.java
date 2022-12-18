@@ -12,11 +12,11 @@ public interface AttributeService {
 
     Attribute create(Attribute attribute);
 
-    boolean delete(Long id) throws AccountNotFoundException;
+    boolean delete(Long id);
 
-    Attribute get(Long id) throws AccountNotFoundException;
+    Attribute get(Long id);
 
     <T> List<T> getAll();
 
-    <T> List<T> getAllInBoard(Long boardId) throws AccountNotFoundException;
+    <T> List<T> getAllInBoard(Long boardId);
 }
