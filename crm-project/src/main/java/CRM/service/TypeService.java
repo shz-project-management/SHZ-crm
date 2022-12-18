@@ -35,6 +35,6 @@ public class TypeService implements AttributeService{
     public Type create(Attribute type) {
         if(typeRepository.existsByBoardAndNameLike(type.getBoard(), type.getName()))
             Validations.throwAttributeAlreadyExistsForBoard(type, "Type");
-        return typeRepository.save((Type) type);
+        return typeRepository.save(Type.createType(type));
     }
 }
