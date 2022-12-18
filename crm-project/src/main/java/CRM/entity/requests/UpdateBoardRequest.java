@@ -8,6 +8,7 @@ import lombok.*;
 @Getter
 @ToString
 public class UpdateBoardRequest {
-    private String boardName;
+    private Long id;
+    private String name;
     private String description;
 }
