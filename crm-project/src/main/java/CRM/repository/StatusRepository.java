@@ -6,8 +6,11 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface StatusRepository extends JpaRepository<Status, Long> {
+    List<Status> findByBoard(Board board);
     /**
      * This function checks if a Status with the name and the same board exists in the database.
      * @param board The board object that the status belongs to.
