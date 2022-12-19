@@ -68,6 +68,7 @@ public class ItemController {
 
     @GetMapping(value = "{itemId}")
     public ResponseEntity<Response> get(@PathVariable Long itemId){
-        return null;
+        Response response = sharedContentFacade.get(itemId, Item.class);
+        return new ResponseEntity<>(response, response.getStatus());
     }
 }
