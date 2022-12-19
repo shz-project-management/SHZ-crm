@@ -33,7 +33,9 @@ public class ItemController {
 
     @PostMapping(consumes = "application/json")
     public ResponseEntity<Response> create(@RequestBody ItemRequest item) {
-        return null;
+
+        Response response = sharedContentFacade.create(item);
+        return new ResponseEntity<>(response, response.getStatus());
     }
 
     @DeleteMapping
