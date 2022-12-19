@@ -61,4 +61,8 @@ public class CommentService implements ServiceInterface {
     public List<Comment> getAllCommentsInBoard(long boardId) {
         return null;
     }
+
+    public List<Comment> getAllCommentsInStatus(long statusId) {
+        return null;
+    }
 }
