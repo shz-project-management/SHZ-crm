@@ -79,7 +79,8 @@ public class ItemService implements ServiceInterface {
         return null;
     }
 
-    public List<Item> getAllItemsInBaord(long boardId){
-        return null;
+    public List<Item> getAllInBoard(long boardId){
+        Board board = Validations.doesIdExists(boardId, boardRepository);
+        return itemRepository.findAllByBoard(board);
     }
 }

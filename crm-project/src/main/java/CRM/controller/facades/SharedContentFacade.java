@@ -145,7 +145,7 @@ public class SharedContentFacade {
             // call the correct service using convertFromClassToService(clz) function
             // with getAllInItem function in it.
             return new Response.Builder()
-                    .data(itemService.getAllItemsInBaord(id).stream().map(item -> ItemDTO.getSharedContentFromDB(item)).collect(Collectors.toList()))
+                    .data(itemService.getAllInBoard(id).stream().map(item -> ItemDTO.getSharedContentFromDB(item)).collect(Collectors.toList()))
                     .message(SuccessMessage.FOUND.toString())
                     .status(HttpStatus.OK)
                     .statusCode(200)
