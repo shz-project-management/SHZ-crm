@@ -3,25 +3,19 @@ package CRM.utils;
 import CRM.entity.*;
 import CRM.entity.requests.*;
 import CRM.entity.Attribute;
-import CRM.entity.Comment;
-import CRM.entity.Item;
 import CRM.entity.requests.LoginUserRequest;
 import CRM.entity.requests.RegisterUserRequest;
-import CRM.repository.UserRepository;
 import CRM.utils.enums.ExceptionMessage;
 import CRM.utils.enums.Regex;
 import io.jsonwebtoken.Claims;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.hibernate.NonUniqueObjectException;
-import org.aspectj.apache.bcel.classfile.ClassFormatException;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import javax.security.auth.login.AccountNotFoundException;
 import java.lang.reflect.Field;
 import java.util.NoSuchElementException;
 import java.util.Optional;
-import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -90,6 +84,13 @@ public class Validations {
         return true;
     }
 
+    /**
+     * Validates an item request object by checking each field for conformity with regex patterns and other constraints.
+     *
+     * @param item The item request object to validate.
+     * @throws NullPointerException if the parent item ID is null.
+     * @throws IllegalArgumentException if the importance value is not within the range 0-5, or if any other field fails validation.
+     */
     public static void validateCreatedItem(ItemRequest item) {
         // validate each field of the item using validate(regex, field)
         try {
@@ -113,6 +114,13 @@ public class Validations {
             item.setDescription("");
     }
 
+    /**
+     * Validates a comment request object by checking each field for conformity with regex patterns and other constraints.
+     *
+     * @param comment The comment request object to validate.
+     * @throws IllegalArgumentException if any field fails validation.
+     * @throws NullPointerException if the title is null.
+     */
     public static void validateCreatedComment(CommentRequest comment) {
         // validate each field of the item using validate(regex, field)
         validate(comment.getParentItemId(), Regex.ID.getRegex());
@@ -191,7 +199,13 @@ public class Validations {
         }
     }
 
-
+    /**
+     * Throws a NonUniqueObjectException with a specific message and attribute ID when an attribute already exists for a board.
+     *
+     * @param attribute The attribute that already exists.
+     * @param className The name of the class where the attribute was found to exist.
+     * @throws NonUniqueObjectException with the attribute ID and class name as parameters.
+     */
     public static void throwAttributeAlreadyExistsForBoard(Attribute attribute, String className){
         throw new NonUniqueObjectException(ExceptionMessage.ATTRIBUTE_ALREADY_IN_DB.toString(), attribute.getId(), className);
     }
