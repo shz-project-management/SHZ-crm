@@ -3,6 +3,7 @@ package CRM.controller.controllers;
 import CRM.controller.facades.BoardFacade;
 import CRM.entity.Board;
 import CRM.entity.requests.BoardRequest;
+import CRM.entity.requests.UpdateObjectRequest;
 import CRM.entity.response.Response;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -88,9 +89,9 @@ public class BoardController {
      * @param boardRequest An object containing the fields to update for the board.
      * @return A response object indicating the status of the update operation.
      */
-    @PutMapping(value = "/update", consumes = "application/json")
-    public ResponseEntity<Response> updateBoard(@RequestBody BoardRequest boardRequest) {
-        Response response = boardFacade.updateBoard(boardRequest);
+    @PutMapping(value = "/update/{boardId}", consumes = "application/json")
+    public ResponseEntity<Response> updateBoard(@RequestBody UpdateObjectRequest boardRequest, @PathVariable Long boardId) {
+        Response response = boardFacade.updateBoard(boardRequest, boardId);
         return new ResponseEntity<>(response, response.getStatus());
     }
 }

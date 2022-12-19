@@ -4,6 +4,7 @@ import CRM.entity.Board;
 import CRM.entity.User;
 import CRM.entity.UserInBoard;
 import CRM.entity.requests.BoardRequest;
+import CRM.entity.requests.UpdateObjectRequest;
 import CRM.repository.BoardRepository;
 import CRM.repository.UserInBoardRepository;
 import CRM.repository.UserRepository;
@@ -11,6 +12,7 @@ import CRM.utils.Validations;
 import CRM.utils.enums.ExceptionMessage;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.hibernate.sql.Update;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -103,15 +105,9 @@ public class BoardService {
      * @return the updated board
      * @throws AccountNotFoundException if the board with the given id does not exist
      */
-    //FIXME: fieldName and content will replace the actual fields such as: "name" and "description"
-    public Board updateBoard(BoardRequest boardReq) {
-        Board board = Validations.doesIdExists(boardReq.getBoardId(), boardRepository);
-        if (boardReq.getName() != null) {
-            board.setName(boardReq.getName());
-        }
-        if (boardReq.getDescription() != null) {
-            board.setDescription(boardReq.getDescription());
-        }
+    public Board updateBoard(UpdateObjectRequest boardReq, long boardId) throws NoSuchFieldException {
+        Board board = Validations.doesIdExists(boardId, boardRepository);
+        Validations.setContentToFieldIfFieldExists(board, boardReq.getFieldName(), boardReq.getContent());
         return boardRepository.save(board);
     }
 }

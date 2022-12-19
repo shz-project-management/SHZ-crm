@@ -160,27 +160,31 @@ public class Validations {
     }
 
 
-    public static <T> void checkIfFieldExists(T object, String fieldName, Object content) throws NoSuchFieldException, IllegalAccessException {
-        for (Field field : object.getClass().getDeclaredFields()) {
-            field.setAccessible(true);
-            Object value = field.get(object);
-            if(value == null){
-                continue;
+    public static <T> void setContentToFieldIfFieldExists(T object, String fieldName, Object content) throws NoSuchFieldException {
+        try {
+            for (Field field : object.getClass().getDeclaredFields()) {
+                field.setAccessible(true);
+                Object value = field.get(object);
+                if (value == null) {
+                    continue;
+                }
+                if (!field.getName().equals(fieldName)) {
+                    continue;
+                }
+                if (!(value.getClass().equals(content.getClass()))) {
+                    value.getClass().cast(content);
+                }
+                field.set(object, content);
+                return;
             }
-            if(!field.getName().equals(fieldName)){
-                continue;
-            }
-            if(!(value.getClass().equals(content.getClass()))){
-                value.getClass().cast(content);
-            }
-            return;
+            throw new NoSuchFieldException(ExceptionMessage.FIELD_OBJECT_NOT_EXISTS.toString());
+        }catch (IllegalAccessException | NoSuchFieldException e){
+            throw new NoSuchFieldException(ExceptionMessage.FIELD_OBJECT_NOT_EXISTS.toString());
         }
-        throw new NoSuchFieldException(ExceptionMessage.FIELD_OBJECT_NOT_EXISTS.toString());
     }
 
 
     public static void throwAttributeAlreadyExistsForBoard(Attribute attribute, String className){
-    public static void throwAttributeAlreadyExistsForBoard(Attribute attribute, String className) {
         throw new NonUniqueObjectException(ExceptionMessage.ATTRIBUTE_ALREADY_IN_DB.toString(), attribute.getId(), className);
     }
 }
