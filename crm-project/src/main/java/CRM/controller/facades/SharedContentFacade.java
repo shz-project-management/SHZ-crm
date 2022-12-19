@@ -4,7 +4,6 @@ import CRM.entity.Comment;
 import CRM.entity.DTO.CommentDTO;
 import CRM.entity.DTO.ItemDTO;
 import CRM.entity.DTO.SharedContentDTO;
-import CRM.entity.DTO.UserDTO;
 import CRM.entity.Item;
 import CRM.entity.SharedContent;
 import CRM.entity.requests.CommentRequest;
@@ -38,17 +37,14 @@ public class SharedContentFacade {
     private CommentService commentService;
 
     /**
-     * create
+     * Creates a new item in the system and stores it in the database.
      *
-     * @param item - a request object containing information about the item to be created
-     * @return a response object containing the new item as data and a message and status about the creation process
-     * This function receives an item request object and validates its parameters using the validateCreatedItem function from the Validations class.
-     * If the validation is successful, the function calls the create function from the itemService class to create a new item.
-     * The new item is then wrapped in a response object, along with a message indicating success and a status of HttpStatus.ACCEPTED and a status code of 201.
-     * If an exception is thrown during the validation or item creation process, a response object is returned with a message and status indicating the error that occurred.
-     * The specific exceptions that are caught and handled include IllegalArgumentException, AccountNotFoundException, NoSuchElementException, and NullPointerException.
-     * If an IllegalArgumentException or AccountNotFoundException is thrown, the response has a status of HttpStatus.BAD_REQUEST and a status code of 400.
-     * If a NoSuchElementException or NullPointerException is thrown, the response has a status of HttpStatus.BAD_REQUEST and a status code of 500.
+     * @param item The request object containing the details of the item to be created.
+     * @return A response object with the newly created item as data, or an error message if the creation failed.
+     * @throws IllegalArgumentException if any field in the request object fails validation.
+     * @throws AccountNotFoundException if the user ID specified in the request object does not correspond to an existing user.
+     * @throws NoSuchElementException   if the board ID, type ID, or status ID specified in the request object do not correspond to existing entities.
+     * @throws NullPointerException     if the parent item ID is null.
      */
     public Response create(ItemRequest item) {
         try {
@@ -78,6 +74,16 @@ public class SharedContentFacade {
         }
     }
 
+    /**
+     * Creates a new comment in the system and stores it in the database.
+     *
+     * @param comment The request object containing the details of the comment to be created.
+     * @return A response object with the newly created comment as data, or an error message if the creation failed.
+     * @throws IllegalArgumentException if any field in the request object fails validation.
+     * @throws AccountNotFoundException if the user ID specified in the request object does not correspond to an existing user.
+     * @throws NoSuchElementException   if the parent item ID specified in the request object does not correspond to an existing item.
+     * @throws NullPointerException     if the title is null.
+     */
     public Response create(CommentRequest comment) {
         try {
             // make sure the params are correct using Validations.validateCreatedComment()
@@ -107,19 +113,14 @@ public class SharedContentFacade {
     }
 
     /**
-     * delete
+     * Deletes a list of items or comments from the system and their associated comments from the database.
      *
-     * @param ids - a list of IDs for the items to be deleted
-     * @param clz - the class of the items to be deleted
-     * @return a response object containing a message and status about the deletion process
-     * This function receives a list of IDs and a class of items to be deleted.
-     * The IDs are validated using the validate function from the Validations class, which checks that they match the regex provided.
-     * The correct service to handle the deletion is then determined using the convertFromClassToService function, which takes the class of the items as an argument and returns the appropriate service.
-     * The delete function of this service is then called with the list of IDs, and the result is wrapped in a response object along with a message indicating success and a status of HttpStatus.NO_CONTENT and a status code of 204.
-     * If an exception is thrown during the validation or deletion process, a response object is returned with a message and status indicating the error that occurred.
-     * The specific exceptions that are caught and handled include IllegalArgumentException, NoSuchElementException, and NullPointerException.
-     * If an IllegalArgumentException or NoSuchElementException is thrown, the response has a status of HttpStatus.BAD_REQUEST and a status code of 400.
-     * If a NullPointerException is thrown, the response has a status of HttpStatus.BAD_REQUEST and a status code of 500.
+     * @param ids The IDs of the items or comments to be deleted.
+     * @param clz The class of the objects to be deleted (either Item or Comment).
+     * @return A response object with the number of items or comments deleted as data, or an error message if the deletion failed.
+     * @throws IllegalArgumentException if any of the IDs fails validation.
+     * @throws NoSuchElementException   if any of the IDs do not correspond to existing items or comments.
+     * @throws NullPointerException     if the list of IDs is null.
      */
     public Response delete(List<Long> ids, Class clz) {
         try {
@@ -161,20 +162,15 @@ public class SharedContentFacade {
 //    }
 
     /**
-     * get
+     * Returns an object with the given id and class type.
      *
-     * @param id  - the ID of the item to retrieve
-     * @param clz - the class of the item to retrieve
-     * @return a response object containing the retrieved item as data and a message and status about the retrieval process
-     * This function receives an ID and a class of an item to retrieve.
-     * The ID is validated using the validate function from the Validations class, which checks that it matches the regex provided.
-     * The correct service to handle the retrieval is then determined using the convertFromClassToService function, which takes the class of the item as an argument and returns the appropriate service.
-     * The get function of this service is then called with the ID, and the result is passed through the convertFromServiceOutputToDTOEntity function to convert it to a DTO entity.
-     * The resulting DTO entity is then wrapped in a response object along with a message indicating success and a status of HttpStatus.OK and a status code of 200.
-     * If an exception is thrown during the validation or retrieval process, a response object is returned with a message and status indicating the error that occurred.
-     * The specific exceptions that are caught and handled include IllegalArgumentException, NoSuchElementException, and NullPointerException.
-     * If an IllegalArgumentException or NoSuchElementException is thrown, the response has a status of HttpStatus.BAD_REQUEST and a status code of 400.
-     * If a NullPointerException is thrown, the response has a status of HttpStatus.BAD_REQUEST and a status code of 500.
+     * @param id  the id of the object
+     * @param clz the class type of the object
+     * @return a {@link Response} object with the object and a status message. If the object with the given
+     * id and class type does not exist, a BAD_REQUEST status with a message indicating the error is
+     * returned. If the id is not valid, a BAD_REQUEST status with a message indicating the error is
+     * returned. If a NullPointerException is thrown, a BAD_REQUEST status with a message indicating the
+     * error is returned.
      */
     public Response get(Long id, Class clz) {
         try {
@@ -203,18 +199,14 @@ public class SharedContentFacade {
     }
 
     /**
-     * getAllItemsInBoard
+     * Returns a list of all items in a board with the given id.
      *
-     * @param id - the ID of the board whose items are to be retrieved
-     * @return a response object containing a list of the retrieved items as data and a message and status about the retrieval process
-     * This function receives the ID of a board and retrieves all the items in that board.
-     * The ID is validated using the validate function from the Validations class, which checks that it matches the regex provided.
-     * The itemService is then called with the getAllInBoard function, passing in the ID of the board.
-     * The returned list of items is converted to a list of DTO entities using the getSharedContentFromDB function, and this list is wrapped in a response object along with a message indicating success and a status of HttpStatus.OK and a status code of 200.
-     * If an exception is thrown during the validation or retrieval process, a response object is returned with a message and status indicating the error that occurred.
-     * The specific exceptions that are caught and handled include IllegalArgumentException, NoSuchElementException, and NullPointerException.
-     * If an IllegalArgumentException or NoSuchElementException is thrown, the response has a status of HttpStatus.BAD_REQUEST and a status code of 400.
-     * If a NullPointerException is thrown, the response has a status of HttpStatus.BAD_REQUEST and a status code of 500.
+     * @param id the id of the board
+     * @return a {@link Response} object with a list of {@link ItemDTO} objects and a status message.
+     * If the board with the given id does not exist, a BAD_REQUEST status with a message indicating
+     * the error is returned. If the id is not valid, a BAD_REQUEST status with a message indicating
+     * the error is returned. If a NullPointerException is thrown, a BAD_REQUEST status with a message
+     * indicating the error is returned.
      */
     public Response getAllItemsInBoard(Long id) {
         try {
@@ -243,6 +235,16 @@ public class SharedContentFacade {
         }
     }
 
+    /**
+     * Returns a list of all comments in a board with the given id.
+     *
+     * @param boardId the id of the board
+     * @return a {@link Response} object with a list of {@link CommentDTO} objects and a status message.
+     * If the board with the given id does not exist, a BAD_REQUEST status with a message indicating
+     * the error is returned. If the id is not valid, a BAD_REQUEST status with a message indicating
+     * the error is returned. If a NullPointerException is thrown, a BAD_REQUEST status with a message
+     * indicating the error is returned.
+     */
     public Response getAllCommentsInBoard(Long boardId) {
         try {
             Validations.validate(boardId, Regex.ID.getRegex());
@@ -272,7 +274,16 @@ public class SharedContentFacade {
         return null;
     }
 
-
+    /**
+     * Returns a list of all comments in a status with the given id.
+     *
+     * @param statusId the id of the status
+     * @return a {@link Response} object with a list of {@link CommentDTO} objects and a status message.
+     * If the status with the given id does not exist, a BAD_REQUEST status with a message indicating
+     * the error is returned. If the id is not valid, a BAD_REQUEST status with a message indicating
+     * the error is returned. If a NullPointerException is thrown, a BAD_REQUEST status with a message
+     * indicating the error is returned.
+     */
     public Response getAllCommentsInStatus(Long statusId) {
         try {
             Validations.validate(statusId, Regex.ID.getRegex());
@@ -316,15 +327,14 @@ public class SharedContentFacade {
     }
 
     /**
-     * convertFromServiceOutputToDTOEntity
-     *
-     * @param content - the shared content object to convert
-     * @param clz     - the class of the shared content object
-     * @return a DTO entity representing the shared content object
      * This function receives a shared content object and a class representing the type of shared content.
      * It checks the class of the shared content and converts it to the corresponding DTO entity using the appropriate conversion function.
      * Currently, the only supported class is Item, and for this class, the getSharedContentFromDB function from the ItemDTO class is used for the conversion.
      * If the class is not recognized, an IllegalArgumentException is thrown.
+     *
+     * @param content - the shared content object to convert
+     * @param clz     - the class of the shared content object
+     * @return a DTO entity representing the shared content object
      */
     private SharedContentDTO convertFromServiceOutputToDTOEntity(SharedContent content, Class clz) {
         if (clz.getSimpleName().equals(Item.class.getSimpleName()))

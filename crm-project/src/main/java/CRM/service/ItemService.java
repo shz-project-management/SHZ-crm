@@ -29,20 +29,16 @@ public class ItemService implements ServiceInterface {
     private TypeRepository typeRepository;
     @Autowired
     private StatusRepository statusRepository;
+    @Autowired
+    private CommentRepository commentRepository;
 
     /**
-     * create
+     * Creates a new item in the system and stores it in the database.
      *
-     * @param itemRequest - a request object containing information about the item to be created
-     * @return the newly created item
-     * @throws AccountNotFoundException if the user ID provided in the request does not correspond to an existing user
-     *                                  This function receives an item request object and creates a new item based on the information provided in the request.
-     *                                  It first initializes variables for the user, parent item, board, type, and status that the new item will have.
-     *                                  If the parent item ID provided in the request is null, the parent item variable is set to null. Otherwise, the doesIdExists function from the Validations class is used to retrieve the parent item with the provided ID from the itemRepository.
-     *                                  The doesIdExists function is also used to retrieve the user, board, type, and status from the corresponding repositories using the IDs provided in the request.
-     *                                  If the user ID does not correspond to an existing user, an AccountNotFoundException is thrown.
-     *                                  The createNewItem function from the Item class is then called to create a new item with the retrieved user, board, type, status, and the other information provided in the request.
-     *                                  The new item is then saved to the repository and returned.
+     * @param itemRequest The request object containing the details of the item to be created.
+     * @return The newly created item.
+     * @throws AccountNotFoundException if the user ID specified in the request object does not correspond to an existing user.
+     * @throws NoSuchElementException   if any of the board ID, type ID, or status ID specified in the request object do not correspond to existing entities.
      */
     public Item create(ItemRequest itemRequest) throws AccountNotFoundException {
         User user;
@@ -66,16 +62,11 @@ public class ItemService implements ServiceInterface {
     }
 
     /**
-     * delete
+     * Deletes a list of items from the system and their associated comments from the database.
      *
-     * @param ids - a list of IDs for the items to be deleted
-     * @return the number of items successfully deleted
-     * This function receives a list of IDs for items to be deleted and attempts to delete them.
-     * It first initializes a counter to the number of IDs in the list.
-     * It then iterates through the list of IDs and tries to retrieve the item with each ID using the doesIdExists function from the Validations class.
-     * If an item with the ID is not found, the ID is removed from the list and the counter is decremented.
-     * After the iteration is complete, the deleteAllById function from the itemRepository is called with the list of IDs, deleting all the items with those IDs.
-     * The function then returns the counter, which is the number of items successfully deleted.
+     * @param ids The IDs of the items to be deleted.
+     * @return The number of items successfully deleted.
+     * @throws NoSuchElementException if any of the IDs does not correspond to an existing item.
      */
     @Override
     public int delete(List<Long> ids) {
@@ -83,8 +74,8 @@ public class ItemService implements ServiceInterface {
         for (Long id : ids) {
             try {
                 Item item = Validations.doesIdExists(id, itemRepository);
+                commentRepository.deleteAllByParentItem(item);
             } catch (NoSuchElementException e) {
-                ids.remove(id);
                 counter--;
             }
         }
@@ -123,12 +114,12 @@ public class ItemService implements ServiceInterface {
 
     /**
      * getAllInBoard
-     *
-     * @param boardId - the ID of the board whose items are to be retrieved
-     * @return a list of the items in the specified board
      * This function receives the ID of a board and retrieves all the items in that board.
      * It uses the doesIdExists function from the Validations class to retrieve the board with the provided ID from the boardRepository.
      * The findAllByBoard function from the itemRepository is then called with the retrieved board, returning a list of all the items in that board.
+     *
+     * @param boardId - the ID of the board whose items are to be retrieved
+     * @return a list of the items in the specified board
      */
     public List<Item> getAllInBoard(long boardId) {
         Board board = Validations.doesIdExists(boardId, boardRepository);
