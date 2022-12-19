@@ -52,10 +52,18 @@ public class ItemService implements ServiceInterface {
     }
 
     @Override
-    public int delete(long id) {
-        Item item = Validations.doesIdExists(id, itemRepository);
-        itemRepository.delete(item);
-        return 1;
+    public int delete(List<Long> ids) {
+        int counter = ids.size();
+        for (Long id : ids) {
+            try {
+                Item item = Validations.doesIdExists(id, itemRepository);
+            } catch (NoSuchElementException e){
+                ids.remove(id);
+                counter--;
+            }
+        }
+        itemRepository.deleteAllById(ids);
+        return counter;
     }
 
     @Override
@@ -79,7 +87,8 @@ public class ItemService implements ServiceInterface {
         return null;
     }
 
-    public List<Item> getAllItemsInBaord(long boardId){
-        return null;
+    public List<Item> getAllInBoard(long boardId) {
+        Board board = Validations.doesIdExists(boardId, boardRepository);
+        return itemRepository.findAllByBoard(board);
     }
 }

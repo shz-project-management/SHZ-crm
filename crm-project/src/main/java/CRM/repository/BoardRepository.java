@@ -21,4 +21,6 @@ public interface BoardRepository extends JpaRepository<Board, Long> {
     @Modifying
     @Query("DELETE Board b WHERE b.creatorUser = ?1")
     void deleteAllByUser(User user);
+
+
 }

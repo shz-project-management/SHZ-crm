@@ -13,6 +13,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @Controller
 @RequestMapping(value = "/item")
 @AllArgsConstructor
@@ -31,8 +33,8 @@ public class ItemController {
     }
 
     @DeleteMapping
-    public ResponseEntity<Response> delete(@RequestParam Long itemId) {
-        Response response = sharedContentFacade.delete(itemId, Item.class);
+    public ResponseEntity<Response> delete(@RequestBody List<Long> itemsIds) {
+        Response response = sharedContentFacade.delete(itemsIds, Item.class);
         return new ResponseEntity<>(response, response.getStatus());
     }
 
@@ -53,7 +55,7 @@ public class ItemController {
 
     @GetMapping(value = "all-in-board/{boardId}")
     public ResponseEntity<Response> getAllItemsInBoard(@PathVariable Long boardId){
-        Response response = sharedContentFacade.getAllItemsInBoard(boardId, Item.class);
+        Response response = sharedContentFacade.getAllItemsInBoard(boardId);
         return new ResponseEntity<>(response, response.getStatus());
     }
 
