@@ -164,6 +164,10 @@ public class SharedContentFacade {
         }
     }
 
+    public Response getAllCommentsInBoard(Long boardId) {
+        return null;
+    }
+
     public Response getAllItemsInItem(Long boardId) {
         // validate the id using the Validations.validate function
         // call itemService with the relevant function.
@@ -193,4 +197,5 @@ public class SharedContentFacade {
 
         throw new IllegalArgumentException("There is no such class in the system!");
     }
+
 }

@@ -54,4 +54,11 @@ public class CommentController {
         Response response = sharedContentFacade.get(commentId, Comment.class);
         return new ResponseEntity<>(response, response.getStatus());
     }
+
+    @GetMapping(value = "all-in-board/{boardId}")
+    public ResponseEntity<Response> getAllCommentsInBoard(@PathVariable Long boardId){
+        Response response = sharedContentFacade.getAllCommentsInBoard(boardId);
+        return new ResponseEntity<>(response, response.getStatus());
+    }
+
 }
