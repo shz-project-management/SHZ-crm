@@ -1,6 +1,5 @@
 package CRM.controller.controllers;
 
-import CRM.controller.facades.AttributeFacade;
 import CRM.controller.facades.SharedContentFacade;
 import CRM.entity.Item;
 import CRM.entity.requests.AttributeRequest;
@@ -24,24 +23,15 @@ public class ItemController {
 
     @Autowired
     private SharedContentFacade sharedContentFacade;
-    @Autowired
-    private AttributeFacade attributeFacade;
-
-    // TODO:
-    //  ------------------------------------------- //
-    //  in each endpoint, call SharedContentFacade! //
-    //  ------------------------------------------- //
 
     @PostMapping(consumes = "application/json")
     public ResponseEntity<Response> create(@RequestBody ItemRequest item) {
-
         Response response = sharedContentFacade.create(item);
         return new ResponseEntity<>(response, response.getStatus());
     }
 
     @DeleteMapping
     public ResponseEntity<Response> delete(@RequestParam Long itemId) {
-
         Response response = sharedContentFacade.delete(itemId, Item.class);
         return new ResponseEntity<>(response, response.getStatus());
     }
@@ -61,9 +51,10 @@ public class ItemController {
         return null;
     }
 
-    @GetMapping(value = "all-in-board/{itemId}")
+    @GetMapping(value = "all-in-board/{boardId}")
     public ResponseEntity<Response> getAllItemsInBoard(@PathVariable Long boardId){
-        return null;
+        Response response = sharedContentFacade.getAllItemsInBoard(boardId, Item.class);
+        return new ResponseEntity<>(response, response.getStatus());
     }
 
     @GetMapping(value = "{itemId}")
