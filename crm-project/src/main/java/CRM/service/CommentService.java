@@ -55,10 +55,7 @@ public class CommentService implements ServiceInterface {
 
     @Override
     public Comment get(long id) {
-        // checkIfExists
-        // return the received item
-
-        return null;
+        return Validations.doesIdExists(id, commentRepository);
     }
 
     @Override
