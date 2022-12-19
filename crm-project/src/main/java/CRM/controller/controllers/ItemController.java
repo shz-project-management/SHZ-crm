@@ -2,6 +2,7 @@ package CRM.controller.controllers;
 
 import CRM.controller.facades.AttributeFacade;
 import CRM.controller.facades.SharedContentFacade;
+import CRM.entity.Item;
 import CRM.entity.requests.AttributeRequest;
 import CRM.entity.requests.ItemRequest;
 import CRM.entity.response.Response;
@@ -40,7 +41,9 @@ public class ItemController {
 
     @DeleteMapping
     public ResponseEntity<Response> delete(@RequestParam Long itemId) {
-        return null;
+
+        Response response = sharedContentFacade.delete(itemId, Item.class);
+        return new ResponseEntity<>(response, response.getStatus());
     }
 
     @PatchMapping
