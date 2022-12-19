@@ -103,7 +103,7 @@ public class BoardService {
      *
      * @param boardReq the request object containing the update information for the board
      * @return the updated board
-     * @throws AccountNotFoundException if the board with the given id does not exist
+     * @throws NoSuchFieldException if the boardReq with the given field does not exist
      */
     public Board updateBoard(UpdateObjectRequest boardReq, long boardId) throws NoSuchFieldException {
         Board board = Validations.doesIdExists(boardId, boardRepository);

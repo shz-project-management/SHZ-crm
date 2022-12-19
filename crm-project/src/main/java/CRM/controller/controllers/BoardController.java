@@ -89,7 +89,7 @@ public class BoardController {
      * @param boardRequest An object containing the fields to update for the board.
      * @return A response object indicating the status of the update operation.
      */
-    @PutMapping(value = "/update/{boardId}", consumes = "application/json")
+    @PatchMapping(value = "/update/{boardId}", consumes = "application/json")
     public ResponseEntity<Response> updateBoard(@RequestBody UpdateObjectRequest boardRequest, @PathVariable Long boardId) {
         Response response = boardFacade.updateBoard(boardRequest, boardId);
         return new ResponseEntity<>(response, response.getStatus());
