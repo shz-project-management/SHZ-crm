@@ -2,6 +2,7 @@ package CRM.service;
 
 import CRM.entity.Comment;
 import CRM.entity.SharedContent;
+import CRM.entity.requests.CommentRequest;
 import CRM.entity.requests.ItemRequest;
 import CRM.repository.CommentRepository;
 import org.apache.logging.log4j.LogManager;
@@ -48,7 +49,7 @@ public class CommentService implements ServiceInterface {
         return null;
     }
 
-    public Comment create(Comment comment){
+    public Comment create(CommentRequest comment){
         // I don't think there are any validations needed to be here, since we
         // don't have any unique or primary values in an item.
 

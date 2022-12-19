@@ -113,8 +113,16 @@ public class Validations {
             item.setDescription("");
     }
 
-    public static void validateCreatedComment(Comment comment) {
-        // validate each field of the comment using validate(regex, field)
+    public static void validateCreatedComment(CommentRequest comment) {
+        // validate each field of the item using validate(regex, field)
+        validate(comment.getParentItemId(), Regex.ID.getRegex());
+        validate(comment.getUserId(), Regex.ID.getRegex());
+
+        if (comment.getTitle() == null)
+            throw new NullPointerException(ExceptionMessage.VALIDATION_FAILED.toString());
+
+        if (comment.getDescription() == null)
+            comment.setDescription("");
     }
 
     /**
