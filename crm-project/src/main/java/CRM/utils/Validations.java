@@ -115,12 +115,7 @@ public class Validations {
 
     public static void validateCreatedComment(CommentRequest comment) {
         // validate each field of the item using validate(regex, field)
-        try {
-            validate(comment.getParentItemId(), Regex.ID.getRegex());
-        } catch (NullPointerException e){
-            logger.warn("Parent item ID is null");
-        }
-
+        validate(comment.getParentItemId(), Regex.ID.getRegex());
         validate(comment.getUserId(), Regex.ID.getRegex());
 
         if (comment.getTitle() == null)
