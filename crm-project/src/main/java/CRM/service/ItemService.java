@@ -18,6 +18,10 @@ public class ItemService implements ServiceInterface {
     @Autowired
     private ItemRepository itemRepository;
 
+    public Item create(ItemRequest itemRequest){
+        return null;
+    }
+
     @Override
     public int delete(long id) {
         // checkIfExists

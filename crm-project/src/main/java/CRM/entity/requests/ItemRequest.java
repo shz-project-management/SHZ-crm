@@ -15,12 +15,7 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @ToString
-public class ItemRequest {
-    //SharedContent fields
-    private Long parentItemId;
-    private Long userId;
-    private String title;
-    private String description;
+public class ItemRequest extends SharedContentRequest{
 
     //Item fields
     private Long boardId;

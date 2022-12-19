@@ -1,15 +1,20 @@
 package CRM.controller.facades;
 
 import CRM.entity.Comment;
+import CRM.entity.DTO.ItemDTO;
+import CRM.entity.DTO.UserDTO;
 import CRM.entity.Item;
 import CRM.entity.requests.ItemRequest;
 import CRM.entity.response.Response;
 import CRM.service.CommentService;
 import CRM.service.ItemService;
 import CRM.service.ServiceInterface;
+import CRM.utils.Validations;
+import CRM.utils.enums.SuccessMessage;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -23,12 +28,31 @@ public class SharedContentFacade {
     private CommentService commentService;
 
     public Response create(ItemRequest item){
-        // make sure the params are correct using Validations.validateCreatedItem()
-        // catch exception if relevant
+        try {
+            // make sure the params are correct using Validations.validateCreatedItem()
+            // catch exception if relevant
+            Validations.validateCreatedItem(item);
 
-        // call itemService with create function to create a new item
-        // return the response with the new item as a data inside response entity.
-        return null;
+            // call itemService with create function to create a new item
+            // return the response with the new item as a data inside response entity.
+            return new Response.Builder()
+                    .data(ItemDTO.fromItem(itemService.create(item)))
+                    .message(SuccessMessage.CREATE.toString())
+                    .status(HttpStatus.ACCEPTED)
+                    .statusCode(201)
+                    .build();
+
+        } catch (IllegalArgumentException e) {
+            return new Response.Builder()
+                    .message(e.getMessage())
+                    .status(HttpStatus.BAD_REQUEST)
+                    .statusCode(400).build();
+        } catch (NullPointerException e) {
+            return new Response.Builder()
+                    .message(e.getMessage())
+                    .status(HttpStatus.BAD_REQUEST)
+                    .statusCode(500).build();
+        }
     }
 
 //    public Response create(CommentRequest comment){
