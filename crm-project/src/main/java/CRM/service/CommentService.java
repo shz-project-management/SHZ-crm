@@ -3,6 +3,7 @@ package CRM.service;
 import CRM.entity.*;
 import CRM.entity.requests.CommentRequest;
 import CRM.entity.requests.ItemRequest;
+import CRM.repository.BoardRepository;
 import CRM.repository.CommentRepository;
 import CRM.repository.ItemRepository;
 import CRM.repository.UserRepository;
@@ -14,9 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.security.auth.login.AccountNotFoundException;
-import java.util.Arrays;
-import java.util.List;
-import java.util.NoSuchElementException;
+import java.util.*;
 
 @Service
 public class CommentService implements ServiceInterface {
@@ -27,6 +26,8 @@ public class CommentService implements ServiceInterface {
     private CommentRepository commentRepository;
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private BoardRepository boardRepository;
     @Autowired
     private ItemRepository itemRepository;
 
@@ -80,7 +81,16 @@ public class CommentService implements ServiceInterface {
     }
 
     public List<Comment> getAllCommentsInBoard(long boardId) {
-        return null;
+        //get all items
+        //get all comments
+
+        Board board = Validations.doesIdExists(boardId, boardRepository);
+        Set<Item> itemsInBoard = board.getItems();
+        List<Comment> commentList = new ArrayList<>();
+        for (Item item: itemsInBoard){
+            commentList.addAll(commentRepository.findAllByParentItem(item));
+        }
+        return commentList;
     }
 
     public List<Comment> getAllCommentsInStatus(long statusId) {
