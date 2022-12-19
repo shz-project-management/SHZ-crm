@@ -1,5 +1,6 @@
 package CRM.entity;
 
+import CRM.entity.DTO.ItemDTO;
 import lombok.*;
 
 import javax.persistence.*;
@@ -37,4 +38,19 @@ public class Item extends SharedContent {
 
     @OneToMany(mappedBy = "parentItem", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Item> items;
+
+    // FIXME: Is it ok? Should it get less params?
+    public static Item createNewItem(Board board, Status status, Type type, User user, String title, String description, Item parentItem, int importance){
+        Item item = new Item();
+        item.setBoard(board);
+        item.setImportance(importance);
+        item.setStatus(status);
+        item.setType(type);
+        item.setUser(user);
+        item.setParentItem(parentItem);
+        item.setDescription(description);
+        item.setTitle(title);
+        return item;
+    }
+
 }

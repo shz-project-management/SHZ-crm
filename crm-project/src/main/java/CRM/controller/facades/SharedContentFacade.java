@@ -17,6 +17,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
+import javax.security.auth.login.AccountNotFoundException;
+import java.util.NoSuchElementException;
+
 @Component
 public class SharedContentFacade {
 
@@ -27,7 +30,7 @@ public class SharedContentFacade {
     @Autowired
     private CommentService commentService;
 
-    public Response create(ItemRequest item){
+    public Response create(ItemRequest item) {
         try {
             // make sure the params are correct using Validations.validateCreatedItem()
             // catch exception if relevant
@@ -36,13 +39,13 @@ public class SharedContentFacade {
             // call itemService with create function to create a new item
             // return the response with the new item as a data inside response entity.
             return new Response.Builder()
-                    .data(ItemDTO.fromItem(itemService.create(item)))
+                    .data(ItemDTO.getItemFromDB(itemService.create(item)))
                     .message(SuccessMessage.CREATE.toString())
                     .status(HttpStatus.ACCEPTED)
                     .statusCode(201)
                     .build();
 
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException | AccountNotFoundException | NoSuchElementException e) {
             return new Response.Builder()
                     .message(e.getMessage())
                     .status(HttpStatus.BAD_REQUEST)
@@ -64,14 +67,14 @@ public class SharedContentFacade {
 //        return null;
 //    }
 
-    public Response delete(Long id, Class clz){
+    public Response delete(Long id, Class clz) {
         // validate the id using the Validations.validate function
         // call the correct service using convertFromClassToService(clz) function
         // with delete function in it.
         return null;
     }
 
-    public Response update(ItemRequest updateItem){
+    public Response update(ItemRequest updateItem) {
         // validate params using the Validations.validate function
         // call the correct service using convertFromClassToService(clz) function
         // with update function in it.
@@ -85,14 +88,14 @@ public class SharedContentFacade {
 //        return null;
 //    }
 
-    public Response get(Long id, Class clz){
+    public Response get(Long id, Class clz) {
         // validate the id using the Validations.validate function
         // call the correct service using convertFromClassToService(clz) function
         // with find function in it.
         return null;
     }
 
-    public Response getAllItemsInBoard(Long id, Class clz){
+    public Response getAllItemsInBoard(Long id, Class clz) {
         // validate the id using the Validations.validate function
         // call the correct service using convertFromClassToService(clz) function
         convertFromClassToService(clz).get(id);
@@ -100,7 +103,7 @@ public class SharedContentFacade {
         return null;
     }
 
-    public Response getAllItemsInItem(Long boardId){
+    public Response getAllItemsInItem(Long boardId) {
         // validate the id using the Validations.validate function
         // call itemService with the relevant function.
         return null;
