@@ -2,6 +2,7 @@ package CRM.controller.facades;
 
 import CRM.entity.Comment;
 import CRM.entity.Item;
+import CRM.entity.requests.ItemRequest;
 import CRM.entity.response.Response;
 import CRM.service.CommentService;
 import CRM.service.ItemService;
@@ -21,7 +22,7 @@ public class SharedContentFacade {
     @Autowired
     private CommentService commentService;
 
-    public Response create(Item item){
+    public Response create(ItemRequest item){
         // make sure the params are correct using Validations.validateCreatedItem()
         // catch exception if relevant
 
@@ -30,14 +31,14 @@ public class SharedContentFacade {
         return null;
     }
 
-    public Response create(Comment comment){
-        // make sure the params are correct using Validations.validateCreatedComment()
-        // catch exception if relevant
-
-        // call commentService with create function to create a new item
-        // return the response with the new item as a data inside response entity.
-        return null;
-    }
+//    public Response create(CommentRequest comment){
+//        // make sure the params are correct using Validations.validateCreatedComment()
+//        // catch exception if relevant
+//
+//        // call commentService with create function to create a new item
+//        // return the response with the new item as a data inside response entity.
+//        return null;
+//    }
 
     public Response delete(Long id, Class clz){
         // validate the id using the Validations.validate function
@@ -46,12 +47,19 @@ public class SharedContentFacade {
         return null;
     }
 
-    public Response update(Long id, String field, String content, Class clz){
+    public Response update(ItemRequest updateItem){
         // validate params using the Validations.validate function
         // call the correct service using convertFromClassToService(clz) function
         // with update function in it.
         return null;
     }
+
+//    public Response update(UpdateCommentRequest updateComment){
+//        // validate params using the Validations.validate function
+//        // call the correct service using convertFromClassToService(clz) function
+//        // with update function in it.
+//        return null;
+//    }
 
     public Response get(Long id, Class clz){
         // validate the id using the Validations.validate function
@@ -60,7 +68,7 @@ public class SharedContentFacade {
         return null;
     }
 
-    public Response getAllInItem(Long id, Class clz){
+    public Response getAllItemsInBoard(Long id, Class clz){
         // validate the id using the Validations.validate function
         // call the correct service using convertFromClassToService(clz) function
         convertFromClassToService(clz).get(id);
@@ -68,17 +76,17 @@ public class SharedContentFacade {
         return null;
     }
 
-    public Response getAllItemsInBoard(Long boardId){
+    public Response getAllItemsInItem(Long boardId){
         // validate the id using the Validations.validate function
         // call itemService with the relevant function.
         return null;
     }
 
     /**
-     * This function gets an item as a parameter and extracts its class in order to
-     * return the correct service we need to select the action we need.
-     * @param c - class of folder/document
-     * @return the service we need to use according to what file it is.
+     * Converts a given Class object to the corresponding AttributeService object.
+     *
+     * @param c the Class object to be converted
+     * @return the corresponding AttributeService object, or null if no corresponding AttributeService object is found
      */
     private ServiceInterface convertFromClassToService(Class c) {
         logger.info("in FacadeFileController -> convertFromClassToService ,item of Class: " + c);

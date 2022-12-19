@@ -1,5 +1,6 @@
 package CRM.entity.requests;
 
+import CRM.entity.Board;
 import lombok.*;
 
 @AllArgsConstructor
@@ -7,9 +8,7 @@ import lombok.*;
 @Getter
 @Setter
 @ToString
-public class BoardRequest {
-    //FIXME: fieldName and content will replace the actual fields such as: "name" and "description"
-    private Long creatorUserId;
+public class AttributeRequest {
     private Long boardId;
     private String name;
     private String description;

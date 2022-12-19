@@ -1,0 +1,6 @@
+*.class
+.idea/
+resources/
+resources/log4j2.xml
+target/
+log/

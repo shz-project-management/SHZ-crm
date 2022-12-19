@@ -30,6 +30,13 @@ public class UserController {
         return new ResponseEntity<>(response, response.getStatus());
     }
 
+    @DeleteMapping(value = "{id}")
+    public ResponseEntity<Response> delete(@PathVariable Long id){
+
+        Response response = userFacade.delete(id);
+        return new ResponseEntity<>(response, response.getStatus());
+    }
+
     @GetMapping(value = "getAll")
     public ResponseEntity<Response> getAll(){
 
@@ -41,6 +48,13 @@ public class UserController {
     public ResponseEntity<Response> getAllInBoard(@PathVariable Long boardId){
 
         Response response = userFacade.getAllInBoard(boardId);
+        return new ResponseEntity<>(response, response.getStatus());
+    }
+
+    @PostMapping(value = "add/{userId}/toBoard/{boardId}")
+    public ResponseEntity<Response> addUserToBoard(@PathVariable Long userId, @PathVariable Long boardId){
+
+        Response response = userFacade.addUserToBoard(userId, boardId);
         return new ResponseEntity<>(response, response.getStatus());
     }
 }
