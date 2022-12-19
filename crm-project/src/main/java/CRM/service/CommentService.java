@@ -10,6 +10,7 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Arrays;
 import java.util.List;
 
 @Service
@@ -54,6 +55,10 @@ public class CommentService implements ServiceInterface {
         // don't have any unique or primary values in an item.
 
         // save the item in the database -> commentRepository
+        return null;
+    }
+
+    public List<Comment> getAllCommentsInBoard(long boardId) {
         return null;
     }
 }
