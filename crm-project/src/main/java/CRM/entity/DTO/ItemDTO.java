@@ -28,10 +28,11 @@ public class ItemDTO extends SharedContentDTO {
             itemDTO.setParentItem(ItemDTO.getSharedContentFromDB(item.getParentItem()));
         itemDTO.setUser(UserDTO.getUserFromDB(item.getUser()));
         itemDTO.setTitle(item.getTitle());
-        itemDTO.setDescription(itemDTO.getDescription());
+        itemDTO.setDescription(item.getDescription());
         itemDTO.setType(AttributeDTO.createAttributeDTO(item.getStatus()));
         itemDTO.setStatus(AttributeDTO.createAttributeDTO(item.getStatus()));
         itemDTO.setBoardId(item.getBoard().getId());
+        itemDTO.setCreationDate(item.getCreationDate());
 
         return itemDTO;
     }

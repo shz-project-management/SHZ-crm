@@ -1,17 +1,22 @@
 package CRM.service;
 
-import CRM.entity.Comment;
-import CRM.entity.SharedContent;
+import CRM.entity.*;
 import CRM.entity.requests.CommentRequest;
 import CRM.entity.requests.ItemRequest;
 import CRM.repository.CommentRepository;
+import CRM.repository.ItemRepository;
+import CRM.repository.UserRepository;
+import CRM.utils.Validations;
+import CRM.utils.enums.ExceptionMessage;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.security.auth.login.AccountNotFoundException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 @Service
 public class CommentService implements ServiceInterface {
@@ -20,6 +25,10 @@ public class CommentService implements ServiceInterface {
 
     @Autowired
     private CommentRepository commentRepository;
+    @Autowired
+    private UserRepository userRepository;
+    @Autowired
+    private ItemRepository itemRepository;
 
     @Override
     public int delete(List<Long> ids) {
@@ -50,12 +59,18 @@ public class CommentService implements ServiceInterface {
         return null;
     }
 
-    public Comment create(CommentRequest comment){
-        // I don't think there are any validations needed to be here, since we
-        // don't have any unique or primary values in an item.
+    public Comment create(CommentRequest commentRequest) throws AccountNotFoundException {
+        User user;
+        Item parentItem = Validations.doesIdExists(commentRequest.getParentItemId(), itemRepository);
 
-        // save the item in the database -> commentRepository
-        return null;
+        try {
+            user = Validations.doesIdExists(commentRequest.getUserId(), userRepository);
+        } catch (NoSuchElementException e) {
+            throw new AccountNotFoundException(ExceptionMessage.ACCOUNT_DOES_NOT_EXISTS.toString());
+        }
+
+        Comment comment = Comment.createNewComment(user, commentRequest.getTitle(), commentRequest.getDescription(), parentItem);
+        return commentRepository.save(comment);
     }
 
     public List<Comment> getAllCommentsInBoard(long boardId) {
