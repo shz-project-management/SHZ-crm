@@ -2,8 +2,10 @@ package CRM.controller.facades;
 
 import CRM.entity.Comment;
 import CRM.entity.DTO.ItemDTO;
+import CRM.entity.DTO.SharedContentDTO;
 import CRM.entity.DTO.UserDTO;
 import CRM.entity.Item;
+import CRM.entity.SharedContent;
 import CRM.entity.requests.ItemRequest;
 import CRM.entity.response.Response;
 import CRM.service.CommentService;
@@ -40,7 +42,7 @@ public class SharedContentFacade {
             // call itemService with create function to create a new item
             // return the response with the new item as a data inside response entity.
             return new Response.Builder()
-                    .data(ItemDTO.getItemFromDB(itemService.create(item)))
+                    .data(ItemDTO.getSharedContentFromDB(itemService.create(item)))
                     .message(SuccessMessage.CREATE.toString())
                     .status(HttpStatus.ACCEPTED)
                     .statusCode(201)
@@ -69,7 +71,7 @@ public class SharedContentFacade {
 //    }
 
     public Response delete(Long id, Class clz) {
-        try{
+        try {
             // validate the id using the Validations.validate function
             Validations.validate(id, Regex.ID.getRegex());
 
@@ -114,7 +116,7 @@ public class SharedContentFacade {
 
             // call the correct service using convertFromClassToService(clz) function with find function in it
             return new Response.Builder()
-                    .data(convertFromClassToService(clz).get(id))
+                    .data(convertFromServiceOutputToDTOEntity(convertFromClassToService(clz).get(id), clz))
                     .message(SuccessMessage.FOUND.toString())
                     .status(HttpStatus.OK)
                     .statusCode(200)
@@ -159,6 +161,15 @@ public class SharedContentFacade {
         if (c.equals(Item.class)) return itemService;
         if (c.equals(Comment.class)) return commentService;
 
-        return null;
+        throw new IllegalArgumentException("There is no such class in the system!");
+    }
+
+    private SharedContentDTO convertFromServiceOutputToDTOEntity(SharedContent content, Class clz){
+        if (clz.getSimpleName().equals(Item.class.getSimpleName()))
+            return ItemDTO.getSharedContentFromDB((Item) content);
+//        if (clz.getSimpleName().equals(Comment.class.getSimpleName()))
+//               contentDTO = CommentDTO.getSharedContentFromDB((Comment)content);
+
+        throw new IllegalArgumentException("There is no such class in the system!");
     }
 }
