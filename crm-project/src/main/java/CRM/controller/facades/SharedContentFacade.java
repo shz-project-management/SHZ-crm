@@ -6,6 +6,7 @@ import CRM.entity.DTO.SharedContentDTO;
 import CRM.entity.DTO.UserDTO;
 import CRM.entity.Item;
 import CRM.entity.SharedContent;
+import CRM.entity.requests.CommentRequest;
 import CRM.entity.requests.ItemRequest;
 import CRM.entity.response.Response;
 import CRM.service.CommentService;
@@ -62,14 +63,14 @@ public class SharedContentFacade {
         }
     }
 
-//    public Response create(CommentRequest comment){
-//        // make sure the params are correct using Validations.validateCreatedComment()
-//        // catch exception if relevant
-//
-//        // call commentService with create function to create a new item
-//        // return the response with the new item as a data inside response entity.
-//        return null;
-//    }
+    public Response create(CommentRequest comment){
+        // make sure the params are correct using Validations.validateCreatedComment()
+        // catch exception if relevant
+
+        // call commentService with create function to create a new item
+        // return the response with the new item as a data inside response entity.
+        return null;
+    }
 
     public Response delete(Long id, Class clz) {
         try {
