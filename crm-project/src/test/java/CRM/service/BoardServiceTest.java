@@ -5,6 +5,7 @@ import CRM.entity.User;
 import CRM.entity.UserInBoard;
 import CRM.entity.requests.BoardRequest;
 import CRM.entity.requests.RegisterUserRequest;
+import CRM.entity.requests.UpdateObjectRequest;
 import CRM.repository.BoardRepository;
 import CRM.repository.UserInBoardRepository;
 import CRM.repository.UserRepository;
@@ -146,37 +147,37 @@ class BoardServiceTest {
 
     @Test
     @DisplayName("Test update board with valid input")
-    public void testUpdateBoardWithValidInput() {
-        BoardRequest boardRequest = new BoardRequest();
-        boardRequest.setBoardId(1L);
-        boardRequest.setName("Test Board");
-        given(boardRepository.findById(boardRequest.getBoardId())).willReturn(Optional.of(board));
+    public void testUpdateBoardWithValidInput() throws NoSuchFieldException {
+        UpdateObjectRequest boardRequest = new UpdateObjectRequest();
+        boardRequest.setFieldName("name");
+        boardRequest.setContent("Test new board name");
+        given(boardRepository.findById(1L)).willReturn(Optional.of(board));
         given(boardRepository.save(board)).willReturn(board);
-        assertNotNull(boardService.updateBoard(boardRequest));
+        assertNotNull(boardService.updateBoard(boardRequest, 1L));
     }
 
     @Test
     @DisplayName("Test update board with invalid board ID")
     public void testUpdateBoardWithInvalidBoardId() {
-        BoardRequest boardRequest = new BoardRequest();
-        boardRequest.setBoardId(-2L);
-        boardRequest.setName("Test Board");
-        assertThrows(NoSuchElementException.class, () -> boardService.updateBoard(boardRequest));
+        UpdateObjectRequest boardRequest = new UpdateObjectRequest();
+        boardRequest.setFieldName("name");
+        boardRequest.setContent("Test new board name");
+        assertThrows(NoSuchElementException.class, () -> boardService.updateBoard(boardRequest, -2L));
     }
 
     @Test
     @DisplayName("Test update board with null name")
     public void testUpdateBoardWithNullName() {
-        BoardRequest boardRequest = new BoardRequest();
-        boardRequest.setBoardId(1L);
-        boardRequest.setName(null);
-        assertThrows(NoSuchElementException.class, () -> boardService.updateBoard(boardRequest));
+        UpdateObjectRequest boardRequest = new UpdateObjectRequest();
+        boardRequest.setFieldName("name");
+        boardRequest.setContent(null);
+        assertThrows(NoSuchElementException.class, () -> boardService.updateBoard(boardRequest, 1L));
     }
 
     @Test
     @DisplayName("Test update board with null request")
     public void testUpdateBoardWithNullRequest() {
-        BoardRequest boardRequest = null;
-        assertThrows(NullPointerException.class, () -> boardService.updateBoard(boardRequest));
+        UpdateObjectRequest boardRequest = null;
+        assertThrows(NoSuchElementException.class, () -> boardService.updateBoard(boardRequest, 1L));
     }
 }

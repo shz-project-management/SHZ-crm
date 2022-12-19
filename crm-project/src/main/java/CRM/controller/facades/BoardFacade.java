@@ -4,6 +4,7 @@ import CRM.entity.Board;
 import CRM.entity.DTO.BoardDTO;
 import CRM.entity.User;
 import CRM.entity.requests.BoardRequest;
+import CRM.entity.requests.UpdateObjectRequest;
 import CRM.entity.response.Response;
 import CRM.service.AuthService;
 import CRM.service.BoardService;
@@ -182,20 +183,16 @@ public class BoardFacade {
      * @throws NoSuchElementException   if the board to update is not found in the database
      * @throws NullPointerException     if the board object is null
      */
-    //FIXME: fieldName and content will replace the actual fields such as: "name" and "description"
-    public Response updateBoard(BoardRequest board) {
+    public Response updateBoard(UpdateObjectRequest board, Long boardId) {
         try {
-            Validations.validate(board.getBoardId(), Regex.ID.getRegex());
-            if (board.getName() != null) {
-                Validations.validate(board.getName(), Regex.BOARD_NAME.getRegex());
-            }
+            Validations.validate(boardId, Regex.ID.getRegex());
             return new Response.Builder()
-                    .data(BoardDTO.getBoardFromDB(boardService.updateBoard(board)))
+                    .data(BoardDTO.getBoardFromDB(boardService.updateBoard(board, boardId)))
                     .message(SuccessMessage.FOUND.toString())
                     .status(HttpStatus.OK)
                     .statusCode(200)
                     .build();
-        } catch (IllegalArgumentException | NoSuchElementException e) {
+        } catch (IllegalArgumentException | NoSuchElementException | NoSuchFieldException e) {
             return new Response.Builder()
                     .message(e.getMessage())
                     .status(HttpStatus.BAD_REQUEST)

@@ -14,11 +14,14 @@ import io.jsonwebtoken.Claims;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.hibernate.NonUniqueObjectException;
+import org.aspectj.apache.bcel.classfile.ClassFormatException;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import javax.security.auth.login.AccountNotFoundException;
+import java.lang.reflect.Field;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -156,7 +159,32 @@ public class Validations {
         return Long.valueOf(claims.getId());
     }
 
-    public static void throwAttributeAlreadyExistsForBoard(Attribute attribute, String className) {
+
+    public static <T> void setContentToFieldIfFieldExists(T object, String fieldName, Object content) throws NoSuchFieldException {
+        try {
+            for (Field field : object.getClass().getDeclaredFields()) {
+                field.setAccessible(true);
+                Object value = field.get(object);
+                if (value == null) {
+                    continue;
+                }
+                if (!field.getName().equals(fieldName)) {
+                    continue;
+                }
+                if (!(value.getClass().equals(content.getClass()))) {
+                    value.getClass().cast(content);
+                }
+                field.set(object, content);
+                return;
+            }
+            throw new NoSuchFieldException(ExceptionMessage.FIELD_OBJECT_NOT_EXISTS.toString());
+        }catch (IllegalAccessException | NoSuchFieldException e){
+            throw new NoSuchFieldException(ExceptionMessage.FIELD_OBJECT_NOT_EXISTS.toString());
+        }
+    }
+
+
+    public static void throwAttributeAlreadyExistsForBoard(Attribute attribute, String className){
         throw new NonUniqueObjectException(ExceptionMessage.ATTRIBUTE_ALREADY_IN_DB.toString(), attribute.getId(), className);
     }
 }
