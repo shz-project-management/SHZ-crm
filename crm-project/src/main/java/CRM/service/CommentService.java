@@ -32,7 +32,17 @@ public class CommentService implements ServiceInterface {
 
     @Override
     public int delete(List<Long> ids) {
-        return 0;
+        int counter = ids.size();
+        for (Long id : ids) {
+            try {
+                Validations.doesIdExists(id, commentRepository);
+            } catch (NoSuchElementException e) {
+                ids.remove(id);
+                counter--;
+            }
+        }
+        commentRepository.deleteAllById(ids);
+        return counter;
     }
 
     @Override
