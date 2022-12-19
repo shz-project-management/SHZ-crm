@@ -22,6 +22,7 @@ import org.springframework.stereotype.Component;
 
 import javax.security.auth.login.AccountNotFoundException;
 import java.util.NoSuchElementException;
+import java.util.stream.Collectors;
 
 @Component
 public class SharedContentFacade {
@@ -135,12 +136,31 @@ public class SharedContentFacade {
         }
     }
 
-    public Response getAllItemsInBoard(Long id, Class clz) {
-        // validate the id using the Validations.validate function
-        // call the correct service using convertFromClassToService(clz) function
-        convertFromClassToService(clz).get(id);
-        // with getAllInItem function in it.
-        return null;
+    public Response getAllItemsInBoard(Long id) {
+        try {
+            // validate the id using the Validations.validate function
+            Validations.validate(id, Regex.ID.getRegex());
+
+            // call the correct service using convertFromClassToService(clz) function
+            // with getAllInItem function in it.
+            return new Response.Builder()
+                    .data(itemService.getAllItemsInBaord(id).stream().map(item -> ItemDTO.getSharedContentFromDB(item)).collect(Collectors.toList()))
+                    .message(SuccessMessage.FOUND.toString())
+                    .status(HttpStatus.OK)
+                    .statusCode(200)
+                    .build();
+
+        } catch (IllegalArgumentException | NoSuchElementException e) {
+            return new Response.Builder()
+                    .message(e.getMessage())
+                    .status(HttpStatus.BAD_REQUEST)
+                    .statusCode(400).build();
+        } catch (NullPointerException e) {
+            return new Response.Builder()
+                    .message(e.getMessage())
+                    .status(HttpStatus.BAD_REQUEST)
+                    .statusCode(500).build();
+        }
     }
 
     public Response getAllItemsInItem(Long boardId) {
@@ -164,7 +184,7 @@ public class SharedContentFacade {
         throw new IllegalArgumentException("There is no such class in the system!");
     }
 
-    private SharedContentDTO convertFromServiceOutputToDTOEntity(SharedContent content, Class clz){
+    private SharedContentDTO convertFromServiceOutputToDTOEntity(SharedContent content, Class clz) {
         if (clz.getSimpleName().equals(Item.class.getSimpleName()))
             return ItemDTO.getSharedContentFromDB((Item) content);
 //        if (clz.getSimpleName().equals(Comment.class.getSimpleName()))

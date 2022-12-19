@@ -14,5 +14,6 @@ public class SharedContentRequest {
     private Long userId;
     private String title;
     private String description;
+    private Long assignToUserId;
     private LocalDateTime creationTime = LocalDateTime.now();
 }
