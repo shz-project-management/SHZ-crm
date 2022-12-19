@@ -273,7 +273,6 @@ public class SharedContentFacade {
     }
 
 
-
     public Response getAllCommentsInStatus(Long statusId) {
         try {
             Validations.validate(statusId, Regex.ID.getRegex());
@@ -330,8 +329,8 @@ public class SharedContentFacade {
     private SharedContentDTO convertFromServiceOutputToDTOEntity(SharedContent content, Class clz) {
         if (clz.getSimpleName().equals(Item.class.getSimpleName()))
             return ItemDTO.getSharedContentFromDB((Item) content);
-//        if (clz.getSimpleName().equals(Comment.class.getSimpleName()))
-//               contentDTO = CommentDTO.getSharedContentFromDB((Comment)content);
+        if (clz.getSimpleName().equals(Comment.class.getSimpleName()))
+            return CommentDTO.getSharedContentFromDB((Comment) content);
 
         throw new IllegalArgumentException("There is no such class in the system!");
     }
