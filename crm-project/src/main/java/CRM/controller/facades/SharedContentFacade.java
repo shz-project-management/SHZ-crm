@@ -22,6 +22,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
 import javax.security.auth.login.AccountNotFoundException;
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
@@ -72,14 +73,14 @@ public class SharedContentFacade {
         return null;
     }
 
-    public Response delete(Long id, Class clz) {
+    public Response delete(List<Long> ids, Class clz) {
         try {
             // validate the id using the Validations.validate function
-            Validations.validate(id, Regex.ID.getRegex());
+            ids.forEach(id -> Validations.validate(id, Regex.ID.getRegex()));
 
             // call the correct service using convertFromClassToService(clz) function with delete function in it
             return new Response.Builder()
-                    .data(convertFromClassToService(clz).delete(id))
+                    .data(convertFromClassToService(clz).delete(ids))
                     .message(SuccessMessage.DELETED.toString())
                     .status(HttpStatus.NO_CONTENT)
                     .statusCode(204)

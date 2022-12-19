@@ -20,10 +20,7 @@ public class CommentService implements ServiceInterface {
     private CommentRepository commentRepository;
 
     @Override
-    public int delete(long id) {
-        // checkIfExists
-        // delete it.
-
+    public int delete(List<Long> ids) {
         return 0;
     }
 
