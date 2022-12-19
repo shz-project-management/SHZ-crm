@@ -8,13 +8,9 @@ import CRM.entity.requests.ItemRequest;
 import java.util.List;
 
 public interface ServiceInterface {
-
     int delete(long id);
-
     SharedContent update(long id, String field, String content);
-
     SharedContent get(long id);
-
     List<SharedContent> getAllInItem(long itemId);
 
 }

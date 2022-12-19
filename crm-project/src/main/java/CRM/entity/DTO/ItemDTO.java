@@ -23,4 +23,10 @@ public class ItemDTO {
     private Long assignedToUserId;
     private LocalDateTime dueDate;
     private Integer importance;
+
+    public static ItemDTO fromItem(Item item){
+        ItemDTO itemDTO = new ItemDTO();
+        // ...
+        return itemDTO;
+    }
 }
