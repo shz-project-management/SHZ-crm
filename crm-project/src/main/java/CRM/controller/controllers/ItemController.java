@@ -65,9 +65,4 @@ public class ItemController {
         return new ResponseEntity<>(response, response.getStatus());
     }
 
-    @GetMapping(value = "all-in-status/{statusId}")
-    public ResponseEntity<Response> getAllCommentsInItem(@PathVariable Long statusId){
-        Response response = sharedContentFacade.getAllCommentsInStatus(statusId);
-        return new ResponseEntity<>(response, response.getStatus());
-    }
 }
