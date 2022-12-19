@@ -64,4 +64,10 @@ public class CommentController {
         return new ResponseEntity<>(response, response.getStatus());
     }
 
+    @GetMapping(value = "all-in-status/{statusId}")
+    public ResponseEntity<Response> getAllCommentsInStatus(@PathVariable Long statusId){
+        Response response = sharedContentFacade.getAllCommentsInStatus(statusId);
+        return new ResponseEntity<>(response, response.getStatus());
+    }
+
 }

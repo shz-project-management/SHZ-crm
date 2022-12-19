@@ -3,10 +3,7 @@ package CRM.service;
 import CRM.entity.*;
 import CRM.entity.requests.CommentRequest;
 import CRM.entity.requests.ItemRequest;
-import CRM.repository.BoardRepository;
-import CRM.repository.CommentRepository;
-import CRM.repository.ItemRepository;
-import CRM.repository.UserRepository;
+import CRM.repository.*;
 import CRM.utils.Validations;
 import CRM.utils.enums.ExceptionMessage;
 import org.apache.logging.log4j.LogManager;
@@ -30,6 +27,8 @@ public class CommentService implements ServiceInterface {
     private BoardRepository boardRepository;
     @Autowired
     private ItemRepository itemRepository;
+    @Autowired
+    private StatusRepository statusRepository;
 
     @Override
     public int delete(List<Long> ids) {
@@ -81,9 +80,6 @@ public class CommentService implements ServiceInterface {
     }
 
     public List<Comment> getAllCommentsInBoard(long boardId) {
-        //get all items
-        //get all comments
-
         Board board = Validations.doesIdExists(boardId, boardRepository);
         Set<Item> itemsInBoard = board.getItems();
         List<Comment> commentList = new ArrayList<>();
@@ -94,6 +90,12 @@ public class CommentService implements ServiceInterface {
     }
 
     public List<Comment> getAllCommentsInStatus(long statusId) {
-        return null;
+        Status status = Validations.doesIdExists(statusId, statusRepository);
+        Set<Item> itemsInStatus = itemRepository.findAllByStatus(status);
+        List<Comment> commentList = new ArrayList<>();
+        for (Item item: itemsInStatus){
+            commentList.addAll(commentRepository.findAllByParentItem(item));
+        }
+        return commentList;
     }
 }
