@@ -175,6 +175,13 @@ public class SharedContentFacade {
         return null;
     }
 
+
+
+
+    public Response getAllCommentsInStatus(Long statusId) {
+        return null;
+    }
+
     /**
      * Converts a given Class object to the corresponding AttributeService object.
      *
