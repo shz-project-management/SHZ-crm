@@ -1,6 +1,7 @@
 package CRM.controller.facades;
 
 import CRM.entity.Comment;
+import CRM.entity.DTO.CommentDTO;
 import CRM.entity.DTO.ItemDTO;
 import CRM.entity.DTO.SharedContentDTO;
 import CRM.entity.DTO.UserDTO;
@@ -78,12 +79,31 @@ public class SharedContentFacade {
     }
 
     public Response create(CommentRequest comment) {
-        // make sure the params are correct using Validations.validateCreatedComment()
-        // catch exception if relevant
+        try {
+            // make sure the params are correct using Validations.validateCreatedComment()
+            // catch exception if relevant
+            Validations.validateCreatedComment(comment);
 
-        // call commentService with create function to create a new item
-        // return the response with the new item as a data inside response entity.
-        return null;
+            // call commentService with create function to create a new comment
+            // return the response with the new comment as a data inside response entity.
+            return new Response.Builder()
+                    .data(CommentDTO.getSharedContentFromDB(commentService.create(comment)))
+                    .message(SuccessMessage.CREATE.toString())
+                    .status(HttpStatus.ACCEPTED)
+                    .statusCode(201)
+                    .build();
+
+        } catch (IllegalArgumentException | NoSuchElementException e) {
+            return new Response.Builder()
+                    .message(e.getMessage())
+                    .status(HttpStatus.BAD_REQUEST)
+                    .statusCode(400).build();
+        } catch (NullPointerException e) {
+            return new Response.Builder()
+                    .message(e.getMessage())
+                    .status(HttpStatus.BAD_REQUEST)
+                    .statusCode(500).build();
+        }
     }
 
     /**
