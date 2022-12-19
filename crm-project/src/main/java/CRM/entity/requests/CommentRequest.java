@@ -7,8 +7,6 @@ import lombok.*;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
-@AllArgsConstructor
-@NoArgsConstructor
 @Getter
 @Setter
 @ToString
