@@ -3,6 +3,8 @@ package CRM.controller.controllers;
 import CRM.controller.facades.SharedContentFacade;
 import CRM.entity.Comment;
 import CRM.entity.Item;
+import CRM.entity.requests.CommentRequest;
+import CRM.entity.Item;
 import CRM.entity.response.Response;
 import lombok.AllArgsConstructor;
 import org.apache.logging.log4j.LogManager;
@@ -24,28 +26,26 @@ public class CommentController {
     @Autowired
     SharedContentFacade sharedContentFacade;
 
-    // TODO:
-    //  ------------------------------------------- //
-    //  in each endpoint, call SharedContentFacade! //
-    //  ------------------------------------------- //
-
     @PostMapping(consumes = "application/json")
-    public ResponseEntity<Response> create(@RequestBody Comment comment) {
-        return null;
+    public ResponseEntity<Response> create(@RequestBody CommentRequest comment) {
+
+        Response response = sharedContentFacade.create(comment);
+        return new ResponseEntity<>(response, response.getStatus());
     }
 
     @DeleteMapping
-    public ResponseEntity<Response> delete(@RequestParam Long id) {
-        return null;
+    public ResponseEntity<Response> delete(@RequestParam Long commentId) {
+        Response response = sharedContentFacade.delete(commentId, Comment.class);
+        return new ResponseEntity<>(response, response.getStatus());
     }
 
     @PatchMapping
-    public ResponseEntity<Response> update(@RequestParam Long id, @RequestParam String field, @RequestParam String content){
+    public ResponseEntity<Response> update(@RequestParam Long id, @RequestParam String field, @RequestParam String content) {
         return null;
     }
 
     @GetMapping(value = "all-in-item/{id}")
-    public ResponseEntity<Response> getAllCommentsInItem(@DestinationVariable Long id){
+    public ResponseEntity<Response> getAllCommentsInItem(@DestinationVariable Long id) {
         return null;
     }
 
