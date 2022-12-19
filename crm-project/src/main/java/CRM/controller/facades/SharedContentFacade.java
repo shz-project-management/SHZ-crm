@@ -255,9 +255,27 @@ public class SharedContentFacade {
 
 
 
-
     public Response getAllCommentsInStatus(Long statusId) {
-        return null;
+        try {
+            Validations.validate(statusId, Regex.ID.getRegex());
+            return new Response.Builder()
+                    .data(commentService.getAllCommentsInStatus(statusId).stream().map(comment -> CommentDTO.getSharedContentFromDB(comment)).collect(Collectors.toList()))
+                    .message(SuccessMessage.FOUND.toString())
+                    .status(HttpStatus.OK)
+                    .statusCode(200)
+                    .build();
+
+        } catch (IllegalArgumentException | NoSuchElementException e) {
+            return new Response.Builder()
+                    .message(e.getMessage())
+                    .status(HttpStatus.BAD_REQUEST)
+                    .statusCode(400).build();
+        } catch (NullPointerException e) {
+            return new Response.Builder()
+                    .message(e.getMessage())
+                    .status(HttpStatus.BAD_REQUEST)
+                    .statusCode(500).build();
+        }
     }
 
     public Response getAllCommentsInItem(Long itemId) {
