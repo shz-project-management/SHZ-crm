@@ -78,4 +78,8 @@ public class ItemService implements ServiceInterface {
 
         return null;
     }
+
+    public List<Item> getAllItemsInBaord(long boardId){
+        return null;
+    }
 }
