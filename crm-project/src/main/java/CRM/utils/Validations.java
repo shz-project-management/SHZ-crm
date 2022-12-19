@@ -1,12 +1,10 @@
 package CRM.utils;
 
 import CRM.entity.*;
-import CRM.entity.requests.LoginUserRequest;
-import CRM.entity.requests.RegisterUserRequest;
+import CRM.entity.requests.*;
 import CRM.entity.Attribute;
 import CRM.entity.Comment;
 import CRM.entity.Item;
-import CRM.entity.requests.BoardRequest;
 import CRM.entity.requests.LoginUserRequest;
 import CRM.entity.requests.RegisterUserRequest;
 import CRM.repository.UserRepository;
@@ -92,8 +90,27 @@ public class Validations {
         return true;
     }
 
-    public static void validateCreatedItem(Item item) {
+    public static void validateCreatedItem(ItemRequest item) {
         // validate each field of the item using validate(regex, field)
+        try {
+            validate(item.getParentItemId(), Regex.ID.getRegex());
+        } catch (NullPointerException e){
+            logger.warn("Parent item ID is null");
+        }
+
+        validate(item.getUserId(), Regex.ID.getRegex());
+        validate(item.getBoardId(), Regex.ID.getRegex());
+        validate(item.getStatusId(), Regex.ID.getRegex());
+        validate(item.getTypeId(), Regex.ID.getRegex());
+
+        if (item.getImportance() < 0 || item.getImportance() > 5)
+            throw new IllegalArgumentException(ExceptionMessage.VALIDATION_FAILED.toString());
+
+        if (item.getTitle() == null)
+            throw new NullPointerException(ExceptionMessage.VALIDATION_FAILED.toString());
+
+        if (item.getDescription() == null)
+            item.setDescription("");
     }
 
     public static void validateCreatedComment(Comment comment) {
@@ -163,6 +180,7 @@ public class Validations {
 
 
     public static void throwAttributeAlreadyExistsForBoard(Attribute attribute, String className){
+    public static void throwAttributeAlreadyExistsForBoard(Attribute attribute, String className) {
         throw new NonUniqueObjectException(ExceptionMessage.ATTRIBUTE_ALREADY_IN_DB.toString(), attribute.getId(), className);
     }
 }
