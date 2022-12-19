@@ -93,7 +93,7 @@ public class SharedContentFacade {
                     .statusCode(201)
                     .build();
 
-        } catch (IllegalArgumentException | NoSuchElementException e) {
+        } catch (IllegalArgumentException | AccountNotFoundException | NoSuchElementException e) {
             return new Response.Builder()
                     .message(e.getMessage())
                     .status(HttpStatus.BAD_REQUEST)

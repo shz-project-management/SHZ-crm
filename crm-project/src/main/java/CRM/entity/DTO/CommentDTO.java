@@ -13,13 +13,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class CommentDTO extends SharedContentDTO {
 
-    private AttributeDTO status;
-    private AttributeDTO type;
-    private String section;
     private Long assignedToUserId;
-    private LocalDateTime dueDate;
-    private Integer importance;
-    private Long boardId;
 
     public static CommentDTO getSharedContentFromDB(Comment comment) {
         CommentDTO commentDTO = new CommentDTO();
@@ -28,7 +22,8 @@ public class CommentDTO extends SharedContentDTO {
             commentDTO.setParentItem(ItemDTO.getSharedContentFromDB(comment.getParentItem()));
         commentDTO.setUser(UserDTO.getUserFromDB(comment.getUser()));
         commentDTO.setTitle(comment.getTitle());
-        commentDTO.setDescription(commentDTO.getDescription());
+        commentDTO.setDescription(comment.getDescription());
+        commentDTO.setCreationDate(comment.getCreationDate());
 
         return commentDTO;
     }
