@@ -12,5 +12,4 @@ import javax.persistence.*;
 @Entity
 @Table(name = "comments")
 public class Comment extends SharedContent {
-    private Long relateToUserId;
 }
