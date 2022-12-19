@@ -20,12 +20,12 @@ public class ItemDTO extends SharedContentDTO {
     private Integer importance;
     private Long boardId;
 
-    public static ItemDTO getItemFromDB(Item item) {
+    public static ItemDTO getSharedContentFromDB(Item item) {
         ItemDTO itemDTO = new ItemDTO();
 
         itemDTO.setImportance(item.getImportance());
         if (item.getParentItem() != null)
-            itemDTO.setParentItem(ItemDTO.getItemFromDB(item.getParentItem()));
+            itemDTO.setParentItem(ItemDTO.getSharedContentFromDB(item.getParentItem()));
         itemDTO.setUser(UserDTO.getUserFromDB(item.getUser()));
         itemDTO.setTitle(item.getTitle());
         itemDTO.setDescription(itemDTO.getDescription());

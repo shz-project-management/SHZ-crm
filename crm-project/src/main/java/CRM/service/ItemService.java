@@ -68,10 +68,7 @@ public class ItemService implements ServiceInterface {
 
     @Override
     public Item get(long id) {
-        // checkIfExists
-        // return the received item
-
-        return null;
+        return Validations.doesIdExists(id, itemRepository);
     }
 
     @Override
