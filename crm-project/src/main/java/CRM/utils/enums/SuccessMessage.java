@@ -7,7 +7,7 @@ public enum SuccessMessage {
     LOGIN("Successfully logged in to the system!"),
     REGISTER("The user has been successfully registered to the database"),
     CREATE("The instance has been successfully created"),
-    DELETED("The board has been deleted"),
+    DELETED("The instance has been deleted"),
     FOUND("Successfully fetched this element in the database");
 
     private final String message;
