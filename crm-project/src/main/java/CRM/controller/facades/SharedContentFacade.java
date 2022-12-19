@@ -233,6 +233,13 @@ public class SharedContentFacade {
         return null;
     }
 
+
+
+
+    public Response getAllCommentsInStatus(Long statusId) {
+        return null;
+    }
+
     public Response getAllCommentsInItem(Long itemId) {
         return null;
     }
