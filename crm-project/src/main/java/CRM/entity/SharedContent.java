@@ -1,10 +1,16 @@
 package CRM.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
+@Setter
+@Getter
+@ToString
 @MappedSuperclass
 public class SharedContent {
     @Id
@@ -20,24 +26,7 @@ public class SharedContent {
     @JoinColumn(name = "creator_id")
     private User user;
 
-    private LocalDateTime creationDate;
+    private LocalDateTime creationDate = LocalDateTime.now();
     private String title;
     private String description;
-
-    public User getCreator() {
-        return user;
-    }
-
-    public void setCreator(User creator) {
-        this.user = creator;
-    }
-
-//    public Item getItem() {
-//        return item;
-//    }
-//
-//    public void setItem(Item item) {
-//        this.item = item;
-//    }
-
 }

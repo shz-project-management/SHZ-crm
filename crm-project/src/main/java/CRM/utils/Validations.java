@@ -89,7 +89,12 @@ public class Validations {
 
     public static void validateCreatedItem(ItemRequest item) {
         // validate each field of the item using validate(regex, field)
-        validate(item.getParentItemId(), Regex.ID.getRegex());
+        try {
+            validate(item.getParentItemId(), Regex.ID.getRegex());
+        } catch (NullPointerException e){
+            logger.warn("Parent item ID is null");
+        }
+
         validate(item.getUserId(), Regex.ID.getRegex());
         validate(item.getBoardId(), Regex.ID.getRegex());
         validate(item.getStatusId(), Regex.ID.getRegex());

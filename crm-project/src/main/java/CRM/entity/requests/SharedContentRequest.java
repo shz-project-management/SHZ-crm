@@ -2,7 +2,6 @@ package CRM.entity.requests;
 
 import lombok.*;
 
-import javax.persistence.MappedSuperclass;
 import java.time.LocalDateTime;
 
 @AllArgsConstructor
