@@ -15,6 +15,8 @@ import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @Controller
 @RequestMapping(value = "/comment")
 @AllArgsConstructor
@@ -34,10 +36,9 @@ public class CommentController {
     }
 
     @DeleteMapping
-    public ResponseEntity<Response> delete(@RequestParam Long commentId) {
-//        Response response = sharedContentFacade.delete(commentId, Comment.class);
-//        return new ResponseEntity<>(response, response.getStatus());
-        return null;
+    public ResponseEntity<Response> delete(@RequestBody List<Long> commentsIds) {
+        Response response = sharedContentFacade.delete(commentsIds, Comment.class);
+        return new ResponseEntity<>(response, response.getStatus());
     }
 
     @PatchMapping
