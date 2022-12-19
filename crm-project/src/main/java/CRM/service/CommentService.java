@@ -30,6 +30,32 @@ public class CommentService implements ServiceInterface {
     @Autowired
     private StatusRepository statusRepository;
 
+    /**
+     * Creates a new comment based on the information provided in the comment request.
+     *
+     * @param commentRequest the comment request containing the information for the new comment
+     * @return the created comment
+     * @throws AccountNotFoundException if the user specified in the comment request does not exist
+     */
+    public Comment create(CommentRequest commentRequest) throws AccountNotFoundException {
+        Item parentItem = Validations.doesIdExists(commentRequest.getParentItemId(), itemRepository);
+        User user;
+        try {
+            user = Validations.doesIdExists(commentRequest.getUserId(), userRepository);
+        } catch (NoSuchElementException e) {
+            throw new AccountNotFoundException(ExceptionMessage.ACCOUNT_DOES_NOT_EXISTS.toString());
+        }
+
+        Comment comment = Comment.createNewComment(user, commentRequest.getTitle(), commentRequest.getDescription(), parentItem);
+        return commentRepository.save(comment);
+    }
+
+    /**
+     * Deletes the comments with the specified IDs.
+     *
+     * @param ids the IDs of the comments to delete
+     * @return the number of comments that were successfully deleted
+     */
     @Override
     public int delete(List<Long> ids) {
         int counter = ids.size();
@@ -53,6 +79,13 @@ public class CommentService implements ServiceInterface {
         return null;
     }
 
+    /**
+     * Retrieves the comment with the specified ID.
+     *
+     * @param id the ID of the comment to retrieve
+     * @return the comment with the specified ID
+     * @throws NoSuchElementException if a comment with the given ID does not exist
+     */
     @Override
     public Comment get(long id) {
         return Validations.doesIdExists(id, commentRepository);
@@ -66,34 +99,33 @@ public class CommentService implements ServiceInterface {
         return null;
     }
 
-    public Comment create(CommentRequest commentRequest) throws AccountNotFoundException {
-        Item parentItem = Validations.doesIdExists(commentRequest.getParentItemId(), itemRepository);
-        User user;
-        try {
-            user = Validations.doesIdExists(commentRequest.getUserId(), userRepository);
-        } catch (NoSuchElementException e) {
-            throw new AccountNotFoundException(ExceptionMessage.ACCOUNT_DOES_NOT_EXISTS.toString());
-        }
-
-        Comment comment = Comment.createNewComment(user, commentRequest.getTitle(), commentRequest.getDescription(), parentItem);
-        return commentRepository.save(comment);
-    }
-
+    /**
+     * Retrieves all comments in the board with the specified ID.
+     *
+     * @param boardId the ID of the board
+     * @return a list of comments in the board
+     */
     public List<Comment> getAllCommentsInBoard(long boardId) {
         Board board = Validations.doesIdExists(boardId, boardRepository);
         Set<Item> itemsInBoard = board.getItems();
         List<Comment> commentList = new ArrayList<>();
-        for (Item item: itemsInBoard){
+        for (Item item : itemsInBoard) {
             commentList.addAll(commentRepository.findAllByParentItem(item));
         }
         return commentList;
     }
 
+    /**
+     * Retrieves all comments in the status with the specified ID.
+     *
+     * @param statusId the ID of the status
+     * @return a list of comments in the status
+     */
     public List<Comment> getAllCommentsInStatus(long statusId) {
         Status status = Validations.doesIdExists(statusId, statusRepository);
         Set<Item> itemsInStatus = itemRepository.findAllByStatus(status);
         List<Comment> commentList = new ArrayList<>();
-        for (Item item: itemsInStatus){
+        for (Item item : itemsInStatus) {
             commentList.addAll(commentRepository.findAllByParentItem(item));
         }
         return commentList;
