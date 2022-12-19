@@ -2,6 +2,7 @@ package CRM.controller.controllers;
 
 import CRM.controller.facades.SharedContentFacade;
 import CRM.entity.Comment;
+import CRM.entity.Item;
 import CRM.entity.response.Response;
 import lombok.AllArgsConstructor;
 import org.apache.logging.log4j.LogManager;
@@ -34,8 +35,9 @@ public class CommentController {
     }
 
     @DeleteMapping
-    public ResponseEntity<Response> delete(@RequestParam Long id) {
-        return null;
+    public ResponseEntity<Response> delete(@RequestParam Long commentId) {
+        Response response = sharedContentFacade.delete(commentId, Comment.class);
+        return new ResponseEntity<>(response, response.getStatus());
     }
 
     @PatchMapping
