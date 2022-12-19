@@ -10,6 +10,7 @@ import CRM.service.CommentService;
 import CRM.service.ItemService;
 import CRM.service.ServiceInterface;
 import CRM.utils.Validations;
+import CRM.utils.enums.Regex;
 import CRM.utils.enums.SuccessMessage;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -68,10 +69,28 @@ public class SharedContentFacade {
 //    }
 
     public Response delete(Long id, Class clz) {
-        // validate the id using the Validations.validate function
-        // call the correct service using convertFromClassToService(clz) function
-        // with delete function in it.
-        return null;
+        try{
+            // validate the id using the Validations.validate function
+            Validations.validate(id, Regex.ID.getRegex());
+
+            // call the correct service using convertFromClassToService(clz) function with delete function in it
+            return new Response.Builder()
+                    .data(convertFromClassToService(clz).delete(id))
+                    .message(SuccessMessage.DELETED.toString())
+                    .status(HttpStatus.NO_CONTENT)
+                    .statusCode(204)
+                    .build();
+        } catch (IllegalArgumentException | NoSuchElementException e) {
+            return new Response.Builder()
+                    .message(e.getMessage())
+                    .status(HttpStatus.BAD_REQUEST)
+                    .statusCode(400).build();
+        } catch (NullPointerException e) {
+            return new Response.Builder()
+                    .message(e.getMessage())
+                    .status(HttpStatus.BAD_REQUEST)
+                    .statusCode(500).build();
+        }
     }
 
     public Response update(ItemRequest updateItem) {
