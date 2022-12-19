@@ -35,8 +35,9 @@ public class CommentController {
 
     @DeleteMapping
     public ResponseEntity<Response> delete(@RequestParam Long commentId) {
-        Response response = sharedContentFacade.delete(commentId, Comment.class);
-        return new ResponseEntity<>(response, response.getStatus());
+//        Response response = sharedContentFacade.delete(commentId, Comment.class);
+//        return new ResponseEntity<>(response, response.getStatus());
+        return null;
     }
 
     @PatchMapping
