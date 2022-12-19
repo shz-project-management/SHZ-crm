@@ -53,10 +53,9 @@ public class ItemService implements ServiceInterface {
 
     @Override
     public int delete(long id) {
-        // checkIfExists
-        // delete it.
-
-        return 0;
+        Item item = Validations.doesIdExists(id, itemRepository);
+        itemRepository.delete(item);
+        return 1;
     }
 
     @Override
