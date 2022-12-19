@@ -4,6 +4,7 @@ import CRM.controller.facades.SharedContentFacade;
 import CRM.entity.Comment;
 import CRM.entity.Item;
 import CRM.entity.requests.CommentRequest;
+import CRM.entity.Item;
 import CRM.entity.response.Response;
 import lombok.AllArgsConstructor;
 import org.apache.logging.log4j.LogManager;
@@ -48,8 +49,9 @@ public class CommentController {
         return null;
     }
 
-    @GetMapping(value = "{id}")
-    public ResponseEntity<Response> get(@DestinationVariable Long id) {
-        return null;
+    @GetMapping(value = "{commentId}")
+    public ResponseEntity<Response> get(@PathVariable Long commentId){
+        Response response = sharedContentFacade.get(commentId, Comment.class);
+        return new ResponseEntity<>(response, response.getStatus());
     }
 }
