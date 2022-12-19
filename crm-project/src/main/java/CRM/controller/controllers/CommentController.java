@@ -45,9 +45,10 @@ public class CommentController {
         return null;
     }
 
-    @GetMapping(value = "all-in-item/{id}")
-    public ResponseEntity<Response> getAllCommentsInItem(@DestinationVariable Long id) {
-        return null;
+    @GetMapping(value = "all-in-item/{itemId}")
+    public ResponseEntity<Response> getAllCommentsInItem(@PathVariable Long itemId){
+        Response response = sharedContentFacade.getAllCommentsInItem(itemId);
+        return new ResponseEntity<>(response, response.getStatus());
     }
 
     @GetMapping(value = "{commentId}")
