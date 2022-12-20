@@ -72,7 +72,7 @@ class StatusServiceTest {
     }
 
     @Test
-    @DisplayName("Should throw NonUniqueObjectException when name is not unique for board")
+    @DisplayName("Should throw NonUniqueObjectException when name is not unique for board when creating a status")
     void testCreateNonUniqueStatus() {
         // Set up test data and mock behavior
         Attribute statusAttribute = Attribute.createAttribute(board, "Test Status", "Test description");
@@ -189,7 +189,7 @@ class StatusServiceTest {
     }
 
     @Test
-    @DisplayName("Should throw NoSuchElementException when board does not exist")
+    @DisplayName("Should throw NoSuchElementException when board does not exist when getting all statuses in board")
     void testGetAllStatusesInNonExistentBoard() {
         // Set up test data and mock behavior
         Long nonExistentBoardId = 2L;
@@ -200,12 +200,12 @@ class StatusServiceTest {
     }
 
     @Test
-    @DisplayName("Should throw IllegalArgumentException when board id is invalid")
+    @DisplayName("Should throw NoSuchElementException when board id is invalid when getting all statuses in board")
     void testGetAllStatusesWithInvalidBoardId() {
         // Set up test data and mock behavior
         Long invalidBoardId = -1L;
 
         // Call method under test and verify exception is thrown
-        assertThrows(IllegalArgumentException.class, () -> statusService.getAllInBoard(invalidBoardId));
+        assertThrows(NoSuchElementException.class, () -> statusService.getAllInBoard(invalidBoardId));
     }
 }
