@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.security.auth.login.AccountNotFoundException;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -74,11 +75,15 @@ public class CommentService implements ServiceInterface {
     }
 
     @Override
-    public Comment update(UpdateObjectRequest updateObject, long itemId) {
-        // checkIfExists
-        // make sure there is such a field in Item -> use reflection!
-
-        return null;
+    public Comment update(UpdateObjectRequest updateObject, long commentId) throws NoSuchFieldException {
+        Comment comment = Validations.doesIdExists(commentId, commentRepository);
+        if(Validations.checkIfFieldIsCustomObject(updateObject.getFieldName())){
+            throw new NoSuchFieldException(ExceptionMessage.FIELD_OBJECT_NOT_EXISTS.toString());
+        }
+        else{
+            fieldIsPrimitiveOrKnownObjectHelper(updateObject, comment);
+        }
+        return commentRepository.save(comment);
     }
 
     /**
@@ -136,5 +141,22 @@ public class CommentService implements ServiceInterface {
             commentList.addAll(commentRepository.findAllByParentItem(item));
         }
         return commentList;
+    }
+
+    /**
+     * Helper function for updating a primitive or known object field.
+     *
+     * @param updateObject the request object containing the updates to be made
+     * @param comment the item object being updated
+     * @throws NoSuchFieldException if the field does not exist in the item object
+     */
+    private void fieldIsPrimitiveOrKnownObjectHelper(UpdateObjectRequest updateObject, Comment comment) throws NoSuchFieldException {
+        if(Validations.checkIfFieldIsNonPrimitive(updateObject.getFieldName())) {
+            LocalDateTime dueDate = LocalDateTime.now().plusDays(Long.valueOf((Integer) updateObject.getContent()));
+            Validations.setContentToFieldIfFieldExists(comment, updateObject.getFieldName(), dueDate);
+        }
+        else{
+            Validations.setContentToFieldIfFieldExists(comment, updateObject.getFieldName(), updateObject.getContent());
+        }
     }
 }
