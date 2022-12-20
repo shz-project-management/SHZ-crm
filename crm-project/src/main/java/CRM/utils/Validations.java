@@ -195,8 +195,8 @@ public class Validations {
     public static <T> void setContentToFieldIfFieldExists(T object, UpdateField fieldName, Object content) throws NoSuchFieldException {
         String fieldNameModified = fieldName.toString().replaceAll("_", "");
         try {
-            checkIfFieldExistsInEntity(object, fieldNameModified, content);
-            checkIfFieldExistsInParentEntity(object, fieldNameModified, content);
+            if(checkIfFieldExistsInEntity(object, fieldNameModified, content)) return;
+            if(checkIfFieldExistsInParentEntity(object, fieldNameModified, content)) return;
 
             throw new NoSuchFieldException(ExceptionMessage.FIELD_OBJECT_NOT_EXISTS.toString());
         } catch (IllegalAccessException | NoSuchFieldException e) {
@@ -257,10 +257,11 @@ public class Validations {
      * @param content the content to be set to the field
      * @throws IllegalAccessException if the field is not accessible
      */
-    private static <T> void checkIfFieldExistsInEntity(T object, String fieldName, Object content) throws IllegalAccessException {
+    private static <T> boolean checkIfFieldExistsInEntity(T object, String fieldName, Object content) throws IllegalAccessException {
         for (Field field : object.getClass().getDeclaredFields()) {
-            if(checkIfFieldExistsInEntityHelper(field, object, fieldName, content)) return;
+            if(checkIfFieldExistsInEntityHelper(field, object, fieldName, content)) return true;
         }
+        return false;
     }
 
     /**
@@ -271,12 +272,13 @@ public class Validations {
      * @param content the content to be set to the field
      * @throws IllegalAccessException if the field is not accessible
      */
-    private static <T> void checkIfFieldExistsInParentEntity(T object, String fieldName, Object content) throws IllegalAccessException {
+    private static <T> boolean checkIfFieldExistsInParentEntity(T object, String fieldName, Object content) throws IllegalAccessException {
         if (object.getClass().getSuperclass().equals(SharedContent.class)) {
-            for (Field field : object.getClass().getDeclaredFields()) {
-                if(checkIfFieldExistsInEntityHelper(field, object, fieldName, content)) return;
+            for (Field field : object.getClass().getSuperclass().getDeclaredFields()) {
+                if(checkIfFieldExistsInEntityHelper(field, object, fieldName, content)) return true;
             }
         }
+        return false;
     }
 
     /**
