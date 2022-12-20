@@ -1,5 +1,6 @@
 package CRM.entity.requests;
 
+import CRM.utils.enums.UpdateField;
 import lombok.*;
 
 @AllArgsConstructor
@@ -8,6 +9,6 @@ import lombok.*;
 @Setter
 @ToString
 public class UpdateObjectRequest {
-    private String fieldName;
+    private UpdateField fieldName;
     private Object content;
 }

@@ -7,6 +7,7 @@ import CRM.entity.requests.LoginUserRequest;
 import CRM.entity.requests.RegisterUserRequest;
 import CRM.utils.enums.ExceptionMessage;
 import CRM.utils.enums.Regex;
+import CRM.utils.enums.UpdateField;
 import io.jsonwebtoken.Claims;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -176,7 +177,7 @@ public class Validations {
     }
 
 
-    public static <T> void setContentToFieldIfFieldExists(T object, String fieldName, Object content) throws NoSuchFieldException {
+    public static <T> void setContentToFieldIfFieldExists(T object, UpdateField fieldName, Object content) throws NoSuchFieldException {
         try {
             for (Field field : object.getClass().getDeclaredFields()) {
                 field.setAccessible(true);
@@ -184,7 +185,7 @@ public class Validations {
                 if (value == null) {
                     continue;
                 }
-                if (!field.getName().equals(fieldName)) {
+                if (!field.getName().equals(fieldName.toString().toLowerCase())) {
                     continue;
                 }
                 if (!(value.getClass().equals(content.getClass()))) {

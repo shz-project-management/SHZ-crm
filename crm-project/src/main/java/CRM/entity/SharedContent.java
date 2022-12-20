@@ -27,6 +27,8 @@ public class SharedContent {
     private User user;
 
     private LocalDateTime creationDate = LocalDateTime.now();
+
+    //FIXME: change title to name
     private String title;
     private String description;
 }

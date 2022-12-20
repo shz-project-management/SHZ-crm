@@ -39,7 +39,7 @@ public class ItemController {
     }
 
     @PatchMapping
-    public ResponseEntity<Response> update(@RequestParam ItemRequest itemRequest){
+    public ResponseEntity<Response> update(@RequestBody String field, Object content){
         return null;
     }
 

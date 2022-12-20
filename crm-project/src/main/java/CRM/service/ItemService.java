@@ -133,4 +133,6 @@ public class ItemService implements ServiceInterface {
         Board board = Validations.doesIdExists(boardId, boardRepository);
         return itemRepository.findAllByBoard(board);
     }
+
+    //check the class of the id
 }
