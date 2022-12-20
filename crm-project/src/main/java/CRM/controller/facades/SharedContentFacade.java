@@ -274,6 +274,29 @@ public class SharedContentFacade {
         return null;
     }
 
+    public Response getAllInItem(Long itemId, Class clz) {
+        try {
+            Validations.validate(itemId, Regex.ID.getRegex());
+            return new Response.Builder()
+                    .data(convertFromClassToService(clz).getAllInItem(itemId).stream().map(entity -> convertFromServiceOutputToDTOEntity(entity, clz)).collect(Collectors.toList()))
+                    .message(SuccessMessage.FOUND.toString())
+                    .status(HttpStatus.OK)
+                    .statusCode(200)
+                    .build();
+
+        } catch (IllegalArgumentException | NoSuchElementException e) {
+            return new Response.Builder()
+                    .message(e.getMessage())
+                    .status(HttpStatus.BAD_REQUEST)
+                    .statusCode(400).build();
+        } catch (NullPointerException e) {
+            return new Response.Builder()
+                    .message(e.getMessage())
+                    .status(HttpStatus.BAD_REQUEST)
+                    .statusCode(500).build();
+        }
+    }
+
     /**
      * Returns a list of all comments in a status with the given id.
      *
