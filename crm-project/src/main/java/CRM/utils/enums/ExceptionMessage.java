@@ -23,7 +23,7 @@ public enum ExceptionMessage {
     TOO_SHORT_STRING("This field can not be as short as inserted"),
     CREATE_TABLE("Couldn't create the table properly."),
     NO_PRIMARY_KEY_FOUND("No primary key found."),
-    ACCOUNT_EXISTS("This user email already exists: "),
+    PARENT_ITEM_ERROR("Item can't be his own parent"),
     ILLEGAL_AUTH_HEADER("Authorization header is not legal"),
     PASSWORD_DOESNT_MATCH("The given password doesn't match our database's"),
 

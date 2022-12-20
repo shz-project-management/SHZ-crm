@@ -5,6 +5,7 @@ import CRM.entity.requests.*;
 import CRM.entity.Attribute;
 import CRM.entity.requests.LoginUserRequest;
 import CRM.entity.requests.RegisterUserRequest;
+import CRM.repository.ItemRepository;
 import CRM.repository.StatusRepository;
 import CRM.repository.TypeRepository;
 import CRM.utils.enums.ExceptionMessage;
@@ -20,12 +21,12 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.lang.reflect.Field;
 import java.util.NoSuchElementException;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static CRM.utils.enums.UpdateField.STATUS;
-import static CRM.utils.enums.UpdateField.TYPE;
+import static CRM.utils.enums.UpdateField.*;
 
 public class Validations {
     private static Logger logger = LogManager.getLogger(Validations.class.getName());
@@ -185,22 +186,36 @@ public class Validations {
 
 
     public static <T> void setContentToFieldIfFieldExists(T object, UpdateField fieldName, Object content) throws NoSuchFieldException {
+        String fieldNameModified = fieldName.toString().replaceAll("_","");
         try {
             for (Field field : object.getClass().getDeclaredFields()) {
                 field.setAccessible(true);
                 Object value = field.get(object);
-                if (value == null) {
+                if (!field.getName().equalsIgnoreCase(fieldNameModified)) {
                     continue;
                 }
-                if (!field.getName().equals(fieldName.toString().toLowerCase())) {
-                    continue;
-                }
-                if (!(value.getClass().equals(content.getClass()))) {
+                if (value != null && !(value.getClass().equals(content.getClass()))) {
                     value.getClass().cast(content);
                 }
                 field.set(object, content);
                 return;
             }
+
+            if(object.getClass().getSuperclass().equals(SharedContent.class)){
+                for (Field field : object.getClass().getSuperclass().getDeclaredFields()) {
+                    field.setAccessible(true);
+                    Object value = field.get(object);
+                    if (!field.getName().equalsIgnoreCase(fieldNameModified)) {
+                        continue;
+                    }
+                    if (value != null && !(value.getClass().equals(content.getClass()))) {
+                        value.getClass().cast(content);
+                    }
+                    field.set(object, content);
+                    return;
+                }
+            }
+
             throw new NoSuchFieldException(ExceptionMessage.FIELD_OBJECT_NOT_EXISTS.toString());
         }catch (IllegalAccessException | NoSuchFieldException e){
             throw new NoSuchFieldException(ExceptionMessage.FIELD_OBJECT_NOT_EXISTS.toString());
@@ -218,9 +233,18 @@ public class Validations {
         throw new NonUniqueObjectException(ExceptionMessage.ATTRIBUTE_ALREADY_IN_DB.toString(), attribute.getId(), className);
     }
 
-    //FIXME: handle DUE_DATE somehow
-    public static boolean checkIfFieldIsNonPrimitive(UpdateField fieldName){
-        return fieldName.equals(STATUS) || fieldName.equals(TYPE);
+    public static boolean checkIfFieldIsCustomObject(UpdateField fieldName){
+        return fieldName.equals(STATUS) || fieldName.equals(TYPE) || fieldName.equals(PARENT_ITEM);
+    }
+
+    public static boolean checkIfFieldIsNonPrimitive(UpdateField fieldName) {
+        return fieldName.equals(DUE_DATE);
+    }
+
+    public static void checkIfParentItemIsNotTheSameItem(UpdateField fieldName, Long itemId, Long parentItemId) {
+        if(fieldName.equals(PARENT_ITEM) && Objects.equals(itemId, parentItemId)){
+            throw new IllegalArgumentException(ExceptionMessage.PARENT_ITEM_ERROR.toString());
+        }
     }
 
     public static Class getFieldObjectRepository(UpdateField fieldName){
@@ -231,6 +255,9 @@ public class Validations {
                 break;
             case TYPE:
                 repo = TypeRepository.class;
+                break;
+            case PARENT_ITEM:
+                repo = ItemRepository.class;
                 break;
             default:
                 break;

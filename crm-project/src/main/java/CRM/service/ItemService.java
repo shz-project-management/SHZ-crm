@@ -14,6 +14,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 
 import javax.security.auth.login.AccountNotFoundException;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
@@ -90,13 +91,20 @@ public class ItemService implements ServiceInterface {
     @Override
     public Item update(UpdateObjectRequest updateObject, long itemId) throws NoSuchFieldException {
         Item item = Validations.doesIdExists(itemId, itemRepository);
-        if(Validations.checkIfFieldIsNonPrimitive(updateObject.getFieldName())){
+        if(Validations.checkIfFieldIsCustomObject(updateObject.getFieldName())){
             Object jpaRepo = Validations.getFieldObjectRepository(updateObject.getFieldName());
-            Object contentObj = Validations.doesIdExists(Long.valueOf((Integer) updateObject.getContent()), getRepo((Class) jpaRepo));
+            Object contentObj = Validations.doesIdExists(Long.valueOf((Integer) updateObject.getContent()), getRepoToUpdateField((Class) jpaRepo));
+            Validations.checkIfParentItemIsNotTheSameItem(updateObject.getFieldName(),itemId, Long.valueOf((Integer) updateObject.getContent()));
             Validations.setContentToFieldIfFieldExists(item, updateObject.getFieldName(), contentObj);
         }
         else{
-            Validations.setContentToFieldIfFieldExists(item, updateObject.getFieldName(), updateObject.getContent());
+            if(Validations.checkIfFieldIsNonPrimitive(updateObject.getFieldName())) {
+                LocalDateTime dueDate = LocalDateTime.now().plusDays(Long.valueOf((Integer) updateObject.getContent()));
+                Validations.setContentToFieldIfFieldExists(item, updateObject.getFieldName(), dueDate);
+            }
+            else{
+                Validations.setContentToFieldIfFieldExists(item, updateObject.getFieldName(), updateObject.getContent());
+            }
         }
         return itemRepository.save(item);
     }
@@ -143,12 +151,15 @@ public class ItemService implements ServiceInterface {
         return itemRepository.findAllByBoard(board);
     }
 
-    public JpaRepository getRepo(Class jpaRepo){
+    public JpaRepository getRepoToUpdateField(Class jpaRepo){
         if(jpaRepo.getSimpleName().equals(StatusRepository.class.getSimpleName())){
             return statusRepository;
         }
-        else{
+        else if(jpaRepo.getSimpleName().equals(TypeRepository.class.getSimpleName())){
             return typeRepository;
+        }
+        else{
+            return itemRepository;
         }
     }
 }

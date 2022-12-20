@@ -45,16 +45,6 @@ public class ItemController {
         return new ResponseEntity<>(response, response.getStatus());
     }
 
-//    @PatchMapping(value = "{itemId}/type")
-//    public ResponseEntity<Response> updateType(@PathVariable Long itemId, @RequestParam Long typeId, @RequestBody AttributeRequest attributeRequest){
-//        return null;
-//    }
-//
-//    @PatchMapping(value = "{itemId}/status")
-//    public ResponseEntity<Response> updateStatus(@PathVariable Long itemId, @RequestParam Long statusId, @RequestBody AttributeRequest attributeRequest){
-//        return null;
-//    }
-
     @GetMapping(value = "all-in-board/{boardId}")
     public ResponseEntity<Response> getAllItemsInBoard(@PathVariable Long boardId){
         Response response = sharedContentFacade.getAllItemsInBoard(boardId);
