@@ -93,10 +93,8 @@ public class CommentService implements ServiceInterface {
 
     @Override
     public List<SharedContent> getAllInItem(long itemId) {
-        // checkIfExists
-        // returns the list of items retrieved
-
-        return null;
+        Item item = Validations.doesIdExists(itemId, itemRepository);
+        return Collections.singletonList((Comment) commentRepository.findAllByParentItem(item));
     }
 
     /**

@@ -367,5 +367,4 @@ public class SharedContentFacade {
 
         throw new IllegalArgumentException("There is no such class in the system!");
     }
-
 }
