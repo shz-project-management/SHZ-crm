@@ -88,6 +88,13 @@ public class ItemService implements ServiceInterface {
         return counter;
     }
 
+    /** Update an item field.
+     *
+     * @param updateObject the request object containing the updates to be made
+     * @param itemId the id of the item to be updated
+     * @return the updated item
+     * @throws NoSuchFieldException if the field to be updated does not exist in the item object
+     */
     @Override
     public Item update(UpdateObjectRequest updateObject, long itemId) throws NoSuchFieldException {
         Item item = Validations.doesIdExists(itemId, itemRepository);
