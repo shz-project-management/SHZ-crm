@@ -14,6 +14,7 @@ import CRM.service.CommentService;
 import CRM.service.ItemService;
 import CRM.service.ServiceInterface;
 import CRM.utils.Validations;
+import CRM.utils.enums.ExceptionMessage;
 import CRM.utils.enums.Regex;
 import CRM.utils.enums.SuccessMessage;
 import org.apache.logging.log4j.LogManager;
@@ -297,12 +298,6 @@ public class SharedContentFacade {
         }
     }
 
-    public Response getAllItemsInItem(Long boardId) {
-        // validate the id using the Validations.validate function
-        // call itemService with the relevant function.
-        return null;
-    }
-
     /**
      * Retrieves a list of entities of a specified class associated with a given item.
      *
@@ -369,10 +364,6 @@ public class SharedContentFacade {
         }
     }
 
-    public Response getAllCommentsInItem(Long itemId) {
-        return null;
-    }
-
     /**
      * Converts a given Class object to the corresponding AttributeService object.
      *
@@ -404,6 +395,6 @@ public class SharedContentFacade {
         if (clz.getSimpleName().equals(Comment.class.getSimpleName()))
             return CommentDTO.getSharedContentFromDB((Comment) content);
 
-        throw new IllegalArgumentException("There is no such class in the system!");
+        throw new IllegalArgumentException(ExceptionMessage.NO_SUCH_CLASS.toString());
     }
 }

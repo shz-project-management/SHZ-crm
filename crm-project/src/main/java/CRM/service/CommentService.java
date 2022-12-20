@@ -2,7 +2,6 @@ package CRM.service;
 
 import CRM.entity.*;
 import CRM.entity.requests.CommentRequest;
-import CRM.entity.requests.ItemRequest;
 import CRM.entity.requests.UpdateObjectRequest;
 import CRM.repository.*;
 import CRM.utils.Validations;
@@ -74,6 +73,14 @@ public class CommentService implements ServiceInterface {
         return counter;
     }
 
+    /**
+     * Updates the specified comment with the new field value provided in the updateObject parameter.
+     *
+     * @param updateObject the object containing the field names and new field values to update
+     * @param commentId the id of the comment to update
+     * @return the updated Comment object
+     * @throws NoSuchFieldException if the field to update is not a primitive or a known object
+     */
     @Override
     public Comment update(UpdateObjectRequest updateObject, long commentId) throws NoSuchFieldException {
         Comment comment = Validations.doesIdExists(commentId, commentRepository);
