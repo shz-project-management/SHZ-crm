@@ -19,7 +19,7 @@ public enum ExceptionMessage {
     EMPTY_NOTNULL_FIELD("Not null fields must be filled out before creation"),
     FIELD_OBJECT_NOT_EXISTS("Field object doesn't exists"),
     FIELD_OBJECT_REPO_NOT_EXISTS("Field object repository doesn't exists or not supported"),
-    NEGATIVE_FIELD("This field can not be negative"),
+    NO_SUCH_CLASS("There is no such class in the system!"),
     TOO_SHORT_STRING("This field can not be as short as inserted"),
     CREATE_TABLE("Couldn't create the table properly."),
     NO_PRIMARY_KEY_FOUND("No primary key found."),
