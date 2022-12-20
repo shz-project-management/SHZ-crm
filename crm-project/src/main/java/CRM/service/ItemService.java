@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import javax.security.auth.login.AccountNotFoundException;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.stream.Collectors;
 
 @Service
 public class ItemService implements ServiceInterface {
@@ -104,12 +105,19 @@ public class ItemService implements ServiceInterface {
         return Validations.doesIdExists(id, itemRepository);
     }
 
+    /**
+     * Retrieves all shared content items that are within the specified item.
+     *
+     * @param itemId the ID of the item to retrieve shared content from
+     * @return a list of shared content items within the specified item
+     * @throws NoSuchElementException if the item with the specified ID does not exist
+     */
     @Override
     public List<SharedContent> getAllInItem(long itemId) {
         // checkIfExists
+        Item item = Validations.doesIdExists(itemId, itemRepository);
         // returns the list of items retrieved
-
-        return null;
+        return itemRepository.findAllByParentItem(item).stream().map(i -> (SharedContent)i).collect(Collectors.toList());
     }
 
     /**
