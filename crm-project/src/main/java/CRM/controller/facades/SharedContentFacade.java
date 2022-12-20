@@ -148,6 +148,18 @@ public class SharedContentFacade {
         }
     }
 
+    /**
+     * Update an object in a service.
+     *
+     * @param updateObject the request object containing the updates to be made
+     * @param id the id of the object to be updated
+     * @param clz the class of the object being updated
+     * @return a response object with the updated object data and a success message, or an error message and appropriate status code
+     * @throws IllegalArgumentException if the id or updateObject parameters are invalid
+     * @throws NoSuchFieldException if the field of the object does not exist
+     * @throws NoSuchElementException if the class does not have a corresponding service
+     * @throws NullPointerException if there is a null value in the updateObject request
+     */
     public Response update(UpdateObjectRequest updateObject, Long id, Class clz) {
         // validate params using the Validations.validate function
         // call the correct service using convertFromClassToService(clz) function

@@ -18,7 +18,7 @@ public enum ExceptionMessage {
     TOKEN_IS_NULL("token is null"),
     EMPTY_NOTNULL_FIELD("Not null fields must be filled out before creation"),
     FIELD_OBJECT_NOT_EXISTS("Field object doesn't exists"),
-    RUNTIME("Runtime exception"),
+    FIELD_OBJECT_REPO_NOT_EXISTS("Field object repository doesn't exists or not supported"),
     NEGATIVE_FIELD("This field can not be negative"),
     TOO_SHORT_STRING("This field can not be as short as inserted"),
     CREATE_TABLE("Couldn't create the table properly."),
