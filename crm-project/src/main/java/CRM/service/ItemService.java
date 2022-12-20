@@ -105,6 +105,13 @@ public class ItemService implements ServiceInterface {
         return Validations.doesIdExists(id, itemRepository);
     }
 
+    /**
+     * Retrieves all shared content items that are within the specified item.
+     *
+     * @param itemId the ID of the item to retrieve shared content from
+     * @return a list of shared content items within the specified item
+     * @throws NoSuchElementException if the item with the specified ID does not exist
+     */
     @Override
     public List<SharedContent> getAllInItem(long itemId) {
         // checkIfExists
