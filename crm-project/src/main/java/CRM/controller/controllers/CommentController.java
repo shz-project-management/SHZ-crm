@@ -5,6 +5,7 @@ import CRM.entity.Comment;
 import CRM.entity.Item;
 import CRM.entity.requests.CommentRequest;
 import CRM.entity.Item;
+import CRM.entity.requests.UpdateObjectRequest;
 import CRM.entity.response.Response;
 import lombok.AllArgsConstructor;
 import org.apache.logging.log4j.LogManager;
@@ -41,9 +42,10 @@ public class CommentController {
         return new ResponseEntity<>(response, response.getStatus());
     }
 
-    @PatchMapping
-    public ResponseEntity<Response> update(@RequestParam Long id, @RequestParam String field, @RequestParam String content) {
-        return null;
+    @PatchMapping(value = "update/{commentId}")
+    public ResponseEntity<Response> update(@RequestBody UpdateObjectRequest updateItemRequest, @PathVariable Long commentId){
+        Response response = sharedContentFacade.update(updateItemRequest, commentId, Comment.class);
+        return new ResponseEntity<>(response, response.getStatus());
     }
 
     @GetMapping(value = "{commentId}")
