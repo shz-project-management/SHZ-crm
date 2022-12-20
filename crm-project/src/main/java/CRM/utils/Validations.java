@@ -5,19 +5,28 @@ import CRM.entity.requests.*;
 import CRM.entity.Attribute;
 import CRM.entity.requests.LoginUserRequest;
 import CRM.entity.requests.RegisterUserRequest;
+import CRM.repository.ItemRepository;
+import CRM.repository.StatusRepository;
+import CRM.repository.TypeRepository;
 import CRM.utils.enums.ExceptionMessage;
 import CRM.utils.enums.Regex;
+import CRM.utils.enums.UpdateField;
 import io.jsonwebtoken.Claims;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.hibernate.NonUniqueObjectException;
+import org.hibernate.sql.Update;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.lang.reflect.Field;
 import java.util.NoSuchElementException;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import static CRM.utils.enums.UpdateField.*;
 
 public class Validations {
     private static Logger logger = LogManager.getLogger(Validations.class.getName());
@@ -88,14 +97,14 @@ public class Validations {
      * Validates an item request object by checking each field for conformity with regex patterns and other constraints.
      *
      * @param item The item request object to validate.
-     * @throws NullPointerException if the parent item ID is null.
+     * @throws NullPointerException     if the parent item ID is null.
      * @throws IllegalArgumentException if the importance value is not within the range 0-5, or if any other field fails validation.
      */
     public static void validateCreatedItem(ItemRequest item) {
         // validate each field of the item using validate(regex, field)
         try {
             validate(item.getParentItemId(), Regex.ID.getRegex());
-        } catch (NullPointerException e){
+        } catch (NullPointerException e) {
             logger.warn("Parent item ID is null");
         }
 
@@ -119,7 +128,7 @@ public class Validations {
      *
      * @param comment The comment request object to validate.
      * @throws IllegalArgumentException if any field fails validation.
-     * @throws NullPointerException if the title is null.
+     * @throws NullPointerException     if the title is null.
      */
     public static void validateCreatedComment(CommentRequest comment) {
         // validate each field of the item using validate(regex, field)
@@ -175,26 +184,22 @@ public class Validations {
         return Long.valueOf(claims.getId());
     }
 
-
-    public static <T> void setContentToFieldIfFieldExists(T object, String fieldName, Object content) throws NoSuchFieldException {
+    /**
+     * Set the content to a field if the field exists in an object using reflection.
+     *
+     * @param object    the object containing the field
+     * @param fieldName the field to be updated
+     * @param content   the content to be set to the field
+     * @throws NoSuchFieldException if the field does not exist in the object
+     */
+    public static <T> void setContentToFieldIfFieldExists(T object, UpdateField fieldName, Object content) throws NoSuchFieldException {
+        String fieldNameModified = fieldName.toString().replaceAll("_", "");
         try {
-            for (Field field : object.getClass().getDeclaredFields()) {
-                field.setAccessible(true);
-                Object value = field.get(object);
-                if (value == null) {
-                    continue;
-                }
-                if (!field.getName().equals(fieldName)) {
-                    continue;
-                }
-                if (!(value.getClass().equals(content.getClass()))) {
-                    value.getClass().cast(content);
-                }
-                field.set(object, content);
-                return;
-            }
+            if(checkIfFieldExistsInEntity(object, fieldNameModified, content)) return;
+            if(checkIfFieldExistsInParentEntity(object, fieldNameModified, content)) return;
+
             throw new NoSuchFieldException(ExceptionMessage.FIELD_OBJECT_NOT_EXISTS.toString());
-        }catch (IllegalAccessException | NoSuchFieldException e){
+        } catch (IllegalAccessException | NoSuchFieldException e) {
             throw new NoSuchFieldException(ExceptionMessage.FIELD_OBJECT_NOT_EXISTS.toString());
         }
     }
@@ -206,7 +211,96 @@ public class Validations {
      * @param className The name of the class where the attribute was found to exist.
      * @throws NonUniqueObjectException with the attribute ID and class name as parameters.
      */
-    public static void throwAttributeAlreadyExistsForBoard(Attribute attribute, String className){
+    public static void throwAttributeAlreadyExistsForBoard(Attribute attribute, String className) {
         throw new NonUniqueObjectException(ExceptionMessage.ATTRIBUTE_ALREADY_IN_DB.toString(), attribute.getId(), className);
+    }
+
+    /**
+     * Check if a field is a custom object field.
+     *
+     * @param fieldName the field to be checked
+     * @return true if the field is a custom object field, false otherwise
+     */
+    public static boolean checkIfFieldIsCustomObject(UpdateField fieldName) {
+        return fieldName.equals(STATUS) || fieldName.equals(TYPE) || fieldName.equals(PARENT_ITEM);
+    }
+
+    /**
+     * Check if a field is a non-primitive field.
+     *
+     * @param fieldName the field to be checked
+     * @return true if the field is a non-primitive field, false otherwise
+     */
+    public static boolean checkIfFieldIsNonPrimitive(UpdateField fieldName) {
+        return fieldName.equals(DUE_DATE);
+    }
+
+    /**
+     * Check if the parent item being set is not the same as the item being updated.
+     *
+     * @param fieldName    the field being updated
+     * @param itemId       the id of the item being updated
+     * @param parentItemId the id of the parent item being set
+     * @throws IllegalArgumentException if the field being updated is the parent item field and the parent item id is the same as the item id
+     */
+    public static void checkIfParentItemIsNotTheSameItem(UpdateField fieldName, Long itemId, Long parentItemId) {
+        if (fieldName.equals(PARENT_ITEM) && Objects.equals(itemId, parentItemId)) {
+            throw new IllegalArgumentException(ExceptionMessage.PARENT_ITEM_ERROR.toString());
+        }
+    }
+
+    /**
+     * Check if a field exists in an entity object.
+     *
+     * @param object the entity object
+     * @param fieldName the name of the field to be checked
+     * @param content the content to be set to the field
+     * @throws IllegalAccessException if the field is not accessible
+     */
+    private static <T> boolean checkIfFieldExistsInEntity(T object, String fieldName, Object content) throws IllegalAccessException {
+        for (Field field : object.getClass().getDeclaredFields()) {
+            if(checkIfFieldExistsInEntityHelper(field, object, fieldName, content)) return true;
+        }
+        return false;
+    }
+
+    /**
+     * Check if a field exists in the parent entity of an object.
+     *
+     * @param object the object
+     * @param fieldName the name of the field to be checked
+     * @param content the content to be set to the field
+     * @throws IllegalAccessException if the field is not accessible
+     */
+    private static <T> boolean checkIfFieldExistsInParentEntity(T object, String fieldName, Object content) throws IllegalAccessException {
+        if (object.getClass().getSuperclass().equals(SharedContent.class)) {
+            for (Field field : object.getClass().getSuperclass().getDeclaredFields()) {
+                if(checkIfFieldExistsInEntityHelper(field, object, fieldName, content)) return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Helper function for checking if a field exists in an entity object.
+     *
+     * @param field the field to be checked
+     * @param object the entity object
+     * @param fieldName the name of the field to be checked
+     * @param content the content to be set to the field
+     * @return true if the field exists in the entity object, false otherwise
+     * @throws IllegalAccessException if the field is not accessible
+     */
+    private static <T> boolean checkIfFieldExistsInEntityHelper(Field field, T object, String fieldName, Object content) throws IllegalAccessException {
+            field.setAccessible(true);
+            Object value = field.get(object);
+            if (!field.getName().equalsIgnoreCase(fieldName)) {
+                return false;
+            }
+            if (value != null && !(value.getClass().equals(content.getClass()))) {
+                value.getClass().cast(content);
+            }
+            field.set(object, content);
+            return true;
     }
 }

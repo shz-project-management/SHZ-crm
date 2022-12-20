@@ -3,6 +3,7 @@ package CRM.service;
 import CRM.entity.*;
 import CRM.entity.requests.CommentRequest;
 import CRM.entity.requests.ItemRequest;
+import CRM.entity.requests.UpdateObjectRequest;
 import CRM.repository.*;
 import CRM.utils.Validations;
 import CRM.utils.enums.ExceptionMessage;
@@ -73,7 +74,7 @@ public class CommentService implements ServiceInterface {
     }
 
     @Override
-    public Comment update(long id, String field, String content) {
+    public Comment update(UpdateObjectRequest updateObject, long itemId) {
         // checkIfExists
         // make sure there is such a field in Item -> use reflection!
 

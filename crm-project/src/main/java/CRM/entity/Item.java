@@ -1,11 +1,9 @@
 package CRM.entity;
 
-import CRM.entity.DTO.ItemDTO;
 import lombok.*;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Set;
 
 @AllArgsConstructor

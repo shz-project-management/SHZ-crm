@@ -29,7 +29,7 @@ public class ItemDTO extends SharedContentDTO {
         itemDTO.setUser(UserDTO.getUserFromDB(item.getUser()));
         itemDTO.setTitle(item.getTitle());
         itemDTO.setDescription(item.getDescription());
-        itemDTO.setType(AttributeDTO.createAttributeDTO(item.getStatus()));
+        itemDTO.setType(AttributeDTO.createAttributeDTO(item.getType()));
         itemDTO.setStatus(AttributeDTO.createAttributeDTO(item.getStatus()));
         itemDTO.setBoardId(item.getBoard().getId());
         itemDTO.setCreationDate(item.getCreationDate());

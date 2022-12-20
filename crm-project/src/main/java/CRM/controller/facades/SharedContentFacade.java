@@ -8,6 +8,7 @@ import CRM.entity.Item;
 import CRM.entity.SharedContent;
 import CRM.entity.requests.CommentRequest;
 import CRM.entity.requests.ItemRequest;
+import CRM.entity.requests.UpdateObjectRequest;
 import CRM.entity.response.Response;
 import CRM.service.CommentService;
 import CRM.service.ItemService;
@@ -147,19 +148,47 @@ public class SharedContentFacade {
         }
     }
 
-    public Response update(ItemRequest updateItem) {
+    /**
+     * Update an object in a service.
+     *
+     * @param updateObject the request object containing the updates to be made
+     * @param id the id of the object to be updated
+     * @param clz the class of the object being updated
+     * @return a response object with the updated object data and a success message, or an error message and appropriate status code
+     * @throws IllegalArgumentException if the id or updateObject parameters are invalid
+     * @throws NoSuchFieldException if the field of the object does not exist
+     * @throws NoSuchElementException if the class does not have a corresponding service
+     * @throws NullPointerException if there is a null value in the updateObject request
+     */
+    public Response update(UpdateObjectRequest updateObject, Long id, Class clz) {
         // validate params using the Validations.validate function
         // call the correct service using convertFromClassToService(clz) function
         // with update function in it.
-        return null;
+        try {
+            // validate the id using the Validations.validate function
+            Validations.validate(id, Regex.ID.getRegex());
+
+            // call the correct service using convertFromClassToService(clz) function with find function in it
+            return new Response.Builder()
+                    .data(convertFromServiceOutputToDTOEntity(convertFromClassToService(clz).update(updateObject, id), clz))
+                    .message(SuccessMessage.FOUND.toString())
+                    .status(HttpStatus.OK)
+                    .statusCode(200)
+                    .build();
+
+        } catch (IllegalArgumentException | NoSuchFieldException | NoSuchElementException e) {
+            return new Response.Builder()
+                    .message(e.getMessage())
+                    .status(HttpStatus.BAD_REQUEST)
+                    .statusCode(400).build();
+        } catch (NullPointerException e) {
+            return new Response.Builder()
+                    .message(e.getMessage())
+                    .status(HttpStatus.BAD_REQUEST)
+                    .statusCode(500).build();
+        }
     }
 
-//    public Response update(UpdateCommentRequest updateComment){
-//        // validate params using the Validations.validate function
-//        // call the correct service using convertFromClassToService(clz) function
-//        // with update function in it.
-//        return null;
-//    }
 
     /**
      * Returns an object with the given id and class type.
