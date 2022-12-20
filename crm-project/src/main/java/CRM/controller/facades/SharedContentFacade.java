@@ -274,6 +274,10 @@ public class SharedContentFacade {
         return null;
     }
 
+    public Response getAllInItem(Long itemId, Class clz) {
+        return null;
+    }
+
     /**
      * Returns a list of all comments in a status with the given id.
      *
@@ -344,5 +348,4 @@ public class SharedContentFacade {
 
         throw new IllegalArgumentException("There is no such class in the system!");
     }
-
 }
