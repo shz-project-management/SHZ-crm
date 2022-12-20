@@ -274,6 +274,16 @@ public class SharedContentFacade {
         return null;
     }
 
+    /**
+     * Retrieves a list of entities of a specified class associated with a given item.
+     *
+     * @param itemId The ID of the item to retrieve the entities for.
+     * @param clz The class of the entities to retrieve.
+     * @return A response object containing the list of entities and related status information.
+     * @throws IllegalArgumentException if the item ID is invalid or if the class is not supported.
+     * @throws NoSuchElementException if no entities are found for the given item.
+     * @throws NullPointerException if there is a problem with the input.
+     */
     public Response getAllInItem(Long itemId, Class clz) {
         try {
             Validations.validate(itemId, Regex.ID.getRegex());

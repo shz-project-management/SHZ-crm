@@ -92,6 +92,13 @@ public class CommentService implements ServiceInterface {
         return Validations.doesIdExists(id, commentRepository);
     }
 
+    /**
+     * Retrieves a list of shared content entities associated with a given item.
+     *
+     * @param itemId The ID of the item to retrieve the shared content entities for.
+     * @return A list of shared content entities for the given item.
+     * @throws NoSuchElementException if the item with the given ID does not exist.
+     */
     @Override
     public List<SharedContent> getAllInItem(long itemId) {
         Item item = Validations.doesIdExists(itemId, itemRepository);
