@@ -91,9 +91,9 @@ public class ItemService implements ServiceInterface {
     public Item update(UpdateObjectRequest updateObject, long itemId) throws NoSuchFieldException {
         Item item = Validations.doesIdExists(itemId, itemRepository);
         if(Validations.checkIfFieldIsNonPrimitive(updateObject.getFieldName())){
-            JpaRepository jpaRepo = Validations.getFieldObjectRepository(updateObject.getFieldName());
-            Object obj = Validations.doesIdExists((Long) updateObject.getContent(), jpaRepo);
-            Validations.setContentToFieldIfFieldExists(item, updateObject.getFieldName(), obj);
+            Object jpaRepo = Validations.getFieldObjectRepository(updateObject.getFieldName());
+            Object contentObj = Validations.doesIdExists(Long.valueOf((Integer) updateObject.getContent()), getRepo((Class) jpaRepo));
+            Validations.setContentToFieldIfFieldExists(item, updateObject.getFieldName(), contentObj);
         }
         else{
             Validations.setContentToFieldIfFieldExists(item, updateObject.getFieldName(), updateObject.getContent());
@@ -143,5 +143,12 @@ public class ItemService implements ServiceInterface {
         return itemRepository.findAllByBoard(board);
     }
 
-    //check the class of the id
+    public JpaRepository getRepo(Class jpaRepo){
+        if(jpaRepo.getSimpleName().equals(StatusRepository.class.getSimpleName())){
+            return statusRepository;
+        }
+        else{
+            return typeRepository;
+        }
+    }
 }

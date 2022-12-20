@@ -30,9 +30,6 @@ import static CRM.utils.enums.UpdateField.TYPE;
 public class Validations {
     private static Logger logger = LogManager.getLogger(Validations.class.getName());
 
-    private static TypeRepository typeRepository;
-    private static StatusRepository statusRepository;
-
     /**
      * Validates the provided data against the given regular expression.
      *
@@ -226,14 +223,14 @@ public class Validations {
         return fieldName.equals(STATUS) || fieldName.equals(TYPE);
     }
 
-    public static JpaRepository getFieldObjectRepository(UpdateField fieldName){
-        JpaRepository repo = null;
+    public static Class getFieldObjectRepository(UpdateField fieldName){
+        Class repo = null;
         switch (fieldName) {
             case STATUS:
-                repo = statusRepository;
+                repo = StatusRepository.class;
                 break;
             case TYPE:
-                repo = typeRepository;
+                repo = TypeRepository.class;
                 break;
             default:
                 break;
