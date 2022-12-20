@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import javax.security.auth.login.AccountNotFoundException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class CommentService implements ServiceInterface {
@@ -94,7 +95,7 @@ public class CommentService implements ServiceInterface {
     @Override
     public List<SharedContent> getAllInItem(long itemId) {
         Item item = Validations.doesIdExists(itemId, itemRepository);
-        return Collections.singletonList((Comment) commentRepository.findAllByParentItem(item));
+        return commentRepository.findAllByParentItem(item).stream().map(comment -> (SharedContent)comment).collect(Collectors.toList());
     }
 
     /**
