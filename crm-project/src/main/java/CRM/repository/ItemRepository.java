@@ -15,4 +15,6 @@ public interface ItemRepository extends JpaRepository<Item, Long> {
     List<Item> findAllByBoard(Board board);
 
     Set<Item> findAllByStatus(Status status);
+
+    List<Item> findAllByParentItem(Item item);
 }
