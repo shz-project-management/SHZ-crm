@@ -4,6 +4,7 @@ import CRM.controller.facades.SharedContentFacade;
 import CRM.entity.Item;
 import CRM.entity.requests.AttributeRequest;
 import CRM.entity.requests.ItemRequest;
+import CRM.entity.requests.UpdateObjectRequest;
 import CRM.entity.response.Response;
 import lombok.AllArgsConstructor;
 import org.apache.logging.log4j.LogManager;
@@ -38,20 +39,21 @@ public class ItemController {
         return new ResponseEntity<>(response, response.getStatus());
     }
 
-    @PatchMapping
-    public ResponseEntity<Response> update(@RequestBody String field, Object content){
-        return null;
+    @PatchMapping(value = "update/{itemId}")
+    public ResponseEntity<Response> update(@RequestBody UpdateObjectRequest updateItemRequest, @PathVariable Long itemId){
+        Response response = sharedContentFacade.update(updateItemRequest, itemId, Item.class);
+        return new ResponseEntity<>(response, response.getStatus());
     }
 
-    @PatchMapping(value = "{itemId}/type")
-    public ResponseEntity<Response> updateType(@PathVariable Long itemId, @RequestParam Long typeId, @RequestBody AttributeRequest attributeRequest){
-        return null;
-    }
-
-    @PatchMapping(value = "{itemId}/status")
-    public ResponseEntity<Response> updateStatus(@PathVariable Long itemId, @RequestParam Long statusId, @RequestBody AttributeRequest attributeRequest){
-        return null;
-    }
+//    @PatchMapping(value = "{itemId}/type")
+//    public ResponseEntity<Response> updateType(@PathVariable Long itemId, @RequestParam Long typeId, @RequestBody AttributeRequest attributeRequest){
+//        return null;
+//    }
+//
+//    @PatchMapping(value = "{itemId}/status")
+//    public ResponseEntity<Response> updateStatus(@PathVariable Long itemId, @RequestParam Long statusId, @RequestBody AttributeRequest attributeRequest){
+//        return null;
+//    }
 
     @GetMapping(value = "all-in-board/{boardId}")
     public ResponseEntity<Response> getAllItemsInBoard(@PathVariable Long boardId){

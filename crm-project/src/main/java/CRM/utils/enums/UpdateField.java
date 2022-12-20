@@ -1,3 +1,3 @@
 package CRM.utils.enums;
 
-public enum UpdateField {NAME, DESCRIPTION, STATUS, TYPE, IMPORTANCE, DUE_DATE, SECTION}
+public enum UpdateField {NAME, DESCRIPTION, IMPORTANCE, DUE_DATE, SECTION, STATUS, TYPE}

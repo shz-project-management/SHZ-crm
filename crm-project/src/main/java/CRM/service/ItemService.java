@@ -2,12 +2,15 @@ package CRM.service;
 
 import CRM.entity.*;
 import CRM.entity.requests.ItemRequest;
+import CRM.entity.requests.UpdateObjectRequest;
 import CRM.repository.*;
 import CRM.utils.Validations;
 import CRM.utils.enums.ExceptionMessage;
+import CRM.utils.enums.UpdateField;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 
 import javax.security.auth.login.AccountNotFoundException;
@@ -85,11 +88,17 @@ public class ItemService implements ServiceInterface {
     }
 
     @Override
-    public Item update(long id, String field, String content) {
-        // checkIfExists
-        // make sure there is such a field in Item -> use reflection!
-
-        return null;
+    public Item update(UpdateObjectRequest updateObject, long itemId) throws NoSuchFieldException {
+        Item item = Validations.doesIdExists(itemId, itemRepository);
+        if(Validations.checkIfFieldIsNonPrimitive(updateObject.getFieldName())){
+            JpaRepository jpaRepo = Validations.getFieldObjectRepository(updateObject.getFieldName());
+            Object obj = Validations.doesIdExists((Long) updateObject.getContent(), jpaRepo);
+            Validations.setContentToFieldIfFieldExists(item, updateObject.getFieldName(), obj);
+        }
+        else{
+            Validations.setContentToFieldIfFieldExists(item, updateObject.getFieldName(), updateObject.getContent());
+        }
+        return itemRepository.save(item);
     }
 
     /**

@@ -108,8 +108,6 @@ public class BoardService {
     public Board updateBoard(UpdateObjectRequest boardReq, long boardId) throws NoSuchFieldException {
         Board board = Validations.doesIdExists(boardId, boardRepository);
         Validations.setContentToFieldIfFieldExists(board, boardReq.getFieldName(), boardReq.getContent());
-//        return boardRepository.save(board);
-        Board savedBoard = boardRepository.save(board);
-        return savedBoard;
+        return boardRepository.save(board);
     }
 }

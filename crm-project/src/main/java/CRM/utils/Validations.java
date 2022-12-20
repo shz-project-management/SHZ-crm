@@ -5,6 +5,8 @@ import CRM.entity.requests.*;
 import CRM.entity.Attribute;
 import CRM.entity.requests.LoginUserRequest;
 import CRM.entity.requests.RegisterUserRequest;
+import CRM.repository.StatusRepository;
+import CRM.repository.TypeRepository;
 import CRM.utils.enums.ExceptionMessage;
 import CRM.utils.enums.Regex;
 import CRM.utils.enums.UpdateField;
@@ -12,6 +14,8 @@ import io.jsonwebtoken.Claims;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.hibernate.NonUniqueObjectException;
+import org.hibernate.sql.Update;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.lang.reflect.Field;
@@ -20,8 +24,14 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static CRM.utils.enums.UpdateField.STATUS;
+import static CRM.utils.enums.UpdateField.TYPE;
+
 public class Validations {
     private static Logger logger = LogManager.getLogger(Validations.class.getName());
+
+    private static TypeRepository typeRepository;
+    private static StatusRepository statusRepository;
 
     /**
      * Validates the provided data against the given regular expression.
@@ -209,5 +219,25 @@ public class Validations {
      */
     public static void throwAttributeAlreadyExistsForBoard(Attribute attribute, String className){
         throw new NonUniqueObjectException(ExceptionMessage.ATTRIBUTE_ALREADY_IN_DB.toString(), attribute.getId(), className);
+    }
+
+    //FIXME: handle DUE_DATE somehow
+    public static boolean checkIfFieldIsNonPrimitive(UpdateField fieldName){
+        return fieldName.equals(STATUS) || fieldName.equals(TYPE);
+    }
+
+    public static JpaRepository getFieldObjectRepository(UpdateField fieldName){
+        JpaRepository repo = null;
+        switch (fieldName) {
+            case STATUS:
+                repo = statusRepository;
+                break;
+            case TYPE:
+                repo = typeRepository;
+                break;
+            default:
+                break;
+        }
+        return repo;
     }
 }
