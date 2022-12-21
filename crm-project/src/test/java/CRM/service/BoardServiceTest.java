@@ -3,7 +3,6 @@ package CRM.service;
 import CRM.entity.Board;
 import CRM.entity.User;
 import CRM.entity.UserInBoard;
-import CRM.entity.requests.BoardRequest;
 import CRM.entity.requests.RegisterUserRequest;
 import CRM.entity.requests.UpdateObjectRequest;
 import CRM.repository.BoardRepository;
