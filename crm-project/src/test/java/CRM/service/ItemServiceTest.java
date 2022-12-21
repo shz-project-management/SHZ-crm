@@ -148,7 +148,7 @@ class ItemServiceTest {
     void testUpdateWithCustomObjectStatus() throws NoSuchFieldException {
         UpdateObjectRequest updateObject = new UpdateObjectRequest();
         updateObject.setFieldName(UpdateField.STATUS);
-        updateObject.setContent(1L);
+        updateObject.setContent(1);
         Status status = new Status();
         Item item = new Item();
         item.setId(1L);
@@ -179,7 +179,7 @@ class ItemServiceTest {
     void testUpdateWithCustomObjectType() throws NoSuchFieldException {
         UpdateObjectRequest updateObject = new UpdateObjectRequest();
         updateObject.setFieldName(UpdateField.TYPE);
-        updateObject.setContent(1L);
+        updateObject.setContent(1);
         Type type = new Type();
         Item item = new Item();
         item.setId(1L);
@@ -196,7 +196,7 @@ class ItemServiceTest {
     void testUpdateWithCustomObjectParentItem() throws NoSuchFieldException {
         UpdateObjectRequest updateObject = new UpdateObjectRequest();
         updateObject.setFieldName(UpdateField.PARENT_ITEM);
-        updateObject.setContent(2L);
+        updateObject.setContent(2);
         Item parentItem = new Item();
         parentItem.setId(2L);
         Item item = new Item();
@@ -214,7 +214,7 @@ class ItemServiceTest {
     void testUpdateWithCustomObjectSection() throws NoSuchFieldException {
         UpdateObjectRequest updateObject = new UpdateObjectRequest();
         updateObject.setFieldName(UpdateField.SECTION);
-        updateObject.setContent(1L);
+        updateObject.setContent(1);
         Section section = new Section();
         section.setId(2L);
         Item item = new Item();
@@ -232,7 +232,7 @@ class ItemServiceTest {
     void testUpdateWithCustomObjectItemHisOwnParentItemThrowsException() throws NoSuchFieldException {
         UpdateObjectRequest updateObject = new UpdateObjectRequest();
         updateObject.setFieldName(UpdateField.PARENT_ITEM);
-        updateObject.setContent(1L);
+        updateObject.setContent(1);
         Item parentItem = new Item();
         parentItem.setId(2L);
         Item item = new Item();

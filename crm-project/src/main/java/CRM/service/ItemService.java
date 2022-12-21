@@ -183,8 +183,8 @@ public class ItemService implements ServiceInterface {
      * @throws NoSuchFieldException if the field does not exist in the item object
      */
     private void fieldIsCustomObjectHelper(UpdateObjectRequest updateObject, long itemId, Item item) throws NoSuchFieldException {
-        Object contentObj = Validations.doesIdExists((Long) updateObject.getContent(), getRepoToUpdateField(updateObject.getFieldName()));
-        Validations.checkIfParentItemIsNotTheSameItem(updateObject.getFieldName(), itemId, (Long) updateObject.getContent());
+        Object contentObj = Validations.doesIdExists(Long.valueOf( (Integer) updateObject.getContent()), getRepoToUpdateField(updateObject.getFieldName()));
+        Validations.checkIfParentItemIsNotTheSameItem(updateObject.getFieldName(), itemId, Long.valueOf( (Integer) updateObject.getContent()));
         Validations.setContentToFieldIfFieldExists(item, updateObject.getFieldName(), contentObj);
     }
 
