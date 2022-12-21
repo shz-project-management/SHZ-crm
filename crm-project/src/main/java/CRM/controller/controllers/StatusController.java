@@ -84,7 +84,7 @@ public class StatusController {
     }
 
     /**
-     * Handles PUT requests to update status.
+     * Handles PATCH requests to update status.
      *
      * @param statusRequest An object containing the fields to update for the status.
      * @return A response object indicating the status of the update operation.

@@ -85,7 +85,7 @@ public class TypeController {
     }
 
     /**
-     * Handles PUT requests to update type.
+     * Handles PATCH requests to update type.
      *
      * @param typeRequest An object containing the fields to update for the type.
      * @return A response object indicating the status of the update operation.

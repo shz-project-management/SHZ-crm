@@ -2,6 +2,7 @@ package CRM.controller.facades;
 
 import CRM.entity.*;
 import CRM.entity.DTO.AttributeDTO;
+import CRM.entity.DTO.BoardDTO;
 import CRM.entity.requests.AttributeRequest;
 import CRM.entity.requests.UpdateObjectRequest;
 import CRM.entity.response.Response;
@@ -179,6 +180,40 @@ public class AttributeFacade {
     }
 
     /**
+     * Updates an attribute in the database.
+     *
+     * @param statusId the id of the attribute to update
+     * @param statusRequest the data of the update(fieldName and content)
+     * @return a response object with a status code and message
+     * @throws IllegalArgumentException if the attribute ID does not match the expected format
+     * @throws NoSuchElementException   if the attribute to update is not found in the database
+     * @throws NullPointerException     if the attribute object is null
+     */
+    public Response update(UpdateObjectRequest statusRequest, Long statusId, Class clz) {
+        try {
+            Validations.validate(statusId, Regex.ID.getRegex());
+            return new Response.Builder()
+                    .data(AttributeDTO.createAttributeDTO(convertFromClassToService(clz).update(statusRequest, statusId)))
+                    .message(SuccessMessage.FOUND.toString())
+                    .status(HttpStatus.OK)
+                    .statusCode(200)
+                    .build();
+        } catch (IllegalArgumentException | NoSuchElementException | NoSuchFieldException e) {
+            return new Response.Builder()
+                    .message(e.getMessage())
+                    .status(HttpStatus.BAD_REQUEST)
+                    .statusCode(400)
+                    .build();
+        } catch (NullPointerException e) {
+            return new Response.Builder()
+                    .message(e.getMessage())
+                    .status(HttpStatus.BAD_REQUEST)
+                    .statusCode(500)
+                    .build();
+        }
+    }
+
+    /**
      * Converts a given Class object to the corresponding AttributeService object.
      *
      * @param c the Class object to be converted
@@ -190,20 +225,6 @@ public class AttributeFacade {
         if (c.equals(Type.class)) return typeService;
         if (c.equals(Status.class)) return statusService;
 
-        return null;
-    }
-
-    /**
-     * Updates a status in the database.
-     *
-     * @param statusId the id of the status to update
-     * @param statusRequest the data of the update(fieldName and content)
-     * @return a response object with a status code and message
-     * @throws IllegalArgumentException if the status ID does not match the expected format
-     * @throws NoSuchElementException   if the status to update is not found in the database
-     * @throws NullPointerException     if the status object is null
-     */
-    public Response update(UpdateObjectRequest statusRequest, Long statusId, Class clz) {
         return null;
     }
 }
