@@ -28,7 +28,6 @@ class BoardFacadeTest {
 
     @Mock
     private BoardService boardService;
-
     @Mock
     private AuthService authService;
 

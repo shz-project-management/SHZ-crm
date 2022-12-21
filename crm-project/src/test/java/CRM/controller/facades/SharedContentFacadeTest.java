@@ -7,30 +7,23 @@ import CRM.entity.requests.UpdateObjectRequest;
 import CRM.entity.response.Response;
 import CRM.service.CommentService;
 import CRM.service.ItemService;
-import CRM.utils.Validations;
 import CRM.utils.enums.UpdateField;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.HttpStatus;
 
 import javax.security.auth.login.AccountNotFoundException;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.NoSuchElementException;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -54,6 +47,8 @@ public class SharedContentFacadeTest {
 
         User user = new User(1L, "test", "testa", "test123456", "test@gmail.com", null, null);
         Board board = new Board(1L, user, "title", "description", null, null, null);
+        Section section = new Section();
+
 
         Type type = new Type();
         type.setBoard(board);
@@ -65,7 +60,7 @@ public class SharedContentFacadeTest {
         status.setName("status");
         status.setDescription("description");
 
-        Item expectedItem = new Item(board, status, type, "section", null, LocalDateTime.now(), 1, null, null);
+        Item expectedItem = Item.createNewItem(section, status, type, user, "title", "desc" ,  null, 1);
         expectedItem.setUser(user);
 
         when(itemService.create(item)).thenReturn(expectedItem);
@@ -117,8 +112,8 @@ public class SharedContentFacadeTest {
         status.setName("status");
         status.setDescription("description");
 
-        Item item = new Item(board, status, type, "section", null, LocalDateTime.now(), 1, null, null);
-        item.setUser(user);
+        Section section = new Section();
+        Item item = Item.createNewItem(section, status, type, user, "title", "desc" ,  null, 1);
 
         Comment expectedComment = Comment.createNewComment(user, "title", "description", item);
 
@@ -246,8 +241,8 @@ public class SharedContentFacadeTest {
         status.setName("status");
         status.setDescription("description");
 
-        Item item = new Item(board, status, type, "section", null, LocalDateTime.now(), 1, null, null);
-        item.setUser(user);
+        Section section = new Section();
+        Item item = Item.createNewItem(section, status, type, user, "title", "desc" ,  null, 1);
 
         given(itemService.update(updateObject, id)).willReturn(item);
 
@@ -273,8 +268,8 @@ public class SharedContentFacadeTest {
         status.setName("status");
         status.setDescription("description");
 
-        Item item = new Item(board, status, type, "section", null, LocalDateTime.now(), 1, null, null);
-        item.setUser(user);
+        Section section = new Section();
+        Item item = Item.createNewItem(section, status, type, user, "title", "desc" ,  null, 1);
 
         Comment comment = new Comment();
         comment.setUser(user);
@@ -323,8 +318,8 @@ public class SharedContentFacadeTest {
         status.setName("status");
         status.setDescription("description");
 
-        Item item = new Item(board, status, type, "section", null, LocalDateTime.now(), 1, null, null);
-        item.setUser(user);
+        Section section = new Section();
+        Item item = Item.createNewItem(section, status, type, user, "title", "desc" ,  null, 1);
 
         Comment comment = new Comment();
         comment.setUser(user);
@@ -350,8 +345,8 @@ public class SharedContentFacadeTest {
         status.setName("status");
         status.setDescription("description");
 
-        Item item = new Item(board, status, type, "section", null, LocalDateTime.now(), 1, null, null);
-        item.setUser(user);
+        Section section = new Section();
+        Item item = Item.createNewItem(section, status, type, user, "title", "desc" ,  null, 1);
 
         given(itemService.get(1L)).willReturn(item);
         assertEquals(200, sharedContentFacade.get(1L, Item.class).getStatusCode());

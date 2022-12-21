@@ -29,7 +29,6 @@ class StatusServiceTest {
 
     @Mock
     private StatusRepository statusRepository;
-
     @Mock
     private BoardRepository boardRepository;
 
@@ -37,9 +36,7 @@ class StatusServiceTest {
     private StatusService statusService;
 
     private Board board;
-
     private Status status;
-
     private Long statusId;
 
     @BeforeEach

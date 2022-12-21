@@ -1,13 +1,10 @@
 package CRM.controller.facades;
 
-import CRM.controller.controllers.UserController;
-import CRM.entity.DTO.UserInBoardDTO;
 import CRM.entity.User;
 import CRM.entity.response.Response;
 import CRM.service.UserService;
 import CRM.utils.enums.ExceptionMessage;
 import CRM.utils.enums.SuccessMessage;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -23,7 +20,6 @@ import java.util.List;
 import java.util.NoSuchElementException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 
