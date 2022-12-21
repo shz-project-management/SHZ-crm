@@ -30,7 +30,11 @@ public class UserSettingsInBoard {
     @Cascade(org.hibernate.annotations.CascadeType.ALL)
     private NotificationSetting setting;
 
-    @Column(name = "is_active")
+    @Column(name = "in_app")
     @Cascade(org.hibernate.annotations.CascadeType.ALL)
-    private boolean isActive;
+    private boolean inApp;
+
+    @Column(name = "in_email")
+    @Cascade(org.hibernate.annotations.CascadeType.ALL)
+    private boolean inEmail;
 }
