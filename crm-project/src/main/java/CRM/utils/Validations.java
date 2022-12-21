@@ -195,6 +195,7 @@ public class Validations {
     public static <T> void setContentToFieldIfFieldExists(T object, UpdateField fieldName, Object content) throws NoSuchFieldException {
         String fieldNameModified = fieldName.toString().replaceAll("_", "");
         try {
+            System.out.println(fieldNameModified);
             if(checkIfFieldExistsInEntity(object, fieldNameModified, content)) return;
             if(checkIfFieldExistsInParentEntity(object, fieldNameModified, content)) return;
 
@@ -273,7 +274,7 @@ public class Validations {
      * @throws IllegalAccessException if the field is not accessible
      */
     private static <T> boolean checkIfFieldExistsInParentEntity(T object, String fieldName, Object content) throws IllegalAccessException {
-        if (object.getClass().getSuperclass().equals(SharedContent.class)) {
+        if (Util.fatherClasses().contains(object.getClass().getSuperclass())) {
             for (Field field : object.getClass().getSuperclass().getDeclaredFields()) {
                 if(checkIfFieldExistsInEntityHelper(field, object, fieldName, content)) return true;
             }
