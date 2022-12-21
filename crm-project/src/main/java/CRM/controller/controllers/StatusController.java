@@ -3,6 +3,7 @@ package CRM.controller.controllers;
 import CRM.controller.facades.AttributeFacade;
 import CRM.entity.Status;
 import CRM.entity.requests.AttributeRequest;
+import CRM.entity.requests.UpdateObjectRequest;
 import CRM.entity.response.Response;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -79,6 +80,18 @@ public class StatusController {
     @GetMapping(value = "getAll/{boardId}")
     public ResponseEntity<Response> getAllStatusesInBoard(@PathVariable Long boardId) {
         Response response = attributeFacade.getAllAttributesInBoard(boardId, Status.class);
+        return new ResponseEntity<>(response, response.getStatus());
+    }
+
+    /**
+     * Handles PUT requests to update status.
+     *
+     * @param statusRequest An object containing the fields to update for the status.
+     * @return A response object indicating the status of the update operation.
+     */
+    @PatchMapping(value = "/update/{statusId}", consumes = "application/json")
+    public ResponseEntity<Response> update(@RequestBody UpdateObjectRequest statusRequest, @PathVariable Long statusId) {
+        Response response = attributeFacade.update(statusRequest, statusId, Status.class);
         return new ResponseEntity<>(response, response.getStatus());
     }
 }

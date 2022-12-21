@@ -4,6 +4,7 @@ import CRM.controller.facades.AttributeFacade;
 import CRM.entity.Status;
 import CRM.entity.Type;
 import CRM.entity.requests.AttributeRequest;
+import CRM.entity.requests.UpdateObjectRequest;
 import CRM.entity.response.Response;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -80,6 +81,18 @@ public class TypeController {
     @GetMapping(value = "getAll/{boardId}")
     public ResponseEntity<Response> getAllTypesInBoard(@PathVariable Long boardId) {
         Response response = attributeFacade.getAllAttributesInBoard(boardId, Type.class);
+        return new ResponseEntity<>(response, response.getStatus());
+    }
+
+    /**
+     * Handles PUT requests to update type.
+     *
+     * @param typeRequest An object containing the fields to update for the type.
+     * @return A response object indicating the status of the update operation.
+     */
+    @PatchMapping(value = "/update/{typeId}", consumes = "application/json")
+    public ResponseEntity<Response> update(@RequestBody UpdateObjectRequest typeRequest, @PathVariable Long typeId) {
+        Response response = attributeFacade.update(typeRequest, typeId, Type.class);
         return new ResponseEntity<>(response, response.getStatus());
     }
 }
