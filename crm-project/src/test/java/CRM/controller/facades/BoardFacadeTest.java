@@ -7,6 +7,7 @@ import CRM.entity.requests.RegisterUserRequest;
 import CRM.entity.requests.UpdateObjectRequest;
 import CRM.service.AuthService;
 import CRM.service.BoardService;
+import CRM.utils.enums.UpdateField;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -181,7 +182,7 @@ class BoardFacadeTest {
 //        board.setName("Test new board name");
 //        board.setDescription("Test new description");
         UpdateObjectRequest boardRequest = new UpdateObjectRequest();
-        boardRequest.setFieldName("name");
+        boardRequest.setFieldName(UpdateField.NAME);
         boardRequest.setContent("Test new board name");
         given(boardService.updateBoard(boardRequest, 1L)).willReturn(board);
         assertEquals(200, boardFacade.updateBoard(boardRequest, 1L).getStatusCode());
@@ -191,7 +192,7 @@ class BoardFacadeTest {
     @DisplayName("Test update board with invalid board ID")
     public void testUpdateBoardWithInvalidBoardId() {
         UpdateObjectRequest boardRequest = new UpdateObjectRequest();
-        boardRequest.setFieldName("name");
+        boardRequest.setFieldName(UpdateField.NAME);
         boardRequest.setContent("Test new board name");
         assertEquals(400, boardFacade.updateBoard(boardRequest, -2L).getStatusCode());
     }
@@ -200,7 +201,7 @@ class BoardFacadeTest {
     @DisplayName("Test update board with non-existent board")
     public void testUpdateBoardWithNonExistentBoard() throws NoSuchFieldException {
         UpdateObjectRequest boardRequest = new UpdateObjectRequest();
-        boardRequest.setFieldName("name");
+        boardRequest.setFieldName(UpdateField.NAME);
         boardRequest.setContent("Test new board name");
         given(boardService.updateBoard(boardRequest,1L)).willThrow(NoSuchElementException.class);
         assertEquals(400, boardFacade.updateBoard(boardRequest, 1L).getStatusCode());
