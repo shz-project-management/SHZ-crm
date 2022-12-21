@@ -65,7 +65,6 @@ public class CommentService implements ServiceInterface {
             try {
                 Validations.doesIdExists(id, commentRepository);
             } catch (NoSuchElementException e) {
-                ids.remove(id);
                 counter--;
             }
         }
