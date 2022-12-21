@@ -5,10 +5,7 @@ import CRM.entity.DTO.AttributeDTO;
 import CRM.entity.requests.AttributeRequest;
 import CRM.entity.requests.UpdateObjectRequest;
 import CRM.entity.response.Response;
-import CRM.service.AttributeService;
-import CRM.service.BoardService;
-import CRM.service.StatusService;
-import CRM.service.TypeService;
+import CRM.service.*;
 import CRM.utils.Validations;
 import CRM.utils.enums.Regex;
 import CRM.utils.enums.SuccessMessage;
@@ -26,10 +23,10 @@ public class AttributeFacade {
 
     @Autowired
     private StatusService statusService;
-
     @Autowired
     private TypeService typeService;
-
+    @Autowired
+    private SectionService sectionService;
     @Autowired
     private BoardService boardService;
 
@@ -48,6 +45,7 @@ public class AttributeFacade {
     public Response create(AttributeRequest attributeRequest, Class clz) {
         try{
             Validations.validate(attributeRequest.getName(), Regex.NAME.getRegex());
+
             Board board = boardService.get(attributeRequest.getBoardId());
             Attribute attribute = Attribute.createAttribute(board, attributeRequest.getName(), attributeRequest.getDescription());
             Attribute savedAttribute = convertFromClassToService(clz).create(attribute);
@@ -187,6 +185,7 @@ public class AttributeFacade {
     private AttributeService convertFromClassToService(Class c) {
         logger.info("in AttributeFacade -> convertFromClassToService ,item of Class: " + c);
 
+        if(c.equals(Section.class)) return sectionService;
         if (c.equals(Type.class)) return typeService;
         if (c.equals(Status.class)) return statusService;
 

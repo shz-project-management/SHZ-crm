@@ -45,9 +45,9 @@ public class ItemController {
         return new ResponseEntity<>(response, response.getStatus());
     }
 
-    @GetMapping(value = "all-in-board/{boardId}")
-    public ResponseEntity<Response> getAllItemsInBoard(@PathVariable Long boardId){
-        Response response = sharedContentFacade.getAllItemsInBoard(boardId);
+    @GetMapping(value = "all-in-section/{boardId}")
+    public ResponseEntity<Response> getAllItemsInSection(@PathVariable Long boardId){
+        Response response = sharedContentFacade.getAllItemsInSection(boardId);
         return new ResponseEntity<>(response, response.getStatus());
     }
 

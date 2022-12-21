@@ -238,7 +238,7 @@ public class SharedContentFacade {
      * the error is returned. If a NullPointerException is thrown, a BAD_REQUEST status with a message
      * indicating the error is returned.
      */
-    public Response getAllItemsInBoard(Long id) {
+    public Response getAllItemsInSection(Long id) {
         try {
             // validate the id using the Validations.validate function
             Validations.validate(id, Regex.ID.getRegex());
@@ -246,7 +246,7 @@ public class SharedContentFacade {
             // call the correct service using convertFromClassToService(clz) function
             // with getAllInItem function in it.
             return new Response.Builder()
-                    .data(itemService.getAllInBoard(id).stream().map(item -> ItemDTO.getSharedContentFromDB(item)).collect(Collectors.toList()))
+                    .data(itemService.getAllInSection(id).stream().map(item -> ItemDTO.getSharedContentFromDB(item)).collect(Collectors.toList()))
                     .message(SuccessMessage.FOUND.toString())
                     .status(HttpStatus.OK)
                     .statusCode(200)

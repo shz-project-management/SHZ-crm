@@ -109,7 +109,7 @@ public class Validations {
         }
 
         validate(item.getUserId(), Regex.ID.getRegex());
-        validate(item.getBoardId(), Regex.ID.getRegex());
+        validate(item.getSectionId(), Regex.ID.getRegex());
         validate(item.getStatusId(), Regex.ID.getRegex());
         validate(item.getTypeId(), Regex.ID.getRegex());
 
