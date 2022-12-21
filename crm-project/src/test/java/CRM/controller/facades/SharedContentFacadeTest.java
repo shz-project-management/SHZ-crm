@@ -379,4 +379,231 @@ public class SharedContentFacadeTest {
         given(commentService.get(1L)).willThrow(NullPointerException.class);
         assertEquals(500, sharedContentFacade.get(1L, Comment.class).getStatusCode());
     }
+
+    @Test
+    @DisplayName("get all items in section")
+    void getAllItemsInSection_ValidInput() {
+        User user = new User(1L, "test", "testa", "test123456", "test@gmail.com", null, null);
+        Board board = new Board(1L, user, "title", "description", null, null, null);
+
+        Type type = new Type();
+        type.setBoard(board);
+        type.setName("type");
+        type.setDescription("description");
+
+        Status status = new Status();
+        status.setBoard(board);
+        status.setName("status");
+        status.setDescription("description");
+
+        Section section = new Section();
+        Item item = Item.createNewItem(section, status, type, user, "title", "desc" ,  null, 1);
+        Item item2 = Item.createNewItem(section, status, type, user, "titleee", "desccc" ,  null, 1);
+
+        given(itemService.getAllInSection(1L)).willReturn(Arrays.asList(item,item2));
+        assertEquals(200, sharedContentFacade.getAllItemsInSection(1L).getStatusCode());
+    }
+
+    @Test
+    @DisplayName("null id given to test the get all items in section function")
+    void getAllItemsInSection_NullExceptionBeThrown() {
+        given(itemService.getAllInSection(1L)).willThrow(NullPointerException.class);
+        assertEquals(500, sharedContentFacade.getAllItemsInSection(1L).getStatusCode());
+    }
+
+    @Test
+    @DisplayName("illegal id given to test the get all items in section function")
+    void getAllItemsInSection_IllegalArgumentBeThrown() {
+        given(itemService.getAllInSection(1L)).willThrow(IllegalArgumentException.class);
+        assertEquals(400, sharedContentFacade.getAllItemsInSection(1L).getStatusCode());
+    }
+
+    @Test
+    @DisplayName("illegal id given to test the get all items in section function")
+    void getAllItemsInSection_NoSuchElementThrown() {
+        given(itemService.getAllInSection(1L)).willThrow(NoSuchElementException.class);
+        assertEquals(400, sharedContentFacade.getAllItemsInSection(1L).getStatusCode());
+    }
+
+    @Test
+    @DisplayName("get all comment in board")
+    void getAllCommentsInBoard_ValidInput() {
+        User user = new User(1L, "test", "testa", "test123456", "test@gmail.com", null, null);
+        Board board = new Board(1L, user, "title", "description", null, null, null);
+
+        Type type = new Type();
+        type.setBoard(board);
+        type.setName("type");
+        type.setDescription("description");
+
+        Status status = new Status();
+        status.setBoard(board);
+        status.setName("status");
+        status.setDescription("description");
+
+        Section section = new Section();
+        Item item = Item.createNewItem(section, status, type, user, "title", "desc" ,  null, 1);
+        Item item2 = Item.createNewItem(section, status, type, user, "titleee", "desccc" ,  null, 1);
+
+        Comment comment = Comment.createNewComment(user, "title", "desc", item);
+        comment.setId(1L);
+        Comment comment2 = Comment.createNewComment(user, "title", "desc", item2);
+        comment2.setId(2L);
+
+
+        given(commentService.getAllCommentsInBoard(1L)).willReturn(Arrays.asList(comment,comment2));
+        assertEquals(200, sharedContentFacade.getAllCommentsInBoard(1L).getStatusCode());
+    }
+
+    @Test
+    @DisplayName("null id given to test the get all comment in board function")
+    void getAllCommentsInBoard_NullExceptionBeThrown() {
+        given(commentService.getAllCommentsInBoard(1L)).willThrow(NullPointerException.class);
+        assertEquals(500, sharedContentFacade.getAllCommentsInBoard(1L).getStatusCode());
+    }
+
+    @Test
+    @DisplayName("illegal id given to test the get all comment in board function")
+    void getAllCommentsInBoard_IllegalArgumentBeThrown() {
+        given(commentService.getAllCommentsInBoard(1L)).willThrow(IllegalArgumentException.class);
+        assertEquals(400, sharedContentFacade.getAllCommentsInBoard(1L).getStatusCode());
+    }
+
+    @Test
+    @DisplayName("illegal id given to test the get all comment in board function")
+    void getAllCommentsInBoard_NoSuchElementThrown() {
+        given(commentService.getAllCommentsInBoard(1L)).willThrow(NoSuchElementException.class);
+        assertEquals(400, sharedContentFacade.getAllCommentsInBoard(1L).getStatusCode());
+    }
+
+    @Test
+    @DisplayName("get all comments in item")
+    void getAllinItem_GetComments_ValidInput() {
+        User user = new User(1L, "test", "testa", "test123456", "test@gmail.com", null, null);
+        Board board = new Board(1L, user, "title", "description", null, null, null);
+
+        Type type = new Type();
+        type.setBoard(board);
+        type.setName("type");
+        type.setDescription("description");
+
+        Status status = new Status();
+        status.setBoard(board);
+        status.setName("status");
+        status.setDescription("description");
+
+        Section section = new Section();
+        Item item = Item.createNewItem(section, status, type, user, "title", "desc" ,  null, 1);
+
+        Comment comment = Comment.createNewComment(user, "title", "desc", item);
+        comment.setId(1L);
+        Comment comment2 = Comment.createNewComment(user, "title", "desc", item);
+        comment.setId(2L);
+
+        given(commentService.getAllInItem(1L)).willReturn(List.of(comment,comment2));
+        assertEquals(200, sharedContentFacade.getAllInItem(1L, Comment.class).getStatusCode());
+    }
+
+    @Test
+    @DisplayName("get all items in item")
+    void getAllinItem_GetItems_ValidInput() {
+        User user = new User(1L, "test", "testa", "test123456", "test@gmail.com", null, null);
+        Board board = new Board(1L, user, "title", "description", null, null, null);
+
+        Type type = new Type();
+        type.setBoard(board);
+        type.setName("type");
+        type.setDescription("description");
+
+        Status status = new Status();
+        status.setBoard(board);
+        status.setName("status");
+        status.setDescription("description");
+
+        Section section = new Section();
+        Item item = Item.createNewItem(section, status, type, user, "title", "desc" ,  null, 1);
+        item.setId(1L);
+        Item item2 = Item.createNewItem(section, status, type, user, "titleee", "desccc" ,  item, 1);
+        item2.setId(2L);
+
+        given(itemService.getAllInItem(1L)).willReturn(List.of(item));
+        assertEquals(200, sharedContentFacade.getAllInItem(1L, Item.class).getStatusCode());
+    }
+
+    @Test
+    @DisplayName("null id given to test the get all comment in item function")
+    void getAllInItem_Comments_NoSuchElementThrown() {
+        given(commentService.getAllInItem(1L)).willThrow(NoSuchElementException.class);
+        assertEquals(400, sharedContentFacade.getAllInItem(1L, Comment.class).getStatusCode());
+    }
+
+    @Test
+    @DisplayName("null id given to test the get all items in item function")
+    void getAllInItem_Items_NoSuchElementThrown() {
+        given(itemService.getAllInItem(1L)).willThrow(NoSuchElementException.class);
+        assertEquals(400, sharedContentFacade.getAllInItem(1L, Item.class).getStatusCode());
+    }
+
+    @Test
+    @DisplayName("null id given to test the get all in items function")
+    void getAllInItems_NullExceptionBeThrown() {
+        assertEquals(500, sharedContentFacade.getAllInItem(null, Comment.class).getStatusCode());
+    }
+
+    @Test
+    @DisplayName("illegal id given to test the get all in items function")
+    void getAllInItems_IllegalArgumentExceptionBeThrown() {
+        assertEquals(400, sharedContentFacade.getAllInItem(-2L, Comment.class).getStatusCode());
+    }
+
+    @Test
+    @DisplayName("get all comment in status")
+    void getAllCommentsInStatus_ValidInput() {
+        User user = new User(1L, "test", "testa", "test123456", "test@gmail.com", null, null);
+        Board board = new Board(1L, user, "title", "description", null, null, null);
+
+        Type type = new Type();
+        type.setBoard(board);
+        type.setName("type");
+        type.setDescription("description");
+
+        Status status = new Status();
+        status.setBoard(board);
+        status.setName("status");
+        status.setDescription("description");
+
+        Section section = new Section();
+        Item item = Item.createNewItem(section, status, type, user, "title", "desc" ,  null, 1);
+        Item item2 = Item.createNewItem(section, status, type, user, "titleee", "desccc" ,  null, 1);
+
+        Comment comment = Comment.createNewComment(user, "title", "desc", item);
+        comment.setId(1L);
+        Comment comment2 = Comment.createNewComment(user, "title", "desc", item2);
+        comment2.setId(2L);
+
+        given(commentService.getAllCommentsInStatus(1L)).willReturn(Arrays.asList(comment,comment2));
+        assertEquals(200, sharedContentFacade.getAllCommentsInStatus(1L).getStatusCode());
+    }
+
+    @Test
+    @DisplayName("null id given to test the get all comment in status function")
+    void getAllCommentsInStatus_NullExceptionBeThrown() {
+        given(commentService.getAllCommentsInStatus(1L)).willThrow(NullPointerException.class);
+        assertEquals(500, sharedContentFacade.getAllCommentsInStatus(1L).getStatusCode());
+    }
+
+    @Test
+    @DisplayName("illegal id given to test the get all comment in status function")
+    void getAllCommentsInStatus_IllegalArgumentBeThrown() {
+        given(commentService.getAllCommentsInStatus(1L)).willThrow(IllegalArgumentException.class);
+        assertEquals(400, sharedContentFacade.getAllCommentsInStatus(1L).getStatusCode());
+    }
+
+    @Test
+    @DisplayName("illegal id given to test the get all comment in status function")
+    void getAllCommentsInStatus_NoSuchElementThrown() {
+        given(commentService.getAllCommentsInStatus(1L)).willThrow(NoSuchElementException.class);
+        assertEquals(400, sharedContentFacade.getAllCommentsInStatus(1L).getStatusCode());
+    }
+
 }
