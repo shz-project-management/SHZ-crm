@@ -24,6 +24,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
 import javax.security.auth.login.AccountNotFoundException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
@@ -125,41 +126,35 @@ public class SharedContentFacade {
      * @throws NullPointerException     if the list of IDs is null.
      */
     public Response delete(List<Long> ids, Class clz) {
-        try {
-            // validate the id using the Validations.validate function
-            ids.forEach(id -> Validations.validate(id, Regex.ID.getRegex()));
-
-            // call the correct service using convertFromClassToService(clz) function with delete function in it
-            return new Response.Builder()
-                    .data(convertFromClassToService(clz).delete(ids))
-                    .message(SuccessMessage.DELETED.toString())
-                    .status(HttpStatus.NO_CONTENT)
-                    .statusCode(204)
-                    .build();
-        } catch (IllegalArgumentException | NoSuchElementException e) {
-            return new Response.Builder()
-                    .message(e.getMessage())
-                    .status(HttpStatus.BAD_REQUEST)
-                    .statusCode(400).build();
-        } catch (NullPointerException e) {
-            return new Response.Builder()
-                    .message(e.getMessage())
-                    .status(HttpStatus.BAD_REQUEST)
-                    .statusCode(500).build();
-        }
+        List<Long> correctIds = new ArrayList<>();
+        // validate the id using the Validations.validate function
+        ids.forEach(id -> {
+            try {
+                Validations.validate(id, Regex.ID.getRegex());
+                correctIds.add(id);
+            } catch (IllegalArgumentException | NullPointerException e) {
+            }
+        });
+        // call the correct service using convertFromClassToService(clz) function with delete function in it
+        return new Response.Builder()
+                .data(convertFromClassToService(clz).delete(correctIds))
+                .message(SuccessMessage.DELETED.toString())
+                .status(HttpStatus.NO_CONTENT)
+                .statusCode(204)
+                .build();
     }
 
     /**
      * Update an object in a service.
      *
      * @param updateObject the request object containing the updates to be made
-     * @param id the id of the object to be updated
-     * @param clz the class of the object being updated
+     * @param id           the id of the object to be updated
+     * @param clz          the class of the object being updated
      * @return a response object with the updated object data and a success message, or an error message and appropriate status code
      * @throws IllegalArgumentException if the id or updateObject parameters are invalid
-     * @throws NoSuchFieldException if the field of the object does not exist
-     * @throws NoSuchElementException if the class does not have a corresponding service
-     * @throws NullPointerException if there is a null value in the updateObject request
+     * @throws NoSuchFieldException     if the field of the object does not exist
+     * @throws NoSuchElementException   if the class does not have a corresponding service
+     * @throws NullPointerException     if there is a null value in the updateObject request
      */
     public Response update(UpdateObjectRequest updateObject, Long id, Class clz) {
         // validate params using the Validations.validate function
@@ -302,11 +297,11 @@ public class SharedContentFacade {
      * Retrieves a list of entities of a specified class associated with a given item.
      *
      * @param itemId The ID of the item to retrieve the entities for.
-     * @param clz The class of the entities to retrieve.
+     * @param clz    The class of the entities to retrieve.
      * @return A response object containing the list of entities and related status information.
      * @throws IllegalArgumentException if the item ID is invalid or if the class is not supported.
-     * @throws NoSuchElementException if no entities are found for the given item.
-     * @throws NullPointerException if there is a problem with the input.
+     * @throws NoSuchElementException   if no entities are found for the given item.
+     * @throws NullPointerException     if there is a problem with the input.
      */
     public Response getAllInItem(Long itemId, Class clz) {
         try {
@@ -370,7 +365,7 @@ public class SharedContentFacade {
      * @param c the Class object to be converted
      * @return the corresponding AttributeService object, or null if no corresponding AttributeService object is found
      */
-    private ServiceInterface convertFromClassToService(Class c) {
+    ServiceInterface convertFromClassToService(Class c) {
         logger.info("in FacadeFileController -> convertFromClassToService ,item of Class: " + c);
 
         if (c.equals(Item.class)) return itemService;

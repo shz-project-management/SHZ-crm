@@ -98,6 +98,7 @@ public class ItemService implements ServiceInterface {
     @Override
     public Item update(UpdateObjectRequest updateObject, long itemId) throws NoSuchFieldException {
         Item item = Validations.doesIdExists(itemId, itemRepository);
+
         if(Validations.checkIfFieldIsCustomObject(updateObject.getFieldName())){
             fieldIsCustomObjectHelper(updateObject, itemId, item);
         }

@@ -18,8 +18,7 @@ public class CommentDTO extends SharedContentDTO {
     public static CommentDTO getSharedContentFromDB(Comment comment) {
         CommentDTO commentDTO = new CommentDTO();
 
-        if (comment.getParentItem() != null)
-            commentDTO.setParentItem(ItemDTO.getSharedContentFromDB(comment.getParentItem()));
+        commentDTO.setParentItem(ItemDTO.getSharedContentFromDB(comment.getParentItem()));
         commentDTO.setUser(UserDTO.getUserFromDB(comment.getUser()));
         commentDTO.setTitle(comment.getTitle());
         commentDTO.setDescription(comment.getDescription());
