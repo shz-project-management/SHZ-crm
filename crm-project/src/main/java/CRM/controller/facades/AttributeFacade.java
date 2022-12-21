@@ -180,14 +180,14 @@ public class AttributeFacade {
     }
 
     /**
-     * Updates a status in the database.
+     * Updates an attribute in the database.
      *
-     * @param statusId the id of the status to update
+     * @param statusId the id of the attribute to update
      * @param statusRequest the data of the update(fieldName and content)
      * @return a response object with a status code and message
-     * @throws IllegalArgumentException if the status ID does not match the expected format
-     * @throws NoSuchElementException   if the status to update is not found in the database
-     * @throws NullPointerException     if the status object is null
+     * @throws IllegalArgumentException if the attribute ID does not match the expected format
+     * @throws NoSuchElementException   if the attribute to update is not found in the database
+     * @throws NullPointerException     if the attribute object is null
      */
     public Response update(UpdateObjectRequest statusRequest, Long statusId, Class clz) {
         try {
