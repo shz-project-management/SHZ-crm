@@ -3,6 +3,7 @@ package CRM.service;
 import CRM.entity.Attribute;
 import CRM.entity.Board;
 import CRM.entity.Type;
+import CRM.entity.requests.UpdateObjectRequest;
 import CRM.repository.BoardRepository;
 import CRM.repository.TypeRepository;
 import CRM.utils.Validations;
@@ -22,11 +23,6 @@ public class TypeService implements AttributeService{
     private TypeRepository typeRepository;
     @Autowired
     private BoardRepository boardRepository;
-
-    @Override
-    public int update(long id, Attribute object) {
-        return 0;
-    }
 
     /**
      * This function persists a new Type to the database by calling the save function in the TypeRepository class.
@@ -62,6 +58,13 @@ public class TypeService implements AttributeService{
     @Override
     public Type get(Long id) {
         return Validations.doesIdExists(id, typeRepository);
+    }
+
+    @Override
+    public Type update(UpdateObjectRequest typeRequest, Long typeId) throws NoSuchFieldException {
+        Type type = Validations.doesIdExists(typeId, typeRepository);
+        Validations.setContentToFieldIfFieldExists(type, typeRequest.getFieldName(), typeRequest.getContent());
+        return typeRepository.save(type);
     }
 
     /**

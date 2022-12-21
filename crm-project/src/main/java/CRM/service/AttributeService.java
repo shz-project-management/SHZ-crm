@@ -2,13 +2,12 @@ package CRM.service;
 
 import CRM.entity.Attribute;
 import CRM.entity.Status;
+import CRM.entity.requests.UpdateObjectRequest;
 
 import javax.security.auth.login.AccountNotFoundException;
 import java.util.List;
 
 public interface AttributeService {
-
-    int update(long id, Attribute object);
 
     Attribute create(Attribute attribute);
 
@@ -19,4 +18,6 @@ public interface AttributeService {
     <T> List<T> getAll();
 
     <T> List<T> getAllInBoard(Long boardId);
+
+    Attribute update(UpdateObjectRequest attributeRequest, Long id) throws NoSuchFieldException;
 }
