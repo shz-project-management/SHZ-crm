@@ -41,7 +41,7 @@ public class TypeService implements AttributeService{
      * @param typeId the type ID to delete
      */
     @Override
-    public boolean delete(Long typeId) {
+    public boolean delete(long typeId) {
         Type type = Validations.doesIdExists(typeId, typeRepository);
         typeRepository.delete(type);
         return true;
@@ -56,12 +56,12 @@ public class TypeService implements AttributeService{
      * @throws NullPointerException     if the specified id is null.
      */
     @Override
-    public Type get(Long id) {
+    public Type get(long id) {
         return Validations.doesIdExists(id, typeRepository);
     }
 
     @Override
-    public Type update(UpdateObjectRequest typeRequest, Long typeId) throws NoSuchFieldException {
+    public Type update(UpdateObjectRequest typeRequest, long typeId) throws NoSuchFieldException {
         Type type = Validations.doesIdExists(typeId, typeRepository);
         Validations.setContentToFieldIfFieldExists(type, typeRequest.getFieldName(), typeRequest.getContent());
         return typeRepository.save(type);
@@ -87,7 +87,7 @@ public class TypeService implements AttributeService{
      * @throws NullPointerException     if the specified board id is null.
      */
     @Override
-    public List<Type> getAllInBoard(Long boardId) {
+    public List<Type> getAllInBoard(long boardId) {
         Board board = Validations.doesIdExists(boardId, boardRepository);
         return typeRepository.findByBoard(board);
     }
