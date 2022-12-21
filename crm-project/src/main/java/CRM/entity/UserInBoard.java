@@ -13,6 +13,7 @@ import javax.persistence.*;
 @Setter
 @NoArgsConstructor
 public class UserInBoard {
+
     @EmbeddedId
     private UserInBoardPK id = new UserInBoardPK();
 

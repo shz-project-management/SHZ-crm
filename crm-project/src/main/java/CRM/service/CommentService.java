@@ -77,17 +77,16 @@ public class CommentService implements ServiceInterface {
      * Updates the specified comment with the new field value provided in the updateObject parameter.
      *
      * @param updateObject the object containing the field names and new field values to update
-     * @param commentId the id of the comment to update
+     * @param commentId    the id of the comment to update
      * @return the updated Comment object
      * @throws NoSuchFieldException if the field to update is not a primitive or a known object
      */
     @Override
     public Comment update(UpdateObjectRequest updateObject, long commentId) throws NoSuchFieldException {
         Comment comment = Validations.doesIdExists(commentId, commentRepository);
-        if(Validations.checkIfFieldIsCustomObject(updateObject.getFieldName())){
+        if (Validations.checkIfFieldIsCustomObject(updateObject.getFieldName())) {
             throw new NoSuchFieldException(ExceptionMessage.FIELD_OBJECT_NOT_EXISTS.toString());
-        }
-        else{
+        } else {
             fieldIsPrimitiveOrKnownObjectHelper(updateObject, comment);
         }
         return commentRepository.save(comment);
@@ -115,7 +114,7 @@ public class CommentService implements ServiceInterface {
     @Override
     public List<SharedContent> getAllInItem(long itemId) {
         Item item = Validations.doesIdExists(itemId, itemRepository);
-        return commentRepository.findAllByParentItem(item).stream().map(comment -> (SharedContent)comment).collect(Collectors.toList());
+        return commentRepository.findAllByParentItem(item).stream().map(comment -> (SharedContent) comment).collect(Collectors.toList());
     }
 
     /**
@@ -126,9 +125,14 @@ public class CommentService implements ServiceInterface {
      */
     public List<Comment> getAllCommentsInBoard(long boardId) {
         Board board = Validations.doesIdExists(boardId, boardRepository);
-        Set<Item> itemsInBoard = board.getItems();
+
+        List<Item> items = new ArrayList<>();
+        Set<Section> sectionsInBoard = board.getSections();
+        sectionsInBoard.forEach(section -> section.getItems().forEach(item -> items.add(item)));
+
         List<Comment> commentList = new ArrayList<>();
-        for (Item item : itemsInBoard) {
+
+        for (Item item : items) {
             commentList.addAll(commentRepository.findAllByParentItem(item));
         }
         return commentList;
@@ -154,15 +158,14 @@ public class CommentService implements ServiceInterface {
      * Helper function for updating a primitive or known object field.
      *
      * @param updateObject the request object containing the updates to be made
-     * @param comment the item object being updated
+     * @param comment      the item object being updated
      * @throws NoSuchFieldException if the field does not exist in the item object
      */
     private void fieldIsPrimitiveOrKnownObjectHelper(UpdateObjectRequest updateObject, Comment comment) throws NoSuchFieldException {
-        if(Validations.checkIfFieldIsNonPrimitive(updateObject.getFieldName())) {
+        if (Validations.checkIfFieldIsNonPrimitive(updateObject.getFieldName())) {
             LocalDateTime dueDate = LocalDateTime.now().plusDays(Long.valueOf((Integer) updateObject.getContent()));
             Validations.setContentToFieldIfFieldExists(comment, updateObject.getFieldName(), dueDate);
-        }
-        else{
+        } else {
             Validations.setContentToFieldIfFieldExists(comment, updateObject.getFieldName(), updateObject.getContent());
         }
     }

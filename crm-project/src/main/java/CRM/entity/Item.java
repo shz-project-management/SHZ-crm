@@ -15,10 +15,6 @@ import java.util.Set;
 @Table(name = "items")
 public class Item extends SharedContent {
     @ManyToOne
-    @JoinColumn(name = "board_id")
-    private Board board;
-
-    @ManyToOne
     @JoinColumn(name = "status_id")
     private Status status;
 
@@ -26,7 +22,10 @@ public class Item extends SharedContent {
     @JoinColumn(name = "type_id")
     private Type type;
 
-    private String section;
+    @ManyToOne
+    @JoinColumn(name = "section_id")
+    private Section section;
+
     private Long assignedToUserId;
     private LocalDateTime dueDate;
     private int importance;
@@ -38,9 +37,9 @@ public class Item extends SharedContent {
     private Set<Item> items;
 
     // FIXME: Is it ok? Should it get less params?
-    public static Item createNewItem(Board board, Status status, Type type, User user, String title, String description, Item parentItem, int importance){
+    public static Item createNewItem(Section section, Status status, Type type, User user, String title, String description, Item parentItem, int importance){
         Item item = new Item();
-        item.setBoard(board);
+        item.setSection(section);
         item.setImportance(importance);
         item.setStatus(status);
         item.setType(type);
