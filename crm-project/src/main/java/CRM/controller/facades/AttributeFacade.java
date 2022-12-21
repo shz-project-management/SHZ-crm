@@ -3,6 +3,7 @@ package CRM.controller.facades;
 import CRM.entity.*;
 import CRM.entity.DTO.AttributeDTO;
 import CRM.entity.requests.AttributeRequest;
+import CRM.entity.requests.UpdateObjectRequest;
 import CRM.entity.response.Response;
 import CRM.service.AttributeService;
 import CRM.service.BoardService;
@@ -177,11 +178,6 @@ public class AttributeFacade {
         }
     }
 
-    public Response updateAttribute(Long itemId, Attribute object){
-        // validate the id using Validations.validate
-        return null;
-    }
-
     /**
      * Converts a given Class object to the corresponding AttributeService object.
      *
@@ -194,6 +190,20 @@ public class AttributeFacade {
         if (c.equals(Type.class)) return typeService;
         if (c.equals(Status.class)) return statusService;
 
+        return null;
+    }
+
+    /**
+     * Updates a status in the database.
+     *
+     * @param statusId the id of the status to update
+     * @param statusRequest the data of the update(fieldName and content)
+     * @return a response object with a status code and message
+     * @throws IllegalArgumentException if the status ID does not match the expected format
+     * @throws NoSuchElementException   if the status to update is not found in the database
+     * @throws NullPointerException     if the status object is null
+     */
+    public Response update(UpdateObjectRequest statusRequest, Long statusId, Class clz) {
         return null;
     }
 }
