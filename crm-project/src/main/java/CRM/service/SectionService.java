@@ -4,6 +4,7 @@ import CRM.entity.Attribute;
 import CRM.entity.Board;
 import CRM.entity.Section;
 import CRM.entity.Type;
+import CRM.entity.requests.UpdateObjectRequest;
 import CRM.repository.BoardRepository;
 import CRM.repository.SectionRepository;
 import CRM.repository.TypeRepository;
@@ -26,11 +27,6 @@ public class SectionService implements AttributeService{
     @Autowired
     private BoardRepository boardRepository;
 
-    @Override
-    public int update(long id, Attribute object) {
-        return 0;
-    }
-
     /**
      * This function persists a new Type to the database by calling the save function in the TypeRepository class.
      * @param section The section object to be persisted.
@@ -48,7 +44,7 @@ public class SectionService implements AttributeService{
      * @param sectionId the type ID to delete
      */
     @Override
-    public boolean delete(Long sectionId) {
+    public boolean delete(long sectionId) {
         Section section = Validations.doesIdExists(sectionId, sectionRepository);
         sectionRepository.delete(section);
         return true;
@@ -63,8 +59,13 @@ public class SectionService implements AttributeService{
      * @throws NullPointerException     if the specified id is null.
      */
     @Override
-    public Type get(Long id) {
+    public Type get(long id) {
         return Validations.doesIdExists(id, sectionRepository);
+    }
+
+    @Override
+    public Attribute update(UpdateObjectRequest attributeRequest, long id) throws NoSuchFieldException {
+        return null;
     }
 
     /**
@@ -87,7 +88,7 @@ public class SectionService implements AttributeService{
      * @throws NullPointerException     if the specified board id is null.
      */
     @Override
-    public List<Section> getAllInBoard(Long boardId) {
+    public List<Section> getAllInBoard(long boardId) {
         Board board = Validations.doesIdExists(boardId, boardRepository);
         return sectionRepository.findByBoard(board);
     }

@@ -11,13 +11,13 @@ public interface AttributeService {
 
     Attribute create(Attribute attribute);
 
-    boolean delete(Long id);
+    boolean delete(long id);
 
-    Attribute get(Long id);
+    Attribute get(long id);
 
     <T> List<T> getAll();
 
-    <T> List<T> getAllInBoard(Long boardId);
+    <T> List<T> getAllInBoard(long boardId);
 
-    Attribute update(UpdateObjectRequest attributeRequest, Long id) throws NoSuchFieldException;
+    Attribute update(UpdateObjectRequest attributeRequest, long id) throws NoSuchFieldException;
 }

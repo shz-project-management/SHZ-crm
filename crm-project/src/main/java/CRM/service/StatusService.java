@@ -37,7 +37,7 @@ public class StatusService implements AttributeService {
      * @param statusId the status ID to delete
      */
     @Override
-    public boolean delete(Long statusId) {
+    public boolean delete(long statusId) {
         Status status = Validations.doesIdExists(statusId, statusRepository);
         statusRepository.delete(status);
         return true;
@@ -52,12 +52,12 @@ public class StatusService implements AttributeService {
      * @throws NullPointerException     if the specified id is null.
      */
     @Override
-    public Status get(Long id) {
+    public Status get(long id) {
         return Validations.doesIdExists(id, statusRepository);
     }
 
     @Override
-    public Status update(UpdateObjectRequest statusRequest, Long statusId) throws NoSuchFieldException {
+    public Status update(UpdateObjectRequest statusRequest, long statusId) throws NoSuchFieldException {
         Status status = Validations.doesIdExists(statusId, statusRepository);
         Validations.setContentToFieldIfFieldExists(status, statusRequest.getFieldName(), statusRequest.getContent());
         return statusRepository.save(status);
@@ -83,7 +83,7 @@ public class StatusService implements AttributeService {
      * @throws NullPointerException     if the specified board id is null.
      */
     @Override
-    public List<Status> getAllInBoard(Long boardId) {
+    public List<Status> getAllInBoard(long boardId) {
         Board board = Validations.doesIdExists(boardId, boardRepository);
         return statusRepository.findByBoard(board);
     }
