@@ -41,6 +41,7 @@ public class CommentService implements ServiceInterface {
      */
     public Comment create(CommentRequest commentRequest) throws AccountNotFoundException {
         Item parentItem = Validations.doesIdExists(commentRequest.getParentItemId(), itemRepository);
+
         User user;
         try {
             user = Validations.doesIdExists(commentRequest.getUserId(), userRepository);

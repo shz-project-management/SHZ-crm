@@ -41,6 +41,7 @@ class CommentServiceTest {
 
     private CommentRequest commentRequest;
 
+
     @Test
     @DisplayName("Test create method with user not found")
     void testCreateWithUserNotFound() {
@@ -50,29 +51,10 @@ class CommentServiceTest {
         commentRequest.setTitle("Test Title");
         commentRequest.setDescription("Test Description");
         Item item = Item.createNewItem(null, null, null, null, "title", "desc", null, 1);
-        given(userRepository.findById(1L)).willReturn(java.util.Optional.empty());
-        given(itemRepository.findById(1L)).willReturn(java.util.Optional.of(item));
+        given(userRepository.findById(1L)).willReturn(Optional.empty());
+        given(itemRepository.findById(1L)).willReturn(Optional.of(item));
         assertThrows(AccountNotFoundException.class, () -> commentService.create(commentRequest));
     }
-
-//    @Test
-//    @DisplayName("Test create method with valid input")
-//    void testCreateWithValidInput() throws AccountNotFoundException {
-//        commentRequest = new CommentRequest();
-//        commentRequest.setParentItemId(1L);
-//        commentRequest.setUserId(1L);
-//        commentRequest.setTitle("Test Title");
-//        commentRequest.setDescription("Test Description");
-//        commentRequest.setAssignToUserId(1L);
-//        User user = new User();
-//        user.setId(1L);
-//        Item itemParent = new Item();
-//        itemParent.setId(1L);
-//        Item item = Item.createNewItem(null, null, null, user, "title", "desc", itemParent, 1);
-//        given(userRepository.findById(1L)).willReturn(java.util.Optional.of(user));
-//        given(itemRepository.findById(1L)).willReturn(java.util.Optional.of(item));
-//        assertNotNull(commentService.create(commentRequest));
-//    }
 
     @Test
     @DisplayName("Test create method with invalid parent item")
@@ -84,7 +66,7 @@ class CommentServiceTest {
         commentRequest.setDescription("Test Description");
         User user = new User();
         user.setId(1L);
-        given(itemRepository.findById(1L)).willReturn(java.util.Optional.empty());
+        given(itemRepository.findById(1L)).willReturn(Optional.empty());
         assertThrows(NoSuchElementException.class, () -> commentService.create(commentRequest));
     }
 
@@ -97,7 +79,7 @@ class CommentServiceTest {
         commentRequest.setTitle("Test Title");
         commentRequest.setDescription("Test Description");
         Item item = Item.createNewItem(null, null, null, null, "title", "desc", null, 1);
-        given(itemRepository.findById(1L)).willReturn(java.util.Optional.of(item));
+        given(itemRepository.findById(1L)).willReturn(Optional.of(item));
         assertThrows(AccountNotFoundException.class, () -> commentService.create(commentRequest));
     }
 
@@ -128,9 +110,9 @@ class CommentServiceTest {
         Comment comment1 = Comment.createNewComment(user1, "title", "desc", item);
         Comment comment2 = Comment.createNewComment(user2, "title", "desc", item);
         Comment comment3 = Comment.createNewComment(user3, "title", "desc", item);
-        given(commentRepository.findById(1L)).willReturn(java.util.Optional.of(comment1));
-        given(commentRepository.findById(2L)).willReturn(java.util.Optional.of(comment2));
-        given(commentRepository.findById(3L)).willReturn(java.util.Optional.of(comment3));
+        given(commentRepository.findById(1L)).willReturn(Optional.of(comment1));
+        given(commentRepository.findById(2L)).willReturn(Optional.of(comment2));
+        given(commentRepository.findById(3L)).willReturn(Optional.of(comment3));
         int result = commentService.delete(ids);
         assertEquals(3, result);
     }
@@ -143,24 +125,25 @@ class CommentServiceTest {
         user1.setId(1L);
         Item item = Item.createNewItem(null, null, null, user1, "title", "desc", null, 1);
         Comment comment1 = Comment.createNewComment(user1, "title", "desc", item);
-        given(commentRepository.findById(1L)).willReturn(java.util.Optional.of(comment1));
-        given(commentRepository.findById(2L)).willReturn(java.util.Optional.empty());
-        given(commentRepository.findById(3L)).willReturn(java.util.Optional.empty());
+        given(commentRepository.findById(1L)).willReturn(Optional.of(comment1));
+        given(commentRepository.findById(2L)).willReturn(Optional.empty());
+        given(commentRepository.findById(3L)).willReturn(Optional.empty());
         int result = commentService.delete(ids);
         assertEquals(1, result);
     }
 
-//    @Test
-//    @DisplayName("Test update method with valid input")
-//    void testUpdateWithValidInput() throws NoSuchFieldException {
-//        UpdateObjectRequest updateObject = new UpdateObjectRequest();
-//        updateObject.setFieldName(UpdateField.DESCRIPTION);
-//        updateObject.setContent("Updated desc");
-//        Comment comment = new Comment();
-//        comment.setId(1L);
-//        given(commentRepository.findById(1L)).willReturn(java.util.Optional.of(comment));
-//        assertNotNull(commentService.update(updateObject, 1L));
-//    }
+    @Test
+    @DisplayName("Test update method with valid comment id")
+    void testUpdateWithValidCommentId() throws NoSuchFieldException {
+        UpdateObjectRequest updateObject = new UpdateObjectRequest();
+        updateObject.setFieldName(UpdateField.DESCRIPTION);
+        updateObject.setContent("Updated descr");
+        Comment comment = new Comment();
+        comment.setId(1L);
+        given(commentRepository.findById(1L)).willReturn(Optional.of(comment));
+        given(commentRepository.save(comment)).willReturn(comment);
+        assertNotNull(commentService.update(updateObject, 1L));
+    }
 
     @Test
     @DisplayName("Test update method with invalid comment id")
@@ -168,7 +151,7 @@ class CommentServiceTest {
         UpdateObjectRequest updateObject = new UpdateObjectRequest();
         updateObject.setFieldName(UpdateField.DESCRIPTION);
         updateObject.setContent("Updated descr");
-        given(commentRepository.findById(1L)).willReturn(java.util.Optional.empty());
+        given(commentRepository.findById(1L)).willReturn(Optional.empty());
         assertThrows(NoSuchElementException.class, () -> commentService.update(updateObject, 1L));
     }
 
@@ -178,7 +161,7 @@ class CommentServiceTest {
         UpdateObjectRequest updateObject = null;
         Comment comment = new Comment();
         comment.setId(1L);
-        given(commentRepository.findById(1L)).willReturn(java.util.Optional.of(comment));
+        given(commentRepository.findById(1L)).willReturn(Optional.of(comment));
         assertThrows(NullPointerException.class, () -> commentService.update(updateObject, 1L));
     }
 
@@ -190,7 +173,7 @@ class CommentServiceTest {
         updateObject.setContent("Updated");
         Comment comment = new Comment();
         comment.setId(1L);
-        given(commentRepository.findById(1L)).willReturn(java.util.Optional.of(comment));
+        given(commentRepository.findById(1L)).willReturn(Optional.of(comment));
         assertThrows(NullPointerException.class, () -> commentService.update(updateObject, 1L));
     }
 
@@ -199,7 +182,7 @@ class CommentServiceTest {
     void testGetWithValidInput() {
         Comment comment = new Comment();
         comment.setId(1L);
-        given(commentRepository.findById(1L)).willReturn(java.util.Optional.of(comment));
+        given(commentRepository.findById(1L)).willReturn(Optional.of(comment));
         Comment result = commentService.get(1L);
         assertEquals(comment, result);
     }
@@ -207,7 +190,7 @@ class CommentServiceTest {
     @Test
     @DisplayName("Test get method with invalid input")
     void testGetWithInvalidInput() {
-        given(commentRepository.findById(1L)).willReturn(java.util.Optional.empty());
+        given(commentRepository.findById(1L)).willReturn(Optional.empty());
         assertThrows(NoSuchElementException.class, () -> commentService.get(1L));
     }
 
@@ -221,7 +204,7 @@ class CommentServiceTest {
                 new Comment(),
                 new Comment()
         );
-        given(itemRepository.findById(1L)).willReturn(java.util.Optional.of(item));
+        given(itemRepository.findById(1L)).willReturn(Optional.of(item));
         given(commentRepository.findAllByParentItem(item)).willReturn(comments);
         List<SharedContent> result = commentService.getAllInItem(1L);
         assertEquals(comments, result);
@@ -230,7 +213,7 @@ class CommentServiceTest {
     @Test
     @DisplayName("Test getAllInItem method with invalid input")
     void testGetAllInItemWithInvalidInput() {
-        given(itemRepository.findById(1L)).willReturn(java.util.Optional.empty());
+        given(itemRepository.findById(1L)).willReturn(Optional.empty());
         assertThrows(NoSuchElementException.class, () -> commentService.getAllInItem(1L));
     }
 
@@ -239,7 +222,7 @@ class CommentServiceTest {
     void testGetAllInItemWithNoCommentsInItem() {
         Item item = new Item();
         item.setId(1L);
-        given(itemRepository.findById(1L)).willReturn(java.util.Optional.of(item));
+        given(itemRepository.findById(1L)).willReturn(Optional.of(item));
         given(commentRepository.findAllByParentItem(item)).willReturn(new ArrayList<>());
         List<SharedContent> result = commentService.getAllInItem(1L);
         assertTrue(result.isEmpty());
@@ -265,7 +248,7 @@ class CommentServiceTest {
                 new Comment(),
                 new Comment()
         );
-        given(boardRepository.findById(1L)).willReturn(java.util.Optional.of(board));
+        given(boardRepository.findById(1L)).willReturn(Optional.of(board));
         given(commentRepository.findAllByParentItem(items.get(0))).willReturn(comments1);
         given(commentRepository.findAllByParentItem(items.get(1))).willReturn(comments2);
         List<Comment> result = commentService.getAllCommentsInBoard(1L);
@@ -275,7 +258,7 @@ class CommentServiceTest {
     @Test
     @DisplayName("Test getAllCommentsInBoard method with invalid input")
     void testGetAllCommentsInBoardWithInvalidInput() {
-        given(boardRepository.findById(1L)).willReturn(java.util.Optional.empty());
+        given(boardRepository.findById(1L)).willReturn(Optional.empty());
         assertThrows(NoSuchElementException.class, () -> commentService.getAllCommentsInBoard(1L));
     }
 
@@ -285,7 +268,7 @@ class CommentServiceTest {
         Board board = new Board();
         board.setId(1L);
         board.setItems(new HashSet<>());
-        given(boardRepository.findById(1L)).willReturn(java.util.Optional.of(board));
+        given(boardRepository.findById(1L)).willReturn(Optional.of(board));
         List<Comment> result = commentService.getAllCommentsInBoard(1L);
         assertTrue(result.isEmpty());
     }
@@ -307,7 +290,7 @@ class CommentServiceTest {
         List<Comment> comments2 = Arrays.asList(
                 new Comment()
         );
-        given(statusRepository.findById(1L)).willReturn(java.util.Optional.of(status));
+        given(statusRepository.findById(1L)).willReturn(Optional.of(status));
         given(itemRepository.findAllByStatus(status)).willReturn(itemsSet);
         given(commentRepository.findAllByParentItem(items.get(0))).willReturn(comments1);
         given(commentRepository.findAllByParentItem(items.get(1))).willReturn(comments2);
@@ -318,7 +301,7 @@ class CommentServiceTest {
     @Test
     @DisplayName("Test getAllCommentsInStatus method with invalid input")
     void testGetAllCommentsInStatusWithInvalidInput() {
-        given(statusRepository.findById(1L)).willReturn(java.util.Optional.empty());
+        given(statusRepository.findById(1L)).willReturn(Optional.empty());
         assertThrows(NoSuchElementException.class, () -> commentService.getAllCommentsInStatus(1L));
     }
 

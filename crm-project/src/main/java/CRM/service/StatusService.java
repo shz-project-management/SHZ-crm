@@ -2,6 +2,7 @@ package CRM.service;
 
 import CRM.entity.*;
 import CRM.entity.DTO.AttributeDTO;
+import CRM.entity.requests.UpdateObjectRequest;
 import CRM.repository.BoardRepository;
 import CRM.repository.StatusRepository;
 import CRM.utils.Validations;
@@ -18,11 +19,6 @@ public class StatusService implements AttributeService {
     private StatusRepository statusRepository;
     @Autowired
     private BoardRepository boardRepository;
-
-    @Override
-    public int update(long id, Attribute object) {
-        return 0;
-    }
 
     /**
      * This function persists a new Status to the database by calling the save function in the StatusRepository class.
@@ -58,6 +54,13 @@ public class StatusService implements AttributeService {
     @Override
     public Status get(Long id) {
         return Validations.doesIdExists(id, statusRepository);
+    }
+
+    @Override
+    public Status update(UpdateObjectRequest statusRequest, Long statusId) throws NoSuchFieldException {
+        Status status = Validations.doesIdExists(statusId, statusRepository);
+        Validations.setContentToFieldIfFieldExists(status, statusRequest.getFieldName(), statusRequest.getContent());
+        return statusRepository.save(status);
     }
 
     /**
