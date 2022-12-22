@@ -1,6 +1,10 @@
 package CRM.service;
 
 import CRM.entity.NotificationSetting;
+import CRM.repository.SettingRepository;
+import CRM.utils.enums.Notifications;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
