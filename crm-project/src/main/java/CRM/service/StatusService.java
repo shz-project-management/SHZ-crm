@@ -26,7 +26,15 @@ public class StatusService implements AttributeService {
      * @return The persisted status object.
      */
     @Override
-    public Status create(Attribute status) {
+    public Status create(Attribute status) { // also get the board ID and the type(class) of attribute I want to create
+        // check if board even exists
+
+        // board.addAttrubte(status, clz)
+
+        // boardRepository.save(board)
+
+        // get the new attribute from the board and return it.
+
         if(statusRepository.existsByBoardAndNameLike(status.getBoard(), status.getName()))
             Validations.throwAttributeAlreadyExistsForBoard(status, "Status");
         return statusRepository.save((Status.createStatus(status)));
@@ -38,6 +46,12 @@ public class StatusService implements AttributeService {
      */
     @Override
     public boolean delete(long statusId) {
+        // get the board Id and make sure it exsits
+
+        // delete the attribute by its id using relevant method in board entity
+
+        // return something
+
         Status status = Validations.doesIdExists(statusId, statusRepository);
         statusRepository.delete(status);
         return true;
@@ -53,6 +67,9 @@ public class StatusService implements AttributeService {
      */
     @Override
     public Status get(long id) {
+        // also get the boardId, and find it in the database
+
+        // create method in the entity and get the attribute from
         return Validations.doesIdExists(id, statusRepository);
     }
 

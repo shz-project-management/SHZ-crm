@@ -4,6 +4,7 @@ import lombok.*;
 
 import javax.persistence.*;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @AllArgsConstructor
@@ -60,6 +61,27 @@ public class Board {
     public Item getItemById(long id){
         // ... find the item using his id
         return new Item(); // but not a new one, return the real item.
+    }
+
+    public void removeAttribute(long attributeId, Class clz){
+        // .. loop through the attribute set (by the clz)
+        // remove this attribute from the set
+    }
+
+    public void getAttribute(long attributeId, Class clz){
+        // .. get the attribute from the relevant set
+    }
+
+    public void addAttribute(Attribute attribute, Class clz){
+        // check which class this is
+        // add the attribute (casted) to the relevant Set (status, section, type)
+    }
+
+    public List<User> getAllUsersInBoard(){
+        // create an empty list of users
+        // loop through UsersPermission set and add every user to the list of users
+        // return the users list
+        return null;
     }
 
     public static Board createBoard(User user, String name, String description) {

@@ -53,10 +53,11 @@ public class UserService {
      * @throws AccountNotFoundException if no user with the specified ID exists in the database
      */
     public User get(long userId) throws AccountNotFoundException {
-        // make sure such an id even exists
-        // Ask for the repo to find the user, by the given id input
         try {
+            // make sure such an id even exists
+            // Ask for the repo to find the user, by the given id input
             return Validations.doesIdExists(userId, userRepository);
+
         } catch (NoSuchElementException e) {
             throw new AccountNotFoundException(ExceptionMessage.ACCOUNT_DOES_NOT_EXISTS.toString());
         }
@@ -74,6 +75,7 @@ public class UserService {
         User user;
         try {
             user = Validations.doesIdExists(userId, userRepository);
+
         } catch (NoSuchElementException e) {
             throw new AccountNotFoundException(ExceptionMessage.ACCOUNT_DOES_NOT_EXISTS.toString());
         }
@@ -101,9 +103,11 @@ public class UserService {
      * @throws NullPointerException     if the specified board id is null.
      */
     public List<User> getAllInBoard(long boardId) throws AccountNotFoundException {
+        // make sure this id even exists
         Board board = Validations.doesIdExists(boardId, boardRepository);
-//        return board.getUsers().stream().collect(Collectors.toList());
-        return new ArrayList<>();
+
+        // get all users from this board: use board.getAllUsersInBoard()
+        return board.getAllUsersInBoard();
     }
 
     /**
@@ -117,15 +121,18 @@ public class UserService {
      */
     public void addUserToBoard(long userId, long boardId) throws AccountNotFoundException {
         User user;
-        NotificationSetting notificationSetting;
         Board board;
         try {
             user = Validations.doesIdExists(userId, userRepository);
-            notificationSetting = Validations.doesIdExists(1L, settingRepository);
             board = Validations.doesIdExists(boardId, boardRepository);
+
         } catch (NoSuchElementException e) {
             throw new AccountNotFoundException(ExceptionMessage.ACCOUNT_DOES_NOT_EXISTS.toString());
         }
+
+        // FIXME: create a function that grants default notification values for the user in this board
+        NotificationSetting notificationSetting = Validations.doesIdExists(1L, settingRepository);
+
 
         UserPermission userPermission = new UserPermission(0L, user, Permission.USER);
         UserSetting userSetting = new UserSetting(0L, user, notificationSetting, true, true);
