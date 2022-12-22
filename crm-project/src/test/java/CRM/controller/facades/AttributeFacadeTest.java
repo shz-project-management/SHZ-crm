@@ -1,6 +1,7 @@
 package CRM.controller.facades;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 
 import CRM.entity.Attribute;
@@ -30,10 +31,8 @@ class AttributeFacadeTest {
 
     @Mock
     private StatusService statusService;
-
     @Mock
     private TypeService typeService;
-
     @Mock
     private BoardService boardService;
 
@@ -115,16 +114,18 @@ class AttributeFacadeTest {
     }
 
     @Test
-    @DisplayName("Should throw 400 when name is empty")
+    @DisplayName("Should throw 500 when name is empty")
     void testCreateStatusWithEmptyName() {
         // Set up test data
-        AttributeRequest statusRequest = new AttributeRequest(1L, "", "Test Description");
-
+        AttributeRequest attributeRequest = new AttributeRequest(1L, "", "Test Description");
+        Board board = new Board();
+        board.setId(1L);
+        given(boardService.get(attributeRequest.getBoardId())).willReturn(board);
         // Call the create method with Status.class
-        Response response = attributeFacade.create(statusRequest, Status.class);
+        Response response = attributeFacade.create(attributeRequest, Status.class);
 
         // Call method under test and verify exception is thrown
-        assertEquals(400, response.getStatusCode());
+        assertEquals(500, response.getStatusCode());
     }
 
     /**
@@ -203,7 +204,7 @@ class AttributeFacadeTest {
     }
 
     @Test
-    @DisplayName("Should throw 400 when name is empty")
+    @DisplayName("Should throw 500 when name is empty")
     void testCreateTypeWithEmptyName() {
         // Set up test data
         AttributeRequest statusRequest = new AttributeRequest(1L, "", "Test Description");
@@ -212,7 +213,7 @@ class AttributeFacadeTest {
         Response response = attributeFacade.create(statusRequest, Type.class);
 
         // Call method under test and verify exception is thrown
-        assertEquals(400, response.getStatusCode());
+        assertEquals(500, response.getStatusCode());
     }
 
     /**

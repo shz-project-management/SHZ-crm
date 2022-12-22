@@ -29,7 +29,6 @@ class TypeServiceTest {
 
     @Mock
     private TypeRepository typeRepository;
-
     @Mock
     private BoardRepository boardRepository;
 
@@ -37,9 +36,7 @@ class TypeServiceTest {
     private TypeService typeService;
 
     private Board board;
-
     private Type type;
-
     private Long typeId;
 
     @BeforeEach
