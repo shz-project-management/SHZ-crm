@@ -48,6 +48,11 @@ public class ItemService implements ServiceInterface {
      * @throws NoSuchElementException   if any of the board ID, type ID, or status ID specified in the request object do not correspond to existing entities.
      */
     public Item create(ItemRequest itemRequest) throws AccountNotFoundException {
+        //get in method signature the itemRequest (has the relevant board id and section id)
+        //validate variables.
+        //find the board.
+        //create new item method in board entity.
+
         User user;
         Item parentItem;
 
@@ -113,7 +118,7 @@ public class ItemService implements ServiceInterface {
     /**
      * get
      *
-     * @param id - the ID of the item to retrieve
+     * @param itemId - the ID of the item to retrieve
      * @return the retrieved item
      * This function receives the ID of an item to retrieve and uses the doesIdExists function from the Validations class to retrieve the item with that ID from the itemRepository.
      * The retrieved item is then returned.
@@ -125,10 +130,10 @@ public class ItemService implements ServiceInterface {
         // get the board from the db
         Board board = Validations.doesIdExists(itemId, boardRepository); // but instead of itemId, put board id
 
-        Item item = board.getItemById(itemId);
+//        Item item = board.getItemById(itemId);
 
 
-        return item;
+        return null;
     }
 
     /**

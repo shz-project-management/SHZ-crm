@@ -1,5 +1,7 @@
 package CRM.entity;
 
+import CRM.entity.requests.ItemRequest;
+import CRM.entity.requests.UpdateObjectRequest;
 import lombok.*;
 
 import javax.persistence.*;
@@ -58,11 +60,20 @@ public class Board {
         sections.add(section);
     }
 
-    public Item getItemById(long id){
-        // ... find the item using his id
-        return new Item(); // but not a new one, return the real item.
+    //--------------------------------------Item--------------------------------------//
+//    public Item getItemById(long id){
+//        // ... find the item using his id
+//        return new Item(); // but not a new one, return the real item.
+//    }
+
+    public void insertItem(ItemRequest itemRequest){
+
     }
 
+    //--------------------------------------Item--------------------------------------//
+
+
+    //--------------------------------------Attributes--------------------------------------//
     public void removeAttribute(long attributeId, Class clz){
         // .. loop through the attribute set (by the clz)
         // remove this attribute from the set
@@ -77,12 +88,30 @@ public class Board {
         // add the attribute (casted) to the relevant Set (status, section, type)
     }
 
+    public void updateAttribute(UpdateObjectRequest attributeRequest, long attributeId, Class clz){
+        // check which class this is
+        // update the attribute (casted) field to the relevant Set (status, section, type)
+    }
+
+    public void getAllAttributeInBoard(Class clz){
+        // check which class this is
+        // update the attribute (casted) field to the relevant Set (status, section, type)
+    }
+    //--------------------------------------Attributes--------------------------------------//
+
+
+
+    //--------------------------------------User--------------------------------------//
+
     public List<User> getAllUsersInBoard(){
         // create an empty list of users
         // loop through UsersPermission set and add every user to the list of users
         // return the users list
         return null;
     }
+    //--------------------------------------User--------------------------------------//
+
+
 
     public static Board createBoard(User user, String name, String description) {
         Board board = new Board();

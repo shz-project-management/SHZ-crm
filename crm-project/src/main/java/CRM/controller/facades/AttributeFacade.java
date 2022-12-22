@@ -222,7 +222,7 @@ public class AttributeFacade {
 
         if(c.equals(Section.class)) return sectionService;
         if (c.equals(Type.class)) return typeService;
-        if (c.equals(Status.class)) return statusService;
+//        if (c.equals(Status.class)) return statusService;
 
         return null;
     }
