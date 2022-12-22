@@ -130,16 +130,22 @@ public class UserService {
             throw new AccountNotFoundException(ExceptionMessage.ACCOUNT_DOES_NOT_EXISTS.toString());
         }
 
-        // FIXME: create a function that grants default notification values for the user in this board
-        NotificationSetting notificationSetting = Validations.doesIdExists(1L, settingRepository);
-
-
         UserPermission userPermission = new UserPermission(0L, user, Permission.USER);
-        UserSetting userSetting = new UserSetting(0L, user, notificationSetting, true, true);
 
         board.addUserPermissionToBoard(userPermission);
-        board.addUserSettingToBoard(userSetting);
 
+        createDefaultSettingForNewUserInBoard(user, board);
         boardRepository.save(board);
+    }
+
+    /**
+     * Creates default notifications for every new user in every board,
+     * using constant notifications
+     */
+    private void createDefaultSettingForNewUserInBoard(User user, Board board){
+        for (NotificationSetting notificationSetting : settingRepository.findAll()) {
+            UserSetting userSetting = new UserSetting(0L, user, notificationSetting, true, true);
+            board.addUserSettingToBoard(userSetting);
+        }
     }
 }
