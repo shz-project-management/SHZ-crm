@@ -138,6 +138,10 @@ public class UserService {
         boardRepository.save(board);
     }
 
+    /**
+     * Creates default notifications for every new user in every board,
+     * using constant notifications
+     */
     private void createDefaultSettingForNewUserInBoard(User user, Board board){
         for (NotificationSetting notificationSetting : settingRepository.findAll()) {
             UserSetting userSetting = new UserSetting(0L, user, notificationSetting, true, true);
