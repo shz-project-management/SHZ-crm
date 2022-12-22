@@ -19,8 +19,8 @@ public class UserPermission {
     @Column(name = "id", nullable = false)
     private Long id;
 
-    @ManyToOne()
-    @JoinColumn(nullable = false)
+    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @JoinColumn(name = "user_id", nullable = false)
     @Cascade(org.hibernate.annotations.CascadeType.ALL)
     private User user;
 

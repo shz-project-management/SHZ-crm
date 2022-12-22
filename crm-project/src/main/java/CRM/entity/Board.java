@@ -34,20 +34,22 @@ public class Board {
     private String name;
     private String description;
 
-    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "board_id")
     private Set<Type> types = new HashSet<>();
 
-    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "board_id")
     private Set<Status> statuses = new HashSet<>();
 
-    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "board_id")
     private Set<Section> sections = new HashSet<>();
 
-    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "board_id")
     private Set<UserPermission> usersPermissions = new HashSet<>();
 
-    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<UserSetting> usersSettings = new HashSet<>();
 
     public static Board createBoard(User user, String name, String description) {
         Board board = new Board();
@@ -62,16 +64,20 @@ public class Board {
         usersPermissions.add(userPermission);
     }
 
-    public void addUserSettingToBoard(UserSetting userSetting) {
-        usersSettings.add(userSetting);
-    }
-
     //--------------------------------------Section--------------------------------------//
     public Section getSectionFromBoard(long sectionId) {
         for (Section section : sections) {
             if (section.getId() == sectionId) return section;
         }
         throw new IllegalArgumentException("Could not find this section in the db!");
+    }
+
+    public void addSectionToBoard(Section section){
+        sections.add(section);
+    }
+
+    public void removeSectionFromBoard(long sectionId){
+        sections.removeIf(section -> section.getId() == sectionId);
     }
 
     //--------------------------------------Comment--------------------------------------//

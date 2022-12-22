@@ -80,6 +80,14 @@ public class UserService {
             throw new AccountNotFoundException(ExceptionMessage.ACCOUNT_DOES_NOT_EXISTS.toString());
         }
 
+        List<Board> boards = boardRepository.findAll();
+        for (Board board : boards) {
+            board.getUsersPermissions().removeIf(userPermission -> userPermission.getUser().getId() == userId);
+            board.getUsersSettings().removeIf(userSetting -> userSetting.getUser().getId() == userId);
+            boardRepository.save(board);
+        }
+
+        boardRepository.removeByCreatorUser(user);
         userRepository.delete(user);
         return true;
     }

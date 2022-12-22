@@ -17,13 +17,13 @@ public class UserSetting {
     @Column(name = "id", nullable = false)
     private Long id;
 
-    @JoinColumn(nullable = false)
-    @ManyToOne()
+    @JoinColumn(name = "user_id", nullable = false)
+    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @Cascade(org.hibernate.annotations.CascadeType.ALL)
     private User user;
 
-    @JoinColumn(nullable = false)
-    @ManyToOne()
+    @JoinColumn(name = "notification_id", nullable = false)
+    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @Cascade(org.hibernate.annotations.CascadeType.ALL)
     private NotificationSetting setting;
 

@@ -1,6 +1,7 @@
 package CRM.controller.controllers;
 
 import CRM.controller.facades.AttributeFacade;
+import CRM.controller.facades.SectionFacade;
 import CRM.entity.Section;
 import CRM.entity.requests.AttributeRequest;
 import CRM.entity.requests.UpdateObjectRequest;
@@ -18,7 +19,7 @@ import org.springframework.web.bind.annotation.*;
 public class SectionController {
 
     @Autowired
-    private AttributeFacade attributeFacade;
+    private SectionFacade sectionFacade;
 
     /**
      * This function maps HTTP POST requests to the /create endpoint to the create function in the attributeFacade class.
@@ -30,7 +31,7 @@ public class SectionController {
      */
     @PostMapping(consumes = "application/json")
     public ResponseEntity<Response> create(@RequestBody AttributeRequest sectionRequest) {
-        Response response = attributeFacade.create(sectionRequest, Section.class);
+        Response response = sectionFacade.create(sectionRequest);
         return new ResponseEntity<>(response, response.getStatus());
     }
 
@@ -41,7 +42,7 @@ public class SectionController {
      */
     @DeleteMapping(value = "{boardId}/{sectionId}")
     public ResponseEntity<Response> delete(@PathVariable Long boardId,@PathVariable Long sectionId) {
-        Response response = attributeFacade.delete(boardId, sectionId, Section.class);
+        Response response = sectionFacade.delete(boardId, sectionId);
         return new ResponseEntity<>(response, response.getStatus());
     }
 
@@ -53,7 +54,7 @@ public class SectionController {
      */
     @GetMapping(value = "{boardId}/{sectionId}")
     public ResponseEntity<Response> get(@PathVariable Long boardId,@PathVariable Long sectionId) {
-        Response response = attributeFacade.get(sectionId, boardId, Section.class);
+        Response response = sectionFacade.get(boardId, sectionId);
         return new ResponseEntity<>(response, response.getStatus());
     }
 
@@ -66,7 +67,7 @@ public class SectionController {
      */
     @GetMapping(value = "getAll/{boardId}")
     public ResponseEntity<Response> getAllInBoard(@PathVariable Long boardId) {
-        Response response = attributeFacade.getAllAttributesInBoard(boardId, Section.class);
+        Response response = sectionFacade.getAllSectionsInBoard(boardId);
         return new ResponseEntity<>(response, response.getStatus());
     }
 

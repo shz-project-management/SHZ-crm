@@ -1,12 +1,13 @@
 package CRM.service;
 
-import CRM.entity.Board;
-import CRM.entity.User;
+import CRM.entity.*;
 import CRM.entity.requests.UpdateObjectRequest;
 import CRM.repository.BoardRepository;
+import CRM.repository.SettingRepository;
 import CRM.repository.UserRepository;
 import CRM.utils.Validations;
 import CRM.utils.enums.ExceptionMessage;
+import CRM.utils.enums.Permission;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +27,8 @@ public class BoardService {
     private BoardRepository boardRepository;
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private SettingRepository settingRepository;
 
 
     /**
@@ -34,7 +37,16 @@ public class BoardService {
      * @param board The board object to be persisted.
      * @return The persisted board object.
      */
+    // FIXME: board should be created within the service, and not in the facade
     public Board create(Board board) {
+//        User user = board.getCreatorUser();
+//
+//        NotificationSetting notificationSetting = Validations.doesIdExists(1L, settingRepository);
+//
+//        UserSetting userSetting = new UserSetting(0L, user, notificationSetting, true, true);
+//
+//        board.addUserSettingToBoard(userSetting);
+
         return boardRepository.save(board);
     }
 

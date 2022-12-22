@@ -26,11 +26,9 @@ public class User {
     private String password;
     private String email;
 
-//    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-//    private Set<Comment> comments = new HashSet<>();
-
-//    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-//    private Set<Item> items = new HashSet<>();
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "user_id")
+    private Set<UserSetting> usersSettings = new HashSet<>();
 
     public static User newUser(RegisterUserRequest registerUser){
         User user = new User();

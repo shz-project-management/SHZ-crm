@@ -52,9 +52,10 @@ public class ItemService implements ServiceInterface {
         }
 
         // check if this element has a parent
-        Item parentItem;
-        if (itemRequest.getParentItemId() == null) parentItem = null;
-        else parentItem = board.getItemFromSectionById(itemRequest.getParentItemId(), itemRequest.getSectionId());
+        // FIXME: validate parent
+        Item parentItem = null;
+        if (itemRequest.getParentItemId() != null)
+            parentItem = board.getItemFromSectionById(itemRequest.getParentItemId(), itemRequest.getSectionId());
 
         // collect sections, statuses and types because it is necesito for the item
         Section section = board.getSectionFromBoard(itemRequest.getSectionId());
@@ -69,7 +70,7 @@ public class ItemService implements ServiceInterface {
         // save the board in the db
         boardRepository.save(board);
 
-//        return boardRepository.findItemInBoardByItem(item);
+//      return boardRepository.findItemInBoardByItem(item);
         return item;
     }
 

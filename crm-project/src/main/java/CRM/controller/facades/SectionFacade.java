@@ -2,9 +2,7 @@ package CRM.controller.facades;
 
 import CRM.entity.*;
 import CRM.entity.DTO.AttributeDTO;
-import CRM.entity.DTO.BoardDTO;
 import CRM.entity.requests.AttributeRequest;
-import CRM.entity.requests.UpdateObjectRequest;
 import CRM.entity.response.Response;
 import CRM.service.*;
 import CRM.utils.Validations;
@@ -20,11 +18,11 @@ import org.springframework.stereotype.Component;
 import java.util.NoSuchElementException;
 
 @Component
-public class AttributeFacade {
-    private static Logger logger = LogManager.getLogger(AttributeFacade.class.getName());
+public class SectionFacade {
+    private static Logger logger = LogManager.getLogger(SectionFacade.class.getName());
 
     @Autowired
-    private AttributeService attributeService;
+    private SectionService sectionService;
 
     /**
      * This function creates a new attribute which could be status or type, both classes inherit from attribute and have no extra data.
@@ -36,19 +34,18 @@ public class AttributeFacade {
      *
      * @param attributeRequest The request body, containing the necessary information to create a new attribute.
      *                         for info is the same for both classes Status and Type.
-     * @param clz              hold the Class type of the attributeRequest details (Status or Type)
      * @return A Response object with the status of the create operation and the created attribute object, or an error message if the operation fails.
      */
-    public Response create(AttributeRequest attributeRequest, Class clz) {
+    public Response create(AttributeRequest attributeRequest) {
         try {
             Validations.validate(attributeRequest.getName(), Regex.NAME.getRegex());
 
-            Attribute savedAttribute = attributeService.create(attributeRequest, clz);
+            Section section = sectionService.create(attributeRequest);
 
             return new Response.Builder()
                     .status(HttpStatus.CREATED)
                     .statusCode(201)
-                    .data(AttributeDTO.createAttributeDTO(savedAttribute))
+                    .data("you are stupid!")
                     .build();
         } catch (IllegalArgumentException | NonUniqueObjectException | NoSuchElementException e) {
             return new Response.Builder()
@@ -72,12 +69,12 @@ public class AttributeFacade {
      * @return a response object indicating the status of the deletion operation
      * @throws NoSuchElementException if no attribute with the given ID exists
      */
-    public Response delete(Long boardId, Long attributeId, Class clz) {
+    public Response delete(Long boardId, Long attributeId) {
         try {
             Validations.validate(attributeId, Regex.ID.getRegex());
             Validations.validate(boardId, Regex.ID.getRegex());
 
-            attributeService.delete(boardId, attributeId, clz);
+            sectionService.delete(boardId, attributeId);
 
             return new Response.Builder()
                     .status(HttpStatus.NO_CONTENT)
@@ -108,13 +105,13 @@ public class AttributeFacade {
      * @throws IllegalArgumentException if the specified id is invalid.
      * @throws NullPointerException     if the specified id is null.
      */
-    public Response get(Long attributeId, Long boardId,  Class clz) {
+    public Response get(Long attributeId, Long boardId) {
         try {
             Validations.validate(attributeId, Regex.ID.getRegex());
             Validations.validate(boardId, Regex.ID.getRegex());
 
             return new Response.Builder()
-                    .data(AttributeDTO.createAttributeDTO(attributeService.get(attributeId, boardId, clz)))
+                    .data(sectionService.get(attributeId, boardId))
                     .message(SuccessMessage.FOUND.toString())
                     .status(HttpStatus.OK)
                     .statusCode(200)
@@ -143,11 +140,11 @@ public class AttributeFacade {
      * @throws NullPointerException     if the specified board id is null.
      * @throws NoSuchElementException   if the board with the specified id is not found.
      */
-    public Response getAllAttributesInBoard(Long boardId, Class clz) {
+    public Response getAllSectionsInBoard(Long boardId) {
         try {
             Validations.validate(boardId, Regex.ID.getRegex());
             return new Response.Builder()
-                    .data(AttributeDTO.createListOfAttributesDTO(attributeService.getAllAttributesInBoard(boardId, clz)))
+                    .data((sectionService.getAllSectionsInBoard(boardId)))
                     .message(SuccessMessage.FOUND.toString())
                     .status(HttpStatus.OK)
                     .statusCode(200)

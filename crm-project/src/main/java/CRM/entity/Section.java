@@ -1,5 +1,7 @@
 package CRM.entity;
 
+import CRM.entity.requests.AttributeRequest;
+import CRM.entity.requests.UpdateObjectRequest;
 import lombok.*;
 
 import javax.persistence.*;
@@ -25,10 +27,10 @@ public class Section {
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     Set<Item> items = new HashSet<>();
 
-    public static Section createSection(Attribute attribute) {
+    public static Section createSection(AttributeRequest sectionRequest) {
         Section section = new Section();
-        section.setName(attribute.getName());
-        section.setDescription(attribute.getDescription());
+        section.setName(sectionRequest.getName());
+        section.setDescription(sectionRequest.getDescription());
         return section;
     }
 
