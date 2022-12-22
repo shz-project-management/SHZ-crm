@@ -33,27 +33,27 @@ public class ItemController {
         return new ResponseEntity<>(response, response.getStatus());
     }
 
-    @DeleteMapping
-    public ResponseEntity<Response> delete(@RequestBody List<Long> itemsIds) {
-        Response response = sharedContentFacade.delete(itemsIds, Item.class);
+    @DeleteMapping(value = "/{boardId}")
+    public ResponseEntity<Response> delete(@RequestBody List<Long> itemsIds, @PathVariable Long boardId) {
+        Response response = sharedContentFacade.delete(itemsIds, boardId, Item.class);
         return new ResponseEntity<>(response, response.getStatus());
     }
 
-    @PatchMapping(value = "update/{itemId}")
-    public ResponseEntity<Response> update(@RequestBody UpdateObjectRequest updateItemRequest, @PathVariable Long itemId){
-        Response response = sharedContentFacade.update(updateItemRequest, itemId, Item.class);
+//    @PatchMapping(value = "update/{itemId}")
+//    public ResponseEntity<Response> update(@RequestBody UpdateObjectRequest updateItemRequest, @PathVariable Long itemId){
+//        Response response = sharedContentFacade.update(updateItemRequest, itemId, Item.class);
+//        return new ResponseEntity<>(response, response.getStatus());
+//    }
+
+    @GetMapping(value = "all-in-section/{boardId}/{sectionId}")
+    public ResponseEntity<Response> getAllItemsInSection(@PathVariable Long boardId, @PathVariable Long sectionId) {
+        Response response = sharedContentFacade.getAllItemsInSection(sectionId, boardId);
         return new ResponseEntity<>(response, response.getStatus());
     }
 
-    @GetMapping(value = "all-in-section/{boardId}")
-    public ResponseEntity<Response> getAllItemsInSection(@PathVariable Long boardId){
-        Response response = sharedContentFacade.getAllItemsInSection(boardId);
-        return new ResponseEntity<>(response, response.getStatus());
-    }
-
-    @GetMapping(value = "{itemId}")
-    public ResponseEntity<Response> get(@PathVariable Long itemId){
-        Response response = sharedContentFacade.get(itemId, Item.class);
+    @GetMapping(value = "{boardId}/{sectionId}/{itemId}")
+    public ResponseEntity<Response> get(@PathVariable Long boardId, @PathVariable Long sectionId, @PathVariable Long itemId) {
+        Response response = sharedContentFacade.get(sectionId, boardId, itemId, null, Item.class);
         return new ResponseEntity<>(response, response.getStatus());
     }
 

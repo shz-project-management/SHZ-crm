@@ -11,7 +11,8 @@ import java.time.LocalDateTime;
 @ToString
 public class ItemRequest extends SharedContentRequest{
 
-    private Long sectionId; //NOTNULL
+    private Long boardId;
+    private Long sectionId;
     private Long statusId;
     private Long typeId;
     private LocalDateTime dueDate;

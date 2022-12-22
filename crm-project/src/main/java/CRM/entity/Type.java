@@ -14,7 +14,6 @@ public class Type extends Attribute{
         Type type = new Type();
         type.setName(attribute.getName());
         type.setDescription(attribute.getDescription());
-        type.setBoard(attribute.getBoard());
         return type;
     }
 }

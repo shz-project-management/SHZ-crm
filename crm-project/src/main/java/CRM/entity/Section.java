@@ -1,9 +1,10 @@
 package CRM.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
 import javax.persistence.*;
+import java.util.HashSet;
+import java.util.NoSuchElementException;
 import java.util.Set;
 
 
@@ -12,16 +13,35 @@ import java.util.Set;
 @Getter
 @Setter
 @Table(name = "sections")
-public class Section extends Attribute {
+public class Section {
 
-    @OneToMany(mappedBy = "section", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-    Set<Item> items;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    private String name;
+    private String description;
+
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    Set<Item> items = new HashSet<>();
 
     public static Section createSection(Attribute attribute) {
         Section section = new Section();
         section.setName(attribute.getName());
         section.setDescription(attribute.getDescription());
-        section.setBoard(attribute.getBoard());
         return section;
     }
+
+    public Item getItemById(long itemId){
+        for (Item item: items) {
+            if(item.getId() == itemId) return item;
+        }
+        throw new NoSuchElementException("Could not find this item in the db");
+    }
+
+    public void insertItem(Item item){
+        items.add(item);
+    }
+
+
 }

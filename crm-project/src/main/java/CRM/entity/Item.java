@@ -1,9 +1,11 @@
 package CRM.entity;
 
+import CRM.entity.requests.UpdateObjectRequest;
 import lombok.*;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.NoSuchElementException;
 import java.util.Set;
 
 @AllArgsConstructor
@@ -48,6 +50,25 @@ public class Item extends SharedContent {
         item.setDescription(description);
         item.setName(name);
         return item;
+    }
+
+    public Item updateItem(UpdateObjectRequest objectRequest){
+        return this;
+    }
+
+    public void insertComment(Comment comment){
+        comments.add(comment);
+    }
+
+    public void insertItem(Item item){
+        items.add(item);
+    }
+
+    public Comment getCommentById(long itemId){
+        for (Comment comment: comments) {
+            if(comment.getId() == itemId) return comment;
+        }
+        throw new NoSuchElementException("Could not find this comment in the db");
     }
 
 }
