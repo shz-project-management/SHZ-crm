@@ -40,35 +40,35 @@ class ItemServiceTest {
     private ItemRequest itemRequest;
 
 
-    @Test
-    @DisplayName("Test create method with user not found")
-    void testCreateWithUserNotFound() {
-        ItemRequest itemRequest = new ItemRequest();
-        itemRequest.setBoardId(1L);
-        itemRequest.setTypeId(1L);
-        itemRequest.setStatusId(1L);
-        itemRequest.setUserId(1L);
-        itemRequest.setTitle("Test Title");
-        itemRequest.setDescription("Test Description");
-        itemRequest.setImportance(1);
-        given(userRepository.findById(1L)).willReturn(Optional.empty());
-        assertThrows(AccountNotFoundException.class, () -> itemService.create(itemRequest));
-    }
+//    @Test
+//    @DisplayName("Test create method with user not found")
+//    void testCreateWithUserNotFound() {
+//        ItemRequest itemRequest = new ItemRequest();
+//        itemRequest.setBoardId(1L);
+//        itemRequest.setTypeId(1L);
+//        itemRequest.setStatusId(1L);
+//        itemRequest.setUserId(1L);
+//        itemRequest.setTitle("Test Title");
+//        itemRequest.setDescription("Test Description");
+//        itemRequest.setImportance(1);
+//        given(userRepository.findById(1L)).willReturn(Optional.empty());
+//        assertThrows(AccountNotFoundException.class, () -> itemService.create(itemRequest));
+//    }
 
-    @Test
-    @DisplayName("Test create method with parent item id not found")
-    void testCreateWithParentItemNotFound() {
-        ItemRequest itemRequest = new ItemRequest();
-        itemRequest.setBoardId(1L);
-        itemRequest.setTypeId(1L);
-        itemRequest.setStatusId(1L);
-        itemRequest.setUserId(1L);
-        itemRequest.setTitle("Test Title");
-        itemRequest.setDescription("Test Description");
-        itemRequest.setImportance(1);
-        itemRequest.setParentItemId(1L);
-        assertThrows(NoSuchElementException.class, () -> itemService.create(itemRequest));
-    }
+//    @Test
+//    @DisplayName("Test create method with parent item id not found")
+//    void testCreateWithParentItemNotFound() {
+//        ItemRequest itemRequest = new ItemRequest();
+//        itemRequest.setBoardId(1L);
+//        itemRequest.setTypeId(1L);
+//        itemRequest.setStatusId(1L);
+//        itemRequest.setUserId(1L);
+//        itemRequest.setTitle("Test Title");
+//        itemRequest.setDescription("Test Description");
+//        itemRequest.setImportance(1);
+//        itemRequest.setParentItemId(1L);
+//        assertThrows(NoSuchElementException.class, () -> itemService.create(itemRequest));
+//    }
 
     @Test
     @DisplayName("Test create method with board id not found")
@@ -195,30 +195,30 @@ class ItemServiceTest {
     }
 
 
-    @Test
-    @DisplayName("Test getAllInBoard method")
-    void testGetAllInBoard() {
-        Board board = new Board();
-        board.setId(1L);
-        List<Item> items = new ArrayList<>();
-        Item item1 = new Item();
-        item1.setId(1L);
-        item1.setBoard(board);
-        Item item2 = new Item();
-        item2.setId(2L);
-        item2.setBoard(board);
-        items.add(item1);
-        items.add(item2);
-        given(boardRepository.findById(1L)).willReturn(java.util.Optional.of(board));
-        given(itemRepository.findAllByBoard(board)).willReturn(items);
-        List<Item> result = itemService.getAllInBoard(1L);
-        assertNotNull(result);
-    }
-
-    @Test
-    @DisplayName("Test getAllInBoard method with non-existent board")
-    void testGetAllInBoardWithNonExistentBoard() {
-        given(boardRepository.findById(1L)).willReturn(Optional.empty());
-        assertThrows(NoSuchElementException.class, () -> itemService.getAllInBoard(1L));
-    }
+//    @Test
+//    @DisplayName("Test getAllInBoard method")
+//    void testGetAllInBoard() {
+//        Board board = new Board();
+//        board.setId(1L);
+//        List<Item> items = new ArrayList<>();
+//        Item item1 = new Item();
+//        item1.setId(1L);
+//        item1.setBoard(board);
+//        Item item2 = new Item();
+//        item2.setId(2L);
+//        item2.setBoard(board);
+//        items.add(item1);
+//        items.add(item2);
+//        given(boardRepository.findById(1L)).willReturn(java.util.Optional.of(board));
+//        given(itemRepository.findAllByBoard(board)).willReturn(items);
+//        List<Item> result = itemService.getAllInBoard(1L);
+//        assertNotNull(result);
+//    }
+//
+//    @Test
+//    @DisplayName("Test getAllInBoard method with non-existent board")
+//    void testGetAllInBoardWithNonExistentBoard() {
+//        given(boardRepository.findById(1L)).willReturn(Optional.empty());
+//        assertThrows(NoSuchElementException.class, () -> itemService.getAllInBoard(1L));
+//    }
 }

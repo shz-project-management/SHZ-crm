@@ -2,17 +2,13 @@ package CRM.service;
 
 import CRM.entity.Board;
 import CRM.entity.User;
-import CRM.entity.UserInBoard;
-import CRM.entity.requests.BoardRequest;
 import CRM.entity.requests.UpdateObjectRequest;
 import CRM.repository.BoardRepository;
-import CRM.repository.UserInBoardRepository;
 import CRM.repository.UserRepository;
 import CRM.utils.Validations;
 import CRM.utils.enums.ExceptionMessage;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.hibernate.sql.Update;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -30,8 +26,7 @@ public class BoardService {
     private BoardRepository boardRepository;
     @Autowired
     private UserRepository userRepository;
-    @Autowired
-    private UserInBoardRepository userInBoardRepository;
+
 
     /**
      * This function persists a new board to the database by calling the save function in the BoardRepository class.
@@ -40,9 +35,7 @@ public class BoardService {
      * @return The persisted board object.
      */
     public Board create(Board board) {
-        Board dbBoard = boardRepository.save(board);
-        userInBoardRepository.save(UserInBoard.adminUserInBoard(dbBoard.getCreatorUser(), dbBoard));
-        return dbBoard;
+        return boardRepository.save(board);
     }
 
     /**
@@ -52,7 +45,6 @@ public class BoardService {
      */
     public boolean delete(long boardId) {
         Board board = Validations.doesIdExists(boardId, boardRepository);
-        userInBoardRepository.deleteAllByBoard(board);
         boardRepository.delete(board);
         return true;
     }
@@ -91,8 +83,8 @@ public class BoardService {
     public List<Board> getAllBoardsOfUser(long userId) throws AccountNotFoundException {
         try {
             User user = Validations.doesIdExists(userId, userRepository);
-            List<UserInBoard> userInBoard = userInBoardRepository.findAllBoardByUser(user);
-            return userInBoard.stream().map(UserInBoard::getBoard).collect(Collectors.toList());
+            return null;
+//            return user.getBoards().stream().collect(Collectors.toList());
         } catch (NoSuchElementException e) {
             throw new AccountNotFoundException(ExceptionMessage.ACCOUNT_DOES_NOT_EXISTS.toString());
         }
@@ -101,7 +93,7 @@ public class BoardService {
     /**
      * Updates a board with the given information.
      *
-     * @param boardReq the request object containing the update information for the board
+     * @param boardReq the request object containing the update      information for the board
      * @return the updated board
      * @throws NoSuchFieldException if the boardReq with the given field does not exist
      */

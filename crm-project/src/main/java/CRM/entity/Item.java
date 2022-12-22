@@ -37,7 +37,7 @@ public class Item extends SharedContent {
     private Set<Item> items;
 
     // FIXME: Is it ok? Should it get less params?
-    public static Item createNewItem(Section section, Status status, Type type, User user, String title, String description, Item parentItem, int importance){
+    public static Item createNewItem(Section section, Status status, Type type, User user, String name, String description, Item parentItem, int importance){
         Item item = new Item();
         item.setSection(section);
         item.setImportance(importance);
@@ -46,7 +46,7 @@ public class Item extends SharedContent {
         item.setUser(user);
         item.setParentItem(parentItem);
         item.setDescription(description);
-        item.setTitle(title);
+        item.setName(name);
         return item;
     }
 

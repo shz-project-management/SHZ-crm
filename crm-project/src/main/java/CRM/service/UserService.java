@@ -1,22 +1,21 @@
 package CRM.service;
 
-import CRM.entity.Board;
-import CRM.entity.User;
-import CRM.entity.UserInBoard;
+import CRM.entity.*;
 import CRM.repository.BoardRepository;
-import CRM.repository.UserInBoardRepository;
+import CRM.repository.SettingRepository;
 import CRM.repository.UserRepository;
 import CRM.utils.Validations;
 import CRM.utils.enums.ExceptionMessage;
+import CRM.utils.enums.Permission;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.security.auth.login.AccountNotFoundException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.stream.Collectors;
 
 @Service
 public class UserService {
@@ -26,9 +25,9 @@ public class UserService {
     @Autowired
     private UserRepository userRepository;
     @Autowired
-    private UserInBoardRepository userInBoardRepository;
-    @Autowired
     private BoardRepository boardRepository;
+    @Autowired
+    private SettingRepository settingRepository;
 
     /**
      * findByEmail search in the database for a user based on the email we have.
@@ -58,7 +57,7 @@ public class UserService {
         // Ask for the repo to find the user, by the given id input
         try {
             return Validations.doesIdExists(userId, userRepository);
-        }catch (NoSuchElementException e){
+        } catch (NoSuchElementException e) {
             throw new AccountNotFoundException(ExceptionMessage.ACCOUNT_DOES_NOT_EXISTS.toString());
         }
     }
@@ -75,12 +74,10 @@ public class UserService {
         User user;
         try {
             user = Validations.doesIdExists(userId, userRepository);
-        }catch (NoSuchElementException e){
+        } catch (NoSuchElementException e) {
             throw new AccountNotFoundException(ExceptionMessage.ACCOUNT_DOES_NOT_EXISTS.toString());
         }
-        // remove all user dependencies from the db
-        removeAllUserDependencies(user);
-        // lastly, remove the user from the database
+
         userRepository.delete(user);
         return true;
     }
@@ -105,8 +102,8 @@ public class UserService {
      */
     public List<User> getAllInBoard(long boardId) throws AccountNotFoundException {
         Board board = Validations.doesIdExists(boardId, boardRepository);
-        List<UserInBoard> usersInBoard = userInBoardRepository.findAllUserByBoard(board);
-        return usersInBoard.stream().map(UserInBoard::getUser).collect(Collectors.toList());
+//        return board.getUsers().stream().collect(Collectors.toList());
+        return new ArrayList<>();
     }
 
     /**
@@ -118,67 +115,24 @@ public class UserService {
      * @throws AccountNotFoundException if the user or board with the given id does not exist in the database
      * @throws IllegalArgumentException if the combination of the given user and board already exists in the database
      */
-    public UserInBoard addUserToBoard(long userId, long boardId) throws AccountNotFoundException {
+    public void addUserToBoard(long userId, long boardId) throws AccountNotFoundException {
         User user;
+        NotificationSetting notificationSetting;
+        Board board;
         try {
             user = Validations.doesIdExists(userId, userRepository);
+            notificationSetting = Validations.doesIdExists(1L, settingRepository);
+            board = Validations.doesIdExists(boardId, boardRepository);
         } catch (NoSuchElementException e) {
             throw new AccountNotFoundException(ExceptionMessage.ACCOUNT_DOES_NOT_EXISTS.toString());
         }
 
-        Board board = Validations.doesIdExists(boardId, boardRepository);
+        UserPermission userPermission = new UserPermission(0L, user, Permission.USER);
+        UserSetting userSetting = new UserSetting(0L, user, notificationSetting, true, true);
 
-        // make sure this combination of user and board doesn't not exist in the db yet
-        if (userInBoardRepository.findByBoardAndUser(user, board).isPresent())
-            throw new IllegalArgumentException(ExceptionMessage.USER_IN_BOARD_EXISTS.toString());
+        board.addUserPermissionToBoard(userPermission);
+        board.addUserSettingToBoard(userSetting);
 
-        // if not, store the new one in the db
-        UserInBoard userInBoard = UserInBoard.userInBoardUser(user, board);
-        return userInBoardRepository.save(userInBoard);
-    }
-
-    /**
-     * Removes all dependencies related to the given user from the database.
-     *
-     * @param user the user whose dependencies are to be removed
-     *             This method performs the following actions:
-     *             Removes all entries of the given user from the UserInBoard table
-     *             Removes all comments made by the given user from the database
-     *             Removes all attributes of the given user from the database
-     *             Removes all boards created by the given user from the database
-     */
-    boolean removeAllUserDependencies(User user) {
-        // second, remove all entries of this user from UserInBoard table
-        removeUserDependenciesFromUserInBoardTable(user);
-
-        // remove all user's comments from the db
-
-        // remove all user's attributes from the db
-
-        // third, remove every board created by this user
-        removeUserDependenciesFromBoardTable(user);
-        return true;
-    }
-
-    /**
-     * Removes all boards from the database that were created by the given user.
-     *
-     * @param user the user whose boards are to be removed from the database
-     */
-    boolean removeUserDependenciesFromBoardTable(User user) {
-        List<Board> boardList = boardRepository.findAllByUser(user);
-        boardList.forEach(board -> boardRepository.delete(board));
-        return true;
-    }
-
-    /**
-     * Removes all entries in the UserInBoard table that are related to the given user or the boards they have created.
-     *
-     * @param user the user whose related entries in the UserInBoard table are to be removed
-     */
-    private boolean removeUserDependenciesFromUserInBoardTable(User user) {
-        List<Board> boardList = boardRepository.findAllByUser(user);
-        boardList.forEach(board -> userInBoardRepository.deleteAllByUserOrBoard(board.getCreatorUser(), board));
-        return true;
+        boardRepository.save(board);
     }
 }

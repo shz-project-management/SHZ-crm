@@ -1,8 +1,6 @@
 package CRM.service;
 
 import CRM.entity.NotificationSetting;
-import CRM.repository.UserInBoardRepository;
-import CRM.repository.UserSettingsInBoardRepository;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,11 +12,6 @@ import java.util.List;
 public class SettingsService {
 
     private static Logger logger = LogManager.getLogger(SettingsService.class.getName());
-
-    @Autowired
-    private UserSettingsInBoardRepository userSettingsInBoardRepository;
-    @Autowired
-    private UserInBoardRepository userInBoardRepository;
 
     public List<NotificationSetting> getAllUserSettingsInBoard(Long userId, Long boardID){
         // make sure there is such a user in board in the db -> checkIfExists

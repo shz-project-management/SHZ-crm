@@ -20,7 +20,7 @@ public class CommentDTO extends SharedContentDTO {
 
         commentDTO.setParentItem(ItemDTO.getSharedContentFromDB(comment.getParentItem()));
         commentDTO.setUser(UserDTO.getUserFromDB(comment.getUser()));
-        commentDTO.setTitle(comment.getTitle());
+        commentDTO.setTitle(comment.getName());
         commentDTO.setDescription(comment.getDescription());
         commentDTO.setCreationDate(comment.getCreationDate());
 

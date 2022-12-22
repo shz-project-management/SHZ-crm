@@ -4,6 +4,7 @@ import CRM.entity.requests.RegisterUserRequest;
 import lombok.*;
 
 import javax.persistence.*;
+import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
@@ -15,21 +16,21 @@ import java.util.Set;
 @Entity
 @Table(name = "users")
 public class User {
-
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "id", nullable = false)
     private Long id;
+
     private String firstName;
     private String lastName;
     private String password;
     private String email;
 
-    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<Comment> comments;
+//    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+//    private Set<Comment> comments = new HashSet<>();
 
-    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<Item> items;
-
+//    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+//    private Set<Item> items = new HashSet<>();
 
     public static User newUser(RegisterUserRequest registerUser){
         User user = new User();
@@ -39,6 +40,10 @@ public class User {
         user.setLastName(registerUser.getLastName());
         return user;
     }
+
+//    public void addBoard(Board board){
+//        boards.add(board);
+//    }
 
     @Override
     public boolean equals(Object o) {

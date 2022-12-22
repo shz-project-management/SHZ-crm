@@ -1,6 +1,5 @@
 package CRM.controller.facades;
 
-import CRM.entity.DTO.UserInBoardDTO;
 import CRM.entity.response.Response;
 import CRM.service.UserService;
 import CRM.utils.Validations;
@@ -161,8 +160,9 @@ public class UserFacade {
             Validations.validate(userId, Regex.ID.getRegex());
             Validations.validate(boardId, Regex.ID.getRegex());
 
+            userService.addUserToBoard(userId, boardId);
+
             return new Response.Builder()
-                    .data(UserInBoardDTO.getUserInBoardFromDB(userService.addUserToBoard(userId, boardId)))
                     .message(SuccessMessage.FOUND.toString())
                     .status(HttpStatus.OK)
                     .statusCode(200)

@@ -11,22 +11,19 @@ import javax.persistence.*;
 @Getter
 @Setter
 @NoArgsConstructor
-public class UserSettingsInBoard {
-    @EmbeddedId
-    private UserSettingsInBoardPK id = new UserSettingsInBoardPK();
+public class UserSetting {
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "id", nullable = false)
+    private Long id;
 
+    @JoinColumn(nullable = false)
     @ManyToOne()
-    @MapsId("userId")
     @Cascade(org.hibernate.annotations.CascadeType.ALL)
     private User user;
 
+    @JoinColumn(nullable = false)
     @ManyToOne()
-    @MapsId("boardId")
-    @Cascade(org.hibernate.annotations.CascadeType.ALL)
-    private Board board;
-
-    @ManyToOne()
-    @MapsId("settingId")
     @Cascade(org.hibernate.annotations.CascadeType.ALL)
     private NotificationSetting setting;
 

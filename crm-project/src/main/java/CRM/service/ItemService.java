@@ -119,8 +119,16 @@ public class ItemService implements ServiceInterface {
      * The retrieved item is then returned.
      */
     @Override
-    public Item get(long id) {
-        return Validations.doesIdExists(id, itemRepository);
+    public Item get(long itemId) {
+        // FIXME: we need to get the board ID as well.
+
+        // get the board from the db
+        Board board = Validations.doesIdExists(itemId, boardRepository); // but instead of itemId, put board id
+
+        Item item = board.getItemById(itemId);
+
+
+        return item;
     }
 
     /**

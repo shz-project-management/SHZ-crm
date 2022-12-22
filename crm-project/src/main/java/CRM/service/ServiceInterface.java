@@ -1,9 +1,6 @@
 package CRM.service;
 
-import CRM.entity.Comment;
-import CRM.entity.Item;
 import CRM.entity.SharedContent;
-import CRM.entity.requests.ItemRequest;
 import CRM.entity.requests.UpdateObjectRequest;
 
 import java.util.List;
