@@ -83,7 +83,7 @@ public class UserService {
         List<Board> boards = boardRepository.findAll();
         for (Board board : boards) {
             board.getUsersPermissions().removeIf(userPermission -> userPermission.getUser().getId() == userId);
-            board.getUsersSettings().removeIf(userSetting -> userSetting.getUser().getId() == userId);
+//            board.getUsersSettings().removeIf(userSetting -> userSetting.getUser().getId() == userId);
             boardRepository.save(board);
         }
 
@@ -142,7 +142,7 @@ public class UserService {
 
         board.addUserPermissionToBoard(userPermission);
 
-        createDefaultSettingForNewUserInBoard(user, board);
+//        createDefaultSettingForNewUserInBoard(user, board);
         boardRepository.save(board);
     }
 
@@ -150,10 +150,10 @@ public class UserService {
      * Creates default notifications for every new user in every board,
      * using constant notifications
      */
-    private void createDefaultSettingForNewUserInBoard(User user, Board board){
-        for (NotificationSetting notificationSetting : settingRepository.findAll()) {
-            UserSetting userSetting = new UserSetting(0L, user, notificationSetting, true, true);
-            board.addUserSettingToBoard(userSetting);
-        }
-    }
+//    private void createDefaultSettingForNewUserInBoard(User user, Board board){
+//        for (NotificationSetting notificationSetting : settingRepository.findAll()) {
+//            UserSetting userSetting = new UserSetting(0L, user, notificationSetting, true, true);
+//            board.addUserSettingToBoard(userSetting);
+//        }
+//    }
 }
