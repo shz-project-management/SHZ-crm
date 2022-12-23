@@ -5,6 +5,7 @@ import lombok.*;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.NoSuchElementException;
 import java.util.Set;
 
@@ -16,6 +17,7 @@ import java.util.Set;
 @Entity
 @Table(name = "items")
 public class Item extends SharedContent {
+
     @ManyToOne
     @JoinColumn(name = "status_id")
     private Status status;
@@ -28,15 +30,20 @@ public class Item extends SharedContent {
     @JoinColumn(name = "section_id")
     private Section section;
 
+    @Column(name = "assigned_to_user_id")
     private Long assignedToUserId;
+
+    @Column(name = "due_date")
     private LocalDateTime dueDate;
+
+    @Column(name = "importance")
     private int importance;
 
-    @OneToMany(mappedBy = "parentItem", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<Comment> comments;
+    @OneToMany(mappedBy = "parentItem", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Comment> comments = new HashSet<>();
 
-    @OneToMany(mappedBy = "parentItem", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<Item> items;
+    @OneToMany(mappedBy = "parentItem", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Item> items = new HashSet<>();
 
     // FIXME: Is it ok? Should it get less params?
     public static Item createNewItem(Section section, Status status, Type type, User user, String name, String description, Item parentItem, int importance){

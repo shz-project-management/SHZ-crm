@@ -28,4 +28,5 @@ public interface BoardRepository extends JpaRepository<Board, Long> {
     @Modifying
     void removeByCreatorUser(User user);
 
+    List<Board> findByCreatorUser(User user);
 }

@@ -1,7 +1,20 @@
 package CRM.utils.enums;
 
-public enum Permission{
-    USER,
-    LEADER,
-    ADMIN,
+import javax.persistence.*;
+
+
+public enum Permission {
+    USER("USER"),
+    LEADER("LEADER"),
+    ADMIN("ADMIN");
+
+    @Id
+    private String name;
+
+    Permission(String user) {
+    }
+
+    public String getName() {
+        return name;
+    }
 }
