@@ -131,11 +131,9 @@ public class ItemService implements ServiceInterface {
      * This function receives the ID of an item to retrieve and uses the doesIdExists function from the Validations class to retrieve the item with that ID from the itemRepository.
      * The retrieved item is then returned.
      */
-    public Item get(long sectionId, long boardId, long searchId, Long parentId) {
-        Board board = Validations.doesIdExists(boardId, boardRepository); // but instead of itemId, put board id
-
-        return board.getSectionFromBoard(sectionId)
-                .getItemById(searchId);
+    @Override
+    public Item get(long id) {
+        return Validations.doesIdExists(id, itemRepository);
     }
 
     /**

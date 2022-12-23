@@ -190,7 +190,6 @@ public class Validations {
     public static <T> void setContentToFieldIfFieldExists(T object, UpdateField fieldName, Object content) throws NoSuchFieldException {
         String fieldNameModified = fieldName.toString().replaceAll("_", "");
         try {
-            System.out.println(fieldNameModified);
             if(checkIfFieldExistsInEntity(object, fieldNameModified, content)) return;
             if(checkIfFieldExistsInParentEntity(object, fieldNameModified, content)) return;
 
@@ -218,7 +217,7 @@ public class Validations {
      * @return true if the field is a custom object field, false otherwise
      */
     public static boolean checkIfFieldIsCustomObject(UpdateField fieldName) {
-        return fieldName.equals(STATUS) || fieldName.equals(TYPE) || fieldName.equals(PARENT_ITEM);
+        return fieldName.equals(STATUS) || fieldName.equals(TYPE) || fieldName.equals(PARENT_ITEM) || fieldName.equals(SECTION);
     }
 
     /**

@@ -29,8 +29,10 @@ class BoardServiceTest {
     private BoardRepository boardRepository;
     @Mock
     private UserRepository userRepository;
+
     @InjectMocks
     private BoardService boardService;
+
     private RegisterUserRequest correctRegisterUserRequest;
     private User expectedUser;
     private Board board;
