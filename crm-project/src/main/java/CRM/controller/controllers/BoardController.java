@@ -58,17 +58,6 @@ public class BoardController {
         return new ResponseEntity<>(response, response.getStatus());
     }
 
-    /**
-     * This method is used to handle HTTP GET requests to the specified URL (board/getAll).
-     * The method retrieves all the boards using the boardFacade object and returns them in a Response object.
-     *
-     * @return A ResponseEntity object containing the Response object with all the board information and the HTTP status code.
-     */
-    @GetMapping(value = "getAll")
-    public ResponseEntity<Response> getAll() {
-        Response response = boardFacade.getAll();
-        return new ResponseEntity<>(response, response.getStatus());
-    }
 
     /**
      * This method is used to handle HTTP GET requests to the specified URL (board/getAll/{userId}).

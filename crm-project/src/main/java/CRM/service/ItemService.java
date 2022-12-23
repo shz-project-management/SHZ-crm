@@ -4,20 +4,18 @@ import CRM.entity.*;
 import CRM.entity.requests.ItemRequest;
 import CRM.entity.requests.UpdateObjectRequest;
 import CRM.repository.*;
+import CRM.utils.Common;
 import CRM.utils.Validations;
 import CRM.utils.enums.ExceptionMessage;
-import CRM.utils.enums.UpdateField;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 
 import javax.security.auth.login.AccountNotFoundException;
-import java.time.LocalDateTime;
-import java.util.Iterator;
-import java.util.List;
-import java.util.NoSuchElementException;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -41,7 +39,7 @@ public class ItemService implements ServiceInterface {
      */
     public Item create(ItemRequest itemRequest) throws AccountNotFoundException {
         // find the board from the db
-        Board board = Validations.doesIdExists(itemRequest.getBoardId(), boardRepository);
+        Board board = Common.getBoard(itemRequest.getBoardId(), boardRepository);
 
         // get the user and make sure he is legit
         User user;
@@ -84,13 +82,13 @@ public class ItemService implements ServiceInterface {
      */
     @Override
     public int delete(List<Long> ids, long boardId) {
-        Board board = Validations.doesIdExists(boardId, boardRepository);
-        List<Section> sections = board.getSections().stream().collect(Collectors.toList());
+        Board board = Common.getBoard(boardId, boardRepository);
+        List<Section> sections = new ArrayList<>(board.getSections());
         int counter = 0;
 
         for (Section section : sections) {
-            for (Iterator iterator = section.getItems().iterator(); iterator.hasNext(); ) {
-                Item item = (Item) iterator.next();
+            for (Iterator<Item> iterator = section.getItems().iterator(); iterator.hasNext(); ) {
+                Item item = iterator.next();
                 if (ids.contains(item.getId())) {
                     iterator.remove();
                     counter++;
@@ -103,37 +101,34 @@ public class ItemService implements ServiceInterface {
         return counter;
     }
 
+    @Override
+    public SharedContent get(long sectionId, long boardId, long searchId, Long parentItem) {
+        Board board = Common.getBoard(boardId, boardRepository);
+        Section section = Common.getSection(board, sectionId);
+        return Common.getItem(section, searchId);
+    }
+
+
     /**
      * Update an item field.
      *
      * @param updateObject the request object containing the updates to be made
-     * @param itemId       the id of the item to be updated
+     * @param sectionId    the id of the item to be updated
      * @return the updated item
      * @throws NoSuchFieldException if the field to be updated does not exist in the item object
      */
-//    @Override
-//    public Item update(UpdateObjectRequest updateObject, long itemId) throws NoSuchFieldException {
-//        Item item = Validations.doesIdExists(itemId, itemRepository);
-//
+
+    @Override
+    public Comment update(UpdateObjectRequest updateObject, long boardId, long sectionId, long commentId) throws NoSuchFieldException {
+        Board board = Validations.doesIdExists(boardId, boardRepository);
+
 //        if (Validations.checkIfFieldIsCustomObject(updateObject.getFieldName())) {
 //            fieldIsCustomObjectHelper(updateObject, itemId, item);
 //        } else {
 //            fieldIsPrimitiveOrKnownObjectHelper(updateObject, item);
 //        }
 //        return itemRepository.save(item);
-//    }
-
-    /**
-     * get
-     *
-     * @param searchId - the ID of the item to retrieve
-     * @return the retrieved item
-     * This function receives the ID of an item to retrieve and uses the doesIdExists function from the Validations class to retrieve the item with that ID from the itemRepository.
-     * The retrieved item is then returned.
-     */
-    @Override
-    public Item get(long id) {
-        return Validations.doesIdExists(id, itemRepository);
+        return null;
     }
 
     /**
@@ -167,25 +162,6 @@ public class ItemService implements ServiceInterface {
                 .getItems().stream().collect(Collectors.toList());
     }
 
-    /**
-     * Get the repository to update a field.
-     *
-     * @param fieldName the field to be updated
-     * @return the repository to update the field
-     * @throws NoSuchFieldException if the field does not have a corresponding repository
-     */
-//    private JpaRepository getRepoToUpdateField(UpdateField fieldName) throws NoSuchFieldException {
-//        switch (fieldName) {
-//            case STATUS:
-//                return statusRepository;
-//            case TYPE:
-//                return typeRepository;
-//            case PARENT_ITEM:
-//                return itemRepository;
-//            default:
-//                throw new NoSuchFieldException(ExceptionMessage.FIELD_OBJECT_REPO_NOT_EXISTS.toString());
-//        }
-//    }
 
     /**
      * Helper function for updating a custom object field.

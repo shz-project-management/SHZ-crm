@@ -39,11 +39,11 @@ public class ItemController {
         return new ResponseEntity<>(response, response.getStatus());
     }
 
-//    @PatchMapping(value = "update/{itemId}")
-//    public ResponseEntity<Response> update(@RequestBody UpdateObjectRequest updateItemRequest, @PathVariable Long itemId){
-//        Response response = sharedContentFacade.update(updateItemRequest, itemId, Item.class);
-//        return new ResponseEntity<>(response, response.getStatus());
-//    }
+    @PatchMapping(value = "update/{boardId}/{sectionId}/{itemId}")
+    public ResponseEntity<Response> update(@RequestBody UpdateObjectRequest updateItemRequest, @PathVariable Long boardId, @PathVariable Long sectionId, @PathVariable Long itemId){
+        Response response = sharedContentFacade.update(updateItemRequest, boardId, itemId, sectionId, Item.class);
+        return new ResponseEntity<>(response, response.getStatus());
+    }
 
     @GetMapping(value = "all-in-section/{boardId}/{sectionId}")
     public ResponseEntity<Response> getAllItemsInSection(@PathVariable Long boardId, @PathVariable Long sectionId) {
