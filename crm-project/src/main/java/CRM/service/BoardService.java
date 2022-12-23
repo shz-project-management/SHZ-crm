@@ -43,11 +43,8 @@ public class BoardService {
     @Transactional
     public Board create(Board board) {
         User user = board.getCreatorUser();
-
+        //FIXME
         NotificationSetting notificationSetting = Validations.doesIdExists(2L, settingRepository);
-
-//        board = boardRepository.save(board);
-//        createDefaultSettingForNewUserInBoard(user, board, notificationSetting);
         UserSetting userSetting = new UserSetting();
         userSetting.setId(0L);
         userSetting.setInApp(true);
@@ -66,7 +63,6 @@ public class BoardService {
      */
     public boolean delete(long boardId) {
         Board board = boardRepository.findById(boardId).get();
-        // Then, delete the board
         boardRepository.delete(board);
         return true;
     }

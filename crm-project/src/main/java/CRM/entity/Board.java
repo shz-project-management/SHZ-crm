@@ -37,15 +37,15 @@ public class Board {
     @Column(name = "description")
     private String description;
 
-    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL , orphanRemoval = true)
     @JoinColumn(name = "board_id")
     private Set<Type> types = new HashSet<>();
 
-    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL , orphanRemoval = true)
     @JoinColumn(name = "board_id")
     private Set<Status> statuses = new HashSet<>();
 
-    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL , orphanRemoval = true)
     @JoinColumn(name = "board_id")
     private Set<Section> sections = new HashSet<>();
 
