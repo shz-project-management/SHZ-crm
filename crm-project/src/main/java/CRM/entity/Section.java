@@ -1,9 +1,12 @@
 package CRM.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import CRM.entity.requests.AttributeRequest;
+import CRM.entity.requests.UpdateObjectRequest;
 import lombok.*;
 
 import javax.persistence.*;
+import java.util.HashSet;
+import java.util.NoSuchElementException;
 import java.util.Set;
 
 
@@ -11,17 +14,39 @@ import java.util.Set;
 @Entity
 @Getter
 @Setter
-@Table(name = "section")
-public class Section extends Attribute {
+@Table(name = "sections")
+public class Section {
 
-    @OneToMany(mappedBy = "section", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-    Set<Item> items;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-    public static Section createSection(Attribute attribute) {
+    @Column(name = "name")
+    private String name;
+
+    @Column(name = "description")
+    private String description;
+
+    @OneToMany(mappedBy = "section", cascade = CascadeType.ALL, orphanRemoval = true)
+    Set<Item> items = new HashSet<>();
+
+    public static Section createSection(AttributeRequest sectionRequest) {
         Section section = new Section();
-        section.setName(attribute.getName());
-        section.setDescription(attribute.getDescription());
-        section.setBoard(attribute.getBoard());
+        section.setName(sectionRequest.getName());
+        section.setDescription(sectionRequest.getDescription());
         return section;
     }
+
+    public Item getItemById(long itemId){
+        for (Item item: items) {
+            if(item.getId() == itemId) return item;
+        }
+        throw new NoSuchElementException("Could not find this item in the db");
+    }
+
+    public void insertItem(Item item){
+        items.add(item);
+    }
+
+
 }

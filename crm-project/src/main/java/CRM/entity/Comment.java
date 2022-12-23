@@ -13,12 +13,12 @@ import javax.persistence.*;
 public class Comment extends SharedContent {
     private Long assignedToUserId;
 
-    public static Comment createNewComment(User user, String title, String description, Item parentItem){
+    public static Comment createNewComment(User user, String name, String description, Item parentItem){
         Comment Comment = new Comment();
         Comment.setUser(user);
         Comment.setParentItem(parentItem);
         Comment.setDescription(description);
-        Comment.setTitle(title);
+        Comment.setName(name);
         return Comment;
     }
 }

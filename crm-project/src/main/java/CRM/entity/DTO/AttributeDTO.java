@@ -22,7 +22,6 @@ public class AttributeDTO {
     public static AttributeDTO createAttributeDTO(Attribute attribute){
         AttributeDTO attributeDTO = new AttributeDTO();
         attributeDTO.setId(attribute.getId());
-        attributeDTO.setBelongsToBoard(attribute.getBoard().getId());
         attributeDTO.setName(attribute.getName());
         attributeDTO.setDescription(attribute.getDescription());
         return attributeDTO;
@@ -35,7 +34,6 @@ public class AttributeDTO {
             attributeDTO.setId(attribute.getId());
             attributeDTO.setName(attribute.getName());
             attributeDTO.setDescription(attribute.getDescription());
-            attributeDTO.setBelongsToBoard(attribute.getBoard().getId());
             attributeDTOS.add(attributeDTO);
         }
         return attributeDTOS;

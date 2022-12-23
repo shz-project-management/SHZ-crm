@@ -1,9 +1,12 @@
 package CRM.entity;
 
+import CRM.entity.requests.UpdateObjectRequest;
 import lombok.*;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.NoSuchElementException;
 import java.util.Set;
 
 @AllArgsConstructor
@@ -14,6 +17,7 @@ import java.util.Set;
 @Entity
 @Table(name = "items")
 public class Item extends SharedContent {
+
     @ManyToOne
     @JoinColumn(name = "status_id")
     private Status status;
@@ -26,18 +30,23 @@ public class Item extends SharedContent {
     @JoinColumn(name = "section_id")
     private Section section;
 
+    @Column(name = "assigned_to_user_id")
     private Long assignedToUserId;
+
+    @Column(name = "due_date")
     private LocalDateTime dueDate;
+
+    @Column(name = "importance")
     private int importance;
 
-    @OneToMany(mappedBy = "parentItem", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<Comment> comments;
+    @OneToMany(mappedBy = "parentItem", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Comment> comments = new HashSet<>();
 
-    @OneToMany(mappedBy = "parentItem", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<Item> items;
+    @OneToMany(mappedBy = "parentItem", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Item> items = new HashSet<>();
 
     // FIXME: Is it ok? Should it get less params?
-    public static Item createNewItem(Section section, Status status, Type type, User user, String title, String description, Item parentItem, int importance){
+    public static Item createNewItem(Section section, Status status, Type type, User user, String name, String description, Item parentItem, int importance){
         Item item = new Item();
         item.setSection(section);
         item.setImportance(importance);
@@ -46,8 +55,27 @@ public class Item extends SharedContent {
         item.setUser(user);
         item.setParentItem(parentItem);
         item.setDescription(description);
-        item.setTitle(title);
+        item.setName(name);
         return item;
+    }
+
+    public Item updateItem(UpdateObjectRequest objectRequest){
+        return this;
+    }
+
+    public void insertComment(Comment comment){
+        comments.add(comment);
+    }
+
+    public void insertItem(Item item){
+        items.add(item);
+    }
+
+    public Comment getCommentById(long itemId){
+        for (Comment comment: comments) {
+            if(comment.getId() == itemId) return comment;
+        }
+        throw new NoSuchElementException("Could not find this comment in the db");
     }
 
 }

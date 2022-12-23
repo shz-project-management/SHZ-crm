@@ -1,95 +1,66 @@
 package CRM.service;
 
-import CRM.entity.Attribute;
-import CRM.entity.Board;
-import CRM.entity.Section;
-import CRM.entity.Type;
-import CRM.entity.requests.UpdateObjectRequest;
+import CRM.entity.*;
+import CRM.entity.requests.AttributeRequest;
 import CRM.repository.BoardRepository;
-import CRM.repository.SectionRepository;
-import CRM.repository.TypeRepository;
 import CRM.utils.Validations;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.NoSuchElementException;
+import java.util.stream.Collectors;
 
 @Service
-public class SectionService implements AttributeService{
+public class SectionService {
 
-    private static Logger logger = LogManager.getLogger(SectionService.class.getName());
-
-    @Autowired
-    private SectionRepository sectionRepository;
     @Autowired
     private BoardRepository boardRepository;
 
-    /**
-     * This function persists a new Type to the database by calling the save function in the TypeRepository class.
-     * @param section The section object to be persisted.
-     * @return The persisted type object.
-     */
-    @Override
-    public Section create(Attribute section) {
-        if(sectionRepository.existsByBoardAndNameLike(section.getBoard(), section.getName()))
-            Validations.throwAttributeAlreadyExistsForBoard(section, "Section");
-        return sectionRepository.save(Section.createSection(section));
+
+    public Section create(AttributeRequest sectionRequest) {
+        Board board = Validations.doesIdExists(sectionRequest.getBoardId(), boardRepository);
+        Section section = Section.createSection(sectionRequest);
+        board.addSectionToBoard(section);
+        boardRepository.save(board);
+        return section;
     }
 
-    /**
-     * Deletes the given type from the repository.
-     * @param sectionId the type ID to delete
-     */
-    @Override
-    public boolean delete(long sectionId) {
-        Section section = Validations.doesIdExists(sectionId, sectionRepository);
-        sectionRepository.delete(section);
-        return true;
-    }
 
-    /**
-     * This method is used to retrieve a type with the specified id.
-     * @param id The id of the type to be retrieved.
-     * @return The retrieved type.
-     * @throws NoSuchElementException   if the type with the specified id is not found.
-     * @throws IllegalArgumentException if the specified id is invalid.
-     * @throws NullPointerException     if the specified id is null.
-     */
-    @Override
-    public Type get(long id) {
-        return Validations.doesIdExists(id, sectionRepository);
-    }
-
-    @Override
-    public Attribute update(UpdateObjectRequest attributeRequest, long id) throws NoSuchFieldException {
-        return null;
-    }
-
-    /**
-     * This method is used to retrieve all the types.
-     *
-     * @return A list containing all the types.
-     */
-    @Override
-    public List<Section> getAll() {
-        return sectionRepository.findAll();
-    }
-
-    /**
-     * This method is used to retrieve all the types that belong to the board with the specified id.
-     *
-     * @param boardId The id of the user whose types are to be retrieved.
-     * @return A list containing all the types that belong to the board with the specified id.
-     * @throws NoSuchElementException   if the board with the specified id is not found.
-     * @throws IllegalArgumentException if the specified board id is invalid.
-     * @throws NullPointerException     if the specified board id is null.
-     */
-    @Override
-    public List<Section> getAllInBoard(long boardId) {
+    public void delete(long boardId, long sectionId) {
         Board board = Validations.doesIdExists(boardId, boardRepository);
-        return sectionRepository.findByBoard(board);
+        board.removeSectionFromBoard(sectionId);
+        boardRepository.save(board);
+    }
+
+
+    public Section get(long sectionId, long boardId) {
+        Board board = Validations.doesIdExists(boardId, boardRepository);
+        return board.getSectionFromBoard(sectionId);
+    }
+
+
+//    public Status update(UpdateObjectRequest statusRequest, long statusId) throws NoSuchFieldException {
+//        //get in method signature the board id, get the attributeRequest and attributeId and Class clz (type,section,status)
+//        //find the board in db
+//        //check if attribute exists, if it exists get the attribute and update it
+//        //use update method in the board entity
+//    }
+
+//    /**
+//     * This method is used to retrieve all the statuses.
+//     *
+//     * @return A list containing all the statuses.
+//     */
+//    @Override
+//    public List<Status> getAll() {
+//        get Class clz and boardId in method signature
+//        findAll method in board entity.
+//
+//        return statusRepository.findAll();
+//    }
+
+    public List<Section> getAllSectionsInBoard(long boardId) {
+        Board board = Validations.doesIdExists(boardId, boardRepository);
+        return board.getSections().stream().collect(Collectors.toList());
     }
 }

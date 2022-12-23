@@ -4,6 +4,8 @@ import CRM.entity.requests.RegisterUserRequest;
 import lombok.*;
 
 import javax.persistence.*;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
@@ -19,16 +21,14 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     private String firstName;
     private String lastName;
     private String password;
     private String email;
 
-    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<Comment> comments;
-
-    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<Item> items;
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "user", cascade = CascadeType.ALL)
+    private Set<UserSetting> usersSettings = new HashSet<>();
 
 
     public static User newUser(RegisterUserRequest registerUser){
@@ -52,4 +52,5 @@ public class User {
     public int hashCode() {
         return Objects.hash(id, firstName, lastName, password, email);
     }
+
 }

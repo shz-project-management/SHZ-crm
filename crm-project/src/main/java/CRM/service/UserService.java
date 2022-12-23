@@ -1,13 +1,12 @@
 package CRM.service;
 
-import CRM.entity.Board;
-import CRM.entity.User;
-import CRM.entity.UserInBoard;
+import CRM.entity.*;
 import CRM.repository.BoardRepository;
-import CRM.repository.UserInBoardRepository;
+import CRM.repository.SettingRepository;
 import CRM.repository.UserRepository;
 import CRM.utils.Validations;
 import CRM.utils.enums.ExceptionMessage;
+import CRM.utils.enums.Permission;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,9 +25,9 @@ public class UserService {
     @Autowired
     private UserRepository userRepository;
     @Autowired
-    private UserInBoardRepository userInBoardRepository;
-    @Autowired
     private BoardRepository boardRepository;
+    @Autowired
+    private SettingRepository settingRepository;
 
     /**
      * findByEmail search in the database for a user based on the email we have.
@@ -54,11 +53,12 @@ public class UserService {
      * @throws AccountNotFoundException if no user with the specified ID exists in the database
      */
     public User get(long userId) throws AccountNotFoundException {
-        // make sure such an id even exists
-        // Ask for the repo to find the user, by the given id input
         try {
+            // make sure such an id even exists
+            // Ask for the repo to find the user, by the given id input
             return Validations.doesIdExists(userId, userRepository);
-        }catch (NoSuchElementException e){
+
+        } catch (NoSuchElementException e) {
             throw new AccountNotFoundException(ExceptionMessage.ACCOUNT_DOES_NOT_EXISTS.toString());
         }
     }
@@ -75,12 +75,41 @@ public class UserService {
         User user;
         try {
             user = Validations.doesIdExists(userId, userRepository);
-        }catch (NoSuchElementException e){
+
+        } catch (NoSuchElementException e) {
             throw new AccountNotFoundException(ExceptionMessage.ACCOUNT_DOES_NOT_EXISTS.toString());
         }
-        // remove all user dependencies from the db
-        removeAllUserDependencies(user);
-        // lastly, remove the user from the database
+        List<Board> boards = boardRepository.findAll();
+
+        for (Board board : boards) {
+            List<UserSetting> userSettingToDelete = board.getUsersSettings().stream()
+                    .filter(userSetting -> userSetting.getUser().getId() == userId)
+                    .collect(Collectors.toList());
+
+            for (UserSetting userSetting : userSettingToDelete) {
+                // Remove the UserSetting object from the set
+                board.getUsersSettings().remove(userSetting);
+            }
+
+            // Save the updated board entity
+            boardRepository.save(board);
+
+            List<UserPermission> userPermissionsToDelete = board.getUsersPermissions().stream()
+                    .filter(userPermission -> userPermission.getUser().getId() == userId)
+                    .collect(Collectors.toList());
+
+            for (UserPermission userPermission : userPermissionsToDelete) {
+                // Remove the UserPermission object from the set
+                board.getUsersPermissions().remove(userPermission);
+            }
+            // Save the updated board entity
+            boardRepository.save(board);
+        }
+
+        List<Board> boardss = boardRepository.findByCreatorUser(user);
+        for (Board board : boardss) {
+            boardRepository.delete(board);
+        }
         userRepository.delete(user);
         return true;
     }
@@ -104,9 +133,11 @@ public class UserService {
      * @throws NullPointerException     if the specified board id is null.
      */
     public List<User> getAllInBoard(long boardId) throws AccountNotFoundException {
+        // make sure this id even exists
         Board board = Validations.doesIdExists(boardId, boardRepository);
-        List<UserInBoard> usersInBoard = userInBoardRepository.findAllUserByBoard(board);
-        return usersInBoard.stream().map(UserInBoard::getUser).collect(Collectors.toList());
+
+        // get all users from this board: use board.getAllUsersInBoard()
+        return board.getAllUsersInBoard();
     }
 
     /**
@@ -118,67 +149,41 @@ public class UserService {
      * @throws AccountNotFoundException if the user or board with the given id does not exist in the database
      * @throws IllegalArgumentException if the combination of the given user and board already exists in the database
      */
-    public UserInBoard addUserToBoard(long userId, long boardId) throws AccountNotFoundException {
+    public void addUserToBoard(long userId, long boardId) throws AccountNotFoundException {
         User user;
+        Board board;
         try {
             user = Validations.doesIdExists(userId, userRepository);
+            board = Validations.doesIdExists(boardId, boardRepository);
+
         } catch (NoSuchElementException e) {
             throw new AccountNotFoundException(ExceptionMessage.ACCOUNT_DOES_NOT_EXISTS.toString());
         }
 
-        Board board = Validations.doesIdExists(boardId, boardRepository);
+        NotificationSetting notificationSetting = Validations.doesIdExists(2L, settingRepository);
 
-        // make sure this combination of user and board doesn't not exist in the db yet
-        if (userInBoardRepository.findByBoardAndUser(user, board).isPresent())
-            throw new IllegalArgumentException(ExceptionMessage.USER_IN_BOARD_EXISTS.toString());
+        UserPermission userPermission = new UserPermission();
+        userPermission.setId(0L);
+        userPermission.setUser(user);
+        userPermission.setPermission(Permission.USER);
 
-        // if not, store the new one in the db
-        UserInBoard userInBoard = UserInBoard.userInBoardUser(user, board);
-        return userInBoardRepository.save(userInBoard);
+        board.addUserPermissionToBoard(userPermission);
+
+        createDefaultSettingForNewUserInBoard(user, board, notificationSetting);
+        boardRepository.save(board);
     }
 
     /**
-     * Removes all dependencies related to the given user from the database.
-     *
-     * @param user the user whose dependencies are to be removed
-     *             This method performs the following actions:
-     *             Removes all entries of the given user from the UserInBoard table
-     *             Removes all comments made by the given user from the database
-     *             Removes all attributes of the given user from the database
-     *             Removes all boards created by the given user from the database
+     * Creates default notifications for every new user in every board,
+     * using constant notifications
      */
-    boolean removeAllUserDependencies(User user) {
-        // second, remove all entries of this user from UserInBoard table
-        removeUserDependenciesFromUserInBoardTable(user);
-
-        // remove all user's comments from the db
-
-        // remove all user's attributes from the db
-
-        // third, remove every board created by this user
-        removeUserDependenciesFromBoardTable(user);
-        return true;
-    }
-
-    /**
-     * Removes all boards from the database that were created by the given user.
-     *
-     * @param user the user whose boards are to be removed from the database
-     */
-    boolean removeUserDependenciesFromBoardTable(User user) {
-        List<Board> boardList = boardRepository.findAllByUser(user);
-        boardList.forEach(board -> boardRepository.delete(board));
-        return true;
-    }
-
-    /**
-     * Removes all entries in the UserInBoard table that are related to the given user or the boards they have created.
-     *
-     * @param user the user whose related entries in the UserInBoard table are to be removed
-     */
-    private boolean removeUserDependenciesFromUserInBoardTable(User user) {
-        List<Board> boardList = boardRepository.findAllByUser(user);
-        boardList.forEach(board -> userInBoardRepository.deleteAllByUserOrBoard(board.getCreatorUser(), board));
-        return true;
+    private void createDefaultSettingForNewUserInBoard(User user, Board board, NotificationSetting notificationSetting) {
+        UserSetting userSetting = new UserSetting();
+        userSetting.setId(0L);
+        userSetting.setInApp(true);
+        userSetting.setInEmail(true);
+        userSetting.setUser(user);
+        userSetting.setSetting(notificationSetting);
+        board.addUserSettingToBoard(userSetting);
     }
 }

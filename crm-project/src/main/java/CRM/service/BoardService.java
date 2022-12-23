@@ -1,24 +1,21 @@
 package CRM.service;
 
-import CRM.entity.Board;
-import CRM.entity.User;
-import CRM.entity.UserInBoard;
-import CRM.entity.requests.BoardRequest;
+import CRM.entity.*;
 import CRM.entity.requests.UpdateObjectRequest;
 import CRM.repository.BoardRepository;
-import CRM.repository.UserInBoardRepository;
+import CRM.repository.SettingRepository;
 import CRM.repository.UserRepository;
 import CRM.utils.Validations;
 import CRM.utils.enums.ExceptionMessage;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.hibernate.sql.Update;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityManager;
 import javax.security.auth.login.AccountNotFoundException;
-import java.util.List;
-import java.util.NoSuchElementException;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -31,7 +28,10 @@ public class BoardService {
     @Autowired
     private UserRepository userRepository;
     @Autowired
-    private UserInBoardRepository userInBoardRepository;
+    private SettingRepository settingRepository;
+    @Autowired
+    private EntityManager entityManager;
+
 
     /**
      * This function persists a new board to the database by calling the save function in the BoardRepository class.
@@ -39,10 +39,21 @@ public class BoardService {
      * @param board The board object to be persisted.
      * @return The persisted board object.
      */
+    // FIXME: board should be created within the service, and not in the facade
+    @Transactional
     public Board create(Board board) {
-        Board dbBoard = boardRepository.save(board);
-        userInBoardRepository.save(UserInBoard.adminUserInBoard(dbBoard.getCreatorUser(), dbBoard));
-        return dbBoard;
+        User user = board.getCreatorUser();
+        //FIXME
+        NotificationSetting notificationSetting = Validations.doesIdExists(2L, settingRepository);
+        UserSetting userSetting = new UserSetting();
+        userSetting.setId(0L);
+        userSetting.setInApp(true);
+        userSetting.setInEmail(true);
+        userSetting.setUser(user);
+        userSetting.setSetting(notificationSetting);
+        userSetting = entityManager.merge(userSetting);
+        board.addUserSettingToBoard(userSetting);
+        return boardRepository.save(board);
     }
 
     /**
@@ -51,8 +62,7 @@ public class BoardService {
      * @param boardId the board ID to delete
      */
     public boolean delete(long boardId) {
-        Board board = Validations.doesIdExists(boardId, boardRepository);
-        userInBoardRepository.deleteAllByBoard(board);
+        Board board = boardRepository.findById(boardId).get();
         boardRepository.delete(board);
         return true;
     }
@@ -91,8 +101,8 @@ public class BoardService {
     public List<Board> getAllBoardsOfUser(long userId) throws AccountNotFoundException {
         try {
             User user = Validations.doesIdExists(userId, userRepository);
-            List<UserInBoard> userInBoard = userInBoardRepository.findAllBoardByUser(user);
-            return userInBoard.stream().map(UserInBoard::getBoard).collect(Collectors.toList());
+            return null;
+//            return user.getBoards().stream().collect(Collectors.toList());
         } catch (NoSuchElementException e) {
             throw new AccountNotFoundException(ExceptionMessage.ACCOUNT_DOES_NOT_EXISTS.toString());
         }
@@ -101,7 +111,7 @@ public class BoardService {
     /**
      * Updates a board with the given information.
      *
-     * @param boardReq the request object containing the update information for the board
+     * @param boardReq the request object containing the update      information for the board
      * @return the updated board
      * @throws NoSuchFieldException if the boardReq with the given field does not exist
      */
@@ -109,5 +119,15 @@ public class BoardService {
         Board board = Validations.doesIdExists(boardId, boardRepository);
         Validations.setContentToFieldIfFieldExists(board, boardReq.getFieldName(), boardReq.getContent());
         return boardRepository.save(board);
+    }
+
+    private void createDefaultSettingForNewUserInBoard(User user, Board board, NotificationSetting notificationSetting) {
+        UserSetting userSetting = new UserSetting();
+        userSetting.setId(0L);
+        userSetting.setInApp(true);
+        userSetting.setInEmail(true);
+        userSetting.setUser(user);
+        userSetting.setSetting(notificationSetting);
+        board.addUserSettingToBoard(userSetting);
     }
 }
