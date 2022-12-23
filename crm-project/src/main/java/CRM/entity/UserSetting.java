@@ -5,33 +5,30 @@ import org.hibernate.annotations.Cascade;
 
 import javax.persistence.*;
 
-@Entity
 @Data
 @AllArgsConstructor
 @Getter
 @Setter
 @NoArgsConstructor
+@Entity
+@Table(name = "users_settings_in_board")
 public class UserSetting {
+
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "id", nullable = false)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @JoinColumn(nullable = false)
-    @ManyToOne()
-    @Cascade(org.hibernate.annotations.CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
     private User user;
 
-    @JoinColumn(nullable = false)
-    @ManyToOne()
-    @Cascade(org.hibernate.annotations.CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "notification_id")
     private NotificationSetting setting;
 
     @Column(name = "in_app")
-    @Cascade(org.hibernate.annotations.CascadeType.ALL)
     private boolean inApp;
 
     @Column(name = "in_email")
-    @Cascade(org.hibernate.annotations.CascadeType.ALL)
     private boolean inEmail;
 }

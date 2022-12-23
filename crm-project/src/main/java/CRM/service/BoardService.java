@@ -1,9 +1,9 @@
 package CRM.service;
 
-import CRM.entity.Board;
-import CRM.entity.User;
+import CRM.entity.*;
 import CRM.entity.requests.UpdateObjectRequest;
 import CRM.repository.BoardRepository;
+import CRM.repository.SettingRepository;
 import CRM.repository.UserRepository;
 import CRM.utils.Validations;
 import CRM.utils.enums.ExceptionMessage;
@@ -11,10 +11,11 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityManager;
 import javax.security.auth.login.AccountNotFoundException;
-import java.util.List;
-import java.util.NoSuchElementException;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -26,6 +27,10 @@ public class BoardService {
     private BoardRepository boardRepository;
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private SettingRepository settingRepository;
+    @Autowired
+    private EntityManager entityManager;
 
 
     /**
@@ -34,7 +39,20 @@ public class BoardService {
      * @param board The board object to be persisted.
      * @return The persisted board object.
      */
+    // FIXME: board should be created within the service, and not in the facade
+    @Transactional
     public Board create(Board board) {
+        User user = board.getCreatorUser();
+        //FIXME
+        NotificationSetting notificationSetting = Validations.doesIdExists(2L, settingRepository);
+        UserSetting userSetting = new UserSetting();
+        userSetting.setId(0L);
+        userSetting.setInApp(true);
+        userSetting.setInEmail(true);
+        userSetting.setUser(user);
+        userSetting.setSetting(notificationSetting);
+        userSetting = entityManager.merge(userSetting);
+        board.addUserSettingToBoard(userSetting);
         return boardRepository.save(board);
     }
 
@@ -44,7 +62,7 @@ public class BoardService {
      * @param boardId the board ID to delete
      */
     public boolean delete(long boardId) {
-        Board board = Validations.doesIdExists(boardId, boardRepository);
+        Board board = boardRepository.findById(boardId).get();
         boardRepository.delete(board);
         return true;
     }
@@ -101,5 +119,15 @@ public class BoardService {
         Board board = Validations.doesIdExists(boardId, boardRepository);
         Validations.setContentToFieldIfFieldExists(board, boardReq.getFieldName(), boardReq.getContent());
         return boardRepository.save(board);
+    }
+
+    private void createDefaultSettingForNewUserInBoard(User user, Board board, NotificationSetting notificationSetting) {
+        UserSetting userSetting = new UserSetting();
+        userSetting.setId(0L);
+        userSetting.setInApp(true);
+        userSetting.setInEmail(true);
+        userSetting.setUser(user);
+        userSetting.setSetting(notificationSetting);
+        board.addUserSettingToBoard(userSetting);
     }
 }

@@ -5,6 +5,7 @@ import lombok.*;
 
 import javax.persistence.*;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
@@ -16,9 +17,9 @@ import java.util.Set;
 @Entity
 @Table(name = "users")
 public class User {
+
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "id", nullable = false)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String firstName;
@@ -26,11 +27,9 @@ public class User {
     private String password;
     private String email;
 
-//    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-//    private Set<Comment> comments = new HashSet<>();
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "user", cascade = CascadeType.ALL)
+    private Set<UserSetting> usersSettings = new HashSet<>();
 
-//    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-//    private Set<Item> items = new HashSet<>();
 
     public static User newUser(RegisterUserRequest registerUser){
         User user = new User();
@@ -40,10 +39,6 @@ public class User {
         user.setLastName(registerUser.getLastName());
         return user;
     }
-
-//    public void addBoard(Board board){
-//        boards.add(board);
-//    }
 
     @Override
     public boolean equals(Object o) {
@@ -57,4 +52,5 @@ public class User {
     public int hashCode() {
         return Objects.hash(id, firstName, lastName, password, email);
     }
+
 }

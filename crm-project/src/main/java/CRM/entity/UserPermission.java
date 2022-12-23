@@ -6,28 +6,25 @@ import org.hibernate.annotations.Cascade;
 
 import javax.persistence.*;
 
-@Entity
 @Data
 @AllArgsConstructor
 @Getter
 @Setter
 @NoArgsConstructor
-@Table(name = "user_permission")
+@Entity
+@Table(name = "users_permissions_in_board")
 public class UserPermission {
+
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "id", nullable = false)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne()
-    @JoinColumn(nullable = false)
-    @Cascade(org.hibernate.annotations.CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
     private User user;
 
-    @Enumerated
-    @Column(name = "permission")
-    @Cascade(org.hibernate.annotations.CascadeType.ALL)
     private Permission permission;
+
 
 //    public static UserInBoard adminUserInBoard(User user, Board board) {
 //        UserInBoard userInBoard = new UserInBoard();

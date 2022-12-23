@@ -13,9 +13,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.security.auth.login.AccountNotFoundException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.stream.Collectors;
 
 @Service
 public class UserService {
@@ -79,7 +79,37 @@ public class UserService {
         } catch (NoSuchElementException e) {
             throw new AccountNotFoundException(ExceptionMessage.ACCOUNT_DOES_NOT_EXISTS.toString());
         }
+        List<Board> boards = boardRepository.findAll();
 
+        for (Board board : boards) {
+            List<UserSetting> userSettingToDelete = board.getUsersSettings().stream()
+                    .filter(userSetting -> userSetting.getUser().getId() == userId)
+                    .collect(Collectors.toList());
+
+            for (UserSetting userSetting : userSettingToDelete) {
+                // Remove the UserSetting object from the set
+                board.getUsersSettings().remove(userSetting);
+            }
+
+            // Save the updated board entity
+            boardRepository.save(board);
+
+            List<UserPermission> userPermissionsToDelete = board.getUsersPermissions().stream()
+                    .filter(userPermission -> userPermission.getUser().getId() == userId)
+                    .collect(Collectors.toList());
+
+            for (UserPermission userPermission : userPermissionsToDelete) {
+                // Remove the UserPermission object from the set
+                board.getUsersPermissions().remove(userPermission);
+            }
+            // Save the updated board entity
+            boardRepository.save(board);
+        }
+
+        List<Board> boardss = boardRepository.findByCreatorUser(user);
+        for (Board board : boardss) {
+            boardRepository.delete(board);
+        }
         userRepository.delete(user);
         return true;
     }
@@ -130,11 +160,16 @@ public class UserService {
             throw new AccountNotFoundException(ExceptionMessage.ACCOUNT_DOES_NOT_EXISTS.toString());
         }
 
-        UserPermission userPermission = new UserPermission(0L, user, Permission.USER);
+        NotificationSetting notificationSetting = Validations.doesIdExists(2L, settingRepository);
+
+        UserPermission userPermission = new UserPermission();
+        userPermission.setId(0L);
+        userPermission.setUser(user);
+        userPermission.setPermission(Permission.USER);
 
         board.addUserPermissionToBoard(userPermission);
 
-        createDefaultSettingForNewUserInBoard(user, board);
+        createDefaultSettingForNewUserInBoard(user, board, notificationSetting);
         boardRepository.save(board);
     }
 
@@ -142,10 +177,13 @@ public class UserService {
      * Creates default notifications for every new user in every board,
      * using constant notifications
      */
-    private void createDefaultSettingForNewUserInBoard(User user, Board board){
-        for (NotificationSetting notificationSetting : settingRepository.findAll()) {
-            UserSetting userSetting = new UserSetting(0L, user, notificationSetting, true, true);
-            board.addUserSettingToBoard(userSetting);
-        }
+    private void createDefaultSettingForNewUserInBoard(User user, Board board, NotificationSetting notificationSetting) {
+        UserSetting userSetting = new UserSetting();
+        userSetting.setId(0L);
+        userSetting.setInApp(true);
+        userSetting.setInEmail(true);
+        userSetting.setUser(user);
+        userSetting.setSetting(notificationSetting);
+        board.addUserSettingToBoard(userSetting);
     }
 }
