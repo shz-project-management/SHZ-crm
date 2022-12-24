@@ -45,7 +45,7 @@ public class ItemService implements ServiceInterface {
         // get the user and make sure he is legit
         User user;
         try {
-            user = Validations.doesIdExists(itemRequest.getUserId(), userRepository);
+            user = Common.getUser(itemRequest.getUserId(), userRepository);
         } catch (NoSuchElementException e) {
             throw new AccountNotFoundException(ExceptionMessage.ACCOUNT_DOES_NOT_EXISTS.toString());
         }

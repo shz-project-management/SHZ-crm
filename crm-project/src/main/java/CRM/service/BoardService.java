@@ -1,6 +1,7 @@
 package CRM.service;
 
 import CRM.entity.*;
+import CRM.entity.requests.BoardRequest;
 import CRM.entity.requests.UpdateObjectRequest;
 import CRM.repository.BoardRepository;
 import CRM.repository.SettingRepository;
@@ -33,19 +34,21 @@ public class BoardService {
     private EntityManager entityManager;
 
 
-    /**
-     * This function persists a new board to the database by calling the save function in the BoardRepository class.
-     *
-     * @param board The board object to be persisted.
-     * @return The persisted board object.
-     */
-    // FIXME: board should be created within the service, and not in the facade
+    //TODO documentation
     @Transactional
-    public Board create(Board board) {
-        User user = board.getCreatorUser();
+    public Board create(BoardRequest boardRequest) throws AccountNotFoundException {
+        User user;
+        try {
+            user = Common.getUser(boardRequest.getCreatorUserId(), userRepository);
+        } catch (NoSuchElementException e) {
+            throw new AccountNotFoundException(ExceptionMessage.ACCOUNT_DOES_NOT_EXISTS.toString());
+        }
+        Board board = Board.createBoard(user, boardRequest.getName(), boardRequest.getDescription());
+
+        User creatorUser = board.getCreatorUser();
         //FIXME notificationSetting shouldn't be created this way.
         NotificationSetting notificationSetting = Validations.doesIdExists(2L, settingRepository);
-        UserSetting userSetting = UserSetting.createUserSetting(user, board, notificationSetting);
+        UserSetting userSetting = UserSetting.createUserSetting(creatorUser, board, notificationSetting);
         //FIXME maybe take Entity manager outside the service will be a better practise.
         userSetting = entityManager.merge(userSetting);
         board.addUserSettingToBoard(userSetting);

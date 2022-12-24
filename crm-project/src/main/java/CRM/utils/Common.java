@@ -1,14 +1,22 @@
 package CRM.utils;
 
 import CRM.entity.*;
+import CRM.entity.response.Response;
 import CRM.utils.enums.ExceptionMessage;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.http.HttpStatus;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.*;
+import java.util.function.Supplier;
 
 public class Common {
+
+
+    public static User getUser(long userId, JpaRepository<User, Long> repo){
+        return Validations.doesIdExists(userId, repo);
+    }
 
     public static Board getBoard(long boardId, JpaRepository<Board, Long> repo) {
         return Validations.doesIdExists(boardId, repo);
@@ -42,4 +50,22 @@ public class Common {
             throw new RuntimeException(ExceptionMessage.UNPROCESSABLE_ENTITY.toString());
         }
     }
+
+    public static <T> Response buildSuccessResponse(T data, HttpStatus successStatus, String message) {
+        return new Response.Builder()
+                .message(message)
+                .data(data)
+                .status(successStatus)
+                .statusCode(successStatus.value())
+                .build();
+    }
+
+    public static Response buildErrorResponse(Exception e, HttpStatus errorStatus) {
+        return new Response.Builder()
+                .message(e.getMessage())
+                .status(errorStatus)
+                .statusCode(errorStatus.value())
+                .build();
+    }
+
 }
