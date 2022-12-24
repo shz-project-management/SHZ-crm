@@ -2,6 +2,7 @@ package CRM.service;
 
 import CRM.entity.*;
 import CRM.entity.requests.CommentRequest;
+import CRM.entity.requests.ObjectsIdsRequest;
 import CRM.entity.requests.UpdateObjectRequest;
 import CRM.repository.*;
 import CRM.utils.Common;
@@ -36,6 +37,7 @@ public class CommentService implements ServiceInterface {
      */
     public Comment create(CommentRequest commentRequest) throws AccountNotFoundException {
 //        Item parentItem = Validations.doesIdExists(commentRequest.getParentItemId(), itemRepository);
+        Board board = Common.getBoard(commentRequest.getBoardId(), boardRepository);
 
         User user;
         try {
@@ -43,10 +45,21 @@ public class CommentService implements ServiceInterface {
         } catch (NoSuchElementException e) {
             throw new AccountNotFoundException(ExceptionMessage.ACCOUNT_DOES_NOT_EXISTS.toString());
         }
+        Item parentItem = null;
+        if (commentRequest.getParentItemId() != null)
+            parentItem = board.getItemFromSectionById(commentRequest.getParentItemId(), commentRequest.getSectionId());
+        else{
+            throw new IllegalArgumentException(ExceptionMessage.PARENT_ITEM_NOT_FOUND.toString());
+        }
 
-//        Comment comment = Comment.createNewComment(user, commentRequest.getTitle(), commentRequest.getDescription(), parentItem);
-//        return commentRepository.save(comment);
-        return null;
+        // build the item
+        Comment comment = Comment.createNewComment(user, commentRequest.getName(), commentRequest.getDescription(), parentItem);
+
+        // add the item to the items list in the board entity
+        board.insertCommentToItemInSection(comment, parentItem.getId(), commentRequest.getSectionId());
+        // save the board in the db
+        boardRepository.save(board);
+        return comment;
     }
 
     /**
@@ -87,8 +100,8 @@ public class CommentService implements ServiceInterface {
      * @throws NoSuchFieldException if the field to update is not a primitive or a known object
      */
     @Override
-    public Comment update(UpdateObjectRequest updateObject, long boardId, long sectionId, long commentId) throws NoSuchFieldException {
-        Board board = Common.getBoard(boardId, boardRepository);
+    public Comment update(UpdateObjectRequest updateObject, long commentId) throws NoSuchFieldException {
+        Board board = Common.getBoard(updateObject.getObjectsIdsRequest().getBoardId(), boardRepository);
 //        if (Validations.checkIfFieldIsCustomObject(updateObject.getFieldName())) {
 //            throw new NoSuchFieldException(ExceptionMessage.FIELD_OBJECT_NOT_EXISTS.toString());
 //        } else {
@@ -99,19 +112,20 @@ public class CommentService implements ServiceInterface {
     }
 
     @Override
-    public SharedContent get(long sectionId, long boardId, long searchId, Long parentItem) {
-        Board board = Common.getBoard(boardId, boardRepository);
-        Section section = Common.getSection(board, sectionId);
-        if(parentItem != null) {
-            Item item = Common.getItem(section, parentItem);
+    public SharedContent get(ObjectsIdsRequest objectsIdsRequest, long searchId) {
+        Board board = Common.getBoard(objectsIdsRequest.getBoardId(), boardRepository);
+        Section section = Common.getSection(board, objectsIdsRequest.getSectionId());
+        if(objectsIdsRequest.getParentId() != null) {
+            Item item = Common.getItem(section, objectsIdsRequest.getParentId());
             return Common.getComment(item, searchId);
         }
         throw new NoSuchElementException(ExceptionMessage.PARENT_ITEM_NOT_FOUND.toString());
     }
 
     @Override
-    public List<SharedContent> getAllInItem(long parentItemId, long sectionId, long boardId) {
-//        Item item = Validations.doesIdExists(itemId, itemRepository);
+    public List<SharedContent> getAllInItem(ObjectsIdsRequest objectsIdsRequest) {
+        //@PathVariable Long boardId, @PathVariable Long sectionId, @PathVariable Long itemId
+//        Item item = Validations.doesIdExists(objectsIdsRequest.getItemId(), itemRepository);
 //        return commentRepository.findAllByParentItem(item).stream().map(comment -> (SharedContent) comment).collect(Collectors.toList());
         return null;
     }
@@ -123,7 +137,7 @@ public class CommentService implements ServiceInterface {
      * @return a list of comments in the board
      */
     public List<Comment> getAllCommentsInBoard(long boardId) {
-        Board board = Validations.doesIdExists(boardId, boardRepository);
+        Board board = Common.getBoard(boardId, boardRepository);
 
         List<Item> items = new ArrayList<>();
         Set<Section> sectionsInBoard = board.getSections();
@@ -138,7 +152,7 @@ public class CommentService implements ServiceInterface {
     }
 
 
-    public List<Comment> getAllCommentsInSection(long boardId, long sectionId) {
+    public List<Comment> getAllCommentsInSection(ObjectsIdsRequest objectsIdsRequest) {
 //        Status status = Validations.doesIdExists(statusId, statusRepository);
 //        Set<Item> itemsInStatus = itemRepository.findAllByStatus(status);
         List<Comment> commentList = new ArrayList<>();
@@ -155,12 +169,12 @@ public class CommentService implements ServiceInterface {
      * @param comment      the item object being updated
      * @throws NoSuchFieldException if the field does not exist in the item object
      */
-    private void fieldIsPrimitiveOrKnownObjectHelper(UpdateObjectRequest updateObject, Comment comment) throws NoSuchFieldException {
-        if (Validations.checkIfFieldIsNonPrimitive(updateObject.getFieldName())) {
-            LocalDateTime dueDate = LocalDateTime.now().plusDays(Long.valueOf((Integer) updateObject.getContent()));
-            Validations.setContentToFieldIfFieldExists(comment, updateObject.getFieldName(), dueDate);
-        } else {
-            Validations.setContentToFieldIfFieldExists(comment, updateObject.getFieldName(), updateObject.getContent());
-        }
-    }
+//    private void fieldIsPrimitiveOrKnownObjectHelper(UpdateObjectRequest updateObject, Comment comment) throws NoSuchFieldException {
+//        if (Validations.checkIfFieldIsNonPrimitive(updateObject.getFieldName())) {
+//            LocalDateTime dueDate = LocalDateTime.now().plusDays(Long.valueOf((Integer) updateObject.getContent()));
+//            Validations.setContentToFieldIfFieldExists(comment, updateObject.getFieldName(), dueDate);
+//        } else {
+//            Validations.setContentToFieldIfFieldExists(comment, updateObject.getFieldName(), updateObject.getContent());
+//        }
+//    }
 }

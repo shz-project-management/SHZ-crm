@@ -1,9 +1,11 @@
 package CRM.controller.controllers;
 
 import CRM.controller.facades.SharedContentFacade;
+import CRM.entity.Comment;
 import CRM.entity.Item;
 import CRM.entity.requests.AttributeRequest;
 import CRM.entity.requests.ItemRequest;
+import CRM.entity.requests.ObjectsIdsRequest;
 import CRM.entity.requests.UpdateObjectRequest;
 import CRM.entity.response.Response;
 import lombok.AllArgsConstructor;
@@ -33,28 +35,27 @@ public class ItemController {
         return new ResponseEntity<>(response, response.getStatus());
     }
 
-    @DeleteMapping(value = "/{boardId}")
+    @DeleteMapping(value = "{boardId}")
     public ResponseEntity<Response> delete(@RequestBody List<Long> itemsIds, @PathVariable Long boardId) {
         Response response = sharedContentFacade.delete(itemsIds, boardId, Item.class);
         return new ResponseEntity<>(response, response.getStatus());
     }
 
-    @PatchMapping(value = "update/{boardId}/{sectionId}/{itemId}")
-    public ResponseEntity<Response> update(@RequestBody UpdateObjectRequest updateItemRequest, @PathVariable Long boardId, @PathVariable Long sectionId, @PathVariable Long itemId){
-        Response response = sharedContentFacade.update(updateItemRequest, boardId, itemId, sectionId, Item.class);
+    @PatchMapping(value = "update")
+    public ResponseEntity<Response> update(@RequestBody UpdateObjectRequest updateItemRequest){
+        Response response = sharedContentFacade.update(updateItemRequest, updateItemRequest.getObjectsIdsRequest().getItemId(), Item.class);
         return new ResponseEntity<>(response, response.getStatus());
     }
 
-    @GetMapping(value = "all-in-section/{boardId}/{sectionId}")
-    public ResponseEntity<Response> getAllItemsInSection(@PathVariable Long boardId, @PathVariable Long sectionId) {
-        Response response = sharedContentFacade.getAllItemsInSection(sectionId, boardId);
+    @GetMapping(value = "{itemId}")
+    public ResponseEntity<Response> get(@RequestBody ObjectsIdsRequest objectsIdsRequest ,@PathVariable Long itemId) {
+        Response response = sharedContentFacade.get(objectsIdsRequest, itemId , Item.class);
         return new ResponseEntity<>(response, response.getStatus());
     }
 
-    @GetMapping(value = "{boardId}/{sectionId}/{itemId}")
-    public ResponseEntity<Response> get(@PathVariable Long boardId, @PathVariable Long sectionId, @PathVariable Long itemId) {
-        Response response = sharedContentFacade.get(sectionId, boardId, itemId, null, Item.class);
+    @GetMapping(value = "all-in-section")
+    public ResponseEntity<Response> getAllItemsInSection(@RequestBody ObjectsIdsRequest objectsIdsRequest) {
+        Response response = sharedContentFacade.getAllItemsInSection(objectsIdsRequest);
         return new ResponseEntity<>(response, response.getStatus());
     }
-
 }

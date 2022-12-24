@@ -2,6 +2,7 @@ package CRM.service;
 
 import CRM.entity.*;
 import CRM.entity.requests.ItemRequest;
+import CRM.entity.requests.ObjectsIdsRequest;
 import CRM.entity.requests.UpdateObjectRequest;
 import CRM.repository.*;
 import CRM.utils.Common;
@@ -102,25 +103,16 @@ public class ItemService implements ServiceInterface {
     }
 
     @Override
-    public SharedContent get(long sectionId, long boardId, long searchId, Long parentItem) {
-        Board board = Common.getBoard(boardId, boardRepository);
-        Section section = Common.getSection(board, sectionId);
+    public SharedContent get(ObjectsIdsRequest objectsIdsRequest, long searchId)  {
+        Board board = Common.getBoard(objectsIdsRequest.getBoardId(), boardRepository);
+        Section section = Common.getSection(board, objectsIdsRequest.getSectionId());
         return Common.getItem(section, searchId);
     }
 
 
-    /**
-     * Update an item field.
-     *
-     * @param updateObject the request object containing the updates to be made
-     * @param sectionId    the id of the item to be updated
-     * @return the updated item
-     * @throws NoSuchFieldException if the field to be updated does not exist in the item object
-     */
-
     @Override
-    public Comment update(UpdateObjectRequest updateObject, long boardId, long sectionId, long commentId) throws NoSuchFieldException {
-        Board board = Validations.doesIdExists(boardId, boardRepository);
+    public Comment update(UpdateObjectRequest updateObject, long commentId) throws NoSuchFieldException {
+        Board board = Validations.doesIdExists(updateObject.getObjectsIdsRequest().getBoardId(), boardRepository);
 
 //        if (Validations.checkIfFieldIsCustomObject(updateObject.getFieldName())) {
 //            fieldIsCustomObjectHelper(updateObject, itemId, item);
@@ -131,35 +123,19 @@ public class ItemService implements ServiceInterface {
         return null;
     }
 
-    /**
-     * Retrieves all shared content items that are within the specified item.
-     *
-     * @param itemId the ID of the item to retrieve shared content from
-     * @return a list of shared content items within the specified item
-     * @throws NoSuchElementException if the item with the specified ID does not exist
-     */
     @Override
-    public List<SharedContent> getAllInItem(long itemId, long sectionId, long boardId) {
-        Board board = Validations.doesIdExists(boardId, boardRepository); // but instead of itemId, put board id
+    public List<SharedContent> getAllInItem(ObjectsIdsRequest objectsIdsRequest) {
+        //long itemId, long sectionId, long boardId
+        Board board = Common.getBoard(objectsIdsRequest.getBoardId(), boardRepository); // but instead of itemId, put board id
 
-        return board.getSectionFromBoard(sectionId)
-                .getItems().stream().collect(Collectors.toList());
+        return new ArrayList<>(board.getSectionFromBoard(objectsIdsRequest.getSectionId()).getItems());
     }
 
-    /**
-     * getAllInBoard
-     * This function receives the ID of a board and retrieves all the items in that board.
-     * It uses the doesIdExists function from the Validations class to retrieve the board with the provided ID from the boardRepository.
-     * The findAllByBoard function from the itemRepository is then called with the retrieved board, returning a list of all the items in that board.
-     *
-     * @param sectionId - the ID of the board whose items are to be retrieved
-     * @return a list of the items in the specified board
-     */
-    public List<Item> getAllInSection(long sectionId, long boardId) {
-        Board board = Validations.doesIdExists(boardId, boardRepository);
 
-        return board.getSectionFromBoard(sectionId)
-                .getItems().stream().collect(Collectors.toList());
+    public List<Item> getAllInSection(ObjectsIdsRequest objectsIdsRequest) {
+        Board board = Validations.doesIdExists(objectsIdsRequest.getBoardId(), boardRepository);
+
+        return new ArrayList<>(board.getSectionFromBoard(objectsIdsRequest.getSectionId()).getItems());
     }
 
 

@@ -36,12 +36,12 @@ public class BoardController {
     /**
      * Handle HTTP DELETE requests to delete a board.
      *
-     * @param id The ID of the board to delete.
+     * @param boardId The ID of the board to delete.
      * @return A ResponseEntity with the appropriate status and response body.
      */
-    @DeleteMapping(value = "{id}")
-    public ResponseEntity<Response> delete(@PathVariable Long id) {
-        Response response = boardFacade.delete(id);
+    @DeleteMapping(value = "{boardId}")
+    public ResponseEntity<Response> delete(@PathVariable Long boardId) {
+        Response response = boardFacade.delete(boardId);
         return new ResponseEntity<>(response, response.getStatus());
     }
 
@@ -49,12 +49,12 @@ public class BoardController {
      * This method is used to handle HTTP GET requests to the specified URL (board/{id}).
      * The method takes the id of the board as a path variable and uses it to retrieve the board information from the boardFacade object.
      *
-     * @param id The id of the board to retrieve.
+     * @param boardId The id of the board to retrieve.
      * @return A ResponseEntity object containing the Response object with the board information and the HTTP status code.
      */
-    @GetMapping(value = "{id}")
-    public ResponseEntity<Response> get(@PathVariable Long id) {
-        Response response = boardFacade.get(id);
+    @GetMapping(value = "{boardId}")
+    public ResponseEntity<Response> get(@PathVariable Long boardId) {
+        Response response = boardFacade.get(boardId);
         return new ResponseEntity<>(response, response.getStatus());
     }
 
@@ -78,9 +78,9 @@ public class BoardController {
      * @param boardRequest An object containing the fields to update for the board.
      * @return A response object indicating the status of the update operation.
      */
-    @PatchMapping(value = "/update/{boardId}", consumes = "application/json")
-    public ResponseEntity<Response> updateBoard(@RequestBody UpdateObjectRequest boardRequest, @PathVariable Long boardId) {
-        Response response = boardFacade.updateBoard(boardRequest, boardId);
+    @PatchMapping(value = "/update", consumes = "application/json")
+    public ResponseEntity<Response> updateBoard(@RequestBody UpdateObjectRequest boardRequest) {
+        Response response = boardFacade.updateBoard(boardRequest, boardRequest.getBoardId());
         return new ResponseEntity<>(response, response.getStatus());
     }
 }
