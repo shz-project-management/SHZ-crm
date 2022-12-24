@@ -14,7 +14,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.security.auth.login.AccountNotFoundException;
-import java.time.LocalDateTime;
 import java.util.*;
 
 @Service
@@ -35,29 +34,24 @@ public class CommentService implements ServiceInterface {
      * @return the created comment
      * @throws AccountNotFoundException if the user specified in the comment request does not exist
      */
+    //TODO documentation
     public Comment create(CommentRequest commentRequest) throws AccountNotFoundException {
-//        Item parentItem = Validations.doesIdExists(commentRequest.getParentItemId(), itemRepository);
         Board board = Common.getBoard(commentRequest.getBoardId(), boardRepository);
-
         User user;
+
         try {
             user = Validations.doesIdExists(commentRequest.getUserId(), userRepository);
         } catch (NoSuchElementException e) {
             throw new AccountNotFoundException(ExceptionMessage.ACCOUNT_DOES_NOT_EXISTS.toString());
         }
-        Item parentItem = null;
-        if (commentRequest.getParentItemId() != null)
-            parentItem = board.getItemFromSectionById(commentRequest.getParentItemId(), commentRequest.getSectionId());
-        else{
+
+        if (commentRequest.getParentItemId() == null){
             throw new IllegalArgumentException(ExceptionMessage.PARENT_ITEM_NOT_FOUND.toString());
         }
 
-        // build the item
+        Item parentItem = board.getItemFromSectionById(commentRequest.getParentItemId(), commentRequest.getSectionId());
         Comment comment = Comment.createNewComment(user, commentRequest.getName(), commentRequest.getDescription(), parentItem);
-
-        // add the item to the items list in the board entity
         board.insertCommentToItemInSection(comment, parentItem.getId(), commentRequest.getSectionId());
-        // save the board in the db
         boardRepository.save(board);
         return comment;
     }
@@ -68,6 +62,7 @@ public class CommentService implements ServiceInterface {
      * @param ids the IDs of the comments to delete
      * @return the number of comments that were successfully deleted
      */
+    //TODO documentation
     @Override
     public int delete(List<Long> ids, long boardId) {
         Board board = Common.getBoard(boardId, boardRepository);
@@ -99,6 +94,7 @@ public class CommentService implements ServiceInterface {
      * @return the updated Comment object
      * @throws NoSuchFieldException if the field to update is not a primitive or a known object
      */
+    //TODO
     @Override
     public Comment update(UpdateObjectRequest updateObject, long commentId) throws NoSuchFieldException {
         Board board = Common.getBoard(updateObject.getObjectsIdsRequest().getBoardId(), boardRepository);
@@ -111,10 +107,12 @@ public class CommentService implements ServiceInterface {
         return null;
     }
 
+    //TODO documentation
     @Override
     public SharedContent get(ObjectsIdsRequest objectsIdsRequest, long searchId) {
         Board board = Common.getBoard(objectsIdsRequest.getBoardId(), boardRepository);
         Section section = Common.getSection(board, objectsIdsRequest.getSectionId());
+
         if(objectsIdsRequest.getParentId() != null) {
             Item item = Common.getItem(section, objectsIdsRequest.getParentId());
             return Common.getComment(item, searchId);
@@ -122,6 +120,7 @@ public class CommentService implements ServiceInterface {
         throw new NoSuchElementException(ExceptionMessage.PARENT_ITEM_NOT_FOUND.toString());
     }
 
+    //TODO + documentation
     @Override
     public List<SharedContent> getAllInItem(ObjectsIdsRequest objectsIdsRequest) {
         //@PathVariable Long boardId, @PathVariable Long sectionId, @PathVariable Long itemId
@@ -136,22 +135,24 @@ public class CommentService implements ServiceInterface {
      * @param boardId the ID of the board
      * @return a list of comments in the board
      */
+    //TODO documentation
     public List<Comment> getAllCommentsInBoard(long boardId) {
         Board board = Common.getBoard(boardId, boardRepository);
 
         List<Item> items = new ArrayList<>();
         Set<Section> sectionsInBoard = board.getSections();
-        sectionsInBoard.forEach(section -> section.getItems().forEach(item -> items.add(item)));
+        sectionsInBoard.forEach(section -> items.addAll(section.getItems()));
 
         List<Comment> commentList = new ArrayList<>();
 
-//        for (Item item : items) {
-//            commentList.addAll(commentRepository.findAllByParentItem(item));
-//        }
+        for (Item item : items) {
+            commentList.addAll(item.getComments());
+        }
         return commentList;
     }
 
 
+    //TODO + documentation
     public List<Comment> getAllCommentsInSection(ObjectsIdsRequest objectsIdsRequest) {
 //        Status status = Validations.doesIdExists(statusId, statusRepository);
 //        Set<Item> itemsInStatus = itemRepository.findAllByStatus(status);

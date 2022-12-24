@@ -62,7 +62,7 @@ public class ItemService implements ServiceInterface {
         Type type = (Type) board.getAttributeById(itemRequest.getTypeId(), Type.class);
 
         // build the item
-        Item item = Item.createNewItem(section, status, type, user, itemRequest.getTitle(), itemRequest.getDescription(), parentItem, itemRequest.getImportance());
+        Item item = Item.createNewItem(section, status, type, user, itemRequest.getName(), itemRequest.getDescription(), parentItem, itemRequest.getImportance());
 
         // add the item to the items list in the board entity
         board.insertItemToSection(item, itemRequest.getSectionId());
@@ -73,14 +73,7 @@ public class ItemService implements ServiceInterface {
         return item;
     }
 
-
-    /**
-     * Deletes a list of items from the system and their associated comments from the database.
-     *
-     * @param ids The IDs of the items to be deleted.
-     * @return The number of items successfully deleted.
-     * @throws NoSuchElementException if any of the IDs does not correspond to an existing item.
-     */
+    //TODO Documentation
     @Override
     public int delete(List<Long> ids, long boardId) {
         Board board = Common.getBoard(boardId, boardRepository);
@@ -98,10 +91,10 @@ public class ItemService implements ServiceInterface {
         }
 
         boardRepository.save(board);
-
         return counter;
     }
 
+    //TODO Documentation
     @Override
     public SharedContent get(ObjectsIdsRequest objectsIdsRequest, long searchId)  {
         Board board = Common.getBoard(objectsIdsRequest.getBoardId(), boardRepository);
@@ -110,6 +103,7 @@ public class ItemService implements ServiceInterface {
     }
 
 
+    //TODO + Documentation
     @Override
     public Comment update(UpdateObjectRequest updateObject, long commentId) throws NoSuchFieldException {
         Board board = Validations.doesIdExists(updateObject.getObjectsIdsRequest().getBoardId(), boardRepository);
@@ -123,6 +117,7 @@ public class ItemService implements ServiceInterface {
         return null;
     }
 
+    //TODO Documentation
     @Override
     public List<SharedContent> getAllInItem(ObjectsIdsRequest objectsIdsRequest) {
         //long itemId, long sectionId, long boardId
@@ -131,7 +126,7 @@ public class ItemService implements ServiceInterface {
         return new ArrayList<>(board.getSectionFromBoard(objectsIdsRequest.getSectionId()).getItems());
     }
 
-
+    //TODO Documentation
     public List<Item> getAllInSection(ObjectsIdsRequest objectsIdsRequest) {
         Board board = Validations.doesIdExists(objectsIdsRequest.getBoardId(), boardRepository);
 

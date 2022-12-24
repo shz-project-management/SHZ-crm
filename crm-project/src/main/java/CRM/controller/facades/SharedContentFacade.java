@@ -146,6 +146,8 @@ public class SharedContentFacade {
                 .build();
     }
 
+
+    //TODO + Validation function + Documentation
     public Response update(UpdateObjectRequest updateObject, Long updateObjectId, Class clz) {
         // validate params using the Validations.validate function
         // call the correct service using convertFromClassToService(clz) function
@@ -190,6 +192,7 @@ public class SharedContentFacade {
      * returned. If a NullPointerException is thrown, a BAD_REQUEST status with a message indicating the
      * error is returned.
      */
+    //TODO Validation function
     public Response get(ObjectsIdsRequest objectsIdsRequest, Long searchId ,Class clz) {
         try {
             // validate the id using the Validations.validate function
@@ -219,6 +222,7 @@ public class SharedContentFacade {
         }
     }
 
+    //TODO + DTO + Documentation
     public Response getAllItemsInSection(ObjectsIdsRequest objectsIdsRequest) {
         try {
             // validate the id using the Validations.validate function
@@ -263,7 +267,7 @@ public class SharedContentFacade {
             Validations.validate(boardId, Regex.ID.getRegex());
             //FIXME- commentDTO list
             return new Response.Builder()
-                    .data(commentService.getAllCommentsInBoard(boardId).stream().map(comment -> CommentDTO.getSharedContentFromDB(comment)).collect(Collectors.toList()))
+                    .data(commentService.getAllCommentsInBoard(boardId).stream().map(CommentDTO::getSharedContentFromDB).collect(Collectors.toList()))
                     .message(SuccessMessage.FOUND.toString())
                     .status(HttpStatus.OK)
                     .statusCode(200)
@@ -282,16 +286,6 @@ public class SharedContentFacade {
         }
     }
 
-    /**
-     * Retrieves a list of entities of a specified class associated with a given item.
-     *
-     * @param itemId The ID of the item to retrieve the entities for.
-     * @param clz    The class of the entities to retrieve.
-     * @return A response object containing the list of entities and related status information.
-     * @throws IllegalArgumentException if the item ID is invalid or if the class is not supported.
-     * @throws NoSuchElementException   if no entities are found for the given item.
-     * @throws NullPointerException     if there is a problem with the input.
-     */
     public Response getAllInItem(ObjectsIdsRequest objectsIdsRequest, Class clz) {
         try {
             Validations.validate(objectsIdsRequest.getItemId(), Regex.ID.getRegex());
@@ -317,11 +311,11 @@ public class SharedContentFacade {
         }
     }
 
+    //TODO Validation function + DTO list
     public Response getAllCommentsInSection(ObjectsIdsRequest objectsIdsRequest) {
         try {
             Validations.validate(objectsIdsRequest.getBoardId(), Regex.ID.getRegex());
             Validations.validate(objectsIdsRequest.getSectionId(), Regex.ID.getRegex());
-            //FIXME- commentDTO list
             return new Response.Builder()
                     .data(commentService.getAllCommentsInSection(objectsIdsRequest).stream().map(CommentDTO::getSharedContentFromDB).collect(Collectors.toList()))
                     .message(SuccessMessage.FOUND.toString())
@@ -352,7 +346,7 @@ public class SharedContentFacade {
         logger.info("in FacadeFileController -> convertFromClassToService ,item of Class: " + c);
 
         if (c.equals(Item.class)) return itemService;
-//        if (c.equals(Comment.class)) return commentService;
+        if (c.equals(Comment.class)) return commentService;
 
         throw new IllegalArgumentException("There is no such class in the system!");
     }

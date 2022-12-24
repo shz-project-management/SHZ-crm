@@ -36,16 +36,16 @@ public class BoardFacade {
      * @param boardRequest The request body, containing the necessary information to create a new board.
      * @return A Response object with the status of the create operation and the created board object, or an error message if the operation fails.
      */
+    //TODO line 44 move to create function in service +++++ => make this function prettier
     public Response create(BoardRequest boardRequest) {
         try {
             Validations.validateNewBoard(boardRequest);
             User user = authService.findById(boardRequest.getCreatorUserId());
             Board board = Board.createBoard(user, boardRequest.getName(), boardRequest.getDescription());
-            Board dbBoard = boardService.create(board);
             return new Response.Builder()
                     .status(HttpStatus.CREATED)
                     .statusCode(201)
-                    .data(BoardDTO.createPlainBoard(dbBoard))
+                    .data(BoardDTO.createPlainBoard(boardService.create(board)))
                     .build();
         } catch (AccountNotFoundException | IllegalArgumentException e) {
             return new Response.Builder()

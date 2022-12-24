@@ -111,11 +111,8 @@ public class Validations {
         if (item.getImportance() < 0 || item.getImportance() > 5)
             throw new IllegalArgumentException(ExceptionMessage.VALIDATION_FAILED.toString());
 
-        if (item.getTitle() == null)
+        if (item.getName() == null)
             throw new NullPointerException(ExceptionMessage.VALIDATION_FAILED.toString());
-
-        if (item.getDescription() == null)
-            item.setDescription("");
     }
 
     /**
@@ -130,11 +127,8 @@ public class Validations {
         validate(comment.getParentItemId(), Regex.ID.getRegex());
         validate(comment.getUserId(), Regex.ID.getRegex());
 
-        if (comment.getTitle() == null)
+        if (comment.getName() == null)
             throw new NullPointerException(ExceptionMessage.VALIDATION_FAILED.toString());
-
-        if (comment.getDescription() == null)
-            comment.setDescription("");
     }
 
     /**

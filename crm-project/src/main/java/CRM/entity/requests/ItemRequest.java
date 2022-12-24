@@ -7,8 +7,6 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
-@Setter
-@ToString
 public class ItemRequest extends SharedContentRequest{
     private Long statusId;
     private Long typeId;

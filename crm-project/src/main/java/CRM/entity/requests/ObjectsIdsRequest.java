@@ -5,7 +5,6 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
-@Setter
 public class ObjectsIdsRequest {
     private Long boardId;
     private Long sectionId;

@@ -31,4 +31,14 @@ public class UserSetting {
 
     @Column(name = "in_email")
     private boolean inEmail;
+
+    public static UserSetting createUserSetting(User user, Board board, NotificationSetting notificationSetting){
+        UserSetting userSetting = new UserSetting();
+        userSetting.setId(0L);
+        userSetting.setInApp(true);
+        userSetting.setInEmail(true);
+        userSetting.setUser(user);
+        userSetting.setSetting(notificationSetting);
+        return userSetting;
+    }
 }
