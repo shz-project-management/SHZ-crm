@@ -1,6 +1,5 @@
 package CRM.entity.DTO;
 
-import CRM.entity.Board;
 import CRM.entity.Item;
 import lombok.*;
 
@@ -30,7 +29,7 @@ public class ItemDTO extends SharedContentDTO {
         itemDTO.setImportance(item.getImportance());
         if (item.getParentItem() != null)
             itemDTO.setParentItem(ItemDTO.getSharedContentFromDB(item.getParentItem()));
-        itemDTO.setUser(UserDTO.getUserFromDB(item.getUser()));
+        itemDTO.setUser(UserDTO.createUserDTO(item.getUser()));
         itemDTO.setTitle(item.getName());
         itemDTO.setDescription(item.getDescription());
         itemDTO.setType(AttributeDTO.createAttributeDTO(item.getType()));

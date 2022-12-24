@@ -3,10 +3,8 @@ package CRM.entity.DTO;
 import CRM.entity.*;
 import lombok.*;
 
-import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -26,7 +24,7 @@ public class BoardDTO {
     public static BoardDTO createPlainBoard(Board board){
         BoardDTO boardDTO = new BoardDTO();
         boardDTO.setId(board.getId());
-        boardDTO.setCreatorUser(UserDTO.getUserFromDB(board.getCreatorUser()));
+        boardDTO.setCreatorUser(UserDTO.createUserDTO(board.getCreatorUser()));
         boardDTO.setName(board.getName());
         boardDTO.setDescription(board.getDescription());
         return boardDTO;
@@ -35,7 +33,7 @@ public class BoardDTO {
     public static BoardDTO getBoardFromDB(Board board){
         BoardDTO boardDTO = new BoardDTO();
         boardDTO.setId(board.getId());
-        boardDTO.setCreatorUser(UserDTO.getUserFromDB(board.getCreatorUser()));
+        boardDTO.setCreatorUser(UserDTO.createUserDTO(board.getCreatorUser()));
         boardDTO.setName(board.getName());
         boardDTO.setDescription(board.getDescription());
         boardDTO.setSections(SectionDTO.getSectionsDTOList(board.getSections()));

@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.security.auth.login.AccountNotFoundException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Set;
@@ -150,7 +151,7 @@ public class UserService {
      * @throws AccountNotFoundException if the user or board with the given id does not exist in the database
      * @throws IllegalArgumentException if the combination of the given user and board already exists in the database
      */
-    public void updateUserToBoard(long userId, long boardId, long permissionId) throws AccountNotFoundException {
+    public List<User> updateUserToBoard(long userId, long boardId, long permissionId) throws AccountNotFoundException {
         User user;
         Board board;
         try {
@@ -165,8 +166,9 @@ public class UserService {
         }
 
         UserPermission userPermissionInBoard = null;
-        Set<UserPermission> userPermissions = board.getUsersPermissions();
-        for (UserPermission userInBoard : userPermissions) {
+        Set<UserPermission> userPermissionsSet = board.getUsersPermissions();
+
+        for (UserPermission userInBoard : userPermissionsSet) {
             if (userInBoard.getId().equals(userId)) {
                 userPermissionInBoard = userInBoard;
                 break;
@@ -185,12 +187,18 @@ public class UserService {
         } else if (permissionRequest.equals(Permission.LEADER) && !userPermissionInBoard.getPermission().equals(Permission.LEADER)) {
             userPermissionInBoard.setPermission(permissionRequest);
         } else if (permissionRequest.equals(Permission.UNAUTHORIZED)) {
-            userPermissions.remove(userPermissionInBoard);
+            userPermissionsSet.remove(userPermissionInBoard);
         } else {
             throw new IllegalArgumentException(ExceptionMessage.USER_ALREADY_HAS_THIS_PERMISSION.toString());
         }
 
+        List<User> users = new ArrayList<>();
+        users.add(board.getCreatorUser());
+        for (UserPermission addUSer: userPermissionsSet) {
+            users.add(addUSer.getUser());
+        }
         boardRepository.save(board);
+        return users;
     }
 
     /**
