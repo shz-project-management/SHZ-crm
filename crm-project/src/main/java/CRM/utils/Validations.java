@@ -60,8 +60,7 @@ public class Validations {
     public static boolean validateRegisteredUser(RegisterUserRequest user) {
         validate(user.getEmail(), Regex.EMAIL.getRegex());
         validate(user.getPassword(), Regex.PASSWORD.getRegex());
-        validate(user.getFirstName(), Regex.NAME.getRegex());
-        validate(user.getLastName(), Regex.NAME.getRegex());
+        validate(user.getFullName(), Regex.NAME.getRegex());
         return true;
     }
 

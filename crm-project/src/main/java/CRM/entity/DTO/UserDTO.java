@@ -11,14 +11,12 @@ import lombok.*;
 public class UserDTO {
 
     private Long id;
-    private String firstName;
-    private String lastName;
+    private String fullName;
 
     public static UserDTO getUserFromDB(User user){
         UserDTO userDTO = new UserDTO();
         userDTO.setId(user.getId());
-        userDTO.setFirstName(user.getFirstName());
-        userDTO.setLastName(user.getLastName());
+        userDTO.setFullName(user.getFullName());
         return userDTO;
     }
 }
