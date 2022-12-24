@@ -22,8 +22,7 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String firstName;
-    private String lastName;
+    private String fullName;
     private String password;
     private String email;
 
@@ -35,8 +34,7 @@ public class User {
         User user = new User();
         user.setEmail(registerUser.getEmail());
         user.setPassword(registerUser.getPassword());
-        user.setFirstName(registerUser.getFirstName());
-        user.setLastName(registerUser.getLastName());
+        user.setFullName(registerUser.getFullName());
         return user;
     }
 
@@ -45,12 +43,12 @@ public class User {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         User user = (User) o;
-        return Objects.equals(id, user.id) && Objects.equals(firstName, user.firstName) && Objects.equals(lastName, user.lastName) && Objects.equals(password, user.password) && Objects.equals(email, user.email);
+        return Objects.equals(id, user.id) && Objects.equals(fullName, user.fullName) && Objects.equals(password, user.password) && Objects.equals(email, user.email);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, firstName, lastName, password, email);
+        return Objects.hash(id, fullName, password, email);
     }
 
 }
