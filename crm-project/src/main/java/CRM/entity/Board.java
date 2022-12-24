@@ -8,10 +8,7 @@ import lombok.*;
 import javax.persistence.*;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.HashSet;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @AllArgsConstructor
@@ -98,6 +95,12 @@ public class Board {
         getSectionFromBoard(sectionId)
                 .getItemById(itemId)
                 .insertComment(comment);
+    }
+
+    public List<Comment> getAllCommentsInItem(long sectionId, long itemId){
+        return new ArrayList<>(getSectionFromBoard(sectionId)
+                .getItemById(itemId)
+                .getComments());
     }
 
 

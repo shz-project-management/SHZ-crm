@@ -20,7 +20,8 @@ public class BoardDTO {
     private UserDTO creatorUser;
     private String name;
     private String description;
-//    private Set<Item> items;
+    // FIXME: put all these stats in DTO also
+//    private Set<Item> sections;
 //    private Set<Type> types;
 //    private Set<Status> statuses;
 
