@@ -8,11 +8,11 @@ public enum ExceptionMessage {
     // TODO: split by subjects!
     // TODO: change messages to each exception
 
-    MULTIPLE_PRIMARY_KEY("A table can not contain multiple primary keys."),
+    ADMIN_CANT_CHANGE_HIS_PERMISSION("Admin cannot change his own permission in the board he has created"),
     MULTIPLE_AUTO_INCREMENT("A table can not contain multiple auto increment fields."),
     TRUNCATE("Couldn't truncate the table properly."),
     ILLEGAL_SQL_QUERY("Sql query is not legal."),
-    DUPLICATED_UNIQUE_FIELD("Can not create a duplicate of a unique field: "),
+    PERMISSION_NOT_ALLOWED("Cant assign another admin to this board"),
     ATTRIBUTE_ALREADY_IN_DB("Attribute with the same name already exists in this board"),
     NULL_INPUT("cannot set the content of the argument to null"),
     TOKEN_IS_NULL("token is null"),
@@ -21,7 +21,7 @@ public enum ExceptionMessage {
     FIELD_OBJECT_REPO_NOT_EXISTS("Field object repository doesn't exists or not supported"),
     NO_SUCH_CLASS("There is no such class in the system!"),
     TOO_SHORT_STRING("This field can not be as short as inserted"),
-    CREATE_TABLE("Couldn't create the table properly."),
+    PERMISSION_NOT_FOUND("Permission not found"),
     PARENT_ITEM_NOT_FOUND("Parent item not found for this comment"),
     PARENT_ITEM_ERROR("Item can't be his own parent"),
     ILLEGAL_AUTH_HEADER("Authorization header is not legal"),
@@ -39,7 +39,7 @@ public enum ExceptionMessage {
     NO_USER_IN_DOCUMENT_IN_DATABASE("Could not locate the find the user that uses this document in the database."),
     UNAUTHORIZED("You are unauthorized to create such a action"),
     FOLDER_EXISTS("This folder ID already exist in the database: "),
-    FOLDER_DOES_NOT_EXISTS("This folder ID does not exist in the database: "),
+    USER_ALREADY_HAS_THIS_PERMISSION("User already has this permission in board"),
     ACCOUNT_DOES_NOT_EXISTS("Could not locate this account in the database"),
     NO_SUCH_ID("Could not locate this element by the given ID"),
     VALIDATION_FAILED("Could not approve the given information: "),
@@ -47,7 +47,7 @@ public enum ExceptionMessage {
     WRONG_SEARCH("Something in the request wasn't properly written, try again"),
     EMAIL_IN_USE("This email address is already in use"),
     UNPROCESSABLE_ENTITY("Server Couldn't process entity"),
-    CANT_ASSIGN_PERMISSION("Document ID or user ID or Permission does not exist in the database: "),
+    CANT_ASSIGN_PERMISSION("Cant assign this permission to the given user"),
     USER_NOT_ACTIVATED("The user is not activated"),
     WRONG_INPUT_TYPE("Could not insert such input to the field"),
     USER_IS_NOT_THE_ADMIN("The user is not the admin of the document");

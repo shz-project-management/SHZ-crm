@@ -1,8 +1,10 @@
 package CRM.controller.facades;
 
+import CRM.entity.requests.ObjectsIdsRequest;
 import CRM.entity.response.Response;
 import CRM.service.UserService;
 import CRM.utils.Validations;
+import CRM.utils.enums.Permission;
 import CRM.utils.enums.Regex;
 import CRM.utils.enums.SuccessMessage;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -155,12 +157,10 @@ public class UserFacade {
      * if there is a null pointer exception, the message field will contain the NullPointerException message,
      * the status field will be HttpStatus.BAD_REQUEST, and the statusCode field will be 500
      */
-    public Response addUserToBoard(Long userId, Long boardId) {
+    public Response updateUserToBoard(ObjectsIdsRequest objectsIdsRequest) {
         try {
-            Validations.validate(userId, Regex.ID.getRegex());
-            Validations.validate(boardId, Regex.ID.getRegex());
-
-            userService.addUserToBoard(userId, boardId);
+            Validations.validateUpdateUserToBoard(objectsIdsRequest.getBoardId(), objectsIdsRequest.getUserId(), objectsIdsRequest.getPermissionId());
+            userService.updateUserToBoard(objectsIdsRequest.getBoardId(), objectsIdsRequest.getUserId(), objectsIdsRequest.getPermissionId());
 
             return new Response.Builder()
                     .message(SuccessMessage.FOUND.toString())

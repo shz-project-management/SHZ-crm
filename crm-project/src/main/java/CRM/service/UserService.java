@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import javax.security.auth.login.AccountNotFoundException;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -149,27 +150,46 @@ public class UserService {
      * @throws AccountNotFoundException if the user or board with the given id does not exist in the database
      * @throws IllegalArgumentException if the combination of the given user and board already exists in the database
      */
-    public void addUserToBoard(long userId, long boardId) throws AccountNotFoundException {
+    public void updateUserToBoard(long userId, long boardId, long permissionId) throws AccountNotFoundException {
         User user;
         Board board;
         try {
             user = Validations.doesIdExists(userId, userRepository);
             board = Validations.doesIdExists(boardId, boardRepository);
-
         } catch (NoSuchElementException e) {
             throw new AccountNotFoundException(ExceptionMessage.ACCOUNT_DOES_NOT_EXISTS.toString());
         }
 
-        NotificationSetting notificationSetting = Validations.doesIdExists(2L, settingRepository);
+        if(user.equals(board.getCreatorUser())){
+            throw new IllegalArgumentException(ExceptionMessage.ADMIN_CANT_CHANGE_HIS_PERMISSION.toString());
+        }
 
-        UserPermission userPermission = new UserPermission();
-        userPermission.setId(0L);
-        userPermission.setUser(user);
-        userPermission.setPermission(Permission.USER);
+        UserPermission userPermissionInBoard = null;
+        Set<UserPermission> userPermissions = board.getUsersPermissions();
+        for (UserPermission userInBoard : userPermissions) {
+            if (userInBoard.getId().equals(userId)) {
+                userPermissionInBoard = userInBoard;
+                break;
+            }
+        }
 
-        board.addUserPermissionToBoard(userPermission);
+        Permission permissionRequest = Permission.values()[(int) permissionId];
 
-        createDefaultSettingForNewUserInBoard(user, board, notificationSetting);
+        if (userPermissionInBoard == null) { //create new
+            if(!permissionRequest.equals(Permission.ADMIN) && !permissionRequest.equals(Permission.UNAUTHORIZED)) createNewUserPermission(user, permissionRequest, board);
+            else throw new IllegalArgumentException(ExceptionMessage.CANT_ASSIGN_PERMISSION.toString());
+        } else if (permissionRequest.equals(Permission.ADMIN)) {
+            throw new IllegalArgumentException(ExceptionMessage.PERMISSION_NOT_ALLOWED.toString());
+        } else if (permissionRequest.equals(Permission.USER) && !userPermissionInBoard.getPermission().equals(Permission.USER)) {
+            userPermissionInBoard.setPermission(permissionRequest);
+        } else if (permissionRequest.equals(Permission.LEADER) && !userPermissionInBoard.getPermission().equals(Permission.LEADER)) {
+            userPermissionInBoard.setPermission(permissionRequest);
+        } else if (permissionRequest.equals(Permission.UNAUTHORIZED)) {
+            userPermissions.remove(userPermissionInBoard);
+        } else {
+            throw new IllegalArgumentException(ExceptionMessage.USER_ALREADY_HAS_THIS_PERMISSION.toString());
+        }
+
         boardRepository.save(board);
     }
 
@@ -185,5 +205,15 @@ public class UserService {
         userSetting.setUser(user);
         userSetting.setSetting(notificationSetting);
         board.addUserSettingToBoard(userSetting);
+    }
+
+    private void createNewUserPermission(User user, Permission permission, Board board){
+        NotificationSetting notificationSetting = Validations.doesIdExists(2L, settingRepository);
+        UserPermission userPermission = new UserPermission();
+        userPermission.setId(0L);
+        userPermission.setUser(user);
+        userPermission.setPermission(permission);
+        board.addUserPermissionToBoard(userPermission);
+        createDefaultSettingForNewUserInBoard(user, board, notificationSetting);
     }
 }

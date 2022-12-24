@@ -144,6 +144,15 @@ public class Validations {
         validate(secondId, Regex.ID.getRegex());
     }
 
+    public static void validateUpdateUserToBoard(Long firstId, Long secondId, Long permissionId){
+        validateTwoIds(firstId, secondId);
+        validate(permissionId, Regex.ID.getRegex());
+        if(permissionId < 0 || permissionId > 3){
+            throw new IllegalArgumentException(ExceptionMessage.PERMISSION_NOT_FOUND.toString());
+        }
+    }
+
+
     /**
      * Checks if an item with the specified ID exists in the given repository.
      *
