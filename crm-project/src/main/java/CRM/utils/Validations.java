@@ -131,6 +131,20 @@ public class Validations {
             throw new NullPointerException(ExceptionMessage.VALIDATION_FAILED.toString());
     }
 
+    public static void validateSharedContent(Long boardId, Long sectionId, Long updateObjectId, Long parentId){
+        Validations.validate(boardId, Regex.ID.getRegex());
+        Validations.validate(sectionId, Regex.ID.getRegex());
+        Validations.validate(updateObjectId, Regex.ID.getRegex());
+        if (parentId != null) Validations.validate(parentId, Regex.ID.getRegex());
+
+    }
+
+    //TODO documentation
+    public static void validateTwoIds(Long firstId, Long secondId){
+        validate(firstId, Regex.ID.getRegex());
+        validate(secondId, Regex.ID.getRegex());
+    }
+
     /**
      * Checks if an item with the specified ID exists in the given repository.
      *

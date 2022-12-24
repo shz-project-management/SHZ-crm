@@ -1,12 +1,9 @@
 package CRM.controller.facades;
 
-import CRM.entity.Board;
 import CRM.entity.DTO.BoardDTO;
-import CRM.entity.User;
 import CRM.entity.requests.BoardRequest;
 import CRM.entity.requests.UpdateObjectRequest;
 import CRM.entity.response.Response;
-import CRM.service.AuthService;
 import CRM.service.BoardService;
 import CRM.utils.Common;
 import CRM.utils.Validations;
@@ -17,11 +14,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
 import javax.security.auth.login.AccountNotFoundException;
-import java.util.Arrays;
 import java.util.List;
 import java.util.NoSuchElementException;
-
-import static CRM.utils.Common.buildErrorResponse;
 
 @Component
 public class BoardFacade {
@@ -43,9 +37,9 @@ public class BoardFacade {
             BoardDTO boardDTO = BoardDTO.createPlainBoard(boardService.create(boardRequest));
             return Common.buildSuccessResponse(boardDTO, HttpStatus.CREATED, SuccessMessage.CREATE.toString());
         } catch (AccountNotFoundException | NoSuchElementException e) {
-            return buildErrorResponse(e, HttpStatus.BAD_REQUEST);
+            return Common.buildErrorResponse(e, HttpStatus.BAD_REQUEST);
         } catch (NullPointerException e) {
-            return buildErrorResponse(e, HttpStatus.INTERNAL_SERVER_ERROR);
+            return Common.buildErrorResponse(e, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -62,9 +56,9 @@ public class BoardFacade {
             boardService.delete(id);
             return Common.buildSuccessResponse(id, HttpStatus.NO_CONTENT, SuccessMessage.DELETED.toString());
         } catch (IllegalArgumentException | NoSuchElementException e) {
-            return buildErrorResponse(e, HttpStatus.BAD_REQUEST);
+            return Common.buildErrorResponse(e, HttpStatus.BAD_REQUEST);
         } catch (NullPointerException e) {
-            return buildErrorResponse(e, HttpStatus.INTERNAL_SERVER_ERROR);
+            return Common.buildErrorResponse(e, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -83,9 +77,9 @@ public class BoardFacade {
             BoardDTO boardDTO = BoardDTO.getBoardFromDB(boardService.get(id));
             return Common.buildSuccessResponse(boardDTO, HttpStatus.OK, SuccessMessage.FOUND.toString());
         } catch (IllegalArgumentException | NoSuchElementException e) {
-            return buildErrorResponse(e, HttpStatus.BAD_REQUEST);
+            return Common.buildErrorResponse(e, HttpStatus.BAD_REQUEST);
         } catch (NullPointerException e) {
-            return buildErrorResponse(e, HttpStatus.INTERNAL_SERVER_ERROR);
+            return Common.buildErrorResponse(e, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -114,9 +108,9 @@ public class BoardFacade {
             List<BoardDTO> boardDTOs = BoardDTO.getListOfBoardsFromDB(boardService.getAllBoardsOfUser(userId));
             return Common.buildSuccessResponse(boardDTOs, HttpStatus.OK, SuccessMessage.FOUND.toString());
         } catch (AccountNotFoundException | IllegalArgumentException | NoSuchElementException e) {
-            return buildErrorResponse(e, HttpStatus.BAD_REQUEST);
+            return Common.buildErrorResponse(e, HttpStatus.BAD_REQUEST);
         } catch (NullPointerException e) {
-            return buildErrorResponse(e, HttpStatus.INTERNAL_SERVER_ERROR);
+            return Common.buildErrorResponse(e, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -135,9 +129,9 @@ public class BoardFacade {
             BoardDTO boardDTO = BoardDTO.getBoardFromDB(boardService.updateBoard(board, boardId));
             return Common.buildSuccessResponse(boardDTO, HttpStatus.OK, SuccessMessage.FOUND.toString());
         } catch (IllegalArgumentException | NoSuchElementException | NoSuchFieldException e) {
-            return buildErrorResponse(e, HttpStatus.BAD_REQUEST);
+            return Common.buildErrorResponse(e, HttpStatus.BAD_REQUEST);
         } catch (NullPointerException e) {
-            return buildErrorResponse(e, HttpStatus.INTERNAL_SERVER_ERROR);
+            return Common.buildErrorResponse(e, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 }

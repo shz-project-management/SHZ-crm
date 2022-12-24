@@ -61,18 +61,10 @@ public class SectionFacade {
         }
     }
 
-    /**
-     * Deletes an attribute(status/type) with the given ID.
-     *
-     * @param attributeId the ID of the attribute to delete
-     * @return a response object indicating the status of the deletion operation
-     * @throws NoSuchElementException if no attribute with the given ID exists
-     */
-    //TODO Validation function
+    //TODO documentation
     public Response delete(Long boardId, Long attributeId) {
         try {
-            Validations.validate(attributeId, Regex.ID.getRegex());
-            Validations.validate(boardId, Regex.ID.getRegex());
+            Validations.validateTwoIds(boardId,attributeId);
             sectionService.delete(boardId, attributeId);
 
             return new Response.Builder()
@@ -107,9 +99,7 @@ public class SectionFacade {
     //TODO Validation function + DTO
     public Response get(Long attributeId, Long boardId) {
         try {
-            Validations.validate(attributeId, Regex.ID.getRegex());
-            Validations.validate(boardId, Regex.ID.getRegex());
-
+            Validations.validateTwoIds(boardId, attributeId);
             return new Response.Builder()
                     .data(sectionService.get(attributeId, boardId))
                     .message(SuccessMessage.FOUND.toString())

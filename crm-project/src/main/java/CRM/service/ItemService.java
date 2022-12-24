@@ -50,19 +50,7 @@ public class ItemService implements ServiceInterface {
             throw new AccountNotFoundException(ExceptionMessage.ACCOUNT_DOES_NOT_EXISTS.toString());
         }
 
-        // check if this element has a parent
-        // FIXME: validate parent
-        Item parentItem = null;
-        if (itemRequest.getParentItemId() != null)
-            parentItem = board.getItemFromSectionById(itemRequest.getParentItemId(), itemRequest.getSectionId());
-
-        // collect sections, statuses and types because it is necesito for the item
-        Section section = board.getSectionFromBoard(itemRequest.getSectionId());
-        Status status = (Status) board.getAttributeById(itemRequest.getStatusId(), Status.class);
-        Type type = (Type) board.getAttributeById(itemRequest.getTypeId(), Type.class);
-
-        // build the item
-        Item item = Item.createNewItem(section, status, type, user, itemRequest.getName(), itemRequest.getDescription(), parentItem, itemRequest.getImportance());
+        Item item = Item.createNewItem(itemRequest, board, user);
 
         // add the item to the items list in the board entity
         board.insertItemToSection(item, itemRequest.getSectionId());
@@ -96,7 +84,7 @@ public class ItemService implements ServiceInterface {
 
     //TODO Documentation
     @Override
-    public SharedContent get(ObjectsIdsRequest objectsIdsRequest, long searchId)  {
+    public SharedContent get(ObjectsIdsRequest objectsIdsRequest, long searchId) {
         Board board = Common.getBoard(objectsIdsRequest.getBoardId(), boardRepository);
         Section section = Common.getSection(board, objectsIdsRequest.getSectionId());
         return Common.getItem(section, searchId);

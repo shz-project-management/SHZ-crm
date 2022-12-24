@@ -1,5 +1,6 @@
 package CRM.entity;
 
+import CRM.entity.requests.ItemRequest;
 import CRM.entity.requests.UpdateObjectRequest;
 import lombok.*;
 
@@ -45,17 +46,24 @@ public class Item extends SharedContent {
     @OneToMany(mappedBy = "parentItem", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Item> items = new HashSet<>();
 
-    // FIXME: Is it ok? Should it get less params?
-    public static Item createNewItem(Section section, Status status, Type type, User user, String name, String description, Item parentItem, int importance){
+    public static Item createNewItem(ItemRequest itemRequest, Board board, User user) {
+        // FIXME: validate parent
+        Item parentItem = null;
+        if (itemRequest.getParentItemId() != null)
+            parentItem = board.getItemFromSectionById(itemRequest.getParentItemId(), itemRequest.getSectionId());
+        Section section = board.getSectionFromBoard(itemRequest.getSectionId());
+        Status status = (Status) board.getAttributeById(itemRequest.getStatusId(), Status.class);
+        Type type = (Type) board.getAttributeById(itemRequest.getTypeId(), Type.class);
+
         Item item = new Item();
         item.setSection(section);
-        item.setImportance(importance);
+        item.setImportance(itemRequest.getImportance());
         item.setStatus(status);
         item.setType(type);
         item.setUser(user);
         item.setParentItem(parentItem);
-        item.setDescription(description);
-        item.setName(name);
+        item.setDescription(itemRequest.getDescription());
+        item.setName(itemRequest.getName());
         return item;
     }
 

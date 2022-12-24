@@ -147,16 +147,16 @@ public class SharedContentFacade {
     }
 
 
-    //TODO + Validation function + Documentation
+    //TODO + Documentation
     public Response update(UpdateObjectRequest updateObject, Long updateObjectId, Class clz) {
         // validate params using the Validations.validate function
         // call the correct service using convertFromClassToService(clz) function
         // with update function in it.
         try {
             // validate the id using the Validations.validate function
-            Validations.validate(updateObject.getObjectsIdsRequest().getBoardId(), Regex.ID.getRegex());
-            Validations.validate(updateObjectId, Regex.ID.getRegex());
-            Validations.validate(updateObject.getObjectsIdsRequest().getSectionId(), Regex.ID.getRegex());
+            Validations.validateSharedContent(updateObject.getObjectsIdsRequest().getBoardId(),
+                    updateObject.getObjectsIdsRequest().getSectionId(),
+                    updateObjectId, null);
 
 
             // call the correct service using convertFromClassToService(clz) function with find function in it
@@ -192,14 +192,13 @@ public class SharedContentFacade {
      * returned. If a NullPointerException is thrown, a BAD_REQUEST status with a message indicating the
      * error is returned.
      */
-    //TODO Validation function
     public Response get(ObjectsIdsRequest objectsIdsRequest, Long searchId ,Class clz) {
         try {
             // validate the id using the Validations.validate function
-            Validations.validate(objectsIdsRequest.getSectionId(), Regex.ID.getRegex());
-            Validations.validate(objectsIdsRequest.getBoardId(), Regex.ID.getRegex());
-            Validations.validate(searchId, Regex.ID.getRegex());
-            if (objectsIdsRequest.getParentId() != null) Validations.validate(objectsIdsRequest.getParentId(), Regex.ID.getRegex());
+            Validations.validateSharedContent(objectsIdsRequest.getBoardId(),
+                    objectsIdsRequest.getSectionId(),
+                    searchId,
+                    objectsIdsRequest.getParentId());
 
             // call the correct service using convertFromClassToService(clz) function with find function in it
             return new Response.Builder()
@@ -311,11 +310,10 @@ public class SharedContentFacade {
         }
     }
 
-    //TODO Validation function + DTO list
+    //TODO + DTO list + documentation
     public Response getAllCommentsInSection(ObjectsIdsRequest objectsIdsRequest) {
         try {
-            Validations.validate(objectsIdsRequest.getBoardId(), Regex.ID.getRegex());
-            Validations.validate(objectsIdsRequest.getSectionId(), Regex.ID.getRegex());
+            Validations.validateTwoIds(objectsIdsRequest.getBoardId(), objectsIdsRequest.getSectionId());
             return new Response.Builder()
                     .data(commentService.getAllCommentsInSection(objectsIdsRequest).stream().map(CommentDTO::getSharedContentFromDB).collect(Collectors.toList()))
                     .message(SuccessMessage.FOUND.toString())
