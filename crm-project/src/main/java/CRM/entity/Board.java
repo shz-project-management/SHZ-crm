@@ -73,6 +73,15 @@ public class Board {
         return null;
     }
 
+    public List<User> getAllUsersInBoard(Board board, Set<UserPermission> userPermissionsSet){
+        List<User> users = new ArrayList<>();
+        users.add(board.getCreatorUser());
+        for (UserPermission addUSer: userPermissionsSet) {
+            users.add(addUSer.getUser());
+        }
+        return users;
+    }
+
     //--------------------------------------Section--------------------------------------//
     public Section getSectionFromBoard(long sectionId) {
         for (Section section : sections) {

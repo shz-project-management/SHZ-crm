@@ -160,11 +160,8 @@ public class UserService {
 
         Permission permissionRequest = Permission.values()[Math.toIntExact(objectsIdsRequest.getPermissionId())];
         Set<UserPermission> userPermissionsSet = updateUserPermission(user, permissionRequest, board);
-        List<User> users = new ArrayList<>();
-        users.add(board.getCreatorUser());
-        for (UserPermission addUSer: userPermissionsSet) {
-            users.add(addUSer.getUser());
-        }
+        List<User> users = board.getAllUsersInBoard(board, userPermissionsSet);
+
         boardRepository.save(board);
         return users;
     }
