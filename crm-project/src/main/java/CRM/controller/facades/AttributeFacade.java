@@ -17,7 +17,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
+import java.util.HashSet;
 import java.util.NoSuchElementException;
+import java.util.Set;
 
 @Component
 public class AttributeFacade {
@@ -146,8 +148,9 @@ public class AttributeFacade {
     public Response getAllAttributesInBoard(Long boardId, Class clz) {
         try {
             Validations.validate(boardId, Regex.ID.getRegex());
+            Set<Attribute> targetSet = new HashSet<>(attributeService.getAllAttributesInBoard(boardId, clz));
             return new Response.Builder()
-                    .data(AttributeDTO.createListOfAttributesDTO(attributeService.getAllAttributesInBoard(boardId, clz)))
+                    .data(AttributeDTO.getListOfAttributesFromDB(targetSet))
                     .message(SuccessMessage.FOUND.toString())
                     .status(HttpStatus.OK)
                     .statusCode(200)
