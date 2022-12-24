@@ -57,11 +57,10 @@ public class Validations {
      * @return true if the user registration request is valid, false otherwise
      * @throws IllegalArgumentException if the email, password, first name, or last name does not match the expected format
      */
-    public static boolean validateRegisteredUser(RegisterUserRequest user) {
+    public static void validateRegisteredUser(RegisterUserRequest user) {
         validate(user.getEmail(), Regex.EMAIL.getRegex());
         validate(user.getPassword(), Regex.PASSWORD.getRegex());
         validate(user.getFullName(), Regex.NAME.getRegex());
-        return true;
     }
 
     /**
