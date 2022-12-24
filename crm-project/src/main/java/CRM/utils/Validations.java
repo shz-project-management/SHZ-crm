@@ -111,11 +111,8 @@ public class Validations {
         if (item.getImportance() < 0 || item.getImportance() > 5)
             throw new IllegalArgumentException(ExceptionMessage.VALIDATION_FAILED.toString());
 
-        if (item.getTitle() == null)
+        if (item.getName() == null)
             throw new NullPointerException(ExceptionMessage.VALIDATION_FAILED.toString());
-
-        if (item.getDescription() == null)
-            item.setDescription("");
     }
 
     /**
@@ -130,11 +127,22 @@ public class Validations {
         validate(comment.getParentItemId(), Regex.ID.getRegex());
         validate(comment.getUserId(), Regex.ID.getRegex());
 
-        if (comment.getTitle() == null)
+        if (comment.getName() == null)
             throw new NullPointerException(ExceptionMessage.VALIDATION_FAILED.toString());
+    }
 
-        if (comment.getDescription() == null)
-            comment.setDescription("");
+    public static void validateSharedContent(Long boardId, Long sectionId, Long updateObjectId, Long parentId){
+        Validations.validate(boardId, Regex.ID.getRegex());
+        Validations.validate(sectionId, Regex.ID.getRegex());
+        Validations.validate(updateObjectId, Regex.ID.getRegex());
+        if (parentId != null) Validations.validate(parentId, Regex.ID.getRegex());
+
+    }
+
+    //TODO documentation
+    public static void validateTwoIds(Long firstId, Long secondId){
+        validate(firstId, Regex.ID.getRegex());
+        validate(secondId, Regex.ID.getRegex());
     }
 
     /**
@@ -145,7 +153,7 @@ public class Validations {
      * @return the item with the specified ID if it exists
      * @throws NoSuchElementException if no item with the specified ID exists in the repository
      */
-    public static <T> T doesIdExists(Long id, JpaRepository repo) {
+    public static <T> T doesIdExists(Long id, JpaRepository<T,Long> repo) {
         Optional<T> element = repo.findById(id);
         if (!element.isPresent()) {
             throw new NoSuchElementException(ExceptionMessage.NO_SUCH_ID.toString());

@@ -1,13 +1,11 @@
 package CRM.controller.facades;
 
-import CRM.entity.Board;
 import CRM.entity.DTO.BoardDTO;
-import CRM.entity.User;
 import CRM.entity.requests.BoardRequest;
 import CRM.entity.requests.UpdateObjectRequest;
 import CRM.entity.response.Response;
-import CRM.service.AuthService;
 import CRM.service.BoardService;
+import CRM.utils.Common;
 import CRM.utils.Validations;
 import CRM.utils.enums.Regex;
 import CRM.utils.enums.SuccessMessage;
@@ -16,6 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
 import javax.security.auth.login.AccountNotFoundException;
+import java.util.List;
 import java.util.NoSuchElementException;
 
 @Component
@@ -23,10 +22,6 @@ public class BoardFacade {
 
     @Autowired
     private BoardService boardService;
-
-    @Autowired
-    private AuthService authService;
-
 
     /**
      * This function creates a new board. It validates the board name using the NAME regex from the Regex enum,
@@ -39,29 +34,14 @@ public class BoardFacade {
     public Response create(BoardRequest boardRequest) {
         try {
             Validations.validateNewBoard(boardRequest);
-            User user = authService.findById(boardRequest.getCreatorUserId());
-            Board board = Board.createBoard(user, boardRequest.getName(), boardRequest.getDescription());
-            Board dbBoard = boardService.create(board);
-            return new Response.Builder()
-                    .status(HttpStatus.CREATED)
-                    .statusCode(201)
-                    .data(BoardDTO.createPlainBoard(dbBoard))
-                    .build();
-        } catch (AccountNotFoundException | IllegalArgumentException e) {
-            return new Response.Builder()
-                    .message(e.getMessage())
-                    .status(HttpStatus.BAD_REQUEST)
-                    .statusCode(400)
-                    .build();
+            BoardDTO boardDTO = BoardDTO.createPlainBoard(boardService.create(boardRequest));
+            return Common.buildSuccessResponse(boardDTO, HttpStatus.CREATED, SuccessMessage.CREATE.toString());
+        } catch (AccountNotFoundException | NoSuchElementException e) {
+            return Common.buildErrorResponse(e, HttpStatus.BAD_REQUEST);
         } catch (NullPointerException e) {
-            return new Response.Builder()
-                    .message(e.getMessage())
-                    .status(HttpStatus.BAD_REQUEST)
-                    .statusCode(500)
-                    .build();
+            return Common.buildErrorResponse(e, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-
 
     /**
      * Deletes a board with the given ID.
@@ -74,23 +54,11 @@ public class BoardFacade {
         try {
             Validations.validate(id, Regex.ID.getRegex());
             boardService.delete(id);
-            return new Response.Builder()
-                    .status(HttpStatus.NO_CONTENT)
-                    .statusCode(204)
-                    .message(SuccessMessage.DELETED.toString())
-                    .build();
-        } catch (NoSuchElementException | IllegalArgumentException e) {
-            return new Response.Builder()
-                    .message(e.getMessage())
-                    .status(HttpStatus.BAD_REQUEST)
-                    .statusCode(400)
-                    .build();
+            return Common.buildSuccessResponse(id, HttpStatus.NO_CONTENT, SuccessMessage.DELETED.toString());
+        } catch (IllegalArgumentException | NoSuchElementException e) {
+            return Common.buildErrorResponse(e, HttpStatus.BAD_REQUEST);
         } catch (NullPointerException e) {
-            return new Response.Builder()
-                    .message(e.getMessage())
-                    .status(HttpStatus.BAD_REQUEST)
-                    .statusCode(500)
-                    .build();
+            return Common.buildErrorResponse(e, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -106,24 +74,12 @@ public class BoardFacade {
     public Response get(Long id) {
         try {
             Validations.validate(id, Regex.ID.getRegex());
-            return new Response.Builder()
-                    .data(BoardDTO.getBoardFromDB(boardService.get(id)))
-                    .message(SuccessMessage.FOUND.toString())
-                    .status(HttpStatus.OK)
-                    .statusCode(200)
-                    .build();
-        } catch (NoSuchElementException | IllegalArgumentException e) {
-            return new Response.Builder()
-                    .message(e.getMessage())
-                    .status(HttpStatus.BAD_REQUEST)
-                    .statusCode(400)
-                    .build();
+            BoardDTO boardDTO = BoardDTO.getBoardFromDB(boardService.get(id));
+            return Common.buildSuccessResponse(boardDTO, HttpStatus.OK, SuccessMessage.FOUND.toString());
+        } catch (IllegalArgumentException | NoSuchElementException e) {
+            return Common.buildErrorResponse(e, HttpStatus.BAD_REQUEST);
         } catch (NullPointerException e) {
-            return new Response.Builder()
-                    .message(e.getMessage())
-                    .status(HttpStatus.BAD_REQUEST)
-                    .statusCode(500)
-                    .build();
+            return Common.buildErrorResponse(e, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -133,12 +89,8 @@ public class BoardFacade {
      * @return A Response object containing all the retrieved boards.
      */
     public Response getAll() {
-        return new Response.Builder()
-                .data(BoardDTO.getListOfBoardsFromDB(boardService.getAll()))
-                .message(SuccessMessage.FOUND.toString())
-                .status(HttpStatus.OK)
-                .statusCode(200)
-                .build();
+        List<BoardDTO> boardDTOs = BoardDTO.getListOfBoardsFromDB(boardService.getAll());
+        return Common.buildSuccessResponse(boardDTOs, HttpStatus.OK, SuccessMessage.FOUND.toString());
     }
 
     /**
@@ -153,24 +105,12 @@ public class BoardFacade {
     public Response getAllBoardsOfUser(Long userId) {
         try {
             Validations.validate(userId, Regex.ID.getRegex());
-            return new Response.Builder()
-                    .data(BoardDTO.getListOfBoardsFromDB(boardService.getAllBoardsOfUser(userId)))
-                    .message(SuccessMessage.FOUND.toString())
-                    .status(HttpStatus.OK)
-                    .statusCode(200)
-                    .build();
+            List<BoardDTO> boardDTOs = BoardDTO.getListOfBoardsFromDB(boardService.getAllBoardsOfUser(userId));
+            return Common.buildSuccessResponse(boardDTOs, HttpStatus.OK, SuccessMessage.FOUND.toString());
         } catch (AccountNotFoundException | IllegalArgumentException | NoSuchElementException e) {
-            return new Response.Builder()
-                    .message(e.getMessage())
-                    .status(HttpStatus.BAD_REQUEST)
-                    .statusCode(400)
-                    .build();
+            return Common.buildErrorResponse(e, HttpStatus.BAD_REQUEST);
         } catch (NullPointerException e) {
-            return new Response.Builder()
-                    .message(e.getMessage())
-                    .status(HttpStatus.BAD_REQUEST)
-                    .statusCode(500)
-                    .build();
+            return Common.buildErrorResponse(e, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -186,24 +126,12 @@ public class BoardFacade {
     public Response updateBoard(UpdateObjectRequest board, Long boardId) {
         try {
             Validations.validate(boardId, Regex.ID.getRegex());
-            return new Response.Builder()
-                    .data(BoardDTO.getBoardFromDB(boardService.updateBoard(board, boardId)))
-                    .message(SuccessMessage.FOUND.toString())
-                    .status(HttpStatus.OK)
-                    .statusCode(200)
-                    .build();
+            BoardDTO boardDTO = BoardDTO.getBoardFromDB(boardService.updateBoard(board, boardId));
+            return Common.buildSuccessResponse(boardDTO, HttpStatus.OK, SuccessMessage.FOUND.toString());
         } catch (IllegalArgumentException | NoSuchElementException | NoSuchFieldException e) {
-            return new Response.Builder()
-                    .message(e.getMessage())
-                    .status(HttpStatus.BAD_REQUEST)
-                    .statusCode(400)
-                    .build();
+            return Common.buildErrorResponse(e, HttpStatus.BAD_REQUEST);
         } catch (NullPointerException e) {
-            return new Response.Builder()
-                    .message(e.getMessage())
-                    .status(HttpStatus.BAD_REQUEST)
-                    .statusCode(500)
-                    .build();
+            return Common.buildErrorResponse(e, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 }

@@ -6,8 +6,6 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
-@Setter
-@ToString
 public class AttributeRequest {
     private Long boardId;
     private String name;

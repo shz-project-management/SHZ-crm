@@ -8,9 +8,10 @@ import CRM.entity.Item;
 import CRM.entity.SharedContent;
 import CRM.entity.requests.CommentRequest;
 import CRM.entity.requests.ItemRequest;
+import CRM.entity.requests.ObjectsIdsRequest;
 import CRM.entity.requests.UpdateObjectRequest;
 import CRM.entity.response.Response;
-//import CRM.service.CommentService;
+import CRM.service.CommentService;
 import CRM.service.ItemService;
 import CRM.service.ServiceInterface;
 import CRM.utils.Validations;
@@ -36,8 +37,8 @@ public class SharedContentFacade {
 
     @Autowired
     private ItemService itemService;
-//    @Autowired
-//    private CommentService commentService;
+    @Autowired
+    private CommentService commentService;
 
     /**
      * Creates a new item in the system and stores it in the database.
@@ -87,33 +88,33 @@ public class SharedContentFacade {
      * @throws NoSuchElementException   if the parent item ID specified in the request object does not correspond to an existing item.
      * @throws NullPointerException     if the title is null.
      */
-//    public Response create(CommentRequest comment) {
-//        try {
-//            // make sure the params are correct using Validations.validateCreatedComment()
-//            // catch exception if relevant
-//            Validations.validateCreatedComment(comment);
-//
-//            // call commentService with create function to create a new comment
-//            // return the response with the new comment as a data inside response entity.
-//            return new Response.Builder()
-//                    .data(CommentDTO.getSharedContentFromDB(commentService.create(comment)))
-//                    .message(SuccessMessage.CREATE.toString())
-//                    .status(HttpStatus.ACCEPTED)
-//                    .statusCode(201)
-//                    .build();
-//
-//        } catch (IllegalArgumentException | AccountNotFoundException | NoSuchElementException e) {
-//            return new Response.Builder()
-//                    .message(e.getMessage())
-//                    .status(HttpStatus.BAD_REQUEST)
-//                    .statusCode(400).build();
-//        } catch (NullPointerException e) {
-//            return new Response.Builder()
-//                    .message(e.getMessage())
-//                    .status(HttpStatus.BAD_REQUEST)
-//                    .statusCode(500).build();
-//        }
-//    }
+    public Response create(CommentRequest comment) {
+        try {
+            // make sure the params are correct using Validations.validateCreatedComment()
+            // catch exception if relevant
+            Validations.validateCreatedComment(comment);
+
+            // call commentService with create function to create a new comment
+            // return the response with the new comment as a data inside response entity.
+            return new Response.Builder()
+                    .data(CommentDTO.getSharedContentFromDB(commentService.create(comment)))
+                    .message(SuccessMessage.CREATE.toString())
+                    .status(HttpStatus.ACCEPTED)
+                    .statusCode(201)
+                    .build();
+
+        } catch (IllegalArgumentException | AccountNotFoundException | NoSuchElementException e) {
+            return new Response.Builder()
+                    .message(e.getMessage())
+                    .status(HttpStatus.BAD_REQUEST)
+                    .statusCode(400).build();
+        } catch (NullPointerException e) {
+            return new Response.Builder()
+                    .message(e.getMessage())
+                    .status(HttpStatus.BAD_REQUEST)
+                    .statusCode(500).build();
+        }
+    }
 
     /**
      * Deletes a list of items or comments from the system and their associated comments from the database.
@@ -128,6 +129,7 @@ public class SharedContentFacade {
     public Response delete(List<Long> ids, long boardId, Class clz) {
         List<Long> correctIds = new ArrayList<>();
         // validate the id using the Validations.validate function
+        Validations.validate(boardId, Regex.ID.getRegex());
         ids.forEach(id -> {
             try {
                 Validations.validate(id, Regex.ID.getRegex());
@@ -144,46 +146,39 @@ public class SharedContentFacade {
                 .build();
     }
 
-    /**
-     * Update an object in a service.
-     *
-     * @param updateObject the request object containing the updates to be made
-     * @param id           the id of the object to be updated
-     * @param clz          the class of the object being updated
-     * @return a response object with the updated object data and a success message, or an error message and appropriate status code
-     * @throws IllegalArgumentException if the id or updateObject parameters are invalid
-     * @throws NoSuchFieldException     if the field of the object does not exist
-     * @throws NoSuchElementException   if the class does not have a corresponding service
-     * @throws NullPointerException     if there is a null value in the updateObject request
-     */
-//    public Response update(UpdateObjectRequest updateObject, Long id, Class clz) {
-//        // validate params using the Validations.validate function
-//        // call the correct service using convertFromClassToService(clz) function
-//        // with update function in it.
-//        try {
-//            // validate the id using the Validations.validate function
-//            Validations.validate(id, Regex.ID.getRegex());
-//
-//            // call the correct service using convertFromClassToService(clz) function with find function in it
-//            return new Response.Builder()
-//                    .data(convertFromServiceOutputToDTOEntity(convertFromClassToService(clz).update(updateObject, id), clz))
-//                    .message(SuccessMessage.FOUND.toString())
-//                    .status(HttpStatus.OK)
-//                    .statusCode(200)
-//                    .build();
-//
-//        } catch (IllegalArgumentException | NoSuchFieldException | NoSuchElementException e) {
-//            return new Response.Builder()
-//                    .message(e.getMessage())
-//                    .status(HttpStatus.BAD_REQUEST)
-//                    .statusCode(400).build();
-//        } catch (NullPointerException e) {
-//            return new Response.Builder()
-//                    .message(e.getMessage())
-//                    .status(HttpStatus.BAD_REQUEST)
-//                    .statusCode(500).build();
-//        }
-//    }
+
+    //TODO + Documentation
+    public Response update(UpdateObjectRequest updateObject, Long updateObjectId, Class clz) {
+        // validate params using the Validations.validate function
+        // call the correct service using convertFromClassToService(clz) function
+        // with update function in it.
+        try {
+            // validate the id using the Validations.validate function
+            Validations.validateSharedContent(updateObject.getObjectsIdsRequest().getBoardId(),
+                    updateObject.getObjectsIdsRequest().getSectionId(),
+                    updateObjectId, null);
+
+
+            // call the correct service using convertFromClassToService(clz) function with find function in it
+            return new Response.Builder()
+                    .data(convertFromServiceOutputToDTOEntity(convertFromClassToService(clz).update(updateObject ,updateObjectId), clz))
+                    .message(SuccessMessage.FOUND.toString())
+                    .status(HttpStatus.OK)
+                    .statusCode(200)
+                    .build();
+
+        } catch (IllegalArgumentException | NoSuchFieldException | NoSuchElementException e) {
+            return new Response.Builder()
+                    .message(e.getMessage())
+                    .status(HttpStatus.BAD_REQUEST)
+                    .statusCode(400).build();
+        } catch (NullPointerException e) {
+            return new Response.Builder()
+                    .message(e.getMessage())
+                    .status(HttpStatus.BAD_REQUEST)
+                    .statusCode(500).build();
+        }
+    }
 
 
     /**
@@ -197,17 +192,17 @@ public class SharedContentFacade {
      * returned. If a NullPointerException is thrown, a BAD_REQUEST status with a message indicating the
      * error is returned.
      */
-    public Response get(Long sectionId, Long boardId, Long searchId, Long parentId, Class clz) {
+    public Response get(ObjectsIdsRequest objectsIdsRequest, Long searchId ,Class clz) {
         try {
             // validate the id using the Validations.validate function
-            Validations.validate(sectionId, Regex.ID.getRegex());
-            Validations.validate(boardId, Regex.ID.getRegex());
-            Validations.validate(searchId, Regex.ID.getRegex());
-            if (parentId != null) Validations.validate(parentId, Regex.ID.getRegex());
+            Validations.validateSharedContent(objectsIdsRequest.getBoardId(),
+                    objectsIdsRequest.getSectionId(),
+                    searchId,
+                    objectsIdsRequest.getParentId());
 
             // call the correct service using convertFromClassToService(clz) function with find function in it
             return new Response.Builder()
-                    .data(convertFromServiceOutputToDTOEntity(convertFromClassToService(clz).get(sectionId, boardId, searchId, null), clz))
+                    .data(convertFromServiceOutputToDTOEntity(convertFromClassToService(clz).get(objectsIdsRequest, searchId), clz))
                     .message(SuccessMessage.FOUND.toString())
                     .status(HttpStatus.OK)
                     .statusCode(200)
@@ -226,26 +221,18 @@ public class SharedContentFacade {
         }
     }
 
-    /**
-     * Returns a list of all items in a board with the given id.
-     *
-     * @param boardId the id of the board
-     * @return a {@link Response} object with a list of {@link ItemDTO} objects and a status message.
-     * If the board with the given id does not exist, a BAD_REQUEST status with a message indicating
-     * the error is returned. If the id is not valid, a BAD_REQUEST status with a message indicating
-     * the error is returned. If a NullPointerException is thrown, a BAD_REQUEST status with a message
-     * indicating the error is returned.
-     */
-    public Response getAllItemsInSection(Long sectionId, Long boardId) {
+    //TODO + DTO + Documentation
+    public Response getAllItemsInSection(ObjectsIdsRequest objectsIdsRequest) {
         try {
             // validate the id using the Validations.validate function
-            Validations.validate(sectionId, Regex.ID.getRegex());
-            Validations.validate(boardId, Regex.ID.getRegex());
+            Validations.validate(objectsIdsRequest.getSectionId(), Regex.ID.getRegex());
+            Validations.validate(objectsIdsRequest.getBoardId(), Regex.ID.getRegex());
 
             // call the correct service using convertFromClassToService(clz) function
             // with getAllInItem function in it.
+            //FIXME- itemDTO list
             return new Response.Builder()
-                    .data(itemService.getAllInSection(sectionId, boardId).stream().map(item -> ItemDTO.getSharedContentFromDB(item)).collect(Collectors.toList()))
+                    .data(itemService.getAllInSection(objectsIdsRequest).stream().map(ItemDTO::getSharedContentFromDB).collect(Collectors.toList()))
                     .message(SuccessMessage.FOUND.toString())
                     .status(HttpStatus.OK)
                     .statusCode(200)
@@ -274,44 +261,61 @@ public class SharedContentFacade {
      * the error is returned. If a NullPointerException is thrown, a BAD_REQUEST status with a message
      * indicating the error is returned.
      */
-//    public Response getAllCommentsInBoard(Long boardId) {
-//        try {
-//            Validations.validate(boardId, Regex.ID.getRegex());
-//            return new Response.Builder()
-//                    .data(commentService.getAllCommentsInBoard(boardId).stream().map(comment -> CommentDTO.getSharedContentFromDB(comment)).collect(Collectors.toList()))
-//                    .message(SuccessMessage.FOUND.toString())
-//                    .status(HttpStatus.OK)
-//                    .statusCode(200)
-//                    .build();
-//
-//        } catch (IllegalArgumentException | NoSuchElementException e) {
-//            return new Response.Builder()
-//                    .message(e.getMessage())
-//                    .status(HttpStatus.BAD_REQUEST)
-//                    .statusCode(400).build();
-//        } catch (NullPointerException e) {
-//            return new Response.Builder()
-//                    .message(e.getMessage())
-//                    .status(HttpStatus.BAD_REQUEST)
-//                    .statusCode(500).build();
-//        }
-//    }
-
-    /**
-     * Retrieves a list of entities of a specified class associated with a given item.
-     *
-     * @param itemId The ID of the item to retrieve the entities for.
-     * @param clz    The class of the entities to retrieve.
-     * @return A response object containing the list of entities and related status information.
-     * @throws IllegalArgumentException if the item ID is invalid or if the class is not supported.
-     * @throws NoSuchElementException   if no entities are found for the given item.
-     * @throws NullPointerException     if there is a problem with the input.
-     */
-    public Response getAllInItem(Long itemId, Long sectionId, Long boardId, Class clz) {
+    public Response getAllCommentsInBoard(Long boardId) {
         try {
-            Validations.validate(itemId, Regex.ID.getRegex());
+            Validations.validate(boardId, Regex.ID.getRegex());
+            //FIXME- commentDTO list
             return new Response.Builder()
-                    .data(convertFromClassToService(clz).getAllInItem(itemId, sectionId, boardId).stream().map(entity -> convertFromServiceOutputToDTOEntity(entity, clz)).collect(Collectors.toList()))
+                    .data(commentService.getAllCommentsInBoard(boardId).stream().map(CommentDTO::getSharedContentFromDB).collect(Collectors.toList()))
+                    .message(SuccessMessage.FOUND.toString())
+                    .status(HttpStatus.OK)
+                    .statusCode(200)
+                    .build();
+
+        } catch (IllegalArgumentException | NoSuchElementException e) {
+            return new Response.Builder()
+                    .message(e.getMessage())
+                    .status(HttpStatus.BAD_REQUEST)
+                    .statusCode(400).build();
+        } catch (NullPointerException e) {
+            return new Response.Builder()
+                    .message(e.getMessage())
+                    .status(HttpStatus.BAD_REQUEST)
+                    .statusCode(500).build();
+        }
+    }
+
+    public Response getAllInItem(ObjectsIdsRequest objectsIdsRequest, Class clz) {
+        try {
+            Validations.validate(objectsIdsRequest.getItemId(), Regex.ID.getRegex());
+            Validations.validate(objectsIdsRequest.getSectionId(), Regex.ID.getRegex());
+            Validations.validate(objectsIdsRequest.getBoardId(), Regex.ID.getRegex());
+            return new Response.Builder()
+                    .data(convertFromClassToService(clz).getAllInItem(objectsIdsRequest).stream().map(entity -> convertFromServiceOutputToDTOEntity(entity, clz)).collect(Collectors.toList()))
+                    .message(SuccessMessage.FOUND.toString())
+                    .status(HttpStatus.OK)
+                    .statusCode(200)
+                    .build();
+
+        } catch (IllegalArgumentException | NoSuchElementException e) {
+            return new Response.Builder()
+                    .message(e.getMessage())
+                    .status(HttpStatus.BAD_REQUEST)
+                    .statusCode(400).build();
+        } catch (NullPointerException e) {
+            return new Response.Builder()
+                    .message(e.getMessage())
+                    .status(HttpStatus.BAD_REQUEST)
+                    .statusCode(500).build();
+        }
+    }
+
+    //TODO + DTO list + documentation
+    public Response getAllCommentsInSection(ObjectsIdsRequest objectsIdsRequest) {
+        try {
+            Validations.validateTwoIds(objectsIdsRequest.getBoardId(), objectsIdsRequest.getSectionId());
+            return new Response.Builder()
+                    .data(commentService.getAllCommentsInSection(objectsIdsRequest).stream().map(CommentDTO::getSharedContentFromDB).collect(Collectors.toList()))
                     .message(SuccessMessage.FOUND.toString())
                     .status(HttpStatus.OK)
                     .statusCode(200)
@@ -331,39 +335,6 @@ public class SharedContentFacade {
     }
 
     /**
-     * Returns a list of all comments in a status with the given id.
-     *
-     * @param statusId the id of the status
-     * @return a {@link Response} object with a list of {@link CommentDTO} objects and a status message.
-     * If the status with the given id does not exist, a BAD_REQUEST status with a message indicating
-     * the error is returned. If the id is not valid, a BAD_REQUEST status with a message indicating
-     * the error is returned. If a NullPointerException is thrown, a BAD_REQUEST status with a message
-     * indicating the error is returned.
-     */
-//    public Response getAllCommentsInStatus(Long statusId) {
-//        try {
-//            Validations.validate(statusId, Regex.ID.getRegex());
-//            return new Response.Builder()
-//                    .data(commentService.getAllCommentsInStatus(statusId).stream().map(comment -> CommentDTO.getSharedContentFromDB(comment)).collect(Collectors.toList()))
-//                    .message(SuccessMessage.FOUND.toString())
-//                    .status(HttpStatus.OK)
-//                    .statusCode(200)
-//                    .build();
-//
-//        } catch (IllegalArgumentException | NoSuchElementException e) {
-//            return new Response.Builder()
-//                    .message(e.getMessage())
-//                    .status(HttpStatus.BAD_REQUEST)
-//                    .statusCode(400).build();
-//        } catch (NullPointerException e) {
-//            return new Response.Builder()
-//                    .message(e.getMessage())
-//                    .status(HttpStatus.BAD_REQUEST)
-//                    .statusCode(500).build();
-//        }
-//    }
-
-    /**
      * Converts a given Class object to the corresponding AttributeService object.
      *
      * @param c the Class object to be converted
@@ -373,7 +344,7 @@ public class SharedContentFacade {
         logger.info("in FacadeFileController -> convertFromClassToService ,item of Class: " + c);
 
         if (c.equals(Item.class)) return itemService;
-//        if (c.equals(Comment.class)) return commentService;
+        if (c.equals(Comment.class)) return commentService;
 
         throw new IllegalArgumentException("There is no such class in the system!");
     }

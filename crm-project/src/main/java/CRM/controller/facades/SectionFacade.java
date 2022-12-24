@@ -36,16 +36,15 @@ public class SectionFacade {
      *                         for info is the same for both classes Status and Type.
      * @return A Response object with the status of the create operation and the created attribute object, or an error message if the operation fails.
      */
+    //TODO DTO
     public Response create(AttributeRequest attributeRequest) {
         try {
             Validations.validate(attributeRequest.getName(), Regex.NAME.getRegex());
 
-            Section section = sectionService.create(attributeRequest);
-
             return new Response.Builder()
                     .status(HttpStatus.CREATED)
                     .statusCode(201)
-                    .data("you are stupid!")
+                    .data(sectionService.create(attributeRequest))
                     .build();
         } catch (IllegalArgumentException | NonUniqueObjectException | NoSuchElementException e) {
             return new Response.Builder()
@@ -62,18 +61,10 @@ public class SectionFacade {
         }
     }
 
-    /**
-     * Deletes an attribute(status/type) with the given ID.
-     *
-     * @param attributeId the ID of the attribute to delete
-     * @return a response object indicating the status of the deletion operation
-     * @throws NoSuchElementException if no attribute with the given ID exists
-     */
+    //TODO documentation
     public Response delete(Long boardId, Long attributeId) {
         try {
-            Validations.validate(attributeId, Regex.ID.getRegex());
-            Validations.validate(boardId, Regex.ID.getRegex());
-
+            Validations.validateTwoIds(boardId,attributeId);
             sectionService.delete(boardId, attributeId);
 
             return new Response.Builder()
@@ -105,11 +96,10 @@ public class SectionFacade {
      * @throws IllegalArgumentException if the specified id is invalid.
      * @throws NullPointerException     if the specified id is null.
      */
+    //TODO Validation function + DTO
     public Response get(Long attributeId, Long boardId) {
         try {
-            Validations.validate(attributeId, Regex.ID.getRegex());
-            Validations.validate(boardId, Regex.ID.getRegex());
-
+            Validations.validateTwoIds(boardId, attributeId);
             return new Response.Builder()
                     .data(sectionService.get(attributeId, boardId))
                     .message(SuccessMessage.FOUND.toString())
@@ -140,6 +130,7 @@ public class SectionFacade {
      * @throws NullPointerException     if the specified board id is null.
      * @throws NoSuchElementException   if the board with the specified id is not found.
      */
+    //TODO DTO
     public Response getAllSectionsInBoard(Long boardId) {
         try {
             Validations.validate(boardId, Regex.ID.getRegex());
@@ -174,6 +165,7 @@ public class SectionFacade {
      * @throws NoSuchElementException   if the attribute to update is not found in the database
      * @throws NullPointerException     if the attribute object is null
      */
+    //TODO + DTO
 //    public Response update(UpdateObjectRequest statusRequest, Long statusId, Class clz) {
 //        try {
 //            Validations.validate(statusId, Regex.ID.getRegex());

@@ -18,10 +18,6 @@ public class SettingController {
     @Autowired
     private SettingsFacade settingsFacade;
 
-    // TODO:
-    //  ------------------------------------------- //
-    //  in each endpoint, call SettingsFacade! //
-    //  ------------------------------------------- //
 
     @GetMapping(value = "user/{userId}/board/{boardId}")
     public ResponseEntity<Response> getAllUserSettingsInBoard(@DestinationVariable Long userId, @DestinationVariable Long boardId){

@@ -2,22 +2,21 @@ package CRM.service;
 
 import CRM.entity.*;
 import CRM.entity.requests.ItemRequest;
+import CRM.entity.requests.ObjectsIdsRequest;
 import CRM.entity.requests.UpdateObjectRequest;
 import CRM.repository.*;
+import CRM.utils.Common;
 import CRM.utils.Validations;
 import CRM.utils.enums.ExceptionMessage;
-import CRM.utils.enums.UpdateField;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 
 import javax.security.auth.login.AccountNotFoundException;
-import java.time.LocalDateTime;
-import java.util.Iterator;
-import java.util.List;
-import java.util.NoSuchElementException;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -41,29 +40,17 @@ public class ItemService implements ServiceInterface {
      */
     public Item create(ItemRequest itemRequest) throws AccountNotFoundException {
         // find the board from the db
-        Board board = Validations.doesIdExists(itemRequest.getBoardId(), boardRepository);
+        Board board = Common.getBoard(itemRequest.getBoardId(), boardRepository);
 
         // get the user and make sure he is legit
         User user;
         try {
-            user = Validations.doesIdExists(itemRequest.getUserId(), userRepository);
+            user = Common.getUser(itemRequest.getUserId(), userRepository);
         } catch (NoSuchElementException e) {
             throw new AccountNotFoundException(ExceptionMessage.ACCOUNT_DOES_NOT_EXISTS.toString());
         }
 
-        // check if this element has a parent
-        // FIXME: validate parent
-        Item parentItem = null;
-        if (itemRequest.getParentItemId() != null)
-            parentItem = board.getItemFromSectionById(itemRequest.getParentItemId(), itemRequest.getSectionId());
-
-        // collect sections, statuses and types because it is necesito for the item
-        Section section = board.getSectionFromBoard(itemRequest.getSectionId());
-        Status status = (Status) board.getAttributeById(itemRequest.getStatusId(), Status.class);
-        Type type = (Type) board.getAttributeById(itemRequest.getTypeId(), Type.class);
-
-        // build the item
-        Item item = Item.createNewItem(section, status, type, user, itemRequest.getTitle(), itemRequest.getDescription(), parentItem, itemRequest.getImportance());
+        Item item = Item.createNewItem(itemRequest, board, user);
 
         // add the item to the items list in the board entity
         board.insertItemToSection(item, itemRequest.getSectionId());
@@ -74,23 +61,16 @@ public class ItemService implements ServiceInterface {
         return item;
     }
 
-
-    /**
-     * Deletes a list of items from the system and their associated comments from the database.
-     *
-     * @param ids The IDs of the items to be deleted.
-     * @return The number of items successfully deleted.
-     * @throws NoSuchElementException if any of the IDs does not correspond to an existing item.
-     */
+    //TODO Documentation
     @Override
     public int delete(List<Long> ids, long boardId) {
-        Board board = Validations.doesIdExists(boardId, boardRepository);
-        List<Section> sections = board.getSections().stream().collect(Collectors.toList());
+        Board board = Common.getBoard(boardId, boardRepository);
+        List<Section> sections = new ArrayList<>(board.getSections());
         int counter = 0;
 
         for (Section section : sections) {
-            for (Iterator iterator = section.getItems().iterator(); iterator.hasNext(); ) {
-                Item item = (Item) iterator.next();
+            for (Iterator<Item> iterator = section.getItems().iterator(); iterator.hasNext(); ) {
+                Item item = iterator.next();
                 if (ids.contains(item.getId())) {
                     iterator.remove();
                     counter++;
@@ -99,93 +79,48 @@ public class ItemService implements ServiceInterface {
         }
 
         boardRepository.save(board);
-
         return counter;
     }
 
-    /**
-     * Update an item field.
-     *
-     * @param updateObject the request object containing the updates to be made
-     * @param itemId       the id of the item to be updated
-     * @return the updated item
-     * @throws NoSuchFieldException if the field to be updated does not exist in the item object
-     */
-//    @Override
-//    public Item update(UpdateObjectRequest updateObject, long itemId) throws NoSuchFieldException {
-//        Item item = Validations.doesIdExists(itemId, itemRepository);
-//
+    //TODO Documentation
+    @Override
+    public SharedContent get(ObjectsIdsRequest objectsIdsRequest, long searchId) {
+        Board board = Common.getBoard(objectsIdsRequest.getBoardId(), boardRepository);
+        Section section = Common.getSection(board, objectsIdsRequest.getSectionId());
+        return Common.getItem(section, searchId);
+    }
+
+
+    //TODO + Documentation
+    @Override
+    public Comment update(UpdateObjectRequest updateObject, long commentId) throws NoSuchFieldException {
+        Board board = Validations.doesIdExists(updateObject.getObjectsIdsRequest().getBoardId(), boardRepository);
+
 //        if (Validations.checkIfFieldIsCustomObject(updateObject.getFieldName())) {
 //            fieldIsCustomObjectHelper(updateObject, itemId, item);
 //        } else {
 //            fieldIsPrimitiveOrKnownObjectHelper(updateObject, item);
 //        }
 //        return itemRepository.save(item);
-//    }
+        return null;
+    }
 
-    /**
-     * get
-     *
-     * @param searchId - the ID of the item to retrieve
-     * @return the retrieved item
-     * This function receives the ID of an item to retrieve and uses the doesIdExists function from the Validations class to retrieve the item with that ID from the itemRepository.
-     * The retrieved item is then returned.
-     */
+    //TODO Documentation
     @Override
-    public Item get(long id) {
-        return Validations.doesIdExists(id, itemRepository);
+    public List<SharedContent> getAllInItem(ObjectsIdsRequest objectsIdsRequest) {
+        //long itemId, long sectionId, long boardId
+        Board board = Common.getBoard(objectsIdsRequest.getBoardId(), boardRepository); // but instead of itemId, put board id
+
+        return new ArrayList<>(board.getSectionFromBoard(objectsIdsRequest.getSectionId()).getItems());
     }
 
-    /**
-     * Retrieves all shared content items that are within the specified item.
-     *
-     * @param itemId the ID of the item to retrieve shared content from
-     * @return a list of shared content items within the specified item
-     * @throws NoSuchElementException if the item with the specified ID does not exist
-     */
-    @Override
-    public List<SharedContent> getAllInItem(long itemId, long sectionId, long boardId) {
-        Board board = Validations.doesIdExists(boardId, boardRepository); // but instead of itemId, put board id
+    //TODO Documentation
+    public List<Item> getAllInSection(ObjectsIdsRequest objectsIdsRequest) {
+        Board board = Validations.doesIdExists(objectsIdsRequest.getBoardId(), boardRepository);
 
-        return board.getSectionFromBoard(sectionId)
-                .getItems().stream().collect(Collectors.toList());
+        return new ArrayList<>(board.getSectionFromBoard(objectsIdsRequest.getSectionId()).getItems());
     }
 
-    /**
-     * getAllInBoard
-     * This function receives the ID of a board and retrieves all the items in that board.
-     * It uses the doesIdExists function from the Validations class to retrieve the board with the provided ID from the boardRepository.
-     * The findAllByBoard function from the itemRepository is then called with the retrieved board, returning a list of all the items in that board.
-     *
-     * @param sectionId - the ID of the board whose items are to be retrieved
-     * @return a list of the items in the specified board
-     */
-    public List<Item> getAllInSection(long sectionId, long boardId) {
-        Board board = Validations.doesIdExists(boardId, boardRepository);
-
-        return board.getSectionFromBoard(sectionId)
-                .getItems().stream().collect(Collectors.toList());
-    }
-
-    /**
-     * Get the repository to update a field.
-     *
-     * @param fieldName the field to be updated
-     * @return the repository to update the field
-     * @throws NoSuchFieldException if the field does not have a corresponding repository
-     */
-//    private JpaRepository getRepoToUpdateField(UpdateField fieldName) throws NoSuchFieldException {
-//        switch (fieldName) {
-//            case STATUS:
-//                return statusRepository;
-//            case TYPE:
-//                return typeRepository;
-//            case PARENT_ITEM:
-//                return itemRepository;
-//            default:
-//                throw new NoSuchFieldException(ExceptionMessage.FIELD_OBJECT_REPO_NOT_EXISTS.toString());
-//        }
-//    }
 
     /**
      * Helper function for updating a custom object field.

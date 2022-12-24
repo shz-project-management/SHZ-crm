@@ -1,48 +1,71 @@
 package CRM.utils;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import CRM.entity.*;
+import CRM.entity.response.Response;
+import CRM.utils.enums.ExceptionMessage;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.http.HttpStatus;
+
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.*;
+import java.util.function.Supplier;
 
 public class Common {
 
-    public static String generateQuery(Map<String, List<String>> filters) {
-        // Use a StringBuilder to build the query more efficiently
-        StringBuilder queryBuilder = new StringBuilder("SELECT item FROM items WHERE ");
 
-        // Use a List to store the different parts of the query
-        List<String> conditions = new ArrayList<>();
-
-        // Check for null values in the filters map
-        if (filters == null) {
-            throw new IllegalArgumentException("filters cannot be null");
-        }
-
-        // Iterate over the filters
-        for (Map.Entry<String, List<String>> entry : filters.entrySet()) {
-            String column = entry.getKey();
-            List<String> values = entry.getValue();
-
-            // Check for null or empty values in the filter
-            if (column == null || values == null || values.isEmpty()) {
-                throw new IllegalArgumentException("column and values cannot be null or empty");
-            }
-
-            // Use parameterized queries to avoid SQL injection attacks
-            String condition = column + " IN (";
-            for (String value : values) {
-                condition += value + ", ";
-            }
-            condition = condition.substring(0, condition.length() - 2);
-            condition += ")";
-
-            conditions.add(condition);
-        }
-
-        // Join the different parts of the query using AND
-        String query = String.join(" AND ", conditions);
-
-        // Append the completed query to the StringBuilder and return it as a string
-        return queryBuilder.append(query).toString();
+    public static User getUser(long userId, JpaRepository<User, Long> repo){
+        return Validations.doesIdExists(userId, repo);
     }
+
+    public static Board getBoard(long boardId, JpaRepository<Board, Long> repo) {
+        return Validations.doesIdExists(boardId, repo);
+    }
+
+    public static Section getSection(Board board, long sectionId) {
+        return getOptional(board.getSections(), sectionId, Section.class).orElseThrow(() -> new IllegalArgumentException(ExceptionMessage.NO_SUCH_ID.toString()));
+    }
+
+    public static Item getItem(Section section, long searchId) {
+        return getOptional(section.getItems(), searchId, Item.class).orElseThrow(() -> new IllegalArgumentException(ExceptionMessage.NO_SUCH_ID.toString()));
+    }
+
+    public static SharedContent getComment(Item item, long searchId) {
+        return getOptional(item.getComments(), searchId, Comment.class).orElseThrow(() -> new IllegalArgumentException(ExceptionMessage.NO_SUCH_ID.toString()));
+    }
+
+    public static <T> Optional<T> getOptional(Set<T> list, long id, Class<T> cls) {
+        try {
+            Method getIdMethod = cls.getMethod("getId");
+            return list.stream().filter(item -> invokeGetIdMethod(getIdMethod, item).equals(id)).findFirst();
+        } catch (NoSuchMethodException e) {
+            throw new RuntimeException(ExceptionMessage.UNPROCESSABLE_ENTITY.toString());
+        }
+    }
+
+    public static Object invokeGetIdMethod(Method getIdMethod, Object obj) {
+        try {
+            return getIdMethod.invoke(obj);
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            throw new RuntimeException(ExceptionMessage.UNPROCESSABLE_ENTITY.toString());
+        }
+    }
+
+    public static <T> Response buildSuccessResponse(T data, HttpStatus successStatus, String message) {
+        return new Response.Builder()
+                .message(message)
+                .data(data)
+                .status(successStatus)
+                .statusCode(successStatus.value())
+                .build();
+    }
+
+    public static Response buildErrorResponse(Exception e, HttpStatus errorStatus) {
+        return new Response.Builder()
+                .message(e.getMessage())
+                .status(errorStatus)
+                .statusCode(errorStatus.value())
+                .build();
+    }
+
 }

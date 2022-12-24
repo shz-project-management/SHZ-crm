@@ -71,9 +71,9 @@ public class UserFacade {
             Validations.validate(id, Regex.ID.getRegex());
             return new Response.Builder()
                     .data(userService.delete(id))
-                    .message(SuccessMessage.FOUND.toString())
-                    .status(HttpStatus.OK)
-                    .statusCode(200)
+                    .message(SuccessMessage.DELETED.toString())
+                    .status(HttpStatus.NO_CONTENT)
+                    .statusCode(204)
                     .build();
         } catch (AccountNotFoundException | NoSuchElementException | IllegalArgumentException e) {
             return new Response.Builder()

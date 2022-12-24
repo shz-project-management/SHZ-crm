@@ -9,7 +9,5 @@ import javax.persistence.*;
 import java.time.LocalDateTime;
 @AllArgsConstructor
 @Getter
-@Setter
-@ToString
 public class CommentRequest extends SharedContentRequest{
 }

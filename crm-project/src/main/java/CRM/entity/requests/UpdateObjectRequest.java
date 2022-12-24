@@ -6,9 +6,8 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
-@Setter
-@ToString
 public class UpdateObjectRequest {
     private UpdateField fieldName;
     private Object content;
+    private ObjectsIdsRequest objectsIdsRequest;
 }
