@@ -1,7 +1,5 @@
 package CRM.controller.facades;
 
-import CRM.entity.*;
-import CRM.entity.DTO.AttributeDTO;
 import CRM.entity.requests.AttributeRequest;
 import CRM.entity.response.Response;
 import CRM.service.*;
@@ -15,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
+import java.util.Arrays;
 import java.util.NoSuchElementException;
 
 @Component
@@ -64,7 +63,7 @@ public class SectionFacade {
     //TODO documentation
     public Response delete(Long boardId, Long attributeId) {
         try {
-            Validations.validateTwoIds(boardId,attributeId);
+            Validations.validateIDs(boardId, attributeId);
             sectionService.delete(boardId, attributeId);
 
             return new Response.Builder()
@@ -99,7 +98,7 @@ public class SectionFacade {
     //TODO Validation function + DTO
     public Response get(Long attributeId, Long boardId) {
         try {
-            Validations.validateTwoIds(boardId, attributeId);
+            Validations.validateIDs(boardId, attributeId);
             return new Response.Builder()
                     .data(sectionService.get(attributeId, boardId))
                     .message(SuccessMessage.FOUND.toString())

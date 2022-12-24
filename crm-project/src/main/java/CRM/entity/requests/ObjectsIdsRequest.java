@@ -15,5 +15,6 @@ public class ObjectsIdsRequest {
     private Long settingId;
     private Long userId;
     private Long parentId;
+    private Long permissionId;
 
 }

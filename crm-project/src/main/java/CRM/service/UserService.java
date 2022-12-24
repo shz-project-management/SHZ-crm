@@ -1,6 +1,7 @@
 package CRM.service;
 
 import CRM.entity.*;
+import CRM.entity.requests.ObjectsIdsRequest;
 import CRM.repository.BoardRepository;
 import CRM.repository.SettingRepository;
 import CRM.repository.UserRepository;
@@ -13,8 +14,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.security.auth.login.AccountNotFoundException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -140,50 +143,62 @@ public class UserService {
         return board.getAllUsersInBoard();
     }
 
-    /**
-     * Adds a user to a board.
-     *
-     * @param userId  the id of the user to add to the board
-     * @param boardId the id of the board to add the user to
-     * @return the UserInBoard object representing the user being added to the board
-     * @throws AccountNotFoundException if the user or board with the given id does not exist in the database
-     * @throws IllegalArgumentException if the combination of the given user and board already exists in the database
-     */
-    public void addUserToBoard(long userId, long boardId) throws AccountNotFoundException {
+    //TODO documentation
+    public List<User> updateUserToBoard(ObjectsIdsRequest objectsIdsRequest) throws AccountNotFoundException {
         User user;
         Board board;
         try {
-            user = Validations.doesIdExists(userId, userRepository);
-            board = Validations.doesIdExists(boardId, boardRepository);
-
+            user = Validations.doesIdExists(objectsIdsRequest.getUserId(), userRepository);
+            board = Validations.doesIdExists(objectsIdsRequest.getBoardId(), boardRepository);
         } catch (NoSuchElementException e) {
             throw new AccountNotFoundException(ExceptionMessage.ACCOUNT_DOES_NOT_EXISTS.toString());
         }
 
-        NotificationSetting notificationSetting = Validations.doesIdExists(2L, settingRepository);
+        if(user.equals(board.getCreatorUser())){
+            throw new IllegalArgumentException(ExceptionMessage.ADMIN_CANT_CHANGE_HIS_PERMISSION.toString());
+        }
 
-        UserPermission userPermission = new UserPermission();
-        userPermission.setId(0L);
-        userPermission.setUser(user);
-        userPermission.setPermission(Permission.USER);
+        Permission permissionRequest = Permission.values()[Math.toIntExact(objectsIdsRequest.getPermissionId())];
+        Set<UserPermission> userPermissionsSet = updateUserPermission(user, permissionRequest, board);
+        List<User> users = board.getAllUsersInBoard(board, userPermissionsSet);
 
-        board.addUserPermissionToBoard(userPermission);
-
-        createDefaultSettingForNewUserInBoard(user, board, notificationSetting);
         boardRepository.save(board);
+        return users;
     }
 
-    /**
-     * Creates default notifications for every new user in every board,
-     * using constant notifications
-     */
-    private void createDefaultSettingForNewUserInBoard(User user, Board board, NotificationSetting notificationSetting) {
-        UserSetting userSetting = new UserSetting();
-        userSetting.setId(0L);
-        userSetting.setInApp(true);
-        userSetting.setInEmail(true);
-        userSetting.setUser(user);
-        userSetting.setSetting(notificationSetting);
-        board.addUserSettingToBoard(userSetting);
+    //TODO documentation
+    private void createDefaultSettingForNewUserInBoard(User user, Board board) {
+        List<NotificationSetting> notificationSettingList = settingRepository.findAll();
+        for (NotificationSetting notificationSetting : notificationSettingList) {
+            UserSetting userSetting = UserSetting.createUserSetting(user, notificationSetting);
+            board.addUserSettingToBoard(userSetting);
+        }
+    }
+
+    //TODO documentation
+    private void createNewUserPermission(User user, Permission permission, Board board){
+        UserPermission userPermission = UserPermission.newUserPermission(user, permission);
+        board.addUserPermissionToBoard(userPermission);
+        createDefaultSettingForNewUserInBoard(user, board);
+    }
+
+    //TODO documentation
+    private Set<UserPermission> updateUserPermission(User user, Permission permissionRequest, Board board) {
+        Set<UserPermission> userPermissionsSet = board.getUsersPermissions();
+        UserPermission userPermissionInBoard = board.getUserPermissionById(board, user.getId() ,userPermissionsSet);
+
+        if (permissionRequest.equals(Permission.ADMIN)) {
+            throw new IllegalArgumentException(ExceptionMessage.PERMISSION_NOT_ALLOWED.toString());
+        }
+
+        if (permissionRequest.equals(Permission.UNAUTHORIZED)) {
+            userPermissionsSet.removeIf(userPerm -> userPermissionInBoard.getId().equals(userPerm.getId()));
+        }
+        else if (userPermissionInBoard == null) {
+            createNewUserPermission(user, permissionRequest, board);
+        } else{
+            userPermissionInBoard.setPermission(permissionRequest);
+        }
+        return userPermissionsSet;
     }
 }

@@ -1,8 +1,14 @@
 package CRM.controller.facades;
 
+import CRM.entity.DTO.UserDTO;
+import CRM.entity.DTO.UserPermissionDTO;
+import CRM.entity.User;
+import CRM.entity.UserPermission;
+import CRM.entity.requests.ObjectsIdsRequest;
 import CRM.entity.response.Response;
 import CRM.service.UserService;
 import CRM.utils.Validations;
+import CRM.utils.enums.Permission;
 import CRM.utils.enums.Regex;
 import CRM.utils.enums.SuccessMessage;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,7 +16,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
 import javax.security.auth.login.AccountNotFoundException;
+import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Set;
 
 @Component
 public class UserFacade {
@@ -135,35 +143,14 @@ public class UserFacade {
         }
     }
 
-    /**
-     * Adds a user to a board.
-     *
-     * @param userId  the id of the user to add to the board
-     * @param boardId the id of the board to add the user to
-     * @return a Response object with a message, status, and status code indicating the result of the add operation
-     * if the add operation was successful, the data field will contain a UserInBoardDTO object representing the
-     * added user in the board, the message field will contain the SuccessMessage.FOUND message,
-     * the status field will be HttpStatus.OK, and the statusCode field will be 200
-     * if the user or board with the given id does not exist in the database, the message field will contain the
-     * AccountNotFoundException message, the status field will be HttpStatus.BAD_REQUEST, and the statusCode field
-     * will be 400
-     * if the combination of the given user and board already exists in the database, the message field will contain
-     * the IllegalArgumentException message, the status field will be HttpStatus.BAD_REQUEST, and the statusCode field
-     * will be 400
-     * if the userId or boardId input is invalid, the message field will contain the NoSuchElementException message,
-     * the status field will be HttpStatus.BAD_REQUEST, and the statusCode field will be 400
-     * if there is a null pointer exception, the message field will contain the NullPointerException message,
-     * the status field will be HttpStatus.BAD_REQUEST, and the statusCode field will be 500
-     */
-    public Response addUserToBoard(Long userId, Long boardId) {
+    //TODO documentation
+    public Response updateUserToBoard(ObjectsIdsRequest objectsIdsRequest) {
         try {
-            Validations.validate(userId, Regex.ID.getRegex());
-            Validations.validate(boardId, Regex.ID.getRegex());
-
-            userService.addUserToBoard(userId, boardId);
-
+            Validations.validateUpdateUserToBoard(objectsIdsRequest.getBoardId(), objectsIdsRequest.getUserId(), objectsIdsRequest.getPermissionId());
+            List<User> users = userService.updateUserToBoard(objectsIdsRequest);
             return new Response.Builder()
                     .message(SuccessMessage.FOUND.toString())
+                    .data(UserDTO.getListOfUsersDTO(users))
                     .status(HttpStatus.OK)
                     .statusCode(200)
                     .build();
@@ -176,7 +163,7 @@ public class UserFacade {
         } catch (NullPointerException e) {
             return new Response.Builder()
                     .message(e.getMessage())
-                    .status(HttpStatus.BAD_REQUEST)
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .statusCode(500)
                     .build();
         }

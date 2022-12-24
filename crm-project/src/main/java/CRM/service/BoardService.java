@@ -48,7 +48,7 @@ public class BoardService {
         User creatorUser = board.getCreatorUser();
         //FIXME notificationSetting shouldn't be created this way.
         NotificationSetting notificationSetting = Validations.doesIdExists(2L, settingRepository);
-        UserSetting userSetting = UserSetting.createUserSetting(creatorUser, board, notificationSetting);
+        UserSetting userSetting = UserSetting.createUserSetting(creatorUser, notificationSetting);
         //FIXME maybe take Entity manager outside the service will be a better practise.
         userSetting = entityManager.merge(userSetting);
         board.addUserSettingToBoard(userSetting);

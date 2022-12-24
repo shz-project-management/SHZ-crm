@@ -1,6 +1,5 @@
 package CRM.utils;
 
-import CRM.entity.*;
 import CRM.entity.requests.*;
 import CRM.entity.Attribute;
 import CRM.entity.requests.LoginUserRequest;
@@ -15,9 +14,7 @@ import org.hibernate.NonUniqueObjectException;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.lang.reflect.Field;
-import java.util.NoSuchElementException;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -138,10 +135,20 @@ public class Validations {
     }
 
     //TODO documentation
-    public static void validateTwoIds(Long firstId, Long secondId){
-        validate(firstId, Regex.ID.getRegex());
-        validate(secondId, Regex.ID.getRegex());
+    public static void validateIDs(Long ...ids){
+        for(Long id: ids){
+            validate(id, Regex.ID.getRegex());
+        }
     }
+
+    public static void validateUpdateUserToBoard(Long firstId, Long secondId, Long permissionId){
+        validateIDs(firstId, secondId);
+        validate(permissionId, Regex.ID.getRegex());
+        if(permissionId < 0 || permissionId > 3){
+            throw new IllegalArgumentException(ExceptionMessage.PERMISSION_NOT_FOUND.toString());
+        }
+    }
+
 
     /**
      * Checks if an item with the specified ID exists in the given repository.

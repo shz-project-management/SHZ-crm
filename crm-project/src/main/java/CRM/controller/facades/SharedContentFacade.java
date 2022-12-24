@@ -26,6 +26,7 @@ import org.springframework.stereotype.Component;
 
 import javax.security.auth.login.AccountNotFoundException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
@@ -313,7 +314,7 @@ public class SharedContentFacade {
     //TODO + DTO list + documentation
     public Response getAllCommentsInSection(ObjectsIdsRequest objectsIdsRequest) {
         try {
-            Validations.validateTwoIds(objectsIdsRequest.getBoardId(), objectsIdsRequest.getSectionId());
+            Validations.validateIDs(objectsIdsRequest.getBoardId(), objectsIdsRequest.getSectionId());
             return new Response.Builder()
                     .data(commentService.getAllCommentsInSection(objectsIdsRequest).stream().map(CommentDTO::getSharedContentFromDB).collect(Collectors.toList()))
                     .message(SuccessMessage.FOUND.toString())
