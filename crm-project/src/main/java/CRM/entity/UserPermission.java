@@ -25,25 +25,11 @@ public class UserPermission {
 
     private Permission permission;
 
-
-//    public static UserInBoard adminUserInBoard(User user, Board board) {
-//        UserInBoard userInBoard = new UserInBoard();
-//        userInBoard.setUser(user);
-//        userInBoard.setPermission(Permission.ADMIN);
-//        return userInBoard;
-//    }
-//
-//    public static UserInBoard userInBoardUser(User user, Board board) {
-//        UserInBoard userInBoard = new UserInBoard();
-//        userInBoard.setUser(user);
-//        userInBoard.setPermission(Permission.USER);
-//        return userInBoard;
-//    }
-//
-//    public static UserInBoard userInBoardUserChoosePermission(User creatorUser, Board board, Permission permission){
-//        UserInBoard userInBoard = new UserInBoard();
-//        userInBoard.setUser(creatorUser);
-//        userInBoard.setPermission(permission);
-//        return userInBoard;
-//    }
+    public static UserPermission newUserPermission(User user, Permission permission) {
+        UserPermission userPermission = new UserPermission();
+        userPermission.setId(0L);
+        userPermission.setUser(user);
+        userPermission.setPermission(permission);
+        return userPermission;
+    }
 }

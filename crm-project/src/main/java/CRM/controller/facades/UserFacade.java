@@ -147,7 +147,7 @@ public class UserFacade {
     public Response updateUserToBoard(ObjectsIdsRequest objectsIdsRequest) {
         try {
             Validations.validateUpdateUserToBoard(objectsIdsRequest.getBoardId(), objectsIdsRequest.getUserId(), objectsIdsRequest.getPermissionId());
-            List<User> users = userService.updateUserToBoard(objectsIdsRequest.getBoardId(), objectsIdsRequest.getUserId(), objectsIdsRequest.getPermissionId());
+            List<User> users = userService.updateUserToBoard(objectsIdsRequest);
             return new Response.Builder()
                     .message(SuccessMessage.FOUND.toString())
                     .data(UserDTO.getListOfUsersDTO(users))
@@ -163,7 +163,7 @@ public class UserFacade {
         } catch (NullPointerException e) {
             return new Response.Builder()
                     .message(e.getMessage())
-                    .status(HttpStatus.BAD_REQUEST)
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .statusCode(500)
                     .build();
         }

@@ -1,13 +1,9 @@
 package CRM.entity;
 
-import CRM.entity.requests.ItemRequest;
 import CRM.entity.requests.UpdateObjectRequest;
-import CRM.utils.enums.UpdateField;
 import lombok.*;
 
 import javax.persistence.*;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -66,6 +62,15 @@ public class Board {
     //--------------------------------------User--------------------------------------//
     public void addUserPermissionToBoard(UserPermission userPermission) {
         usersPermissions.add(userPermission);
+    }
+
+    public UserPermission getUserPermissionById(Board board, Long userId,  Set<UserPermission> userPermissionsSet){
+        for (UserPermission userInBoard : userPermissionsSet) {
+            if (userInBoard.getId().equals(userId)) {
+                return userInBoard;
+            }
+        }
+        return null;
     }
 
     //--------------------------------------Section--------------------------------------//

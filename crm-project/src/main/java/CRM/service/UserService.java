@@ -1,6 +1,7 @@
 package CRM.service;
 
 import CRM.entity.*;
+import CRM.entity.requests.ObjectsIdsRequest;
 import CRM.repository.BoardRepository;
 import CRM.repository.SettingRepository;
 import CRM.repository.UserRepository;
@@ -142,21 +143,13 @@ public class UserService {
         return board.getAllUsersInBoard();
     }
 
-    /**
-     * Adds a user to a board.
-     *
-     * @param userId  the id of the user to add to the board
-     * @param boardId the id of the board to add the user to
-     * @return the UserInBoard object representing the user being added to the board
-     * @throws AccountNotFoundException if the user or board with the given id does not exist in the database
-     * @throws IllegalArgumentException if the combination of the given user and board already exists in the database
-     */
-    public List<User> updateUserToBoard(long userId, long boardId, long permissionId) throws AccountNotFoundException {
+    //TODO documentation
+    public List<User> updateUserToBoard(ObjectsIdsRequest objectsIdsRequest) throws AccountNotFoundException {
         User user;
         Board board;
         try {
-            user = Validations.doesIdExists(userId, userRepository);
-            board = Validations.doesIdExists(boardId, boardRepository);
+            user = Validations.doesIdExists(objectsIdsRequest.getUserId(), userRepository);
+            board = Validations.doesIdExists(objectsIdsRequest.getBoardId(), boardRepository);
         } catch (NoSuchElementException e) {
             throw new AccountNotFoundException(ExceptionMessage.ACCOUNT_DOES_NOT_EXISTS.toString());
         }
@@ -165,33 +158,8 @@ public class UserService {
             throw new IllegalArgumentException(ExceptionMessage.ADMIN_CANT_CHANGE_HIS_PERMISSION.toString());
         }
 
-        UserPermission userPermissionInBoard = null;
-        Set<UserPermission> userPermissionsSet = board.getUsersPermissions();
-
-        for (UserPermission userInBoard : userPermissionsSet) {
-            if (userInBoard.getId().equals(userId)) {
-                userPermissionInBoard = userInBoard;
-                break;
-            }
-        }
-
-        Permission permissionRequest = Permission.values()[(int) permissionId];
-
-        if (userPermissionInBoard == null) { //create new
-            if(!permissionRequest.equals(Permission.ADMIN) && !permissionRequest.equals(Permission.UNAUTHORIZED)) createNewUserPermission(user, permissionRequest, board);
-            else throw new IllegalArgumentException(ExceptionMessage.CANT_ASSIGN_PERMISSION.toString());
-        } else if (permissionRequest.equals(Permission.ADMIN)) {
-            throw new IllegalArgumentException(ExceptionMessage.PERMISSION_NOT_ALLOWED.toString());
-        } else if (permissionRequest.equals(Permission.USER) && !userPermissionInBoard.getPermission().equals(Permission.USER)) {
-            userPermissionInBoard.setPermission(permissionRequest);
-        } else if (permissionRequest.equals(Permission.LEADER) && !userPermissionInBoard.getPermission().equals(Permission.LEADER)) {
-            userPermissionInBoard.setPermission(permissionRequest);
-        } else if (permissionRequest.equals(Permission.UNAUTHORIZED)) {
-            userPermissionsSet.remove(userPermissionInBoard);
-        } else {
-            throw new IllegalArgumentException(ExceptionMessage.USER_ALREADY_HAS_THIS_PERMISSION.toString());
-        }
-
+        Permission permissionRequest = Permission.values()[Math.toIntExact(objectsIdsRequest.getPermissionId())];
+        Set<UserPermission> userPermissionsSet = updateUserPermission(user, permissionRequest, board);
         List<User> users = new ArrayList<>();
         users.add(board.getCreatorUser());
         for (UserPermission addUSer: userPermissionsSet) {
@@ -201,27 +169,41 @@ public class UserService {
         return users;
     }
 
-    /**
-     * Creates default notifications for every new user in every board,
-     * using constant notifications
-     */
-    private void createDefaultSettingForNewUserInBoard(User user, Board board, NotificationSetting notificationSetting) {
-        UserSetting userSetting = new UserSetting();
-        userSetting.setId(0L);
-        userSetting.setInApp(true);
-        userSetting.setInEmail(true);
-        userSetting.setUser(user);
-        userSetting.setSetting(notificationSetting);
-        board.addUserSettingToBoard(userSetting);
+    //TODO documentation
+    private void createDefaultSettingForNewUserInBoard(User user, Board board) {
+        for (long i = 0; i < 6; i++) {
+            NotificationSetting notificationSetting = Validations.doesIdExists(i+1L, settingRepository);
+            UserSetting userSetting = UserSetting.createUserSetting(user, notificationSetting);
+            board.addUserSettingToBoard(userSetting);
+        }
     }
 
+    //TODO documentation
     private void createNewUserPermission(User user, Permission permission, Board board){
-        NotificationSetting notificationSetting = Validations.doesIdExists(2L, settingRepository);
-        UserPermission userPermission = new UserPermission();
-        userPermission.setId(0L);
-        userPermission.setUser(user);
-        userPermission.setPermission(permission);
+        UserPermission userPermission = UserPermission.newUserPermission(user, permission);
         board.addUserPermissionToBoard(userPermission);
-        createDefaultSettingForNewUserInBoard(user, board, notificationSetting);
+        createDefaultSettingForNewUserInBoard(user, board);
+    }
+
+    //TODO documentation
+    private Set<UserPermission> updateUserPermission(User user, Permission permissionRequest, Board board) {
+        Set<UserPermission> userPermissionsSet = board.getUsersPermissions();
+        UserPermission userPermissionInBoard = board.getUserPermissionById(board, user.getId() ,userPermissionsSet);
+
+        if (permissionRequest.equals(Permission.ADMIN)) {
+            throw new IllegalArgumentException(ExceptionMessage.PERMISSION_NOT_ALLOWED.toString());
+        } else if (permissionRequest.equals(Permission.UNAUTHORIZED)) {
+            if (userPermissionInBoard == null) {
+                throw new IllegalArgumentException(ExceptionMessage.CANT_ASSIGN_PERMISSION.toString());
+            } else {
+                userPermissionsSet.remove(userPermissionInBoard);
+            }
+        } else if (userPermissionInBoard == null) {
+            createNewUserPermission(user, permissionRequest, board);
+        }
+        else{
+            userPermissionInBoard.setPermission(permissionRequest);
+        }
+        return userPermissionsSet;
     }
 }
