@@ -63,7 +63,7 @@ public class SectionFacade {
     //TODO documentation
     public Response delete(Long boardId, Long attributeId) {
         try {
-            Validations.validateIDs(Arrays.asList(boardId, attributeId));
+            Validations.validateIDs(boardId, attributeId);
             sectionService.delete(boardId, attributeId);
 
             return new Response.Builder()
@@ -98,7 +98,7 @@ public class SectionFacade {
     //TODO Validation function + DTO
     public Response get(Long attributeId, Long boardId) {
         try {
-            Validations.validateIDs(Arrays.asList(boardId, attributeId));
+            Validations.validateIDs(boardId, attributeId);
             return new Response.Builder()
                     .data(sectionService.get(attributeId, boardId))
                     .message(SuccessMessage.FOUND.toString())

@@ -135,14 +135,14 @@ public class Validations {
     }
 
     //TODO documentation
-    public static void validateIDs(List<Long> ids){
+    public static void validateIDs(Long ...ids){
         for(Long id: ids){
             validate(id, Regex.ID.getRegex());
         }
     }
 
     public static void validateUpdateUserToBoard(Long firstId, Long secondId, Long permissionId){
-        validateIDs(Arrays.asList(firstId, secondId));
+        validateIDs(firstId, secondId);
         validate(permissionId, Regex.ID.getRegex());
         if(permissionId < 0 || permissionId > 3){
             throw new IllegalArgumentException(ExceptionMessage.PERMISSION_NOT_FOUND.toString());

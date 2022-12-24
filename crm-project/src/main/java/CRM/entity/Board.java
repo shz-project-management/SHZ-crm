@@ -66,7 +66,7 @@ public class Board {
 
     public UserPermission getUserPermissionById(Board board, Long userId,  Set<UserPermission> userPermissionsSet){
         for (UserPermission userInBoard : userPermissionsSet) {
-            if (userInBoard.getId().equals(userId)) {
+            if (userInBoard.getUser().getId().equals(userId)) {
                 return userInBoard;
             }
         }

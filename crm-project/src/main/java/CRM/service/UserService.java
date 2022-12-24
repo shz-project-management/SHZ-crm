@@ -168,8 +168,8 @@ public class UserService {
 
     //TODO documentation
     private void createDefaultSettingForNewUserInBoard(User user, Board board) {
-        for (long i = 0; i < 6; i++) {
-            NotificationSetting notificationSetting = Validations.doesIdExists(i+1L, settingRepository);
+        List<NotificationSetting> notificationSettingList = settingRepository.findAll();
+        for (NotificationSetting notificationSetting : notificationSettingList) {
             UserSetting userSetting = UserSetting.createUserSetting(user, notificationSetting);
             board.addUserSettingToBoard(userSetting);
         }
@@ -189,16 +189,14 @@ public class UserService {
 
         if (permissionRequest.equals(Permission.ADMIN)) {
             throw new IllegalArgumentException(ExceptionMessage.PERMISSION_NOT_ALLOWED.toString());
-        } else if (permissionRequest.equals(Permission.UNAUTHORIZED)) {
-            if (userPermissionInBoard == null) {
-                throw new IllegalArgumentException(ExceptionMessage.CANT_ASSIGN_PERMISSION.toString());
-            } else {
-                userPermissionsSet.remove(userPermissionInBoard);
-            }
-        } else if (userPermissionInBoard == null) {
-            createNewUserPermission(user, permissionRequest, board);
         }
-        else{
+
+        if (permissionRequest.equals(Permission.UNAUTHORIZED)) {
+            userPermissionsSet.removeIf(userPerm -> userPermissionInBoard.getId().equals(userPerm.getId()));
+        }
+        else if (userPermissionInBoard == null) {
+            createNewUserPermission(user, permissionRequest, board);
+        } else{
             userPermissionInBoard.setPermission(permissionRequest);
         }
         return userPermissionsSet;
