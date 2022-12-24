@@ -1,9 +1,13 @@
 package CRM.entity.DTO;
 
+import CRM.entity.Board;
 import CRM.entity.Item;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
 @ToString
 @Getter
@@ -35,5 +39,13 @@ public class ItemDTO extends SharedContentDTO {
         itemDTO.setCreationDate(item.getCreationDate());
 
         return itemDTO;
+    }
+
+    public static List<ItemDTO> getItemsDTOList(Set<Item> items){
+        List<ItemDTO> itemDTOList = new ArrayList<>();
+        for (Item item: items) {
+            itemDTOList.add(getSharedContentFromDB(item));
+        }
+        return itemDTOList;
     }
 }

@@ -15,15 +15,13 @@ import java.util.Set;
 @ToString
 public class BoardDTO {
 
-    //FIXME: change User, Item, Type, Status to DTO's
     private Long id;
     private UserDTO creatorUser;
     private String name;
     private String description;
-    // FIXME: put all these stats in DTO also
-//    private Set<Item> sections;
-//    private Set<Type> types;
-//    private Set<Status> statuses;
+    private List<SectionDTO> sections;
+    private List<AttributeDTO> types;
+    private List<AttributeDTO> statuses;
 
     public static BoardDTO createPlainBoard(Board board){
         BoardDTO boardDTO = new BoardDTO();
@@ -40,9 +38,9 @@ public class BoardDTO {
         boardDTO.setCreatorUser(UserDTO.getUserFromDB(board.getCreatorUser()));
         boardDTO.setName(board.getName());
         boardDTO.setDescription(board.getDescription());
-//        boardDTO.setItems(board.getItems());
-//        boardDTO.setStatuses(board.getStatuses());
-//        boardDTO.setTypes(board.getTypes());
+        boardDTO.setSections(SectionDTO.getSectionsDTOList(board.getSections()));
+        boardDTO.setStatuses(AttributeDTO.getListOfAttributesFromDB(board.getStatuses()));
+        boardDTO.setTypes(AttributeDTO.getListOfAttributesFromDB(board.getTypes()));
         return boardDTO;
     }
 
