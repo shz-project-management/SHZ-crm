@@ -5,6 +5,7 @@ import CRM.entity.requests.ObjectsIdsRequest;
 import CRM.repository.BoardRepository;
 import CRM.repository.SettingRepository;
 import CRM.repository.UserRepository;
+import CRM.utils.Common;
 import CRM.utils.Validations;
 import CRM.utils.enums.ExceptionMessage;
 import CRM.utils.enums.Permission;
@@ -13,8 +14,8 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.EntityManager;
 import javax.security.auth.login.AccountNotFoundException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Set;
@@ -193,6 +194,7 @@ public class UserService {
 
         if (permissionRequest.equals(Permission.UNAUTHORIZED)) {
             userPermissionsSet.removeIf(userPerm -> userPermissionInBoard.getId().equals(userPerm.getId()));
+            board.removeSettingsByUserPermission(userPermissionInBoard);
         }
         else if (userPermissionInBoard == null) {
             createNewUserPermission(user, permissionRequest, board);

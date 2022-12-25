@@ -45,14 +45,7 @@ public class BoardService {
             throw new AccountNotFoundException(ExceptionMessage.ACCOUNT_DOES_NOT_EXISTS.toString());
         }
         Board board = Board.createBoard(user, boardRequest.getName(), boardRequest.getDescription());
-
-        User creatorUser = board.getCreatorUser();
-        //FIXME notificationSetting shouldn't be created this way.
-        NotificationSetting notificationSetting = Validations.doesIdExists(2L, settingRepository);
-        UserSetting userSetting = UserSetting.createUserSetting(creatorUser, notificationSetting);
-        //FIXME maybe take Entity manager outside the service will be a better practise.
-        userSetting = entityManager.merge(userSetting);
-        board.addUserSettingToBoard(userSetting);
+        Common.createDefaultSettingForNewUserInBoard(user,board,settingRepository, entityManager);
         return boardRepository.save(board);
     }
 
@@ -120,5 +113,13 @@ public class BoardService {
         Board board = Validations.doesIdExists(boardId, boardRepository);
         Validations.setContentToFieldIfFieldExists(board, boardReq.getFieldName(), boardReq.getContent());
         return boardRepository.save(board);
+    }
+
+    private void createDefaultSettingForNewUserInBoard(User user, Board board) {
+        List<NotificationSetting> notificationSettingList = settingRepository.findAll();
+        for (NotificationSetting notificationSetting : notificationSettingList) {
+            UserSetting userSetting = UserSetting.createUserSetting(user, notificationSetting);
+            board.addUserSettingToBoard(userSetting);
+        }
     }
 }

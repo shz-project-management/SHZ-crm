@@ -6,13 +6,12 @@ import CRM.utils.enums.ExceptionMessage;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.http.HttpStatus;
 
+import javax.persistence.EntityManager;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.*;
-import java.util.function.Supplier;
 
 public class Common {
-
 
     public static User getUser(long userId, JpaRepository<User, Long> repo){
         return Validations.doesIdExists(userId, repo);
@@ -113,4 +112,17 @@ public class Common {
         return dp[len1][len2];
     }
 
+
+    public static void createDefaultSettingForNewUserInBoard(User user, Board board, JpaRepository<NotificationSetting, Long> settingsRepo, EntityManager entityManager) {
+        try {
+            List<NotificationSetting> notificationSettingList = settingsRepo.findAll();
+            for (NotificationSetting notificationSetting : notificationSettingList) {
+                UserSetting userSetting = UserSetting.createUserSetting(user, notificationSetting);
+                userSetting = entityManager.merge(userSetting);
+                board.addUserSettingToBoard(userSetting);
+            }
+        } finally {
+            entityManager.close();
+        }
+    }
 }

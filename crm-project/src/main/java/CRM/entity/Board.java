@@ -174,6 +174,12 @@ public class Board {
                 .stream().map(UserPermission::getUser).collect(Collectors.toList());
     }
 
+
+    //--------------------------------------Settings--------------------------------------//
+    public void removeSettingsByUserPermission(UserPermission userPermissionInBoard) {
+        usersSettings.removeIf(user -> user.getUser().equals(userPermissionInBoard.getUser()));
+    }
+
     // -------- Helpers: --------- //
 
 
