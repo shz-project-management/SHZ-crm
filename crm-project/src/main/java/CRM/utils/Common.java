@@ -13,7 +13,7 @@ import java.util.*;
 
 public class Common {
 
-    public static User getUser(long userId, JpaRepository<User, Long> repo){
+    public static User getUser(long userId, JpaRepository<User, Long> repo) {
         return Validations.doesIdExists(userId, repo);
     }
 
@@ -124,5 +124,43 @@ public class Common {
         } finally {
             entityManager.close();
         }
+    }
+
+    public static String generateQuery(Map<String,List<String>> filters) {
+        StringBuilder queryBuilder = new StringBuilder("SELECT i FROM Item i WHERE ");
+
+        // Use a List to store the different parts of the query
+        List<String> conditions = new ArrayList<>();
+
+        // Check for null values in the filters map
+        if (filters == null) {
+            throw new IllegalArgumentException("filters cannot be null");
+        }
+
+        // Iterate over the filters
+        for (Map.Entry<String, List<String>> entry : filters.entrySet()) {
+            String column = entry.getKey();
+            List<String> values = entry.getValue();
+
+            if (column == null || values == null || values.isEmpty()) {
+                throw new IllegalArgumentException("column and values cannot be null or empty");
+            }
+
+            // Use parameterized queries to avoid SQL injection attacks
+            StringBuilder condition = new StringBuilder("i." + column + " IN (");
+            for (String value : values) {
+                condition.append(value).append(", ");
+            }
+            condition = new StringBuilder(condition.substring(0, condition.length() - 2));
+            condition.append(")");
+
+            conditions.add(condition.toString());
+        }
+
+        // Join the different parts of the query using AND
+        String query = String.join(" AND ", conditions);
+
+        // Append the completed query to the StringBuilder and return it as a string
+        return queryBuilder.append(query).toString();
     }
 }

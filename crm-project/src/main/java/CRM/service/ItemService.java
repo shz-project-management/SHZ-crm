@@ -13,9 +13,10 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Query;
 import javax.security.auth.login.AccountNotFoundException;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -53,12 +54,14 @@ public class ItemService implements ServiceInterface {
         Item item = Item.createNewItem(itemRequest, board, user);
 
         // add the item to the items list in the board entity
-        board.insertItemToSection(item, itemRequest.getSectionId());
+        board.insertItemToSection(item);
+
         // save the board in the db
         boardRepository.save(board);
 
 //      return boardRepository.findItemInBoardByItem(item);
-        return board.getSectionFromBoard(itemRequest.getSectionId());
+        Section section = board.getSectionFromBoard(itemRequest.getSectionId());
+        return section;
     }
 
     //TODO Documentation

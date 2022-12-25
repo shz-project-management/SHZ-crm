@@ -45,16 +45,16 @@ public class StatusController {
         return new ResponseEntity<>(response, response.getStatus());
     }
 
-    /**
-     This method is used to handle HTTP GET requests to the specified URL (status/{id}).
-     The method takes the id of the status as a path variable and uses it to retrieve the status information from the attributeFacade object.
-     @return A ResponseEntity object containing the Response object with the status information and the HTTP status code.
-     */
-    @GetMapping(value = "{boardId}/{sectionId}")
-    public ResponseEntity<Response> get(@PathVariable Long boardId,@PathVariable Long sectionId) {
-        Response response = attributeFacade.get(sectionId, boardId, Status.class);
-        return new ResponseEntity<>(response, response.getStatus());
-    }
+//    /**
+//     This method is used to handle HTTP GET requests to the specified URL (status/{id}).
+//     The method takes the id of the status as a path variable and uses it to retrieve the status information from the attributeFacade object.
+//     @return A ResponseEntity object containing the Response object with the status information and the HTTP status code.
+//     */
+//    @GetMapping(value = "{boardId}/{sectionId}")
+//    public ResponseEntity<Response> get(@PathVariable Long boardId,@PathVariable Long sectionId) {
+//        Response response = attributeFacade.get(sectionId, boardId, Status.class);
+//        return new ResponseEntity<>(response, response.getStatus());
+//    }
 
     /**
      * This method is used to handle HTTP GET requests to the specified URL (status/getAll/{boardId}).

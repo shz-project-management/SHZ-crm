@@ -1,6 +1,9 @@
 package CRM.controller.facades;
 
+import CRM.entity.DTO.ItemDTO;
 import CRM.entity.DTO.SectionDTO;
+import CRM.entity.Item;
+import CRM.entity.Section;
 import CRM.entity.requests.AttributeRequest;
 import CRM.entity.response.Response;
 import CRM.service.*;
@@ -14,8 +17,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
-import java.util.Arrays;
-import java.util.NoSuchElementException;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Component
 public class SectionFacade {
@@ -135,7 +138,7 @@ public class SectionFacade {
         try {
             Validations.validate(boardId, Regex.ID.getRegex());
             return new Response.Builder()
-                    .data((sectionService.getAllSectionsInBoard(boardId)))
+                    .data(SectionDTO.getSectionsDTOList(new HashSet<>(sectionService.getAllSectionsInBoard(boardId))))
                     .message(SuccessMessage.FOUND.toString())
                     .status(HttpStatus.OK)
                     .statusCode(200)
@@ -153,6 +156,16 @@ public class SectionFacade {
                     .statusCode(500)
                     .build();
         }
+    }
+
+    //TODO + documentation
+    public Response getFilteredItems(Map<String, List<String>> filters, Long boardId) {
+        return new Response.Builder()
+                .data(SectionDTO.getSectionsDTOList(sectionService.getQuery(filters, boardId)))
+                .message(SuccessMessage.FOUND.toString())
+                .status(HttpStatus.OK)
+                .statusCode(200)
+                .build();
     }
 
     /**

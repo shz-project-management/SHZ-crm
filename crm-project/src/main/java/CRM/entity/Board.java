@@ -30,15 +30,15 @@ public class Board {
     @Column(name = "description")
     private String description;
 
-    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL , orphanRemoval = true)
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "board_id")
     private Set<Type> types = new HashSet<>();
 
-    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL , orphanRemoval = true)
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "board_id")
     private Set<Status> statuses = new HashSet<>();
 
-    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL , orphanRemoval = true)
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "board_id")
     private Set<Section> sections = new HashSet<>();
 
@@ -66,7 +66,7 @@ public class Board {
         usersPermissions.add(userPermission);
     }
 
-    public UserPermission getUserPermissionById(Board board, Long userId,  Set<UserPermission> userPermissionsSet){
+    public UserPermission getUserPermissionById(Board board, Long userId, Set<UserPermission> userPermissionsSet) {
         for (UserPermission userInBoard : userPermissionsSet) {
             if (userInBoard.getUser().getId().equals(userId)) {
                 return userInBoard;
@@ -75,10 +75,10 @@ public class Board {
         return null;
     }
 
-    public List<User> getAllUsersInBoard(Board board, Set<UserPermission> userPermissionsSet){
+    public List<User> getAllUsersInBoard(Board board, Set<UserPermission> userPermissionsSet) {
         List<User> users = new ArrayList<>();
         users.add(board.getCreatorUser());
-        for (UserPermission addUSer: userPermissionsSet) {
+        for (UserPermission addUSer : userPermissionsSet) {
             users.add(addUSer.getUser());
         }
         return users;
@@ -92,11 +92,11 @@ public class Board {
         throw new IllegalArgumentException("Could not find this section in the db!");
     }
 
-    public void addSectionToBoard(Section section){
+    public void addSectionToBoard(Section section) {
         sections.add(section);
     }
 
-    public void removeSectionFromBoard(long sectionId){
+    public void removeSectionFromBoard(long sectionId) {
         sections.removeIf(section -> section.getId() == sectionId);
     }
 
@@ -113,7 +113,7 @@ public class Board {
                 .insertComment(comment);
     }
 
-    public List<Comment> getAllCommentsInItem(long sectionId, long itemId){
+    public List<Comment> getAllCommentsInItem(long sectionId, long itemId) {
         return new ArrayList<>(getSectionFromBoard(sectionId)
                 .getItemById(itemId)
                 .getComments());
@@ -126,15 +126,10 @@ public class Board {
                 .getItemById(itemId);
     }
 
-    public void insertItemToSection(Item item, long sectionId) {
-        getSectionFromBoard(sectionId)
-                .insertItem(item);
-    }
-
-    public void insertItemToItemInSection(Item item, long itemId, long sectionId) {
-        getSectionFromBoard(sectionId)
-                .getItemById(itemId)
-                .insertItem(item);
+    public void insertItemToSection(Item item) {
+        Section section = getSectionFromBoard(item.getSection().getId());
+        if (item.getParentItem() == null) section.insertItem(item);
+        else getItemFromSectionById(item.getParentItem().getId(), item.getSection().getId()).insertItem(item);
     }
 
     public Item updateItem(UpdateObjectRequest objectRequest, long itemId, long sectionId) {

@@ -4,12 +4,19 @@ import CRM.entity.*;
 import CRM.entity.requests.AttributeRequest;
 import CRM.repository.BoardRepository;
 import CRM.utils.Common;
+import CRM.utils.Validations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Query;
+import javax.swing.text.html.parser.Entity;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.util.*;
+
+import static CRM.utils.Util.sectionId;
 
 @Service
 public class SectionService {
@@ -17,6 +24,11 @@ public class SectionService {
     @Autowired
     private BoardRepository boardRepository;
 
+    //FIXME - maybe to put it outside
+    @Autowired
+    private EntityManager entityManager;
+    @Autowired
+    private EntityManagerFactory entityManagerFactory;
 
     //TODO documentation
     public Set<Section> create(AttributeRequest sectionRequest) {
@@ -54,5 +66,40 @@ public class SectionService {
     public List<Section> getAllSectionsInBoard(long boardId) {
         Board board = Common.getBoard(boardId, boardRepository);
         return new ArrayList<>(board.getSections());
+    }
+
+    //TODO Documentation
+    public Set<Section> getQuery(Map<String, List<String>> filters, long boardId) {
+        Board board = Validations.doesIdExists(boardId, boardRepository);
+        EntityManager em = entityManagerFactory.createEntityManager();
+        Set<Section> sections = board.getSections();
+
+        // Use an iterator to remove sections with no items that match the filters
+        Iterator<Section> iterator = sections.iterator();
+        while (iterator.hasNext()) {
+            Section section = iterator.next();
+
+            // Set the filter for the section id
+            filters.put(sectionId, List.of(section.getId().toString()));
+
+            // Create a query using the filters
+            Query query = em.createQuery(Common.generateQuery(filters));
+
+            // Get the items for the section
+            Set<Item> items = new HashSet<>();
+            for (Object o : query.getResultList()) {
+                items.add((Item) o);
+            }
+
+            // If the section has no items, remove it from the list
+            if (items.size() == 0) {
+                iterator.remove();
+            } else {
+                // Set the items for the section
+                section.setItems(items);
+            }
+        }
+
+        return sections;
     }
 }
