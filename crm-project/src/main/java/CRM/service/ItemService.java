@@ -38,7 +38,7 @@ public class ItemService implements ServiceInterface {
      * @throws AccountNotFoundException if the user ID specified in the request object does not correspond to an existing user.
      * @throws NoSuchElementException   if any of the board ID, type ID, or status ID specified in the request object do not correspond to existing entities.
      */
-    public Item create(ItemRequest itemRequest) throws AccountNotFoundException {
+    public Section create(ItemRequest itemRequest) throws AccountNotFoundException {
         // find the board from the db
         Board board = Common.getBoard(itemRequest.getBoardId(), boardRepository);
 
@@ -58,7 +58,7 @@ public class ItemService implements ServiceInterface {
         boardRepository.save(board);
 
 //      return boardRepository.findItemInBoardByItem(item);
-        return item;
+        return board.getSectionFromBoard(itemRequest.getSectionId());
     }
 
     //TODO Documentation
