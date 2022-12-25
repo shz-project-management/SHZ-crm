@@ -39,13 +39,13 @@ class BoardFacadeTest {
     private Board board;
 
 
-    @BeforeEach
-    void setUp() {
-        correctRegisterUserRequest = new RegisterUserRequest("Ziv", "Hausler", "ziv123456", "test@gmail.com");
-        user = User.newUser(correctRegisterUserRequest);
-        user.setId(1L);
-        board = Board.createBoard(user, "board", "nice");
-    }
+//    @BeforeEach
+//    void setUp() {
+//        correctRegisterUserRequest = new RegisterUserRequest("Ziv", "Hausler", "ziv123456", "test@gmail.com");
+//        user = User.newUser(correctRegisterUserRequest);
+//        user.setId(1L);
+//        board = Board.createBoard(user, "board", "nice");
+//    }
 
 
 //    @Test
@@ -174,37 +174,37 @@ class BoardFacadeTest {
         given(boardService.getAllBoardsOfUser(id)).willThrow(AccountNotFoundException.class);
         assertEquals(400, boardFacade.getAllBoardsOfUser(id).getStatusCode());
     }
-
-    @Test
-    @DisplayName("Test update board with valid input")
-    public void testUpdateBoardWithValidInput() throws NoSuchFieldException {
-//        board.setName("Test new board name");
-//        board.setDescription("Test new description");
-        UpdateObjectRequest boardRequest = new UpdateObjectRequest();
-        boardRequest.setFieldName(UpdateField.NAME);
-        boardRequest.setContent("Test new board name");
-        given(boardService.updateBoard(boardRequest, 1L)).willReturn(board);
-        assertEquals(200, boardFacade.updateBoard(boardRequest, 1L).getStatusCode());
-    }
-
-    @Test
-    @DisplayName("Test update board with invalid board ID")
-    public void testUpdateBoardWithInvalidBoardId() {
-        UpdateObjectRequest boardRequest = new UpdateObjectRequest();
-        boardRequest.setFieldName(UpdateField.NAME);
-        boardRequest.setContent("Test new board name");
-        assertEquals(400, boardFacade.updateBoard(boardRequest, -2L).getStatusCode());
-    }
-
-    @Test
-    @DisplayName("Test update board with non-existent board")
-    public void testUpdateBoardWithNonExistentBoard() throws NoSuchFieldException {
-        UpdateObjectRequest boardRequest = new UpdateObjectRequest();
-        boardRequest.setFieldName(UpdateField.NAME);
-        boardRequest.setContent("Test new board name");
-        given(boardService.updateBoard(boardRequest,1L)).willThrow(NoSuchElementException.class);
-        assertEquals(400, boardFacade.updateBoard(boardRequest, 1L).getStatusCode());
-    }
+//
+//    @Test
+//    @DisplayName("Test update board with valid input")
+//    public void testUpdateBoardWithValidInput() throws NoSuchFieldException {
+////        board.setName("Test new board name");
+////        board.setDescription("Test new description");
+//        UpdateObjectRequest boardRequest = new UpdateObjectRequest();
+//        boardRequest.setFieldName(UpdateField.NAME);
+//        boardRequest.setContent("Test new board name");
+//        given(boardService.updateBoard(boardRequest, 1L)).willReturn(board);
+//        assertEquals(200, boardFacade.updateBoard(boardRequest, 1L).getStatusCode());
+//    }
+//
+//    @Test
+//    @DisplayName("Test update board with invalid board ID")
+//    public void testUpdateBoardWithInvalidBoardId() {
+//        UpdateObjectRequest boardRequest = new UpdateObjectRequest();
+//        boardRequest.setFieldName(UpdateField.NAME);
+//        boardRequest.setContent("Test new board name");
+//        assertEquals(400, boardFacade.updateBoard(boardRequest, -2L).getStatusCode());
+//    }
+//
+//    @Test
+//    @DisplayName("Test update board with non-existent board")
+//    public void testUpdateBoardWithNonExistentBoard() throws NoSuchFieldException {
+//        UpdateObjectRequest boardRequest = new UpdateObjectRequest();
+//        boardRequest.setFieldName(UpdateField.NAME);
+//        boardRequest.setContent("Test new board name");
+//        given(boardService.updateBoard(boardRequest,1L)).willThrow(NoSuchElementException.class);
+//        assertEquals(400, boardFacade.updateBoard(boardRequest, 1L).getStatusCode());
+//    }
 
     @Test
     @DisplayName("Test update board with null input")

@@ -5,11 +5,18 @@ import CRM.entity.Board;
 import CRM.entity.requests.BoardRequest;
 import CRM.entity.requests.UpdateObjectRequest;
 import CRM.entity.response.Response;
+import CRM.utils.Common;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Controller
 @RequestMapping(value = "/board")
@@ -82,5 +89,29 @@ public class BoardController {
     public ResponseEntity<Response> updateBoard(@RequestBody UpdateObjectRequest boardRequest) {
         Response response = boardFacade.updateBoard(boardRequest, boardRequest.getObjectsIdsRequest().getBoardId());
         return new ResponseEntity<>(response, response.getStatus());
+    }
+
+    @RequestMapping(value = "query", method = RequestMethod.GET)
+    public ResponseEntity<String> query() {
+        Map<String, List<String>> filters = new HashMap<>();
+
+        List<String> types = new ArrayList<>();
+        List<String> statuses = new ArrayList<>();
+        List<String> importances = new ArrayList<>();
+
+        types.add("Bug");
+
+        statuses.add("Done");
+        statuses.add("Open");
+
+        importances.add("1");
+        importances.add("3");
+        importances.add("5");
+
+        filters.put("type", types);
+        filters.put("status", statuses);
+        filters.put("importance", importances);
+
+        return new ResponseEntity<>(Common.generateQuery(filters), HttpStatus.OK);
     }
 }

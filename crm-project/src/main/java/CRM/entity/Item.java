@@ -2,6 +2,7 @@ package CRM.entity;
 
 import CRM.entity.requests.ItemRequest;
 import CRM.entity.requests.UpdateObjectRequest;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
 import javax.persistence.*;
@@ -27,6 +28,7 @@ public class Item extends SharedContent {
     @JoinColumn(name = "type_id")
     private Type type;
 
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "section_id")
     private Section section;
@@ -40,9 +42,11 @@ public class Item extends SharedContent {
     @Column(name = "importance")
     private int importance;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "parentItem", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Comment> comments = new HashSet<>();
 
+    @JsonIgnore
     @OneToMany(mappedBy = "parentItem", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Item> items = new HashSet<>();
 

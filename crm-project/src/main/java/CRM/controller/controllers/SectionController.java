@@ -12,6 +12,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+import java.util.Map;
+
 @Controller
 @RequestMapping(value = "/section")
 @AllArgsConstructor
@@ -68,6 +71,12 @@ public class SectionController {
     @GetMapping(value = "getAll/{boardId}")
     public ResponseEntity<Response> getAllInBoard(@PathVariable Long boardId) {
         Response response = sectionFacade.getAllSectionsInBoard(boardId);
+        return new ResponseEntity<>(response, response.getStatus());
+    }
+
+    @GetMapping(value = "filter-items/{boardId}")
+    public ResponseEntity<Response> getFilteredItems(@RequestBody Map<String, List<String>> filters, @PathVariable Long boardId) {
+        Response response = sectionFacade.getFilteredItems(filters, boardId);
         return new ResponseEntity<>(response, response.getStatus());
     }
 
