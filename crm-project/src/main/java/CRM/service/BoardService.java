@@ -1,7 +1,6 @@
 package CRM.service;
 
 import CRM.entity.*;
-import CRM.entity.DTO.BoardDTO;
 import CRM.entity.requests.BoardRequest;
 import CRM.entity.requests.UpdateObjectRequest;
 import CRM.repository.BoardRepository;
@@ -40,7 +39,7 @@ public class BoardService {
     public Board create(BoardRequest boardRequest) throws AccountNotFoundException {
         User user;
         try {
-            user = Common.getUser(boardRequest.getCreatorUserId(), userRepository);
+            user = Validations.doesIdExists(boardRequest.getCreatorUserId(), userRepository);
         } catch (NoSuchElementException e) {
             throw new AccountNotFoundException(ExceptionMessage.ACCOUNT_DOES_NOT_EXISTS.toString());
         }
@@ -55,7 +54,7 @@ public class BoardService {
      * @param boardId the board ID to delete
      */
     public boolean delete(long boardId) {
-        Board board = Common.getBoard(boardId, boardRepository);
+        Board board = Validations.doesIdExists(boardId, boardRepository);
         boardRepository.delete(board);
         return true;
     }
@@ -70,7 +69,7 @@ public class BoardService {
      * @throws NullPointerException     if the specified id is null.
      */
     public Board get(long boardId) {
-        return Common.getBoard(boardId, boardRepository);
+        return Validations.doesIdExists(boardId, boardRepository);
     }
 
     /**

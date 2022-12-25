@@ -11,9 +11,6 @@ import org.springframework.stereotype.Service;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Query;
-import javax.swing.text.html.parser.Entity;
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
 import java.util.*;
 
 import static CRM.utils.Util.sectionId;
@@ -32,7 +29,7 @@ public class SectionService {
 
     //TODO documentation
     public Set<Section> create(AttributeRequest sectionRequest) {
-        Board board = Common.getBoard(sectionRequest.getBoardId(), boardRepository);
+        Board board = Validations.doesIdExists(sectionRequest.getBoardId(), boardRepository);
         Section section = Section.createSection(sectionRequest);
         board.addSectionToBoard(section);
         boardRepository.save(board);
@@ -42,7 +39,7 @@ public class SectionService {
 
     //TODO documentation
     public void delete(long boardId, long sectionId) {
-        Board board = Common.getBoard(boardId, boardRepository);
+        Board board = Validations.doesIdExists(boardId, boardRepository);
         board.removeSectionFromBoard(sectionId);
         boardRepository.save(board);
     }
@@ -50,7 +47,7 @@ public class SectionService {
 
     //TODO documentation
     public Section get(long sectionId, long boardId) {
-        Board board = Common.getBoard(boardId, boardRepository);
+        Board board = Validations.doesIdExists(boardId, boardRepository);
         return board.getSectionFromBoard(sectionId);
     }
 
@@ -64,7 +61,7 @@ public class SectionService {
 
     //TODO documentation
     public List<Section> getAllSectionsInBoard(long boardId) {
-        Board board = Common.getBoard(boardId, boardRepository);
+        Board board = Validations.doesIdExists(boardId, boardRepository);
         return new ArrayList<>(board.getSections());
     }
 
@@ -99,7 +96,6 @@ public class SectionService {
                 section.setItems(items);
             }
         }
-
         return sections;
     }
 }

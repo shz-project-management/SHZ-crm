@@ -1,10 +1,8 @@
 package CRM.utils;
 
 import CRM.entity.*;
-import CRM.entity.response.Response;
 import CRM.utils.enums.ExceptionMessage;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.http.HttpStatus;
 
 import javax.persistence.EntityManager;
 import java.lang.reflect.InvocationTargetException;
@@ -12,14 +10,6 @@ import java.lang.reflect.Method;
 import java.util.*;
 
 public class Common {
-
-    public static User getUser(long userId, JpaRepository<User, Long> repo) {
-        return Validations.doesIdExists(userId, repo);
-    }
-
-    public static Board getBoard(long boardId, JpaRepository<Board, Long> repo) {
-        return Validations.doesIdExists(boardId, repo);
-    }
 
     public static Section getSection(Board board, long sectionId) {
         return getOptional(board.getSections(), sectionId, Section.class).orElseThrow(() -> new IllegalArgumentException(ExceptionMessage.NO_SUCH_ID.toString()));
@@ -49,24 +39,6 @@ public class Common {
             throw new RuntimeException(ExceptionMessage.UNPROCESSABLE_ENTITY.toString());
         }
     }
-
-    public static <T> Response buildSuccessResponse(T data, HttpStatus successStatus, String message) {
-        return new Response.Builder()
-                .message(message)
-                .data(data)
-                .status(successStatus)
-                .statusCode(successStatus.value())
-                .build();
-    }
-
-    public static Response buildErrorResponse(Exception e, HttpStatus errorStatus) {
-        return new Response.Builder()
-                .message(e.getMessage())
-                .status(errorStatus)
-                .statusCode(errorStatus.value())
-                .build();
-    }
-
 
     public static int getDistanceBetweenWords(String firstWord, String secondWord) {
         // uses levenshtein distance algorithm

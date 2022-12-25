@@ -1,16 +1,14 @@
 package CRM.controller.facades;
 
 import CRM.entity.DTO.UserDTO;
-import CRM.entity.DTO.UserPermissionDTO;
 import CRM.entity.User;
-import CRM.entity.UserPermission;
 import CRM.entity.requests.ObjectsIdsRequest;
 import CRM.entity.response.Response;
 import CRM.service.UserService;
 import CRM.utils.Validations;
-import CRM.utils.enums.Permission;
 import CRM.utils.enums.Regex;
 import CRM.utils.enums.SuccessMessage;
+import com.google.api.client.http.HttpStatusCodes;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
@@ -18,7 +16,6 @@ import org.springframework.stereotype.Component;
 import javax.security.auth.login.AccountNotFoundException;
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Set;
 
 @Component
 public class UserFacade {
@@ -38,23 +35,24 @@ public class UserFacade {
         try {
             Validations.validate(id, Regex.ID.getRegex());
 
-            return new Response.Builder()
-                    .data(userService.get(id))
+            return Response.builder()
+                    .data(UserDTO.createUserDTO(userService.get(id)))
                     .message(SuccessMessage.FOUND.toString())
                     .status(HttpStatus.OK)
-                    .statusCode(200)
+                    .statusCode(HttpStatusCodes.STATUS_CODE_OK)
                     .build();
+
         } catch (AccountNotFoundException | IllegalArgumentException e) {
-            return new Response.Builder()
+            return Response.builder()
                     .message(e.getMessage())
                     .status(HttpStatus.BAD_REQUEST)
-                    .statusCode(400)
+                    .statusCode(HttpStatusCodes.STATUS_CODE_BAD_REQUEST)
                     .build();
         } catch (NullPointerException e) {
-            return new Response.Builder()
+            return Response.builder()
                     .message(e.getMessage())
                     .status(HttpStatus.BAD_REQUEST)
-                    .statusCode(500)
+                    .statusCode(HttpStatusCodes.STATUS_CODE_SERVER_ERROR)
                     .build();
         }
     }
@@ -77,23 +75,25 @@ public class UserFacade {
     public Response delete(Long id) {
         try {
             Validations.validate(id, Regex.ID.getRegex());
-            return new Response.Builder()
+
+            return Response.builder()
                     .data(userService.delete(id))
                     .message(SuccessMessage.DELETED.toString())
                     .status(HttpStatus.NO_CONTENT)
-                    .statusCode(204)
+                    .statusCode(HttpStatusCodes.STATUS_CODE_NO_CONTENT)
                     .build();
+
         } catch (AccountNotFoundException | NoSuchElementException | IllegalArgumentException e) {
-            return new Response.Builder()
+            return Response.builder()
                     .message(e.getMessage())
                     .status(HttpStatus.BAD_REQUEST)
-                    .statusCode(400)
+                    .statusCode(HttpStatusCodes.STATUS_CODE_BAD_REQUEST)
                     .build();
         } catch (NullPointerException e) {
-            return new Response.Builder()
+            return Response.builder()
                     .message(e.getMessage())
                     .status(HttpStatus.BAD_REQUEST)
-                    .statusCode(500)
+                    .statusCode(HttpStatusCodes.STATUS_CODE_SERVER_ERROR)
                     .build();
         }
     }
@@ -104,11 +104,11 @@ public class UserFacade {
      * @return A {@link Response} object containing a list of all users.
      */
     public Response getAll() {
-        return new Response.Builder()
-                .data(userService.getAll())
+        return Response.builder()
+                .data(UserDTO.getListOfUsersDTO(userService.getAll()))
                 .message(SuccessMessage.FOUND.toString())
                 .status(HttpStatus.OK)
-                .statusCode(200)
+                .statusCode(HttpStatusCodes.STATUS_CODE_OK)
                 .build();
     }
 
@@ -122,23 +122,24 @@ public class UserFacade {
         try {
             Validations.validate(boardId, Regex.ID.getRegex());
 
-            return new Response.Builder()
-                    .data(userService.getAllInBoard(boardId))
+            return Response.builder()
+                    .data(UserDTO.getListOfUsersDTO(userService.getAllInBoard(boardId)))
                     .message(SuccessMessage.FOUND.toString())
                     .status(HttpStatus.OK)
-                    .statusCode(200)
+                    .statusCode(HttpStatusCodes.STATUS_CODE_OK)
                     .build();
+
         } catch (AccountNotFoundException | IllegalArgumentException | NoSuchElementException e) {
-            return new Response.Builder()
+            return Response.builder()
                     .message(e.getMessage())
                     .status(HttpStatus.BAD_REQUEST)
-                    .statusCode(400)
+                    .statusCode(HttpStatusCodes.STATUS_CODE_BAD_REQUEST)
                     .build();
         } catch (NullPointerException e) {
-            return new Response.Builder()
+            return Response.builder()
                     .message(e.getMessage())
                     .status(HttpStatus.BAD_REQUEST)
-                    .statusCode(500)
+                    .statusCode(HttpStatusCodes.STATUS_CODE_SERVER_ERROR)
                     .build();
         }
     }
@@ -146,25 +147,28 @@ public class UserFacade {
     //TODO documentation
     public Response updateUserToBoard(ObjectsIdsRequest objectsIdsRequest) {
         try {
-            Validations.validateUpdateUserToBoard(objectsIdsRequest.getBoardId(), objectsIdsRequest.getUserId(), objectsIdsRequest.getPermissionId());
+            Validations.validateUpdateUserToBoard(objectsIdsRequest.getBoardId(), objectsIdsRequest.getUserId(),
+                    objectsIdsRequest.getPermissionId());
             List<User> users = userService.updateUserToBoard(objectsIdsRequest);
-            return new Response.Builder()
+
+            return Response.builder()
                     .message(SuccessMessage.FOUND.toString())
                     .data(UserDTO.getListOfUsersDTO(users))
                     .status(HttpStatus.OK)
-                    .statusCode(200)
+                    .statusCode(HttpStatusCodes.STATUS_CODE_OK)
                     .build();
+
         } catch (AccountNotFoundException | IllegalArgumentException | NoSuchElementException e) {
-            return new Response.Builder()
+            return Response.builder()
                     .message(e.getMessage())
                     .status(HttpStatus.BAD_REQUEST)
-                    .statusCode(400)
+                    .statusCode(HttpStatusCodes.STATUS_CODE_BAD_REQUEST)
                     .build();
         } catch (NullPointerException e) {
-            return new Response.Builder()
+            return Response.builder()
                     .message(e.getMessage())
                     .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .statusCode(500)
+                    .statusCode(HttpStatusCodes.STATUS_CODE_SERVER_ERROR)
                     .build();
         }
     }
