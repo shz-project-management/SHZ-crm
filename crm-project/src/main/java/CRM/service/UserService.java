@@ -2,7 +2,7 @@ package CRM.service;
 
 import CRM.entity.*;
 import CRM.repository.BoardRepository;
-import CRM.repository.SettingRepository;
+import CRM.repository.NotificationSettingRepository;
 import CRM.repository.UserRepository;
 import CRM.utils.Validations;
 import CRM.utils.enums.ExceptionMessage;
@@ -27,7 +27,7 @@ public class UserService {
     @Autowired
     private BoardRepository boardRepository;
     @Autowired
-    private SettingRepository settingRepository;
+    private NotificationSettingRepository notificationSettingRepository;
 
     /**
      * findByEmail search in the database for a user based on the email we have.
@@ -159,8 +159,11 @@ public class UserService {
         } catch (NoSuchElementException e) {
             throw new AccountNotFoundException(ExceptionMessage.ACCOUNT_DOES_NOT_EXISTS.toString());
         }
+        if(Validations.checkIfUserExistsInBoard(userId, boardId, userRepository, boardRepository))
+            throw new IllegalArgumentException();
 
-        NotificationSetting notificationSetting = Validations.doesIdExists(2L, settingRepository);
+        //FIXME: what is this?
+        NotificationSetting notificationSetting = Validations.doesIdExists(2L, notificationSettingRepository);
 
         UserPermission userPermission = new UserPermission();
         userPermission.setId(0L);

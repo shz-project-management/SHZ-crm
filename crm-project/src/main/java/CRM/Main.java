@@ -1,8 +1,7 @@
 package CRM;
 
 import CRM.entity.NotificationSetting;
-import CRM.repository.SettingRepository;
-import CRM.service.SettingsService;
+import CRM.repository.NotificationSettingRepository;
 import CRM.utils.enums.Notifications;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +15,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 public class Main {
 
     @Autowired
-    private SettingRepository settingRepository;
+    private NotificationSettingRepository notificationSettingRepository;
 
     public static void main(String[] args) {
         SpringApplication.run(Main.class, args);
@@ -26,9 +25,9 @@ public class Main {
     InitializingBean initNotificationsInDB(){
         return ()->{
             for (Notifications notification : Notifications.values()) {
-                if(!settingRepository.findByName(notification.name).isPresent()){
+                if(!notificationSettingRepository.findByName(notification.name).isPresent()){
                     NotificationSetting notificationSetting = new NotificationSetting(0L, notification.name, notification.description);
-                    settingRepository.save(notificationSetting);
+                    notificationSettingRepository.save(notificationSetting);
                 }
             }
         };

@@ -22,7 +22,7 @@ public class UserSetting {
     @JoinColumn(name = "user_id")
     private User user;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "notification_id")
     private NotificationSetting setting;
 
@@ -32,7 +32,7 @@ public class UserSetting {
     @Column(name = "in_email")
     private boolean inEmail;
 
-    public static UserSetting createUserSetting(User user, Board board, NotificationSetting notificationSetting){
+    public static UserSetting createUserSetting(User user, NotificationSetting notificationSetting){
         UserSetting userSetting = new UserSetting();
         userSetting.setId(0L);
         userSetting.setInApp(true);

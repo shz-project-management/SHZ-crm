@@ -4,7 +4,7 @@ import CRM.entity.*;
 import CRM.entity.requests.BoardRequest;
 import CRM.entity.requests.UpdateObjectRequest;
 import CRM.repository.BoardRepository;
-import CRM.repository.SettingRepository;
+import CRM.repository.NotificationSettingRepository;
 import CRM.repository.UserRepository;
 import CRM.utils.Common;
 import CRM.utils.Validations;
@@ -29,7 +29,7 @@ public class BoardService {
     @Autowired
     private UserRepository userRepository;
     @Autowired
-    private SettingRepository settingRepository;
+    private NotificationSettingRepository notificationSettingRepository;
     @Autowired
     private EntityManager entityManager;
 
@@ -47,8 +47,8 @@ public class BoardService {
 
         User creatorUser = board.getCreatorUser();
         //FIXME notificationSetting shouldn't be created this way.
-        NotificationSetting notificationSetting = Validations.doesIdExists(2L, settingRepository);
-        UserSetting userSetting = UserSetting.createUserSetting(creatorUser, board, notificationSetting);
+        NotificationSetting notificationSetting = Validations.doesIdExists(2L, notificationSettingRepository);
+        UserSetting userSetting = UserSetting.createUserSetting(creatorUser, notificationSetting);
         //FIXME maybe take Entity manager outside the service will be a better practise.
         userSetting = entityManager.merge(userSetting);
         board.addUserSettingToBoard(userSetting);
