@@ -32,11 +32,11 @@ public class AuthFacadeTest {
     private RegisterUserRequest correctRegisterUserRequest;
     private LoginUserRequest correctLoginUserRequest;
 
-    @BeforeEach
-    void setUp() {
-        correctLoginUserRequest = new LoginUserRequest("test@gmail.com", "ziv123456");
-        correctRegisterUserRequest = new RegisterUserRequest("Ziv", "Hausler", "ziv123456", "test@gmail.com");
-    }
+//    @BeforeEach
+//    void setUp() {
+//        correctLoginUserRequest = new LoginUserRequest("test@gmail.com", "ziv123456");
+//        correctRegisterUserRequest = new RegisterUserRequest("Ziv", "Hausler", "ziv123456", "test@gmail.com");
+//    }
 
     @Test
     @DisplayName("Test that validateRegisteredUser is called with correct arguments")
@@ -61,12 +61,12 @@ public class AuthFacadeTest {
         assertEquals(201, authFacade.register(correctRegisterUserRequest).getStatusCode());
     }
 
-    @Test
-    @DisplayName("Test that a 400 status code and error message is returned when Validations.validateRegisteredUser throws an IllegalArgumentException")
-    public void testErrorResponseReturned_WhenValidateRegisteredUserThrowsIllegalArgumentException() {
-        RegisterUserRequest incorrectEmailRegisterUserRequest = new RegisterUserRequest("Ziv", "Hausler", "56", "testgmail.com");
-        assertEquals(400, authFacade.register(incorrectEmailRegisterUserRequest).getStatusCode());
-    }
+//    @Test
+//    @DisplayName("Test that a 400 status code and error message is returned when Validations.validateRegisteredUser throws an IllegalArgumentException")
+//    public void testErrorResponseReturned_WhenValidateRegisteredUserThrowsIllegalArgumentException() {
+//        RegisterUserRequest incorrectEmailRegisterUserRequest = new RegisterUserRequest("Ziv", "Hausler", "56", "testgmail.com");
+//        assertEquals(400, authFacade.register(incorrectEmailRegisterUserRequest).getStatusCode());
+//    }
 
     @Test
     @DisplayName("Test that a 500 status code and error message is returned when Validations.validateRegisteredUser throws a NullPointerException")

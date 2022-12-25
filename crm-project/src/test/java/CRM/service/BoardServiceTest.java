@@ -37,33 +37,33 @@ class BoardServiceTest {
     private User expectedUser;
     private Board board;
 
-    @BeforeEach
-    void setUp() {
-        correctRegisterUserRequest = new RegisterUserRequest("Shai", "Levi", "shai123456", "shai@gmail.com");
-        expectedUser = User.newUser(correctRegisterUserRequest);
-        board = Board.createBoard(expectedUser, "board", "nice");
-    }
+//    @BeforeEach
+//    void setUp() {
+//        correctRegisterUserRequest = new RegisterUserRequest("Shai", "Levi", "shai123456", "shai@gmail.com");
+//        expectedUser = User.newUser(correctRegisterUserRequest);
+//        board = Board.createBoard(expectedUser, "board", "nice");
+//    }
 
-    @Test
-    @DisplayName("Test that create function correctly saves board to repository and returns it")
-    public void testCreateSavesBoard() {
-        given(boardRepository.save(board)).willReturn(board);
-        assertEquals(board, boardService.create(board));
-    }
+//    @Test
+//    @DisplayName("Test that create function correctly saves board to repository and returns it")
+//    public void testCreateSavesBoard() {
+//        given(boardRepository.save(board)).willReturn(board);
+//        assertEquals(board, boardService.create(board));
+//    }
 
-    @Test
-    @DisplayName("Test that create function correctly handles null board input")
-    public void testCreateWithNullBoardThrowsException() {
-        Board board = null;
-        assertThrows(NullPointerException.class, () -> boardService.create(board));
-    }
+//    @Test
+//    @DisplayName("Test that create function correctly handles null board input")
+//    public void testCreateWithNullBoardThrowsException() {
+//        Board board = null;
+//        assertThrows(NullPointerException.class, () -> boardService.create(board));
+//    }
 
-    @Test
-    @DisplayName("Test that create function correctly handles board with null creator user")
-    public void testCreateWithNullCreatorUserThrowsException() {
-        board.setCreatorUser(null);
-        assertThrows(NullPointerException.class, () -> boardService.create(board));
-    }
+//    @Test
+//    @DisplayName("Test that create function correctly handles board with null creator user")
+//    public void testCreateWithNullCreatorUserThrowsException() {
+//        board.setCreatorUser(null);
+//        assertThrows(NullPointerException.class, () -> boardService.create(board));
+//    }
 
     @Test
     @DisplayName("Test that delete function correctly deletes board from repository and returns true")
@@ -142,35 +142,35 @@ class BoardServiceTest {
         given(userRepository.findById(123L)).willReturn(Optional.empty());
         assertThrows(AccountNotFoundException.class, () -> boardService.getAllBoardsOfUser(123L));
     }
-
-    @Test
-    @DisplayName("Test update board with valid input")
-    public void testUpdateBoardWithValidInput() throws NoSuchFieldException {
-        UpdateObjectRequest boardRequest = new UpdateObjectRequest();
-        boardRequest.setFieldName(UpdateField.NAME);
-        boardRequest.setContent("Test new board name");
-        given(boardRepository.findById(1L)).willReturn(Optional.of(board));
-        given(boardRepository.save(board)).willReturn(board);
-        assertNotNull(boardService.updateBoard(boardRequest, 1L));
-    }
-
-    @Test
-    @DisplayName("Test update board with invalid board ID")
-    public void testUpdateBoardWithInvalidBoardId() {
-        UpdateObjectRequest boardRequest = new UpdateObjectRequest();
-        boardRequest.setFieldName(UpdateField.NAME);
-        boardRequest.setContent("Test new board name");
-        assertThrows(NoSuchElementException.class, () -> boardService.updateBoard(boardRequest, -2L));
-    }
-
-    @Test
-    @DisplayName("Test update board with null name")
-    public void testUpdateBoardWithNullName() {
-        UpdateObjectRequest boardRequest = new UpdateObjectRequest();
-        boardRequest.setFieldName(UpdateField.NAME);
-        boardRequest.setContent(null);
-        assertThrows(NoSuchElementException.class, () -> boardService.updateBoard(boardRequest, 1L));
-    }
+//
+//    @Test
+//    @DisplayName("Test update board with valid input")
+//    public void testUpdateBoardWithValidInput() throws NoSuchFieldException {
+//        UpdateObjectRequest boardRequest = new UpdateObjectRequest();
+//        boardRequest.setFieldName(UpdateField.NAME);
+//        boardRequest.setContent("Test new board name");
+//        given(boardRepository.findById(1L)).willReturn(Optional.of(board));
+//        given(boardRepository.save(board)).willReturn(board);
+//        assertNotNull(boardService.updateBoard(boardRequest, 1L));
+//    }
+//
+//    @Test
+//    @DisplayName("Test update board with invalid board ID")
+//    public void testUpdateBoardWithInvalidBoardId() {
+//        UpdateObjectRequest boardRequest = new UpdateObjectRequest();
+//        boardRequest.setFieldName(UpdateField.NAME);
+//        boardRequest.setContent("Test new board name");
+//        assertThrows(NoSuchElementException.class, () -> boardService.updateBoard(boardRequest, -2L));
+//    }
+//
+//    @Test
+//    @DisplayName("Test update board with null name")
+//    public void testUpdateBoardWithNullName() {
+//        UpdateObjectRequest boardRequest = new UpdateObjectRequest();
+//        boardRequest.setFieldName(UpdateField.NAME);
+//        boardRequest.setContent(null);
+//        assertThrows(NoSuchElementException.class, () -> boardService.updateBoard(boardRequest, 1L));
+//    }
 
     @Test
     @DisplayName("Test update board with null request")
