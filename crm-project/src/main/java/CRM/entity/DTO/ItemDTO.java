@@ -17,7 +17,7 @@ public class ItemDTO extends SharedContentDTO {
 
     private AttributeDTO status;
     private AttributeDTO type;
-    private String section;
+    private Long section;
     private Long assignedToUserId;
     private LocalDateTime dueDate;
     private Integer importance;
@@ -35,6 +35,7 @@ public class ItemDTO extends SharedContentDTO {
         itemDTO.setType(AttributeDTO.createAttributeDTO(item.getType()));
         itemDTO.setStatus(AttributeDTO.createAttributeDTO(item.getStatus()));
         itemDTO.setBoardId(item.getSection().getId());
+        itemDTO.setSection(item.getSection().getId());
         itemDTO.setCreationDate(item.getCreationDate());
 
         return itemDTO;
