@@ -23,6 +23,7 @@ public class ItemDTO extends SharedContentDTO {
     private LocalDateTime dueDate;
     private Integer importance;
     private Long boardId;
+    private List<ItemDTO> subItems;
 
     public static ItemDTO getSharedContentFromDB(Item item) {
         ItemDTO itemDTO = new ItemDTO();
@@ -39,6 +40,7 @@ public class ItemDTO extends SharedContentDTO {
         itemDTO.setSection(item.getSection().getId());
         itemDTO.setCreationDate(item.getCreationDate());
         itemDTO.setId(item.getId());
+        itemDTO.setSubItems(ItemDTO.getItemsDTOList(item.getItems()));
 
         return itemDTO;
     }
