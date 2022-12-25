@@ -52,8 +52,9 @@ public class Item extends SharedContent {
         if (itemRequest.getParentItemId() != null)
             parentItem = board.getItemFromSectionById(itemRequest.getParentItemId(), itemRequest.getSectionId());
         Section section = board.getSectionFromBoard(itemRequest.getSectionId());
-        Status status = (Status) board.getAttributeById(itemRequest.getStatusId(), Status.class);
-        Type type = (Type) board.getAttributeById(itemRequest.getTypeId(), Type.class);
+
+        Status status = itemRequest.getStatusId() == null ? null : (Status) board.getAttributeById(itemRequest.getStatusId(), Status.class);
+        Type type = itemRequest.getTypeId() == null ? null : (Type) board.getAttributeById(itemRequest.getTypeId(), Type.class);
 
         Item item = new Item();
         item.setSection(section);
@@ -67,21 +68,21 @@ public class Item extends SharedContent {
         return item;
     }
 
-    public Item updateItem(UpdateObjectRequest objectRequest){
+    public Item updateItem(UpdateObjectRequest objectRequest) {
         return this;
     }
 
-    public void insertComment(Comment comment){
+    public void insertComment(Comment comment) {
         comments.add(comment);
     }
 
-    public void insertItem(Item item){
+    public void insertItem(Item item) {
         items.add(item);
     }
 
-    public Comment getCommentById(long itemId){
-        for (Comment comment: comments) {
-            if(comment.getId() == itemId) return comment;
+    public Comment getCommentById(long itemId) {
+        for (Comment comment : comments) {
+            if (comment.getId() == itemId) return comment;
         }
         throw new NoSuchElementException("Could not find this comment in the db");
     }
