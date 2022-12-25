@@ -2,6 +2,7 @@ package CRM.entity;
 
 import CRM.entity.requests.AttributeRequest;
 import CRM.entity.requests.UpdateObjectRequest;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
 import javax.persistence.*;
@@ -27,6 +28,7 @@ public class Section {
     @Column(name = "description")
     private String description;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "section", cascade = CascadeType.ALL, orphanRemoval = true)
     Set<Item> items = new HashSet<>();
 

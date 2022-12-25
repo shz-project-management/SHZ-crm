@@ -7,14 +7,12 @@ import CRM.entity.DTO.SectionDTO;
 import CRM.entity.DTO.SharedContentDTO;
 import CRM.entity.Item;
 import CRM.entity.SharedContent;
-import CRM.entity.requests.CommentRequest;
-import CRM.entity.requests.ItemRequest;
-import CRM.entity.requests.ObjectsIdsRequest;
-import CRM.entity.requests.UpdateObjectRequest;
+import CRM.entity.requests.*;
 import CRM.entity.response.Response;
 import CRM.service.CommentService;
 import CRM.service.ItemService;
 import CRM.service.ServiceInterface;
+import CRM.utils.Common;
 import CRM.utils.Validations;
 import CRM.utils.enums.ExceptionMessage;
 import CRM.utils.enums.Regex;
@@ -25,11 +23,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
+import javax.persistence.EntityManager;
+import javax.persistence.Query;
 import javax.security.auth.login.AccountNotFoundException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.NoSuchElementException;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Component

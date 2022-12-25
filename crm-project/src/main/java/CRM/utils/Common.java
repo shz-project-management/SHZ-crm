@@ -127,7 +127,7 @@ public class Common {
     }
 
     public static String generateQuery(Map<String,List<String>> filters) {
-        StringBuilder queryBuilder = new StringBuilder("SELECT section FROM sections WHERE ");
+        StringBuilder queryBuilder = new StringBuilder("SELECT i FROM Item i WHERE ");
 
         // Use a List to store the different parts of the query
         List<String> conditions = new ArrayList<>();
@@ -147,7 +147,7 @@ public class Common {
             }
 
             // Use parameterized queries to avoid SQL injection attacks
-            StringBuilder condition = new StringBuilder(column + " IN (");
+            StringBuilder condition = new StringBuilder("i." + column + " IN (");
             for (String value : values) {
                 condition.append(value).append(", ");
             }
