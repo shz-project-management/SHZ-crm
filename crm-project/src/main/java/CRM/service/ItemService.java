@@ -54,12 +54,14 @@ public class ItemService implements ServiceInterface {
         Item item = Item.createNewItem(itemRequest, board, user);
 
         // add the item to the items list in the board entity
-        board.insertItemToSection(item, itemRequest.getSectionId());
+        board.insertItemToSection(item);
+
         // save the board in the db
         boardRepository.save(board);
 
 //      return boardRepository.findItemInBoardByItem(item);
-        return board.getSectionFromBoard(itemRequest.getSectionId());
+        Section section = board.getSectionFromBoard(itemRequest.getSectionId());
+        return section;
     }
 
     //TODO Documentation

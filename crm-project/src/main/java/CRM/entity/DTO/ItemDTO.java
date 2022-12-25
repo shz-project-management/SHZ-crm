@@ -4,9 +4,7 @@ import CRM.entity.Item;
 import lombok.*;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @ToString
 @Getter
@@ -28,28 +26,46 @@ public class ItemDTO extends SharedContentDTO {
     public static ItemDTO getSharedContentFromDB(Item item) {
         ItemDTO itemDTO = new ItemDTO();
 
-        itemDTO.setImportance(item.getImportance());
-        if (item.getParentItem() != null)
-            itemDTO.setParentItem(ItemDTO.getSharedContentFromDB(item.getParentItem()));
         itemDTO.setUser(UserDTO.createUserDTO(item.getUser()));
         itemDTO.setTitle(item.getName());
         itemDTO.setDescription(item.getDescription());
-        itemDTO.setType(AttributeDTO.createAttributeDTO(item.getType()));
-        itemDTO.setStatus(AttributeDTO.createAttributeDTO(item.getStatus()));
-        itemDTO.setBoardId(item.getSection().getId());
+        itemDTO.setType(item.getType() == null ? null : AttributeDTO.createAttributeDTO(item.getType()));
+        itemDTO.setStatus(item.getStatus() == null ? null : AttributeDTO.createAttributeDTO(item.getStatus()));
         itemDTO.setSection(item.getSection().getId());
         itemDTO.setCreationDate(item.getCreationDate());
         itemDTO.setId(item.getId());
-        itemDTO.setSubItems(ItemDTO.getItemsDTOList(item.getItems()));
+        itemDTO.setImportance(item.getImportance());
+
+        if (item.getItems().size() > 0)
+            itemDTO.setSubItems(ItemDTO.getItemsDTOList(item.getItems()));
 
         return itemDTO;
     }
 
-    public static List<ItemDTO> getItemsDTOList(Set<Item> items){
+    public static ItemDTO getParentItem(Item item){
+        ItemDTO itemDTO = new ItemDTO();
+
+        itemDTO.setUser(UserDTO.createUserDTO(item.getUser()));
+        itemDTO.setTitle(item.getName());
+        itemDTO.setDescription(item.getDescription());
+        itemDTO.setType(item.getType() == null ? null : AttributeDTO.createAttributeDTO(item.getType()));
+        itemDTO.setStatus(item.getStatus() == null ? null : AttributeDTO.createAttributeDTO(item.getStatus()));
+        itemDTO.setSection(item.getSection().getId());
+        itemDTO.setCreationDate(item.getCreationDate());
+        itemDTO.setId(item.getId());
+        itemDTO.setImportance(item.getImportance());
+
+        return itemDTO;
+    }
+
+    public static List<ItemDTO> getItemsDTOList(Set<Item> items) {
         List<ItemDTO> itemDTOList = new ArrayList<>();
-        for (Item item: items) {
+        for (Item item : items) {
             itemDTOList.add(getSharedContentFromDB(item));
         }
+
+        Collections.sort(itemDTOList, Comparator.comparingLong(ItemDTO::getId));
+
         return itemDTOList;
     }
 }
