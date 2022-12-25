@@ -1,5 +1,7 @@
 package CRM.utils;
 
+import CRM.entity.Board;
+import CRM.entity.User;
 import CRM.entity.requests.*;
 import CRM.entity.Attribute;
 import CRM.entity.requests.LoginUserRequest;

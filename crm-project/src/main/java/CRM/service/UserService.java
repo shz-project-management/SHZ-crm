@@ -154,9 +154,6 @@ public class UserService {
         } catch (NoSuchElementException e) {
             throw new AccountNotFoundException(ExceptionMessage.ACCOUNT_DOES_NOT_EXISTS.toString());
         }
-        
-        if(Validations.checkIfUserExistsInBoard(userId, boardId, userRepository, boardRepository))
-            throw new IllegalArgumentException();
             
         if(user.equals(board.getCreatorUser())){
             throw new IllegalArgumentException(ExceptionMessage.ADMIN_CANT_CHANGE_HIS_PERMISSION.toString());
@@ -172,7 +169,7 @@ public class UserService {
 
     //TODO documentation
     private void createDefaultSettingForNewUserInBoard(User user, Board board) {
-        List<NotificationSetting> notificationSettingList = settingRepository.findAll();
+        List<NotificationSetting> notificationSettingList = notificationSettingRepository.findAll();
         for (NotificationSetting notificationSetting : notificationSettingList) {
             UserSetting userSetting = UserSetting.createUserSetting(user, notificationSetting);
             board.addUserSettingToBoard(userSetting);

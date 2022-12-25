@@ -5,6 +5,7 @@ import CRM.repository.BoardRepository;
 import CRM.repository.UserRepository;
 import CRM.repository.UserSettingRepository;
 import CRM.utils.Validations;
+import CRM.utils.enums.ExceptionMessage;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +28,7 @@ public class SettingsService {
 
     public List<UserSetting> getAllUserSettingsInBoard(Long userId, Long boardId) throws AccountNotFoundException {
         if(!Validations.checkIfUserExistsInBoard(userId, boardId, userRepository, boardRepository))
-            throw new NoSuchElementException();
+            throw new NoSuchElementException(ExceptionMessage.USER_DOES_NOT_EXISTS_IN_BOARD.toString());
         return userSettingRepository.getUserSettingsInBoard(userId, boardId);
     }
 
