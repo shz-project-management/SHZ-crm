@@ -1,6 +1,8 @@
 package CRM.controller.controllers;
 
 import CRM.controller.facades.SettingsFacade;
+import CRM.entity.requests.ObjectsIdsRequest;
+import CRM.entity.requests.UpdateObjectRequest;
 import CRM.entity.response.Response;
 import CRM.service.BoardService;
 import com.sun.mail.iap.ResponseInputStream;
@@ -21,9 +23,10 @@ public class SettingController {
     private SettingsFacade settingsFacade;
 
 
-    @GetMapping(value = "user/{userId}/board/{boardId}")
-    public ResponseEntity<Response> getAllUserSettingsInBoard(@PathVariable Long userId, @PathVariable Long boardId){
-        Response response = settingsFacade.getAllUserSettingsInBoard(userId, boardId);
+    @GetMapping(value = "get-user-settings-in-board")
+    public ResponseEntity<Response> getAllUserSettingsInBoard(@RequestBody ObjectsIdsRequest objectsIdsRequest){
+        Response response = settingsFacade.getAllUserSettingsInBoard(objectsIdsRequest.getUserId(),
+                objectsIdsRequest.getBoardId());
         return new ResponseEntity<>(response, response.getStatus());
     }
 
