@@ -35,7 +35,7 @@ public class BoardFacade {
     public Response create(BoardRequest boardRequest) {
         try {
             Validations.validateNewBoard(boardRequest);
-            BoardDTO boardDTO = BoardDTO.createPlainBoard(boardService.create(boardRequest));
+            BoardDTO boardDTO = BoardDTO.getBoardFromDB(boardService.create(boardRequest));
             return Common.buildSuccessResponse(boardDTO, HttpStatus.CREATED, SuccessMessage.CREATE.toString());
         } catch (AccountNotFoundException | NoSuchElementException e) {
             return Common.buildErrorResponse(e, HttpStatus.BAD_REQUEST);

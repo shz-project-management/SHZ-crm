@@ -1,8 +1,13 @@
 package CRM.entity;
 
+import CRM.entity.DTO.AttributeDTO;
 import lombok.*;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 
 @ToString
@@ -10,13 +15,12 @@ import javax.persistence.*;
 @Table(name = "statuses")
 public class Status extends Attribute {
 
-    // FIXME: this method does not have to be written 3 times
-    //  if not in use, remove
-    //  if in use, put in Attribute class and just cast it.
-    public static Status createStatus(Attribute attribute){
-        Status status = new Status();
-        status.setName(attribute.getName());
-        status.setDescription(attribute.getDescription());
-        return status;
+    public static Set<Status> defaultStatuses(){
+        Set<Status> defaultStatus = new HashSet<>();
+        defaultStatus.add(Attribute.createStatusAttribute("Open", ""));
+        defaultStatus.add(Attribute.createStatusAttribute("In Progress", ""));
+        defaultStatus.add(Attribute.createStatusAttribute("Stuck", ""));
+        defaultStatus.add(Attribute.createStatusAttribute("Done", ""));
+        return defaultStatus;
     }
 }
