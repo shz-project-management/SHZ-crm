@@ -1,6 +1,7 @@
 package CRM.service;
 
 import CRM.entity.*;
+import CRM.entity.DTO.BoardDTO;
 import CRM.entity.requests.BoardRequest;
 import CRM.entity.requests.UpdateObjectRequest;
 import CRM.repository.BoardRepository;
@@ -101,8 +102,7 @@ public class BoardService {
     public List<Board> getAllBoardsOfUser(long userId) throws AccountNotFoundException {
         try {
             User user = Validations.doesIdExists(userId, userRepository);
-            return null;
-//            return user.getBoards().stream().collect(Collectors.toList());
+            return boardRepository.findByCreatorUser(user);
         } catch (NoSuchElementException e) {
             throw new AccountNotFoundException(ExceptionMessage.ACCOUNT_DOES_NOT_EXISTS.toString());
         }

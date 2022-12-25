@@ -6,9 +6,7 @@ import CRM.entity.Item;
 import CRM.entity.Section;
 import lombok.*;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -36,6 +34,8 @@ public class SectionDTO {
         for (Section section: sections) {
             sectionDTOList.add(createSectionDTO(section));
         }
+        Collections.sort(sectionDTOList, Comparator.comparingLong(SectionDTO::getId));
+
         return sectionDTOList;
     }
 }
