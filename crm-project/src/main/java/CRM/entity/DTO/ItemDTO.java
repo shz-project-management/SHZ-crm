@@ -15,6 +15,7 @@ import java.util.Set;
 @NoArgsConstructor
 public class ItemDTO extends SharedContentDTO {
 
+    private Long id;
     private AttributeDTO status;
     private AttributeDTO type;
     private Long section;
@@ -37,6 +38,7 @@ public class ItemDTO extends SharedContentDTO {
         itemDTO.setBoardId(item.getSection().getId());
         itemDTO.setSection(item.getSection().getId());
         itemDTO.setCreationDate(item.getCreationDate());
+        itemDTO.setId(item.getId());
 
         return itemDTO;
     }
