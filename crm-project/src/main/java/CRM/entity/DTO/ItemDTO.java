@@ -1,6 +1,5 @@
 package CRM.entity.DTO;
 
-import CRM.entity.Board;
 import CRM.entity.Item;
 import lombok.*;
 
@@ -16,13 +15,15 @@ import java.util.Set;
 @NoArgsConstructor
 public class ItemDTO extends SharedContentDTO {
 
+    private Long id;
     private AttributeDTO status;
     private AttributeDTO type;
-    private String section;
+    private Long section;
     private Long assignedToUserId;
     private LocalDateTime dueDate;
     private Integer importance;
     private Long boardId;
+    private List<ItemDTO> subItems;
 
     public static ItemDTO getSharedContentFromDB(Item item) {
         ItemDTO itemDTO = new ItemDTO();
@@ -30,13 +31,16 @@ public class ItemDTO extends SharedContentDTO {
         itemDTO.setImportance(item.getImportance());
         if (item.getParentItem() != null)
             itemDTO.setParentItem(ItemDTO.getSharedContentFromDB(item.getParentItem()));
-        itemDTO.setUser(UserDTO.getUserFromDB(item.getUser()));
+        itemDTO.setUser(UserDTO.createUserDTO(item.getUser()));
         itemDTO.setTitle(item.getName());
         itemDTO.setDescription(item.getDescription());
         itemDTO.setType(AttributeDTO.createAttributeDTO(item.getType()));
         itemDTO.setStatus(AttributeDTO.createAttributeDTO(item.getStatus()));
         itemDTO.setBoardId(item.getSection().getId());
+        itemDTO.setSection(item.getSection().getId());
         itemDTO.setCreationDate(item.getCreationDate());
+        itemDTO.setId(item.getId());
+        itemDTO.setSubItems(ItemDTO.getItemsDTOList(item.getItems()));
 
         return itemDTO;
     }

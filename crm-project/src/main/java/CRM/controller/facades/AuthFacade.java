@@ -44,7 +44,7 @@ public class AuthFacade {
             // there's no need to send an activation email at the moment (according to Assaf).
             // If we have time, we'll add it later on.
             return new Response.Builder()
-                    .data(UserDTO.getUserFromDB(authService.register(user)))
+                    .data(UserDTO.createUserDTO(authService.register(user)))
                     .message(SuccessMessage.REGISTER.toString())
                     .status(HttpStatus.ACCEPTED)
                     .statusCode(201)

@@ -34,7 +34,6 @@ public class UserSetting {
 
     public static UserSetting createUserSetting(User user, NotificationSetting notificationSetting){
         UserSetting userSetting = new UserSetting();
-        userSetting.setId(0L);
         userSetting.setInApp(true);
         userSetting.setInEmail(true);
         userSetting.setUser(user);

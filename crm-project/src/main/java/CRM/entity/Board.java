@@ -1,13 +1,9 @@
 package CRM.entity;
 
-import CRM.entity.requests.ItemRequest;
 import CRM.entity.requests.UpdateObjectRequest;
-import CRM.utils.enums.UpdateField;
 import lombok.*;
 
 import javax.persistence.*;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -60,12 +56,32 @@ public class Board {
         board.setCreatorUser(user);
         board.setName(name);
         board.setDescription(description);
+        board.setStatuses(Status.defaultStatuses());
+        board.setTypes(Type.defaultTypes());
         return board;
     }
 
     //--------------------------------------User--------------------------------------//
     public void addUserPermissionToBoard(UserPermission userPermission) {
         usersPermissions.add(userPermission);
+    }
+
+    public UserPermission getUserPermissionById(Board board, Long userId,  Set<UserPermission> userPermissionsSet){
+        for (UserPermission userInBoard : userPermissionsSet) {
+            if (userInBoard.getUser().getId().equals(userId)) {
+                return userInBoard;
+            }
+        }
+        return null;
+    }
+
+    public List<User> getAllUsersInBoard(Board board, Set<UserPermission> userPermissionsSet){
+        List<User> users = new ArrayList<>();
+        users.add(board.getCreatorUser());
+        for (UserPermission addUSer: userPermissionsSet) {
+            users.add(addUSer.getUser());
+        }
+        return users;
     }
 
     //--------------------------------------Section--------------------------------------//
@@ -158,6 +174,12 @@ public class Board {
     public List<User> getAllUsersInBoard() {
         return usersPermissions
                 .stream().map(UserPermission::getUser).collect(Collectors.toList());
+    }
+
+
+    //--------------------------------------Settings--------------------------------------//
+    public void removeSettingsByUserPermission(UserPermission userPermissionInBoard) {
+        usersSettings.removeIf(user -> user.getUser().equals(userPermissionInBoard.getUser()));
     }
 
     // -------- Helpers: --------- //

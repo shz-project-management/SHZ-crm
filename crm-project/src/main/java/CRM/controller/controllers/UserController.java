@@ -1,6 +1,8 @@
 package CRM.controller.controllers;
 
 import CRM.controller.facades.UserFacade;
+import CRM.entity.requests.ObjectsIdsRequest;
+import CRM.entity.requests.UpdateObjectRequest;
 import CRM.entity.response.Response;
 import lombok.AllArgsConstructor;
 import org.apache.logging.log4j.LogManager;
@@ -51,10 +53,10 @@ public class UserController {
         return new ResponseEntity<>(response, response.getStatus());
     }
 
-    @PostMapping(value = "add/{userId}/toBoard/{boardId}")
-    public ResponseEntity<Response> addUserToBoard(@PathVariable Long userId, @PathVariable Long boardId){
+    @PostMapping(value = "update-user-to-board")
+    public ResponseEntity<Response> updateUserToBoard(@RequestBody ObjectsIdsRequest objectsIdsRequest){
 
-        Response response = userFacade.addUserToBoard(userId, boardId);
+        Response response = userFacade.updateUserToBoard(objectsIdsRequest);
         return new ResponseEntity<>(response, response.getStatus());
     }
 }

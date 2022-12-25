@@ -1,10 +1,7 @@
 package CRM.entity.DTO;
 
 import CRM.entity.Comment;
-import CRM.entity.Item;
 import lombok.*;
-
-import java.time.LocalDateTime;
 
 @ToString
 @Getter
@@ -19,7 +16,7 @@ public class CommentDTO extends SharedContentDTO {
         CommentDTO commentDTO = new CommentDTO();
 
         commentDTO.setParentItem(ItemDTO.getSharedContentFromDB(comment.getParentItem()));
-        commentDTO.setUser(UserDTO.getUserFromDB(comment.getUser()));
+        commentDTO.setUser(UserDTO.createUserDTO(comment.getUser()));
         commentDTO.setTitle(comment.getName());
         commentDTO.setDescription(comment.getDescription());
         commentDTO.setCreationDate(comment.getCreationDate());

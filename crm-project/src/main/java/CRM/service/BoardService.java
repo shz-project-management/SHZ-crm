@@ -1,6 +1,7 @@
 package CRM.service;
 
 import CRM.entity.*;
+import CRM.entity.DTO.BoardDTO;
 import CRM.entity.requests.BoardRequest;
 import CRM.entity.requests.UpdateObjectRequest;
 import CRM.repository.BoardRepository;
@@ -44,14 +45,7 @@ public class BoardService {
             throw new AccountNotFoundException(ExceptionMessage.ACCOUNT_DOES_NOT_EXISTS.toString());
         }
         Board board = Board.createBoard(user, boardRequest.getName(), boardRequest.getDescription());
-
-        User creatorUser = board.getCreatorUser();
-        //FIXME notificationSetting shouldn't be created this way.
-        NotificationSetting notificationSetting = Validations.doesIdExists(2L, notificationSettingRepository);
-        UserSetting userSetting = UserSetting.createUserSetting(creatorUser, notificationSetting);
-        //FIXME maybe take Entity manager outside the service will be a better practise.
-        userSetting = entityManager.merge(userSetting);
-        board.addUserSettingToBoard(userSetting);
+        Common.createDefaultSettingForNewUserInBoard(user,board,settingRepository, entityManager);
         return boardRepository.save(board);
     }
 
@@ -101,8 +95,7 @@ public class BoardService {
     public List<Board> getAllBoardsOfUser(long userId) throws AccountNotFoundException {
         try {
             User user = Validations.doesIdExists(userId, userRepository);
-            return null;
-//            return user.getBoards().stream().collect(Collectors.toList());
+            return boardRepository.findByCreatorUser(user);
         } catch (NoSuchElementException e) {
             throw new AccountNotFoundException(ExceptionMessage.ACCOUNT_DOES_NOT_EXISTS.toString());
         }
@@ -120,5 +113,13 @@ public class BoardService {
         Board board = Validations.doesIdExists(boardId, boardRepository);
         Validations.setContentToFieldIfFieldExists(board, boardReq.getFieldName(), boardReq.getContent());
         return boardRepository.save(board);
+    }
+
+    private void createDefaultSettingForNewUserInBoard(User user, Board board) {
+        List<NotificationSetting> notificationSettingList = settingRepository.findAll();
+        for (NotificationSetting notificationSetting : notificationSettingList) {
+            UserSetting userSetting = UserSetting.createUserSetting(user, notificationSetting);
+            board.addUserSettingToBoard(userSetting);
+        }
     }
 }

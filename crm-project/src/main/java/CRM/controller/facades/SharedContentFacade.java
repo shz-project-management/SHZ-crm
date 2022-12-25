@@ -3,6 +3,7 @@ package CRM.controller.facades;
 import CRM.entity.Comment;
 import CRM.entity.DTO.CommentDTO;
 import CRM.entity.DTO.ItemDTO;
+import CRM.entity.DTO.SectionDTO;
 import CRM.entity.DTO.SharedContentDTO;
 import CRM.entity.Item;
 import CRM.entity.SharedContent;
@@ -26,6 +27,7 @@ import org.springframework.stereotype.Component;
 
 import javax.security.auth.login.AccountNotFoundException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
@@ -59,7 +61,7 @@ public class SharedContentFacade {
             // call itemService with create function to create a new item
             // return the response with the new item as a data inside response entity.
             return new Response.Builder()
-                    .data(ItemDTO.getSharedContentFromDB(itemService.create(item)))
+                    .data(SectionDTO.createSectionDTO(itemService.create(item)))
                     .message(SuccessMessage.CREATE.toString())
                     .status(HttpStatus.ACCEPTED)
                     .statusCode(201)
@@ -313,7 +315,7 @@ public class SharedContentFacade {
     //TODO + DTO list + documentation
     public Response getAllCommentsInSection(ObjectsIdsRequest objectsIdsRequest) {
         try {
-            Validations.validateTwoIds(objectsIdsRequest.getBoardId(), objectsIdsRequest.getSectionId());
+            Validations.validateIDs(objectsIdsRequest.getBoardId(), objectsIdsRequest.getSectionId());
             return new Response.Builder()
                     .data(commentService.getAllCommentsInSection(objectsIdsRequest).stream().map(CommentDTO::getSharedContentFromDB).collect(Collectors.toList()))
                     .message(SuccessMessage.FOUND.toString())
