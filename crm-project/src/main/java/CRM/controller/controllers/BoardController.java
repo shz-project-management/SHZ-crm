@@ -65,7 +65,6 @@ public class BoardController {
         return new ResponseEntity<>(response, response.getStatus());
     }
 
-
     /**
      * This method is used to handle HTTP GET requests to the specified URL (board/getAll/{userId}).
      * The method takes the id of the user as a path variable and uses it to retrieve all the boards created by the user using the boardFacade object.
@@ -91,27 +90,27 @@ public class BoardController {
         return new ResponseEntity<>(response, response.getStatus());
     }
 
-    @RequestMapping(value = "query", method = RequestMethod.GET)
-    public ResponseEntity<String> query() {
-        Map<String, List<String>> filters = new HashMap<>();
-
-        List<String> types = new ArrayList<>();
-        List<String> statuses = new ArrayList<>();
-        List<String> importances = new ArrayList<>();
-
-        types.add("Bug");
-
-        statuses.add("Done");
-        statuses.add("Open");
-
-        importances.add("1");
-        importances.add("3");
-        importances.add("5");
-
-        filters.put("type", types);
-        filters.put("status", statuses);
-        filters.put("importance", importances);
-
-        return new ResponseEntity<>(Common.generateQuery(filters), HttpStatus.OK);
-    }
+//    @RequestMapping(value = "query", method = RequestMethod.GET)
+//    public ResponseEntity<String> query() {
+//        Map<String, List<String>> filters = new HashMap<>();
+//
+//        List<String> types = new ArrayList<>();
+//        List<String> statuses = new ArrayList<>();
+//        List<String> importances = new ArrayList<>();
+//
+//        types.add("Bug");
+//
+//        statuses.add("Done");
+//        statuses.add("Open");
+//
+//        importances.add("1");
+//        importances.add("3");
+//        importances.add("5");
+//
+//        filters.put("type", types);
+//        filters.put("status", statuses);
+//        filters.put("importance", importances);
+//
+//        return new ResponseEntity<>(Common.generateQuery(filters), HttpStatus.OK);
+//    }
 }

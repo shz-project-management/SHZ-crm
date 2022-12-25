@@ -191,17 +191,17 @@ public class SharedContentFacade {
      * returned. If a NullPointerException is thrown, a BAD_REQUEST status with a message indicating the
      * error is returned.
      */
-    public Response get(ObjectsIdsRequest objectsIdsRequest, Long searchId, Class clz) {
+    public Response get(ObjectsIdsRequest objectsIdsRequest, Class clz) {
         try {
             // validate the id using the Validations.validate function
             Validations.validateSharedContent(objectsIdsRequest.getBoardId(),
                     objectsIdsRequest.getSectionId(),
-                    searchId,
+                    objectsIdsRequest.getSearchId(),
                     objectsIdsRequest.getParentId());
 
             // call the correct service using convertFromClassToService(clz) function with find function in it
             return new Response.Builder()
-                    .data(convertFromServiceOutputToDTOEntity(convertFromClassToService(clz).get(objectsIdsRequest, searchId), clz))
+                    .data(convertFromServiceOutputToDTOEntity(convertFromClassToService(clz).get(objectsIdsRequest), clz))
                     .message(SuccessMessage.FOUND.toString())
                     .status(HttpStatus.OK)
                     .statusCode(200)
@@ -224,8 +224,7 @@ public class SharedContentFacade {
     public Response getAllItemsInSection(ObjectsIdsRequest objectsIdsRequest) {
         try {
             // validate the id using the Validations.validate function
-            Validations.validate(objectsIdsRequest.getSectionId(), Regex.ID.getRegex());
-            Validations.validate(objectsIdsRequest.getBoardId(), Regex.ID.getRegex());
+            Validations.validateIDs(objectsIdsRequest.getSectionId(), objectsIdsRequest.getBoardId());
 
             // call the correct service using convertFromClassToService(clz) function
             // with getAllInItem function in it.

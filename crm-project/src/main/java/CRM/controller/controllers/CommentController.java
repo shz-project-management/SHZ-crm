@@ -36,36 +36,40 @@ public class CommentController {
 
     @DeleteMapping(value = "{boardId}")
     public ResponseEntity<Response> delete(@RequestBody List<Long> commentsIds, @PathVariable Long boardId) {
-        Response response = sharedContentFacade.delete(commentsIds, boardId ,Comment.class);
+        Response response = sharedContentFacade.delete(commentsIds, boardId, Comment.class);
         return new ResponseEntity<>(response, response.getStatus());
     }
 
     @PatchMapping(value = "update")
-    public ResponseEntity<Response> update(@RequestBody UpdateObjectRequest updateObject){
-        Response response = sharedContentFacade.update(updateObject, updateObject.getObjectsIdsRequest().getCommentId() , Comment.class);
+    public ResponseEntity<Response> update(@RequestBody UpdateObjectRequest updateObject) {
+        Response response = sharedContentFacade.update(updateObject, updateObject.getObjectsIdsRequest().getCommentId(), Comment.class);
         return new ResponseEntity<>(response, response.getStatus());
     }
 
     @GetMapping(value = "{commentId}")
-    public ResponseEntity<Response> get(@RequestBody ObjectsIdsRequest objectsIdsRequest, @PathVariable Long commentId){
-        Response response = sharedContentFacade.get(objectsIdsRequest, commentId ,Comment.class);
+    public ResponseEntity<Response> get(@PathVariable Long commentId, @RequestParam Long boardId,
+                                        @RequestParam Long sectionId, @RequestParam Long parentId) {
+        ObjectsIdsRequest objectsIdsRequest = ObjectsIdsRequest.searchBoardSectionParentIds(commentId, boardId, sectionId, parentId);
+        Response response = sharedContentFacade.get(objectsIdsRequest, Comment.class);
         return new ResponseEntity<>(response, response.getStatus());
     }
 
-    @GetMapping(value = "all-in-item")
-    public ResponseEntity<Response> getAllInItem(@RequestBody ObjectsIdsRequest objectsIdsRequest){
+    @GetMapping(value = "all-in-item/{itemId}")
+    public ResponseEntity<Response> getAllInItem( @PathVariable Long itemId, @RequestParam Long boardId, @RequestParam Long sectionId) {
+        ObjectsIdsRequest objectsIdsRequest = ObjectsIdsRequest.boardSectionItemIds(boardId, sectionId, itemId);
         Response response = sharedContentFacade.getAllInItem(objectsIdsRequest, Comment.class);
         return new ResponseEntity<>(response, response.getStatus());
     }
 
     @GetMapping(value = "all-in-board/{boardId}")
-    public ResponseEntity<Response> getAllCommentsInBoard(@PathVariable Long boardId){
+    public ResponseEntity<Response> getAllCommentsInBoard(@PathVariable Long boardId) {
         Response response = sharedContentFacade.getAllCommentsInBoard(boardId);
         return new ResponseEntity<>(response, response.getStatus());
     }
 
     @GetMapping(value = "all-in-section")
-    public ResponseEntity<Response> getAllCommentsInSection(ObjectsIdsRequest objectsIdsRequest){
+    public ResponseEntity<Response> getAllCommentsInSection(@RequestParam Long boardId, @RequestParam Long sectionId) {
+        ObjectsIdsRequest objectsIdsRequest = ObjectsIdsRequest.boardSectionIds(boardId, sectionId);
         Response response = sharedContentFacade.getAllCommentsInSection(objectsIdsRequest);
         return new ResponseEntity<>(response, response.getStatus());
     }

@@ -37,7 +37,7 @@ public class SettingsFacade {
      * @throws NullPointerException     if the specified user/board id is null.
      * @throws NoSuchElementException   if the user with the specified id is not found/user does not belong to that board.
      */
-    public Response getAllUserSettingsInBoard(ObjectsIdsRequest objectsIdsRequest){
+    public Response getAllUserSettingsInBoard(ObjectsIdsRequest objectsIdsRequest) {
         try {
             Validations.validateIDs(objectsIdsRequest.getUserId(), objectsIdsRequest.getBoardId());
             return new Response.Builder()
@@ -61,7 +61,7 @@ public class SettingsFacade {
         }
     }
 
-    public Response changeUserSettingInBoard(Long userId, Long boardId, Long settingId, Boolean shouldBeActive){
+    public Response changeUserSettingInBoard(Long userId, Long boardId, Long settingId, Boolean shouldBeActive) {
         // validate the parameters using Validations.validate function
         // call settingsService and ask to change the setting for the user in the board
         return null;
