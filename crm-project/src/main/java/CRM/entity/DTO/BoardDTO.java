@@ -22,15 +22,6 @@ public class BoardDTO {
     private List<AttributeDTO> types;
     private List<AttributeDTO> statuses;
 
-    public static BoardDTO createPlainBoard(Board board) {
-        BoardDTO boardDTO = new BoardDTO();
-        boardDTO.setId(board.getId());
-        boardDTO.setCreatorUser(UserDTO.createUserDTO(board.getCreatorUser()));
-        boardDTO.setName(board.getName());
-        boardDTO.setDescription(board.getDescription());
-        return boardDTO;
-    }
-
     public static BoardDTO getBoardFromDB(Board board) {
         BoardDTO boardDTO = new BoardDTO();
         boardDTO.setId(board.getId());

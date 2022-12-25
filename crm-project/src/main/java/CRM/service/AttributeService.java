@@ -18,7 +18,7 @@ public class AttributeService {
 
     public Attribute create(AttributeRequest attributeRequest, Class clz) {
         Board board = Validations.doesIdExists(attributeRequest.getBoardId(), boardRepository);
-        Attribute attribute = Attribute.createAttribute(attributeRequest.getName(), attributeRequest.getDescription(), clz);
+        Attribute attribute = Attribute.createAttribute(attributeRequest.getName(), attributeRequest.getDescription());
 
         board.addAttributeToBoard(attribute, clz);
 
