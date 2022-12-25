@@ -3,7 +3,7 @@ package CRM.service;
 import CRM.entity.*;
 import CRM.entity.requests.ObjectsIdsRequest;
 import CRM.repository.BoardRepository;
-import CRM.repository.SettingRepository;
+import CRM.repository.NotificationSettingRepository;
 import CRM.repository.UserRepository;
 import CRM.utils.Common;
 import CRM.utils.Validations;
@@ -31,7 +31,7 @@ public class UserService {
     @Autowired
     private BoardRepository boardRepository;
     @Autowired
-    private SettingRepository settingRepository;
+    private NotificationSettingRepository notificationSettingRepository;
 
     /**
      * findByEmail search in the database for a user based on the email we have.
@@ -154,7 +154,7 @@ public class UserService {
         } catch (NoSuchElementException e) {
             throw new AccountNotFoundException(ExceptionMessage.ACCOUNT_DOES_NOT_EXISTS.toString());
         }
-
+            
         if(user.equals(board.getCreatorUser())){
             throw new IllegalArgumentException(ExceptionMessage.ADMIN_CANT_CHANGE_HIS_PERMISSION.toString());
         }
@@ -169,7 +169,7 @@ public class UserService {
 
     //TODO documentation
     private void createDefaultSettingForNewUserInBoard(User user, Board board) {
-        List<NotificationSetting> notificationSettingList = settingRepository.findAll();
+        List<NotificationSetting> notificationSettingList = notificationSettingRepository.findAll();
         for (NotificationSetting notificationSetting : notificationSettingList) {
             UserSetting userSetting = UserSetting.createUserSetting(user, notificationSetting);
             board.addUserSettingToBoard(userSetting);

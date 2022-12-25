@@ -1,5 +1,7 @@
 package CRM.utils;
 
+import CRM.entity.Board;
+import CRM.entity.User;
 import CRM.entity.requests.*;
 import CRM.entity.Attribute;
 import CRM.entity.requests.LoginUserRequest;
@@ -13,6 +15,7 @@ import org.apache.logging.log4j.Logger;
 import org.hibernate.NonUniqueObjectException;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import javax.security.auth.login.AccountNotFoundException;
 import java.lang.reflect.Field;
 import java.util.*;
 import java.util.regex.Matcher;
@@ -255,6 +258,28 @@ public class Validations {
     public static void checkIfParentItemIsNotTheSameItem(UpdateField fieldName, Long itemId, Long parentItemId) {
         if (fieldName.equals(PARENT_ITEM) && Objects.equals(itemId, parentItemId)) {
             throw new IllegalArgumentException(ExceptionMessage.PARENT_ITEM_ERROR.toString());
+        }
+    }
+
+    /**
+     * Check if a user exists in a board.
+     *
+     * @param userId the id of the user to check
+     * @param boardId the id of the board to check in
+     * @param userRepo userRepository object to get the user from the DB
+     * @param boardRepo boardRepository object to get the board from the DB
+     * @throws AccountNotFoundException if the user/board are not found
+     */
+    public static boolean checkIfUserExistsInBoard(long userId, long boardId,
+                                            JpaRepository<User,Long> userRepo, JpaRepository<Board,Long> boardRepo) throws AccountNotFoundException {
+        User user;
+        Board board;
+        try {
+            user = Validations.doesIdExists(userId, userRepo);
+            board = Validations.doesIdExists(boardId, boardRepo);
+            return board.getAllUsersInBoard().contains(user);
+        } catch (NoSuchElementException e) {
+            throw new AccountNotFoundException(ExceptionMessage.ACCOUNT_DOES_NOT_EXISTS.toString());
         }
     }
 

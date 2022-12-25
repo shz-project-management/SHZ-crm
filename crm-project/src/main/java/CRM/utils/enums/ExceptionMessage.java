@@ -41,6 +41,8 @@ public enum ExceptionMessage {
     FOLDER_EXISTS("This folder ID already exist in the database: "),
     USER_ALREADY_HAS_THIS_PERMISSION("User already has this permission in board"),
     ACCOUNT_DOES_NOT_EXISTS("Could not locate this account in the database"),
+    USER_EXISTS_IN_BOARD("This user already exists in this board"),
+    USER_DOES_NOT_EXISTS_IN_BOARD("This user does not exists in this board"),
     NO_SUCH_ID("Could not locate this element by the given ID"),
     VALIDATION_FAILED("Could not approve the given information: "),
     UNAUTHORIZED_USER("You don't have the permission to do that action: "),

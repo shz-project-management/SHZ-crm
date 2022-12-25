@@ -5,7 +5,7 @@ import CRM.entity.DTO.BoardDTO;
 import CRM.entity.requests.BoardRequest;
 import CRM.entity.requests.UpdateObjectRequest;
 import CRM.repository.BoardRepository;
-import CRM.repository.SettingRepository;
+import CRM.repository.NotificationSettingRepository;
 import CRM.repository.UserRepository;
 import CRM.utils.Common;
 import CRM.utils.Validations;
@@ -30,7 +30,7 @@ public class BoardService {
     @Autowired
     private UserRepository userRepository;
     @Autowired
-    private SettingRepository settingRepository;
+    private NotificationSettingRepository notificationSettingRepository;
     @Autowired
     private EntityManager entityManager;
 
@@ -45,7 +45,7 @@ public class BoardService {
             throw new AccountNotFoundException(ExceptionMessage.ACCOUNT_DOES_NOT_EXISTS.toString());
         }
         Board board = Board.createBoard(user, boardRequest.getName(), boardRequest.getDescription());
-        Common.createDefaultSettingForNewUserInBoard(user,board,settingRepository, entityManager);
+        Common.createDefaultSettingForNewUserInBoard(user,board,notificationSettingRepository, entityManager);
         return boardRepository.save(board);
     }
 
@@ -116,7 +116,7 @@ public class BoardService {
     }
 
     private void createDefaultSettingForNewUserInBoard(User user, Board board) {
-        List<NotificationSetting> notificationSettingList = settingRepository.findAll();
+        List<NotificationSetting> notificationSettingList = notificationSettingRepository.findAll();
         for (NotificationSetting notificationSetting : notificationSettingList) {
             UserSetting userSetting = UserSetting.createUserSetting(user, notificationSetting);
             board.addUserSettingToBoard(userSetting);
