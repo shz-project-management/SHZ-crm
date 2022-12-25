@@ -7,6 +7,7 @@ import CRM.entity.response.Response;
 import CRM.service.BoardService;
 import CRM.utils.Common;
 import CRM.utils.Validations;
+import CRM.utils.enums.ExceptionMessage;
 import CRM.utils.enums.Regex;
 import CRM.utils.enums.SuccessMessage;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -105,12 +106,24 @@ public class BoardFacade {
     public Response getAllBoardsOfUser(Long userId) {
         try {
             Validations.validate(userId, Regex.ID.getRegex());
-            List<BoardDTO> boardDTOs = BoardDTO.getListOfBoardsFromDB(boardService.getAllBoardsOfUser(userId));
-            return Common.buildSuccessResponse(boardDTOs, HttpStatus.OK, SuccessMessage.FOUND.toString());
+            return new Response.Builder()
+                    .data(BoardDTO.getListOfBoardPreviewsFromDB(boardService.getAllBoardsOfUser(userId)))
+                    .message(SuccessMessage.FOUND.toString())
+                    .status(HttpStatus.OK)
+                    .statusCode(200)
+                    .build();
         } catch (AccountNotFoundException | IllegalArgumentException | NoSuchElementException e) {
-            return Common.buildErrorResponse(e, HttpStatus.BAD_REQUEST);
+            return new Response.Builder()
+                    .statusCode(400)
+                    .status(HttpStatus.BAD_REQUEST)
+                    .message(ExceptionMessage.NULL_INPUT.toString())
+                    .build();
         } catch (NullPointerException e) {
-            return Common.buildErrorResponse(e, HttpStatus.INTERNAL_SERVER_ERROR);
+            return new Response.Builder()
+                    .statusCode(500)
+                    .status(HttpStatus.BAD_REQUEST)
+                    .message(ExceptionMessage.NULL_INPUT.toString())
+                    .build();
         }
     }
 

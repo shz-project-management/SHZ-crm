@@ -4,13 +4,12 @@ import CRM.entity.*;
 import CRM.entity.requests.AttributeRequest;
 import CRM.repository.BoardRepository;
 import CRM.utils.Common;
-import CRM.utils.Validations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Set;
 
 @Service
 public class SectionService {
@@ -20,12 +19,12 @@ public class SectionService {
 
 
     //TODO documentation
-    public Section create(AttributeRequest sectionRequest) {
+    public Set<Section> create(AttributeRequest sectionRequest) {
         Board board = Common.getBoard(sectionRequest.getBoardId(), boardRepository);
         Section section = Section.createSection(sectionRequest);
         board.addSectionToBoard(section);
         boardRepository.save(board);
-        return section;
+        return board.getSections();
     }
 
 

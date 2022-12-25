@@ -1,5 +1,6 @@
 package CRM.controller.facades;
 
+import CRM.entity.DTO.SectionDTO;
 import CRM.entity.requests.AttributeRequest;
 import CRM.entity.response.Response;
 import CRM.service.*;
@@ -43,7 +44,7 @@ public class SectionFacade {
             return new Response.Builder()
                     .status(HttpStatus.CREATED)
                     .statusCode(201)
-                    .data(sectionService.create(attributeRequest))
+                    .data(SectionDTO.getSectionsDTOList(sectionService.create(attributeRequest)))
                     .build();
         } catch (IllegalArgumentException | NonUniqueObjectException | NoSuchElementException e) {
             return new Response.Builder()
