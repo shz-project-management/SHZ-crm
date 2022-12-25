@@ -3,6 +3,7 @@ package CRM.controller.facades;
 import CRM.entity.Comment;
 import CRM.entity.DTO.CommentDTO;
 import CRM.entity.DTO.ItemDTO;
+import CRM.entity.DTO.SectionDTO;
 import CRM.entity.DTO.SharedContentDTO;
 import CRM.entity.Item;
 import CRM.entity.SharedContent;
@@ -60,7 +61,7 @@ public class SharedContentFacade {
             // call itemService with create function to create a new item
             // return the response with the new item as a data inside response entity.
             return new Response.Builder()
-                    .data(ItemDTO.getSharedContentFromDB(itemService.create(item)))
+                    .data(SectionDTO.createSectionDTO(itemService.create(item)))
                     .message(SuccessMessage.CREATE.toString())
                     .status(HttpStatus.ACCEPTED)
                     .statusCode(201)
