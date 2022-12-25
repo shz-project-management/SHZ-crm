@@ -284,9 +284,15 @@ public class SharedContentFacade {
         }
     }
 
-    public Response getAllInItem(ObjectsIdsRequest objectsIdsRequest, Class clz) {
+    public Response getAllInItem(Long boardId, Long sectionId, Long itemId, Class clz) {
         try {
-            Validations.validateIDs(objectsIdsRequest.getItemId(), objectsIdsRequest.getSectionId(), objectsIdsRequest.getBoardId());
+            Validations.validateIDs(itemId, sectionId, boardId);
+
+            ObjectsIdsRequest objectsIdsRequest = new ObjectsIdsRequest();
+            objectsIdsRequest.setItemId(itemId);
+            objectsIdsRequest.setBoardId(boardId);
+            objectsIdsRequest.setSectionId(sectionId);
+
             return new Response.Builder()
                     .data(convertFromClassToService(clz).getAllInItem(objectsIdsRequest).stream().map(entity -> convertFromServiceOutputToDTOEntity(entity, clz)).collect(Collectors.toList()))
                     .message(SuccessMessage.FOUND.toString())

@@ -53,8 +53,8 @@ public class CommentController {
     }
 
     @GetMapping(value = "all-in-item")
-    public ResponseEntity<Response> getAllInItem(@RequestBody ObjectsIdsRequest objectsIdsRequest){
-        Response response = sharedContentFacade.getAllInItem(objectsIdsRequest, Comment.class);
+    public ResponseEntity<Response> getAllInItem(@RequestParam Long boardId, @RequestParam Long sectionId, @RequestParam Long itemId){
+        Response response = sharedContentFacade.getAllInItem(boardId, sectionId, itemId, Comment.class);
         return new ResponseEntity<>(response, response.getStatus());
     }
 
