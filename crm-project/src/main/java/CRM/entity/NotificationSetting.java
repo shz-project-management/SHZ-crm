@@ -10,7 +10,7 @@ import javax.persistence.*;
 @Setter
 @ToString
 @Entity
-@Table(name = "notifications")
+@Table(name = "notification_types")
 public class NotificationSetting {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -18,4 +18,5 @@ public class NotificationSetting {
 
     private String name;
     private String description;
+    private Long notificationNumber;
 }

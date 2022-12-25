@@ -282,6 +282,13 @@ public class Validations {
         }
     }
 
+    public static void validateNotificationNumber(Long notificationNumber){
+        if (notificationNumber == null)
+            throw new NullPointerException(ExceptionMessage.NULL_INPUT.toString());
+        if (notificationNumber < 1 && notificationNumber > 6)
+            throw new IllegalArgumentException(ExceptionMessage.FIELD_OBJECT_NOT_EXISTS.toString());
+    }
+
     /**
      * Check if a field exists in an entity object.
      *
