@@ -1,6 +1,7 @@
 package CRM.service;
 
 import CRM.entity.UserSetting;
+import CRM.entity.requests.ObjectsIdsRequest;
 import CRM.repository.BoardRepository;
 import CRM.repository.UserRepository;
 import CRM.repository.UserSettingRepository;
@@ -29,15 +30,14 @@ public class SettingsService {
     /**
      * This method is used to retrieve user's notification settings in a specified board.
      *
-     * @param userId The id of the user whose settings are to be retrieved.
-     * @param boardId The id of the board whose user's settings belong to.
+     * @param objectsIdsRequest contains the user and board ids which we will use to retrieve the settings.
      * @return A Response object containing all the retrieved settings or an error message if the user does not belong to that board.
      * @throws NoSuchElementException   if the user does not belong to that board.
      */
-    public List<UserSetting> getAllUserSettingsInBoard(Long userId, Long boardId) throws AccountNotFoundException {
-        if(!Validations.checkIfUserExistsInBoard(userId, boardId, userRepository, boardRepository))
+    public List<UserSetting> getAllUserSettingsInBoard(ObjectsIdsRequest objectsIdsRequest) throws AccountNotFoundException {
+        if(!Validations.checkIfUserExistsInBoard(objectsIdsRequest.getUserId(), objectsIdsRequest.getBoardId(), userRepository, boardRepository))
             throw new NoSuchElementException(ExceptionMessage.USER_DOES_NOT_EXISTS_IN_BOARD.toString());
-        return userSettingRepository.getUserSettingsInBoard(userId, boardId);
+        return userSettingRepository.getUserSettingsInBoard(objectsIdsRequest.getUserId(), objectsIdsRequest.getBoardId());
     }
 
     public Boolean changeUserSettingInBoard(Long userId, Long boardId, Long settingId, Boolean shouldBeActive){

@@ -2,6 +2,7 @@ package CRM.controller.facades;
 
 import CRM.entity.DTO.BoardDTO;
 import CRM.entity.DTO.SettingsDTO;
+import CRM.entity.requests.ObjectsIdsRequest;
 import CRM.entity.response.Response;
 import CRM.service.SettingsService;
 import CRM.utils.Common;
@@ -30,18 +31,17 @@ public class SettingsFacade {
     /**
      * This method is used to retrieve user's notification settings in a specified board.
      *
-     * @param userId The id of the user whose settings are to be retrieved.
-     * @param boardID The id of the board whose user's settings belong to.
+     * @param objectsIdsRequest contains the ids of the user and board whose settings we want to retrieve and from.
      * @return A Response object containing all the retrieved settings or an error message if the user/board is not found or the id is invalid.
      * @throws IllegalArgumentException if the specified user/board id is invalid.
      * @throws NullPointerException     if the specified user/board id is null.
      * @throws NoSuchElementException   if the user with the specified id is not found/user does not belong to that board.
      */
-    public Response getAllUserSettingsInBoard(Long userId, Long boardID){
+    public Response getAllUserSettingsInBoard(ObjectsIdsRequest objectsIdsRequest){
         try {
-            Validations.validateIDs(userId, boardID);
+            Validations.validateIDs(objectsIdsRequest.getUserId(), objectsIdsRequest.getBoardId());
             return new Response.Builder()
-                    .data(SettingsDTO.createUserSettingsList(settingsService.getAllUserSettingsInBoard(userId, boardID)))
+                    .data(SettingsDTO.createUserSettingsList(settingsService.getAllUserSettingsInBoard(objectsIdsRequest)))
                     .message(SuccessMessage.FOUND.toString())
                     .status(HttpStatus.OK)
                     .statusCode(200)
