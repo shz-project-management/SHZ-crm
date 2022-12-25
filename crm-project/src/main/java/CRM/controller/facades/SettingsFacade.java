@@ -6,6 +6,7 @@ import CRM.entity.response.Response;
 import CRM.service.SettingsService;
 import CRM.utils.Common;
 import CRM.utils.Validations;
+import CRM.utils.enums.ExceptionMessage;
 import CRM.utils.enums.Regex;
 import CRM.utils.enums.SuccessMessage;
 import org.apache.logging.log4j.LogManager;
@@ -38,14 +39,25 @@ public class SettingsFacade {
      */
     public Response getAllUserSettingsInBoard(Long userId, Long boardID){
         try {
-            Validations.validate(userId, Regex.ID.getRegex());
-            Validations.validate(boardID, Regex.ID.getRegex());
-            List<SettingsDTO> settingsDTO = SettingsDTO.createUserSettingsList(settingsService.getAllUserSettingsInBoard(userId, boardID));
-            return Common.buildSuccessResponse(settingsDTO, HttpStatus.OK, SuccessMessage.FOUND.toString());
+            Validations.validateIDs(userId, boardID);
+            return new Response.Builder()
+                    .data(SettingsDTO.createUserSettingsList(settingsService.getAllUserSettingsInBoard(userId, boardID)))
+                    .message(SuccessMessage.FOUND.toString())
+                    .status(HttpStatus.OK)
+                    .statusCode(200)
+                    .build();
         } catch (IllegalArgumentException | NoSuchElementException | AccountNotFoundException e) {
-            return Common.buildErrorResponse(e, HttpStatus.BAD_REQUEST);
+            return new Response.Builder()
+                    .statusCode(400)
+                    .status(HttpStatus.BAD_REQUEST)
+                    .message(e.getMessage())
+                    .build();
         } catch (NullPointerException e) {
-            return Common.buildErrorResponse(e, HttpStatus.INTERNAL_SERVER_ERROR);
+            return new Response.Builder()
+                    .message(e.getMessage())
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .statusCode(500)
+                    .build();
         }
     }
 
