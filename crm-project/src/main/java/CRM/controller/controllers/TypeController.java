@@ -40,21 +40,21 @@ public class TypeController {
      * @return A ResponseEntity with the appropriate status and response body.
      */
     @DeleteMapping(value = "{boardId}/{sectionId}")
-    public ResponseEntity<Response> delete(@PathVariable Long boardId,@PathVariable Long sectionId) {
+    public ResponseEntity<Response> delete(@PathVariable Long boardId, @PathVariable Long sectionId) {
         Response response = attributeFacade.delete(boardId, sectionId, Type.class);
         return new ResponseEntity<>(response, response.getStatus());
     }
 
-    /**
-     This method is used to handle HTTP GET requests to the specified URL (type/{id}).
-     The method takes the id of the type as a path variable and uses it to retrieve the type information from the attributeFacade object.
-     @return A ResponseEntity object containing the Response object with the type information and the HTTP status code.
-     */
-    @GetMapping(value = "{boardId}/{sectionId}")
-    public ResponseEntity<Response> get(@PathVariable Long boardId,@PathVariable Long sectionId) {
-        Response response = attributeFacade.get(sectionId, boardId, Type.class);
-        return new ResponseEntity<>(response, response.getStatus());
-    }
+//    /**
+//     This method is used to handle HTTP GET requests to the specified URL (type/{id}).
+//     The method takes the id of the type as a path variable and uses it to retrieve the type information from the attributeFacade object.
+//     @return A ResponseEntity object containing the Response object with the type information and the HTTP status code.
+//     */
+//    @GetMapping(value = "{boardId}/{sectionId}")
+//    public ResponseEntity<Response> get(@PathVariable Long boardId, @PathVariable Long sectionId) {
+//        Response response = attributeFacade.get(sectionId, boardId, Type.class);
+//        return new ResponseEntity<>(response, response.getStatus());
+//    }
 
     /**
      * This method is used to handle HTTP GET requests to the specified URL (type/getAll/{boardId}).
