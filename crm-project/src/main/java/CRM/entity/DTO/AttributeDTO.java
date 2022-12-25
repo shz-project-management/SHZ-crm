@@ -3,9 +3,7 @@ package CRM.entity.DTO;
 import CRM.entity.*;
 import lombok.*;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 
 @AllArgsConstructor
@@ -33,6 +31,8 @@ public class AttributeDTO {
         for (T attribute: attributes) {
             attributeDTOList.add(createAttributeDTO((Attribute) attribute));
         }
+        attributeDTOList.sort(Comparator.comparingLong(AttributeDTO::getId));
+
         return attributeDTOList;
     }
 }
