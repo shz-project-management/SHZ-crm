@@ -26,6 +26,14 @@ public class SettingsService {
     @Autowired
     UserSettingRepository userSettingRepository;
 
+    /**
+     * This method is used to retrieve user's notification settings in a specified board.
+     *
+     * @param userId The id of the user whose settings are to be retrieved.
+     * @param boardId The id of the board whose user's settings belong to.
+     * @return A Response object containing all the retrieved settings or an error message if the user does not belong to that board.
+     * @throws NoSuchElementException   if the user does not belong to that board.
+     */
     public List<UserSetting> getAllUserSettingsInBoard(Long userId, Long boardId) throws AccountNotFoundException {
         if(!Validations.checkIfUserExistsInBoard(userId, boardId, userRepository, boardRepository))
             throw new NoSuchElementException(ExceptionMessage.USER_DOES_NOT_EXISTS_IN_BOARD.toString());

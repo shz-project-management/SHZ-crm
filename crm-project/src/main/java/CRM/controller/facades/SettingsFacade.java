@@ -26,6 +26,16 @@ public class SettingsFacade {
     @Autowired
     private SettingsService settingsService;
 
+    /**
+     * This method is used to retrieve user's notification settings in a specified board.
+     *
+     * @param userId The id of the user whose settings are to be retrieved.
+     * @param boardID The id of the board whose user's settings belong to.
+     * @return A Response object containing all the retrieved settings or an error message if the user/board is not found or the id is invalid.
+     * @throws IllegalArgumentException if the specified user/board id is invalid.
+     * @throws NullPointerException     if the specified user/board id is null.
+     * @throws NoSuchElementException   if the user with the specified id is not found/user does not belong to that board.
+     */
     public Response getAllUserSettingsInBoard(Long userId, Long boardID){
         try {
             Validations.validate(userId, Regex.ID.getRegex());
