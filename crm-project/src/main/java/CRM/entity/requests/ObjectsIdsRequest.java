@@ -8,7 +8,7 @@ import lombok.*;
 public class ObjectsIdsRequest {
     private Long boardId;
     private Long sectionId;
-    private Long ItemId;
+    private Long itemId;
     private Long statusId;
     private Long typeId;
     private Long commentId;

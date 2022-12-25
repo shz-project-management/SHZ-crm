@@ -35,8 +35,8 @@ public class CommentService implements ServiceInterface {
      * @throws AccountNotFoundException if the user specified in the comment request does not exist
      */
     //TODO documentation
-    public Comment create(CommentRequest commentRequest) throws AccountNotFoundException {
-        Board board = Common.getBoard(commentRequest.getBoardId(), boardRepository);
+    public List<Comment> create(CommentRequest commentRequest) throws AccountNotFoundException {
+        Board board = Validations.doesIdExists(commentRequest.getBoardId(), boardRepository);
         User user;
 
         try {
@@ -53,7 +53,7 @@ public class CommentService implements ServiceInterface {
         Comment comment = Comment.createNewComment(user, commentRequest.getName(), commentRequest.getDescription(), parentItem);
         board.insertCommentToItemInSection(comment, parentItem.getId(), commentRequest.getSectionId());
         boardRepository.save(board);
-        return comment;
+        return board.getAllCommentsInItem(commentRequest.getSectionId(), parentItem.getId());
     }
 
     /**
@@ -65,7 +65,7 @@ public class CommentService implements ServiceInterface {
     //TODO documentation
     @Override
     public int delete(List<Long> ids, long boardId) {
-        Board board = Common.getBoard(boardId, boardRepository);
+        Board board = Validations.doesIdExists(boardId, boardRepository);
         List<Section> sections = new ArrayList<>(board.getSections());
         int counter = 0;
 
@@ -97,7 +97,8 @@ public class CommentService implements ServiceInterface {
     //TODO
     @Override
     public Comment update(UpdateObjectRequest updateObject, long commentId) throws NoSuchFieldException {
-        Board board = Common.getBoard(updateObject.getObjectsIdsRequest().getBoardId(), boardRepository);
+        Board board = Validations.doesIdExists(updateObject.getObjectsIdsRequest().getBoardId(), boardRepository);
+
 //        if (Validations.checkIfFieldIsCustomObject(updateObject.getFieldName())) {
 //            throw new NoSuchFieldException(ExceptionMessage.FIELD_OBJECT_NOT_EXISTS.toString());
 //        } else {
@@ -110,7 +111,7 @@ public class CommentService implements ServiceInterface {
     //TODO documentation
     @Override
     public SharedContent get(ObjectsIdsRequest objectsIdsRequest, long searchId) {
-        Board board = Common.getBoard(objectsIdsRequest.getBoardId(), boardRepository);
+        Board board = Validations.doesIdExists(objectsIdsRequest.getBoardId(), boardRepository);
         Section section = Common.getSection(board, objectsIdsRequest.getSectionId());
 
         if(objectsIdsRequest.getParentId() != null) {
@@ -123,10 +124,8 @@ public class CommentService implements ServiceInterface {
     //TODO + documentation
     @Override
     public List<SharedContent> getAllInItem(ObjectsIdsRequest objectsIdsRequest) {
-        //@PathVariable Long boardId, @PathVariable Long sectionId, @PathVariable Long itemId
-//        Item item = Validations.doesIdExists(objectsIdsRequest.getItemId(), itemRepository);
-//        return commentRepository.findAllByParentItem(item).stream().map(comment -> (SharedContent) comment).collect(Collectors.toList());
-        return null;
+        Board board = Validations.doesIdExists(objectsIdsRequest.getBoardId(), boardRepository);
+        return new ArrayList<>(board.getAllCommentsInItem(objectsIdsRequest.getSectionId(), objectsIdsRequest.getItemId()));
     }
 
     /**
@@ -137,7 +136,7 @@ public class CommentService implements ServiceInterface {
      */
     //TODO documentation
     public List<Comment> getAllCommentsInBoard(long boardId) {
-        Board board = Common.getBoard(boardId, boardRepository);
+        Board board = Validations.doesIdExists(boardId, boardRepository);
 
         List<Item> items = new ArrayList<>();
         Set<Section> sectionsInBoard = board.getSections();

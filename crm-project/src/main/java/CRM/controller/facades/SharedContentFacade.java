@@ -96,7 +96,7 @@ public class SharedContentFacade {
             // call commentService with create function to create a new comment
             // return the response with the new comment as a data inside response entity.
             return new Response.Builder()
-                    .data(CommentDTO.getSharedContentFromDB(commentService.create(comment)))
+                    .data(CommentDTO.getCommentDTOList(new HashSet<>(commentService.create(comment))))
                     .message(SuccessMessage.CREATE.toString())
                     .status(HttpStatus.ACCEPTED)
                     .statusCode(201)
@@ -160,7 +160,7 @@ public class SharedContentFacade {
 
             // call the correct service using convertFromClassToService(clz) function with find function in it
             return new Response.Builder()
-                    .data(convertFromServiceOutputToDTOEntity(convertFromClassToService(clz).update(updateObject ,updateObjectId), clz))
+                    .data(convertFromServiceOutputToDTOEntity(convertFromClassToService(clz).update(updateObject, updateObjectId), clz))
                     .message(SuccessMessage.FOUND.toString())
                     .status(HttpStatus.OK)
                     .statusCode(200)
@@ -191,7 +191,7 @@ public class SharedContentFacade {
      * returned. If a NullPointerException is thrown, a BAD_REQUEST status with a message indicating the
      * error is returned.
      */
-    public Response get(ObjectsIdsRequest objectsIdsRequest, Long searchId ,Class clz) {
+    public Response get(ObjectsIdsRequest objectsIdsRequest, Long searchId, Class clz) {
         try {
             // validate the id using the Validations.validate function
             Validations.validateSharedContent(objectsIdsRequest.getBoardId(),
@@ -286,9 +286,7 @@ public class SharedContentFacade {
 
     public Response getAllInItem(ObjectsIdsRequest objectsIdsRequest, Class clz) {
         try {
-            Validations.validate(objectsIdsRequest.getItemId(), Regex.ID.getRegex());
-            Validations.validate(objectsIdsRequest.getSectionId(), Regex.ID.getRegex());
-            Validations.validate(objectsIdsRequest.getBoardId(), Regex.ID.getRegex());
+            Validations.validateIDs(objectsIdsRequest.getItemId(), objectsIdsRequest.getSectionId(), objectsIdsRequest.getBoardId());
             return new Response.Builder()
                     .data(convertFromClassToService(clz).getAllInItem(objectsIdsRequest).stream().map(entity -> convertFromServiceOutputToDTOEntity(entity, clz)).collect(Collectors.toList()))
                     .message(SuccessMessage.FOUND.toString())

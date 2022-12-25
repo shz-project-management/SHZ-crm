@@ -16,7 +16,7 @@ public class ItemDTO extends SharedContentDTO {
     private Long id;
     private AttributeDTO status;
     private AttributeDTO type;
-    private Long section;
+    private Long sectionId;
     private Long assignedToUserId;
     private LocalDateTime dueDate;
     private Integer importance;
@@ -31,7 +31,7 @@ public class ItemDTO extends SharedContentDTO {
         itemDTO.setDescription(item.getDescription());
         itemDTO.setType(item.getType() == null ? null : AttributeDTO.createAttributeDTO(item.getType()));
         itemDTO.setStatus(item.getStatus() == null ? null : AttributeDTO.createAttributeDTO(item.getStatus()));
-        itemDTO.setSection(item.getSection().getId());
+        itemDTO.setSectionId(item.getSection().getId());
         itemDTO.setCreationDate(item.getCreationDate());
         itemDTO.setId(item.getId());
         itemDTO.setImportance(item.getImportance());
@@ -50,7 +50,7 @@ public class ItemDTO extends SharedContentDTO {
         itemDTO.setDescription(item.getDescription());
         itemDTO.setType(item.getType() == null ? null : AttributeDTO.createAttributeDTO(item.getType()));
         itemDTO.setStatus(item.getStatus() == null ? null : AttributeDTO.createAttributeDTO(item.getStatus()));
-        itemDTO.setSection(item.getSection().getId());
+        itemDTO.setSectionId(item.getSection().getId());
         itemDTO.setCreationDate(item.getCreationDate());
         itemDTO.setId(item.getId());
         itemDTO.setImportance(item.getImportance());
@@ -64,7 +64,7 @@ public class ItemDTO extends SharedContentDTO {
             itemDTOList.add(getSharedContentFromDB(item));
         }
 
-        Collections.sort(itemDTOList, Comparator.comparingLong(ItemDTO::getId));
+        itemDTOList.sort(Comparator.comparingLong(ItemDTO::getId));
 
         return itemDTOList;
     }
