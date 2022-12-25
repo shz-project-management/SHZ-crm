@@ -29,7 +29,7 @@ public class SectionDTO {
         sectionDTO.setDescription(section.getDescription());
 
         if (section.getItems().size() > 0)
-            sectionDTO.setItems(ItemDTO.getItemsDTOList(section.getItems().stream().filter(item -> item.getParentItem() != null).collect(Collectors.toSet())));
+            sectionDTO.setItems(ItemDTO.getItemsDTOList(section.getItems().stream().filter(item -> item.getParentItem() == null).collect(Collectors.toSet())));
 
         return sectionDTO;
     }

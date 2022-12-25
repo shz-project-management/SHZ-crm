@@ -36,9 +36,6 @@ public class ItemDTO extends SharedContentDTO {
         itemDTO.setId(item.getId());
         itemDTO.setImportance(item.getImportance());
 
-        if (item.getParentItem() != null)
-            itemDTO.setParentItem(ItemDTO.getParentItem(item));
-
         if (item.getItems().size() > 0)
             itemDTO.setSubItems(ItemDTO.getItemsDTOList(item.getItems()));
 
