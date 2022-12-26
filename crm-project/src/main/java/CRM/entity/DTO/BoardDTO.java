@@ -4,6 +4,7 @@ import CRM.entity.*;
 import lombok.*;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -19,6 +20,8 @@ public class BoardDTO {
     private List<SectionDTO> sections;
     private List<AttributeDTO> types;
     private List<AttributeDTO> statuses;
+    private List<UserPermissionDTO> userPermissions;
+
 
     public static BoardDTO getBoardFromDB(Board board) {
         BoardDTO boardDTO = new BoardDTO();
@@ -29,6 +32,7 @@ public class BoardDTO {
         boardDTO.setSections(SectionDTO.getSectionsDTOList(board.getSections()));
         boardDTO.setStatuses(AttributeDTO.getListOfAttributesFromDB(board.getStatuses()));
         boardDTO.setTypes(AttributeDTO.getListOfAttributesFromDB(board.getTypes()));
+        boardDTO.setUserPermissions(UserPermissionDTO.getListOfUserPermissionFromDB(new ArrayList<>(board.getUsersPermissions())));
         return boardDTO;
     }
 

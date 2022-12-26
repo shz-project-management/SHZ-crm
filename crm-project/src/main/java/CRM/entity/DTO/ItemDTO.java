@@ -35,6 +35,7 @@ public class ItemDTO extends SharedContentDTO {
         itemDTO.setCreationDate(item.getCreationDate());
         itemDTO.setId(item.getId());
         itemDTO.setImportance(item.getImportance());
+        itemDTO.setDueDate(item.getDueDate());
 
         if (item.getItems().size() > 0)
             itemDTO.setSubItems(ItemDTO.getItemsDTOList(item.getItems()));
@@ -54,6 +55,8 @@ public class ItemDTO extends SharedContentDTO {
         itemDTO.setCreationDate(item.getCreationDate());
         itemDTO.setId(item.getId());
         itemDTO.setImportance(item.getImportance());
+        itemDTO.setDueDate(item.getDueDate());
+
 
         return itemDTO;
     }
