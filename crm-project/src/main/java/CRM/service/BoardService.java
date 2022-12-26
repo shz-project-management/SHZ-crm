@@ -19,6 +19,9 @@ import javax.persistence.EntityManager;
 import javax.security.auth.login.AccountNotFoundException;
 import java.util.*;
 
+import static CRM.utils.Util.SharedBoards;
+import static CRM.utils.Util.myBoards;
+
 @Service
 public class BoardService {
 
@@ -101,18 +104,8 @@ public class BoardService {
 
         //get all the boards of the creator user
         Map<String,List<Board>> userBoards = new HashMap<>();
-        List<Board> creatorBoards =  boardRepository.findByCreatorUser(user);
-        userBoards.put("My_Boards", creatorBoards);
-
-        //get all the boards of the user he is shared with
-        List<Board> allBoards = boardRepository.findAll();
-        List<Board> sharedBoards = new ArrayList<>();
-        for (Board board: allBoards) {
-            if(board.getAllUsersInBoard().contains(user)){
-                sharedBoards.add(board);
-            }
-        }
-        userBoards.put("Shared_Boards", sharedBoards);
+        userBoards.put(myBoards, boardRepository.findByCreatorUser(user));
+        userBoards.put(SharedBoards, getSharedBoardsOfUser(user));
         return userBoards;
     }
 
@@ -136,5 +129,17 @@ public class BoardService {
             UserSetting userSetting = UserSetting.createUserSetting(user, notificationSetting);
             board.addUserSettingToBoard(userSetting);
         }
+    }
+
+    private List<Board> getSharedBoardsOfUser(User user){
+        //get all the boards of the user he is shared with
+        List<Board> allBoards = boardRepository.findAll();
+        List<Board> sharedBoards = new ArrayList<>();
+        for (Board board: allBoards) {
+            if(board.getAllUsersInBoard().contains(user)){
+                sharedBoards.add(board);
+            }
+        }
+        return sharedBoards;
     }
 }
