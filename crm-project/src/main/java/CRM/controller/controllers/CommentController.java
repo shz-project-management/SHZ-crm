@@ -42,7 +42,7 @@ public class CommentController {
 
     @PatchMapping(value = "update")
     public ResponseEntity<Response> update(@RequestBody UpdateObjectRequest updateObject) {
-        Response response = sharedContentFacade.update(updateObject, updateObject.getObjectsIdsRequest().getCommentId(), Comment.class);
+        Response response = sharedContentFacade.update(updateObject, Comment.class);
         return new ResponseEntity<>(response, response.getStatus());
     }
 

@@ -209,9 +209,49 @@ public class Board {
 
     public Status getStatusByName(String statusName) {
         return statuses.stream()
-                .filter(type -> type.getName().equals(statusName))
+                .filter(status -> status.getName().equals(statusName))
                 .findFirst()
                 .orElse(null);
+    }
+
+    public Status getStatusById(long statusId) {
+        return statuses.stream()
+                .filter(status -> status.getId().equals(statusId))
+                .findFirst()
+                .orElse(null);
+    }
+
+    public Type getTypeById(long typeId) {
+        return types.stream()
+                .filter(type -> type.getId().equals(typeId))
+                .findFirst()
+                .orElse(null);
+    }
+
+    public Section getSectionById(long sectionId) {
+        return sections.stream()
+                .filter(section -> section.getId().equals(sectionId))
+                .findFirst()
+                .orElse(null);
+    }
+
+    public Item getItemById(long itemId, long sectionId) {
+        return getItemFromSectionById(itemId, sectionId);
+    }
+
+
+    public Object getObjectByItsClass(Integer content, Class objClass, Long sectionId) {
+        if (objClass == Status.class) {
+            return getStatusById(content);
+        } else if (objClass == Type.class) {
+            return getTypeById(content);
+        } else if (objClass == Section.class) {
+            return getSectionById(content);
+        } else if (objClass == Item.class) {
+            return getItemById(content, sectionId);
+        } else {
+            return null;
+        }
     }
 }
 

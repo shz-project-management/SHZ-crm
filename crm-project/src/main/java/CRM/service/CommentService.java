@@ -86,17 +86,10 @@ public class CommentService implements ServiceInterface {
         return counter;
     }
 
-    /**
-     * Updates the specified comment with the new field value provided in the updateObject parameter.
-     *
-     * @param updateObject the object containing the field names and new field values to update
-     * @param commentId    the id of the comment to update
-     * @return the updated Comment object
-     * @throws NoSuchFieldException if the field to update is not a primitive or a known object
-     */
-    //TODO
+
+    //TODO + Documentation
     @Override
-    public Comment update(UpdateObjectRequest updateObject, long commentId) throws NoSuchFieldException {
+    public Section update(UpdateObjectRequest updateObject) throws NoSuchFieldException {
         Board board = Validations.doesIdExists(updateObject.getObjectsIdsRequest().getBoardId(), boardRepository);
 
 //        if (Validations.checkIfFieldIsCustomObject(updateObject.getFieldName())) {

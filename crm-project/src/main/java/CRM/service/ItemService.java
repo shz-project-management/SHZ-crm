@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.security.auth.login.AccountNotFoundException;
+import java.time.LocalDateTime;
 import java.util.*;
 
 @Service
@@ -93,16 +94,18 @@ public class ItemService implements ServiceInterface {
 
     //TODO + Documentation
     @Override
-    public Comment update(UpdateObjectRequest updateObject, long commentId) throws NoSuchFieldException {
+    public Section update(UpdateObjectRequest updateObject) throws NoSuchFieldException {
         Board board = Validations.doesIdExists(updateObject.getObjectsIdsRequest().getBoardId(), boardRepository);
+        Item item = board.getItemFromSectionById(updateObject.getObjectsIdsRequest().getUpdateObjId(),
+                updateObject.getObjectsIdsRequest().getSectionId());
 
-//        if (Validations.checkIfFieldIsCustomObject(updateObject.getFieldName())) {
-//            fieldIsCustomObjectHelper(updateObject, itemId, item);
-//        } else {
-//            fieldIsPrimitiveOrKnownObjectHelper(updateObject, item);
-//        }
-//        return itemRepository.save(item);
-        return null;
+        if (Validations.checkIfFieldIsCustomObject(updateObject.getFieldName())) {
+            fieldIsCustomObjectHelper(updateObject, item, board, updateObject.getObjectsIdsRequest().getUpdateObjId());
+        } else {
+            fieldIsPrimitiveOrKnownObjectHelper(updateObject, item);
+        }
+        boardRepository.save(board);
+        return board.getSectionFromBoard(updateObject.getObjectsIdsRequest().getSectionId());
     }
 
     //TODO Documentation
@@ -125,14 +128,24 @@ public class ItemService implements ServiceInterface {
      *
      * @param updateObject the request object containing the updates to be made
      * @param itemId       the id of the item being updated
-     * @param item         the item object being updated
+     * @param item         the item to update
      * @throws NoSuchFieldException if the field does not exist in the item object
      */
-//    private void fieldIsCustomObjectHelper(UpdateObjectRequest updateObject, long itemId, Item item) throws NoSuchFieldException {
-//        Object contentObj = Validations.doesIdExists(Long.valueOf((Integer) updateObject.getContent()), getRepoToUpdateField(updateObject.getFieldName()));
-//        Validations.checkIfParentItemIsNotTheSameItem(updateObject.getFieldName(), itemId, Long.valueOf((Integer) updateObject.getContent()));
-//        Validations.setContentToFieldIfFieldExists(item, updateObject.getFieldName(), contentObj);
-//    }
+    private void fieldIsCustomObjectHelper(UpdateObjectRequest updateObject, Item item, Board board, long itemId) throws NoSuchFieldException {
+        Class objClass = Common.getObjectOfField(updateObject.getFieldName());
+        if(objClass == null){
+            throw new NoSuchFieldException(ExceptionMessage.FIELD_OBJECT_NOT_EXISTS.toString());
+        }
+
+        Object contentObj = board.getObjectByItsClass(((Integer) updateObject.getContent()), objClass,
+                updateObject.getObjectsIdsRequest().getSectionId());
+        if(contentObj == null){
+            throw new IllegalArgumentException(ExceptionMessage.NO_SUCH_ID.toString());
+        }
+
+        Validations.checkIfParentItemIsNotTheSameItem(updateObject.getFieldName(), itemId, Long.valueOf((Integer) updateObject.getContent()));
+        Validations.setContentToFieldIfFieldExists(item, updateObject.getFieldName(), contentObj);
+    }
 
     /**
      * Helper function for updating a primitive or known object field.
@@ -141,12 +154,12 @@ public class ItemService implements ServiceInterface {
      * @param item         the item object being updated
      * @throws NoSuchFieldException if the field does not exist in the item object
      */
-//    private void fieldIsPrimitiveOrKnownObjectHelper(UpdateObjectRequest updateObject, Item item) throws NoSuchFieldException {
-//        if (Validations.checkIfFieldIsNonPrimitive(updateObject.getFieldName())) {
-//            LocalDateTime dueDate = LocalDateTime.now().plusDays(Long.valueOf((Integer) updateObject.getContent()));
-//            Validations.setContentToFieldIfFieldExists(item, updateObject.getFieldName(), dueDate);
-//        } else {
-//            Validations.setContentToFieldIfFieldExists(item, updateObject.getFieldName(), updateObject.getContent());
-//        }
-//    }
+    private void fieldIsPrimitiveOrKnownObjectHelper(UpdateObjectRequest updateObject, Item item) throws NoSuchFieldException {
+        if (Validations.checkIfFieldIsNonPrimitive(updateObject.getFieldName())) {
+            LocalDateTime dueDate = LocalDateTime.now().plusDays(Long.valueOf((Integer) updateObject.getContent()));
+            Validations.setContentToFieldIfFieldExists(item, updateObject.getFieldName(), dueDate);
+        } else {
+            Validations.setContentToFieldIfFieldExists(item, updateObject.getFieldName(), updateObject.getContent());
+        }
+    }
 }

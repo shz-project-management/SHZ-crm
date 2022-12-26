@@ -42,7 +42,7 @@ public class ItemController {
 
     @PatchMapping(value = "update")
     public ResponseEntity<Response> update(@RequestBody UpdateObjectRequest updateItemRequest){
-        Response response = sharedContentFacade.update(updateItemRequest, updateItemRequest.getObjectsIdsRequest().getItemId(), Item.class);
+        Response response = sharedContentFacade.update(updateItemRequest, Item.class);
         return new ResponseEntity<>(response, response.getStatus());
     }
 

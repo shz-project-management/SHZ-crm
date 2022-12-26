@@ -229,7 +229,8 @@ public class Validations {
      * @return true if the field is a custom object field, false otherwise
      */
     public static boolean checkIfFieldIsCustomObject(UpdateField fieldName) {
-        return fieldName.equals(STATUS) || fieldName.equals(TYPE) || fieldName.equals(PARENT_ITEM) || fieldName.equals(SECTION);
+        return fieldName.equals(STATUS) || fieldName.equals(TYPE) ||
+                fieldName.equals(PARENT_ITEM) || fieldName.equals(SECTION);
     }
 
     /**
