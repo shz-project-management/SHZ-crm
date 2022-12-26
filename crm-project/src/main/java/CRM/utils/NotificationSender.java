@@ -36,8 +36,8 @@ public class NotificationSender {
         }catch (AccountNotFoundException e){
             return false;
         }
-        UserSetting userSettingsInBoard = UserSetting.getRelevantUserSetting(notificationRequest,
-                settingsService.getNotificationSettingFromDB(notificationRequest.getNotificationType().getName()));
+        UserSetting userSettingsInBoard = UserSetting.getRelevantUserSetting(notificationRequest.getBoard(), notificationRequest.getUser(),
+                settingsService.getNotificationSettingFromDB(notificationRequest.getNotificationType().getName()).getName());
         if (userSettingsInBoard.isInApp()) {
             notificationService.createInAppNotification(notificationRequest, userSettingsInBoard);
         }
