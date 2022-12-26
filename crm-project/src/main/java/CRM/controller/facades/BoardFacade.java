@@ -102,7 +102,6 @@ public class BoardFacade {
     public Response get(Long boardId) {
         try {
             Validations.validate(boardId, Regex.ID.getRegex());
-            boardService.delete(boardId);
 
             return Response.builder()
                     .data(BoardDTO.getBoardFromDB(boardService.get(boardId)))
