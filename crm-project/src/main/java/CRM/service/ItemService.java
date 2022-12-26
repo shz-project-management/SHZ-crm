@@ -13,12 +13,8 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.Query;
 import javax.security.auth.login.AccountNotFoundException;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 public class ItemService implements ServiceInterface {
@@ -41,12 +37,12 @@ public class ItemService implements ServiceInterface {
      */
     public Section create(ItemRequest itemRequest) throws AccountNotFoundException {
         // find the board from the db
-        Board board = Common.getBoard(itemRequest.getBoardId(), boardRepository);
+        Board board = Validations.doesIdExists(itemRequest.getBoardId(), boardRepository);
 
         // get the user and make sure he is legit
         User user;
         try {
-            user = Common.getUser(itemRequest.getUserId(), userRepository);
+            user = Validations.doesIdExists(itemRequest.getUserId(), userRepository);
         } catch (NoSuchElementException e) {
             throw new AccountNotFoundException(ExceptionMessage.ACCOUNT_DOES_NOT_EXISTS.toString());
         }
@@ -67,14 +63,15 @@ public class ItemService implements ServiceInterface {
     //TODO Documentation
     @Override
     public int delete(List<Long> ids, long boardId) {
-        Board board = Common.getBoard(boardId, boardRepository);
+        Board board = Validations.doesIdExists(boardId, boardRepository);
         List<Section> sections = new ArrayList<>(board.getSections());
         int counter = 0;
 
         for (Section section : sections) {
             for (Iterator<Item> iterator = section.getItems().iterator(); iterator.hasNext(); ) {
                 Item item = iterator.next();
-                if (ids.contains(item.getId())) {
+                if (ids.contains(item.getId()) || ids.contains(item.getParentItem().getId())) {
+                    item.getItems().clear();
                     iterator.remove();
                     counter++;
                 }
@@ -87,10 +84,10 @@ public class ItemService implements ServiceInterface {
 
     //TODO Documentation
     @Override
-    public SharedContent get(ObjectsIdsRequest objectsIdsRequest, long searchId) {
-        Board board = Common.getBoard(objectsIdsRequest.getBoardId(), boardRepository);
+    public SharedContent get(ObjectsIdsRequest objectsIdsRequest) {
+        Board board = Validations.doesIdExists(objectsIdsRequest.getBoardId(), boardRepository);
         Section section = Common.getSection(board, objectsIdsRequest.getSectionId());
-        return Common.getItem(section, searchId);
+        return Common.getItem(section, objectsIdsRequest.getSearchId());
     }
 
 
@@ -112,15 +109,13 @@ public class ItemService implements ServiceInterface {
     @Override
     public List<SharedContent> getAllInItem(ObjectsIdsRequest objectsIdsRequest) {
         //long itemId, long sectionId, long boardId
-        Board board = Common.getBoard(objectsIdsRequest.getBoardId(), boardRepository); // but instead of itemId, put board id
-
+        Board board = Validations.doesIdExists(objectsIdsRequest.getBoardId(), boardRepository);
         return new ArrayList<>(board.getSectionFromBoard(objectsIdsRequest.getSectionId()).getItems());
     }
 
     //TODO Documentation
     public List<Item> getAllInSection(ObjectsIdsRequest objectsIdsRequest) {
         Board board = Validations.doesIdExists(objectsIdsRequest.getBoardId(), boardRepository);
-
         return new ArrayList<>(board.getSectionFromBoard(objectsIdsRequest.getSectionId()).getItems());
     }
 

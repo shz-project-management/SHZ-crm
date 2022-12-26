@@ -3,9 +3,7 @@ package CRM.entity.DTO;
 import CRM.entity.*;
 import lombok.*;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -34,14 +32,6 @@ public class BoardDTO {
         return boardDTO;
     }
 
-    public static BoardDTO getBoardPreviewFromDB(Board board) {
-        BoardDTO boardDTO = new BoardDTO();
-        boardDTO.setId(board.getId());
-        boardDTO.setName(board.getName());
-        boardDTO.setDescription(Objects.toString(board.getDescription(), ""));
-        return boardDTO;
-    }
-
     public static List<BoardDTO> getListOfBoardsFromDB(List<Board> boards) {
         List<BoardDTO> boardDTOList = new ArrayList<>();
         for (Board board : boards) {
@@ -50,11 +40,12 @@ public class BoardDTO {
         return boardDTOList;
     }
 
-    public static List<BoardDTO> getListOfBoardPreviewsFromDB(List<Board> boards) {
-        List<BoardDTO> boardDTOList = new ArrayList<>();
-        for (Board board : boards) {
-            boardDTOList.add(getBoardPreviewFromDB(board));
-        }
-        return boardDTOList;
+    public static Map<String,List<BoardDTO>> getMapWithAllBoardsForUser(Map<String,List<Board>> boards) {
+        Map<String,List<BoardDTO>> mapBoardListDTO = new HashMap<>();
+        boards.forEach((key, value) -> {
+            List<BoardDTO> boardDTOList = BoardDTO.getListOfBoardsFromDB(value);
+            mapBoardListDTO.put(key, boardDTOList);
+        });
+        return mapBoardListDTO;
     }
 }

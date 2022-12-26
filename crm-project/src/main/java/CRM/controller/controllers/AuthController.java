@@ -63,31 +63,7 @@ public class AuthController {
         Response response = authFacade.login(user);
         return new ResponseEntity<>(response, response.getStatus());
     }
-
-//    @RequestMapping(value = "query", method = RequestMethod.GET)
-//    public ResponseEntity<String> query() {
-//        Map<String, List<String>> filters = new HashMap<>();
-//
-//        List<String> types = new ArrayList<>();
-//        List<String> statuses = new ArrayList<>();
-//        List<String> importances = new ArrayList<>();
-//
-//        types.add("task");
-//        types.add("subTask");
-//
-//        statuses.add("done");
-//        statuses.add("open");
-//
-//        importances.add("1");
-//        importances.add("3");
-//        importances.add("5");
-//
-//        filters.put("type", types);
-//        filters.put("status", statuses);
-//        filters.put("importance", importances);
-//
-//        return new ResponseEntity<>(Common.generateQuery(filters), HttpStatus.OK);
-    }
+}
 
 //    /**
 //     * Activate function is responsible for activating email links.

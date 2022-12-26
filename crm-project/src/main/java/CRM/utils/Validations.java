@@ -101,8 +101,8 @@ public class Validations {
             logger.warn("Parent item ID is null");
         }
 
-        validate(item.getUserId(), Regex.ID.getRegex());
-        validate(item.getSectionId(), Regex.ID.getRegex());
+        Validations.validateIDs(item.getUserId(), item.getSectionId());
+
         // We don't have to add a status and a type to an item
 //        validate(item.getStatusId(), Regex.ID.getRegex());
 //        validate(item.getTypeId(), Regex.ID.getRegex());
@@ -123,36 +123,31 @@ public class Validations {
      */
     public static void validateCreatedComment(CommentRequest comment) {
         // validate each field of the item using validate(regex, field)
-        validate(comment.getParentItemId(), Regex.ID.getRegex());
-        validate(comment.getUserId(), Regex.ID.getRegex());
+        Validations.validateIDs(comment.getParentItemId(), comment.getUserId());
 
         if (comment.getName() == null)
             throw new NullPointerException(ExceptionMessage.VALIDATION_FAILED.toString());
     }
 
-    public static void validateSharedContent(Long boardId, Long sectionId, Long updateObjectId, Long parentId){
-        Validations.validate(boardId, Regex.ID.getRegex());
-        Validations.validate(sectionId, Regex.ID.getRegex());
-        Validations.validate(updateObjectId, Regex.ID.getRegex());
+    public static void validateSharedContent(Long boardId, Long sectionId, Long updateObjectId, Long parentId) {
+        Validations.validateIDs(boardId, sectionId, updateObjectId);
         if (parentId != null) Validations.validate(parentId, Regex.ID.getRegex());
-
     }
 
     //TODO documentation
-    public static void validateIDs(Long ...ids){
-        for(Long id: ids){
+    public static void validateIDs(Long... ids) {
+        for (Long id : ids) {
             validate(id, Regex.ID.getRegex());
         }
     }
 
-    public static void validateUpdateUserToBoard(Long firstId, Long secondId, Long permissionId){
+    public static void validateUpdateUserToBoard(Long firstId, Long secondId, Long permissionId) {
         validateIDs(firstId, secondId);
         validate(permissionId, Regex.ID.getRegex());
-        if(permissionId < 0 || permissionId > 3){
+        if (permissionId < 0 || permissionId > 3) {
             throw new IllegalArgumentException(ExceptionMessage.PERMISSION_NOT_FOUND.toString());
         }
     }
-
 
     /**
      * Checks if an item with the specified ID exists in the given repository.
@@ -162,7 +157,7 @@ public class Validations {
      * @return the item with the specified ID if it exists
      * @throws NoSuchElementException if no item with the specified ID exists in the repository
      */
-    public static <T> T doesIdExists(Long id, JpaRepository<T,Long> repo) {
+    public static <T> T doesIdExists(Long id, JpaRepository<T, Long> repo) {
         Optional<T> element = repo.findById(id);
         if (!element.isPresent()) {
             throw new NoSuchElementException(ExceptionMessage.NO_SUCH_ID.toString());
@@ -207,8 +202,8 @@ public class Validations {
     public static <T> void setContentToFieldIfFieldExists(T object, UpdateField fieldName, Object content) throws NoSuchFieldException {
         String fieldNameModified = fieldName.toString().replaceAll("_", "");
         try {
-            if(checkIfFieldExistsInEntity(object, fieldNameModified, content)) return;
-            if(checkIfFieldExistsInParentEntity(object, fieldNameModified, content)) return;
+            if (checkIfFieldExistsInEntity(object, fieldNameModified, content)) return;
+            if (checkIfFieldExistsInParentEntity(object, fieldNameModified, content)) return;
 
             throw new NoSuchFieldException(ExceptionMessage.FIELD_OBJECT_NOT_EXISTS.toString());
         } catch (IllegalAccessException | NoSuchFieldException e) {
@@ -264,14 +259,14 @@ public class Validations {
     /**
      * Check if a user exists in a board.
      *
-     * @param userId the id of the user to check
-     * @param boardId the id of the board to check in
-     * @param userRepo userRepository object to get the user from the DB
+     * @param userId    the id of the user to check
+     * @param boardId   the id of the board to check in
+     * @param userRepo  userRepository object to get the user from the DB
      * @param boardRepo boardRepository object to get the board from the DB
      * @throws AccountNotFoundException if the user/board are not found
      */
     public static boolean checkIfUserExistsInBoard(long userId, long boardId,
-                                            JpaRepository<User,Long> userRepo, JpaRepository<Board,Long> boardRepo) throws AccountNotFoundException {
+                                                   JpaRepository<User, Long> userRepo, JpaRepository<Board, Long> boardRepo) throws AccountNotFoundException {
         User user;
         Board board;
         try {
@@ -286,14 +281,14 @@ public class Validations {
     /**
      * Check if a field exists in an entity object.
      *
-     * @param object the entity object
+     * @param object    the entity object
      * @param fieldName the name of the field to be checked
-     * @param content the content to be set to the field
+     * @param content   the content to be set to the field
      * @throws IllegalAccessException if the field is not accessible
      */
     private static <T> boolean checkIfFieldExistsInEntity(T object, String fieldName, Object content) throws IllegalAccessException {
         for (Field field : object.getClass().getDeclaredFields()) {
-            if(checkIfFieldExistsInEntityHelper(field, object, fieldName, content)) return true;
+            if (checkIfFieldExistsInEntityHelper(field, object, fieldName, content)) return true;
         }
         return false;
     }
@@ -301,15 +296,15 @@ public class Validations {
     /**
      * Check if a field exists in the parent entity of an object.
      *
-     * @param object the object
+     * @param object    the object
      * @param fieldName the name of the field to be checked
-     * @param content the content to be set to the field
+     * @param content   the content to be set to the field
      * @throws IllegalAccessException if the field is not accessible
      */
     private static <T> boolean checkIfFieldExistsInParentEntity(T object, String fieldName, Object content) throws IllegalAccessException {
         if (Util.fatherClasses().contains(object.getClass().getSuperclass())) {
             for (Field field : object.getClass().getSuperclass().getDeclaredFields()) {
-                if(checkIfFieldExistsInEntityHelper(field, object, fieldName, content)) return true;
+                if (checkIfFieldExistsInEntityHelper(field, object, fieldName, content)) return true;
             }
         }
         return false;
@@ -318,23 +313,23 @@ public class Validations {
     /**
      * Helper function for checking if a field exists in an entity object.
      *
-     * @param field the field to be checked
-     * @param object the entity object
+     * @param field     the field to be checked
+     * @param object    the entity object
      * @param fieldName the name of the field to be checked
-     * @param content the content to be set to the field
+     * @param content   the content to be set to the field
      * @return true if the field exists in the entity object, false otherwise
      * @throws IllegalAccessException if the field is not accessible
      */
     private static <T> boolean checkIfFieldExistsInEntityHelper(Field field, T object, String fieldName, Object content) throws IllegalAccessException {
-            field.setAccessible(true);
-            Object value = field.get(object);
-            if (!field.getName().equalsIgnoreCase(fieldName)) {
-                return false;
-            }
-            if (value != null && !(value.getClass().equals(content.getClass()))) {
-                value.getClass().cast(content);
-            }
-            field.set(object, content);
-            return true;
+        field.setAccessible(true);
+        Object value = field.get(object);
+        if (!field.getName().equalsIgnoreCase(fieldName)) {
+            return false;
+        }
+        if (value != null && !(value.getClass().equals(content.getClass()))) {
+            value.getClass().cast(content);
+        }
+        field.set(object, content);
+        return true;
     }
 }

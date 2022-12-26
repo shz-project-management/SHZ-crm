@@ -145,14 +145,14 @@ class BoardFacadeTest {
         assertEquals(200, boardFacade.getAll().getStatusCode());
     }
 
-    @Test
-    @DisplayName("Test getAllBoardsOfUser with valid user id and no boards")
-    public void testGetAllBoardsOfUserWithValidUserIdAndNoBoards() throws AccountNotFoundException {
-        Long userId = 1L;
-        List<Board> expectedBoards = new ArrayList<>();
-        given(boardService.getAllBoardsOfUser(userId)).willReturn(expectedBoards);
-        assertEquals(200, boardFacade.getAllBoardsOfUser(userId).getStatusCode());
-    }
+//    @Test
+//    @DisplayName("Test getAllBoardsOfUser with valid user id and no boards")
+//    public void testGetAllBoardsOfUserWithValidUserIdAndNoBoards() throws AccountNotFoundException {
+//        Long userId = 1L;
+//        List<Board> expectedBoards = new ArrayList<>();
+//        given(boardService.getAllBoardsOfUser(userId)).willReturn(expectedBoards);
+//        assertEquals(200, boardFacade.getAllBoardsOfUser(userId).getStatusCode());
+//    }
 
     @Test
     @DisplayName("Test get all boards with invalid user id")

@@ -1,7 +1,6 @@
 package CRM.service;
 
 import CRM.entity.*;
-import CRM.entity.DTO.BoardDTO;
 import CRM.entity.requests.BoardRequest;
 import CRM.entity.requests.UpdateObjectRequest;
 import CRM.repository.BoardRepository;
@@ -19,6 +18,9 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.persistence.EntityManager;
 import javax.security.auth.login.AccountNotFoundException;
 import java.util.*;
+
+import static CRM.utils.Util.SharedBoards;
+import static CRM.utils.Util.myBoards;
 
 @Service
 public class BoardService {
@@ -40,7 +42,7 @@ public class BoardService {
     public Board create(BoardRequest boardRequest) throws AccountNotFoundException {
         User user;
         try {
-            user = Common.getUser(boardRequest.getCreatorUserId(), userRepository);
+            user = Validations.doesIdExists(boardRequest.getCreatorUserId(), userRepository);
         } catch (NoSuchElementException e) {
             throw new AccountNotFoundException(ExceptionMessage.ACCOUNT_DOES_NOT_EXISTS.toString());
         }
@@ -55,7 +57,7 @@ public class BoardService {
      * @param boardId the board ID to delete
      */
     public boolean delete(long boardId) {
-        Board board = Common.getBoard(boardId, boardRepository);
+        Board board = Validations.doesIdExists(boardId, boardRepository);
         boardRepository.delete(board);
         return true;
     }
@@ -70,7 +72,7 @@ public class BoardService {
      * @throws NullPointerException     if the specified id is null.
      */
     public Board get(long boardId) {
-        return Common.getBoard(boardId, boardRepository);
+        return Validations.doesIdExists(boardId, boardRepository);
     }
 
     /**
@@ -92,13 +94,19 @@ public class BoardService {
      * @throws NullPointerException     if the specified user id is null.
      */
     //TODO
-    public List<Board> getAllBoardsOfUser(long userId) throws AccountNotFoundException {
+    public Map<String, List<Board>> getAllBoardsOfUser(long userId) throws AccountNotFoundException {
+        User user;
         try {
-            User user = Validations.doesIdExists(userId, userRepository);
-            return boardRepository.findByCreatorUser(user);
+            user = Validations.doesIdExists(userId, userRepository);
         } catch (NoSuchElementException e) {
             throw new AccountNotFoundException(ExceptionMessage.ACCOUNT_DOES_NOT_EXISTS.toString());
         }
+
+        //get all the boards of the creator user
+        Map<String,List<Board>> userBoards = new HashMap<>();
+        userBoards.put(myBoards, boardRepository.findByCreatorUser(user));
+        userBoards.put(SharedBoards, getSharedBoardsOfUser(user));
+        return userBoards;
     }
 
     /**
@@ -121,5 +129,17 @@ public class BoardService {
             UserSetting userSetting = UserSetting.createUserSetting(user, notificationSetting);
             board.addUserSettingToBoard(userSetting);
         }
+    }
+
+    private List<Board> getSharedBoardsOfUser(User user){
+        //get all the boards of the user he is shared with
+        List<Board> allBoards = boardRepository.findAll();
+        List<Board> sharedBoards = new ArrayList<>();
+        for (Board board: allBoards) {
+            if(board.getAllUsersInBoard().contains(user)){
+                sharedBoards.add(board);
+            }
+        }
+        return sharedBoards;
     }
 }

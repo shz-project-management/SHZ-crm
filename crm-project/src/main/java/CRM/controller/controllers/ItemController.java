@@ -47,13 +47,16 @@ public class ItemController {
     }
 
     @GetMapping(value = "{itemId}")
-    public ResponseEntity<Response> get(@RequestBody ObjectsIdsRequest objectsIdsRequest ,@PathVariable Long itemId) {
-        Response response = sharedContentFacade.get(objectsIdsRequest, itemId , Item.class);
+    public ResponseEntity<Response> get(@PathVariable Long itemId, @RequestParam Long boardId,
+                                        @RequestParam Long sectionId, @RequestParam Long parentId) {
+        ObjectsIdsRequest objectsIdsRequest = ObjectsIdsRequest.searchBoardSectionParentIds(itemId, boardId, sectionId, parentId);
+        Response response = sharedContentFacade.get(objectsIdsRequest, Item.class);
         return new ResponseEntity<>(response, response.getStatus());
     }
 
-    @GetMapping(value = "all-in-section")
-    public ResponseEntity<Response> getAllItemsInSection(@RequestBody ObjectsIdsRequest objectsIdsRequest) {
+    @GetMapping(value = "all-in-section/{sectionId}")
+    public ResponseEntity<Response> getAllItemsInSection(@RequestParam Long boardId, @PathVariable Long sectionId) {
+        ObjectsIdsRequest objectsIdsRequest = ObjectsIdsRequest.boardSectionIds(boardId, sectionId);
         Response response = sharedContentFacade.getAllItemsInSection(objectsIdsRequest);
         return new ResponseEntity<>(response, response.getStatus());
     }

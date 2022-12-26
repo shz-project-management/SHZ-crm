@@ -51,14 +51,16 @@ public class Item extends SharedContent {
     private Set<Item> items = new HashSet<>();
 
     public static Item createNewItem(ItemRequest itemRequest, Board board, User user) {
-        // FIXME: validate parent
-        Item parentItem = null;
-        if (itemRequest.getParentItemId() != null)
-            parentItem = board.getItemFromSectionById(itemRequest.getParentItemId(), itemRequest.getSectionId());
         Section section = board.getSectionFromBoard(itemRequest.getSectionId());
+        Status status = board.getStatusByName("Open");
+        Type type = itemRequest.getParentItemId() != null ?
+                board.getTypeByName("Sub-Item") :
+                board.getTypeByName("Item") ;
 
-        Status status = itemRequest.getStatusId() == null ? null : (Status) board.getAttributeById(itemRequest.getStatusId(), Status.class);
-        Type type = itemRequest.getTypeId() == null ? null : (Type) board.getAttributeById(itemRequest.getTypeId(), Type.class);
+        Item parentItem = null;
+        if (itemRequest.getParentItemId() != null) {
+            parentItem = board.getItemFromSectionById(itemRequest.getParentItemId(), itemRequest.getSectionId());
+        }
 
         Item item = new Item();
         item.setSection(section);
