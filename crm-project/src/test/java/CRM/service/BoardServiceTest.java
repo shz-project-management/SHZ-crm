@@ -172,10 +172,10 @@ class BoardServiceTest {
 //        assertThrows(NoSuchElementException.class, () -> boardService.updateBoard(boardRequest, 1L));
 //    }
 
-    @Test
-    @DisplayName("Test update board with null request")
-    public void testUpdateBoardWithNullRequest() {
-        UpdateObjectRequest boardRequest = null;
-        assertThrows(NoSuchElementException.class, () -> boardService.updateBoard(boardRequest, 1L));
-    }
+//    @Test
+//    @DisplayName("Test update board with null request")
+//    public void testUpdateBoardWithNullRequest() {
+//        UpdateObjectRequest boardRequest = null;
+//        assertThrows(NoSuchElementException.class, () -> boardService.updateBoard(boardRequest, 1L));
+//    }
 }

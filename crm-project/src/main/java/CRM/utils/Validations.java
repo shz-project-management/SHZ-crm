@@ -201,7 +201,12 @@ public class Validations {
      * @throws NoSuchFieldException if the field does not exist in the object
      */
     public static <T> void setContentToFieldIfFieldExists(T object, UpdateField fieldName, Object content) throws NoSuchFieldException {
+        if(object == null){
+            throw new IllegalArgumentException(ExceptionMessage.FIELD_OBJECT_NOT_EXISTS.toString().toString());
+        }
+
         String fieldNameModified = fieldName.toString().replaceAll("_", "");
+
         try {
             if (checkIfFieldExistsInEntity(object, fieldNameModified, content)) return;
             if (checkIfFieldExistsInParentEntity(object, fieldNameModified, content)) return;

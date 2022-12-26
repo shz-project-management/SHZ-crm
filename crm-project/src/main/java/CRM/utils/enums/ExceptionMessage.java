@@ -17,7 +17,7 @@ public enum ExceptionMessage {
     NULL_INPUT("cannot set the content of the argument to null"),
     TOKEN_IS_NULL("token is null"),
     EMPTY_NOTNULL_FIELD("Not null fields must be filled out before creation"),
-    FIELD_OBJECT_NOT_EXISTS("Field object doesn't exists"),
+    FIELD_OBJECT_NOT_EXISTS("Field object doesn't exists or object id not found"),
     FIELD_OBJECT_REPO_NOT_EXISTS("Field object repository doesn't exists or not supported"),
     NO_SUCH_CLASS("There is no such class in the system!"),
     TOO_SHORT_STRING("This field can not be as short as inserted"),
