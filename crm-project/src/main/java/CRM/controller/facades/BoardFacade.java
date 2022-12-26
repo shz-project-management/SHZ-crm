@@ -37,9 +37,9 @@ public class BoardFacade {
 
             return Response.builder()
                     .data(BoardDTO.getBoardFromDB(boardService.create(boardRequest)))
-                    .message(SuccessMessage.FOUND.toString())
-                    .status(HttpStatus.OK)
-                    .statusCode(HttpStatusCodes.STATUS_CODE_OK)
+                    .message(SuccessMessage.CREATE.toString())
+                    .status(HttpStatus.CREATED)
+                    .statusCode(HttpStatusCodes.STATUS_CODE_CREATED)
                     .build();
 
         } catch (IllegalArgumentException | AccountNotFoundException | NoSuchElementException e) {
