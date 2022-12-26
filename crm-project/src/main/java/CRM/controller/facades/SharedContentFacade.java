@@ -13,10 +13,7 @@ import CRM.entity.response.Response;
 import CRM.service.*;
 import CRM.utils.NotificationSender;
 import CRM.utils.Validations;
-import CRM.utils.enums.ExceptionMessage;
-import CRM.utils.enums.Notifications;
-import CRM.utils.enums.Regex;
-import CRM.utils.enums.SuccessMessage;
+import CRM.utils.enums.*;
 import com.google.api.client.http.HttpStatusCodes;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -181,14 +178,24 @@ public class SharedContentFacade {
             // validate the id using the Validations.validate function
             Validations.validateSharedContent(updateObject.getObjectsIdsRequest());
             // call the correct service using convertFromClassToService(clz) function with find function in it
+            SectionDTO sectionDTO = SectionDTO.createSectionDTO(convertFromClassToService(clz).update(updateObject));
+            if (clz.equals(Item.class)){
+                notificationSender.sendNotificationToManyUsers(
+                        NotificationRequest.createItemChangeRequest(userService.get(updateObject.getObjectsIdsRequest().getUserId()),
+                                boardService.get(updateObject.getObjectsIdsRequest().getBoardId()),
+                                updateObject.getObjectsIdsRequest().getItemId(),
+                                updateObject.getFieldName().toString(), updateObject.getContent(),
+                                settingsService.getNotificationSettingFromDB(Notifications.ITEM_DATA_CHANGED.name)),
+                        userService.getAllInBoard(updateObject.getObjectsIdsRequest().getBoardId()));
+            }
             return Response.builder()
-                    .data(SectionDTO.createSectionDTO(convertFromClassToService(clz).update(updateObject)))
+                    .data(sectionDTO)
                     .message(SuccessMessage.FOUND.toString())
                     .status(HttpStatus.OK)
                     .statusCode(HttpStatusCodes.STATUS_CODE_OK)
                     .build();
 
-        } catch (IllegalArgumentException | NoSuchFieldException | NoSuchElementException e) {
+        } catch (IllegalArgumentException | NoSuchFieldException | NoSuchElementException | AccountNotFoundException e) {
             return Response.builder()
                     .message(e.getMessage())
                     .status(HttpStatus.BAD_REQUEST)

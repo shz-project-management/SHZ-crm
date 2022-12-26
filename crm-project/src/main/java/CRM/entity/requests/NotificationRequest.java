@@ -18,8 +18,7 @@ public class NotificationRequest {
     private NotificationSetting notificationType;
     private Long itemId;
     private String comment;
-    private String pastContent;
-    private String presentContent;
+    private Object presentContent;
     private String changedFieldName;
 
     public static NotificationRequest createAssignRequest(User forUser, Board inBoard, Long itemId, NotificationSetting notificationType){
@@ -31,12 +30,11 @@ public class NotificationRequest {
         return notificationRequest;
     }
 
-    public static NotificationRequest createStatusChangeRequest(User forUser, Board inBoard, Long itemId, String pastStatus, String presentStatus, NotificationSetting notificationType){
+    public static NotificationRequest createStatusChangeRequest(User forUser, Board inBoard, Long itemId, Object presentStatus, NotificationSetting notificationType){
         NotificationRequest notificationRequest = new NotificationRequest();
         notificationRequest.user = forUser;
         notificationRequest.board = inBoard;
         notificationRequest.itemId = itemId;
-        notificationRequest.pastContent = pastStatus;
         notificationRequest.presentContent = presentStatus;
         notificationRequest.notificationType = notificationType;
         return notificationRequest;
@@ -62,12 +60,11 @@ public class NotificationRequest {
         return notificationRequest;
     }
 
-    public static NotificationRequest createItemChangeRequest(User forUser, Board inBoard, Long itemId, String fieldName, String past, String present, NotificationSetting notificationType){
+    public static NotificationRequest createItemChangeRequest(User forUser, Board inBoard, Long itemId, String fieldName, Object present, NotificationSetting notificationType){
         NotificationRequest notificationRequest = new NotificationRequest();
         notificationRequest.user = forUser;
         notificationRequest.board = inBoard;
         notificationRequest.itemId = itemId;
-        notificationRequest.pastContent = past;
         notificationRequest.presentContent = present;
         notificationRequest.changedFieldName = fieldName;
         notificationRequest.notificationType = notificationType;

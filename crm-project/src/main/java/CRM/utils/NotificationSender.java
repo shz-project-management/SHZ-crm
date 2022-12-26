@@ -61,8 +61,8 @@ public class NotificationSender {
                 return "Item id: " + notificationRequest.getItemId() + " has been assigned to you in board " +
                         notificationRequest.getBoard().getName();
             case 2:
-                return "Item id: " + notificationRequest.getItemId() + "& status has been changed from " +
-                        notificationRequest.getPastContent() + " to " + notificationRequest.getPresentContent();
+                return "Item id: " + notificationRequest.getItemId() + "& status has been changed to " +
+                        notificationRequest.getPresentContent() + " in item: " + notificationRequest.getItemId();
             case 3:
                 return "New comment added on item id: " + notificationRequest.getItemId() + ":\n " +
                         notificationRequest.getComment() + "\n By: " + notificationRequest.getFromUser().getFullName();
@@ -70,7 +70,7 @@ public class NotificationSender {
                 return "Item: " + notificationRequest.getItemId() + " has been deleted";
             case 5:
                 return "Field " + notificationRequest.getChangedFieldName() + " has been changed " +
-                        " from " + notificationRequest.getPresentContent() + " to " + notificationRequest.getPresentContent();
+                        " to " + notificationRequest.getPresentContent() + " in item: " + notificationRequest.getItemId();
             case 6:
                 return notificationRequest.getFromUser().getFullName() + " has been added to the board, Welcome!";
             default:
