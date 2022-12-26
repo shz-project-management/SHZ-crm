@@ -16,15 +16,13 @@ public class AttributeService {
     private BoardRepository boardRepository;
 
 
-    public Attribute create(AttributeRequest attributeRequest, Class clz) {
+    public List<Attribute> create(AttributeRequest attributeRequest, Class clz) {
         Board board = Validations.doesIdExists(attributeRequest.getBoardId(), boardRepository);
-        Attribute attribute = Attribute.createAttribute(attributeRequest.getName(), attributeRequest.getDescription());
 
-        board.addAttributeToBoard(attribute, clz);
-
+        board.addAttributeToBoard(Attribute.createAttribute(attributeRequest.getName(), attributeRequest.getDescription()), clz);
         boardRepository.save(board);
 
-        return attribute;
+        return board.getAllAttributeInBoard(clz);
     }
 
 
