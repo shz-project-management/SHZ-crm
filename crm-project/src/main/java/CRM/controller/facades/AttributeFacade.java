@@ -19,6 +19,7 @@ import org.springframework.stereotype.Component;
 import java.util.HashSet;
 import java.util.NoSuchElementException;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Component
 public class AttributeFacade {
@@ -43,12 +44,11 @@ public class AttributeFacade {
     public Response create(AttributeRequest attributeRequest, Class clz) {
         try {
             Validations.validate(attributeRequest.getName(), Regex.NAME.getRegex());
-            Attribute savedAttribute = attributeService.create(attributeRequest, clz);
 
             return Response.builder()
                     .status(HttpStatus.CREATED)
                     .statusCode(HttpStatusCodes.STATUS_CODE_CREATED)
-                    .data(AttributeDTO.createAttributeDTO(savedAttribute))
+                    .data(AttributeDTO.getListOfAttributesFromDB(new HashSet<>(attributeService.create(attributeRequest, clz))))
                     .build();
         } catch (IllegalArgumentException | NonUniqueObjectException | NoSuchElementException e) {
             return Response.builder()
