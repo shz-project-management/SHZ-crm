@@ -33,7 +33,7 @@ public class NotificationService {
     private NotificationSettingRepository notificationSettingRepository;
 
     //TODO:DOCUMENTATION
-    public List<Notification> getAllNotificationsForUserInBoard(ObjectsIdsRequest objectsIdsRequest) throws AccountNotFoundException {
+    public List<Notification> getAllForUserPerBoard(ObjectsIdsRequest objectsIdsRequest) throws AccountNotFoundException {
         if(!Validations.checkIfUserExistsInBoard(objectsIdsRequest.getUserId(), objectsIdsRequest.getBoardId(), userRepository, boardRepository))
             throw new NoSuchElementException(ExceptionMessage.USER_DOES_NOT_EXISTS_IN_BOARD.toString());
         return notificationRepository.findByUser_IdAndBoard_Id(objectsIdsRequest.getUserId(), objectsIdsRequest.getBoardId());
@@ -43,5 +43,9 @@ public class NotificationService {
     public void createInAppNotification(NotificationRequest notificationRequest, UserSetting userSetting){
         Notification notification = Notification.createNewNotification(notificationRequest, userSetting);
         notificationRepository.save(notification);
+    }
+
+    public void delete(List<Long> notificationsIds){
+        notificationRepository.deleteAllById(notificationsIds);
     }
 }

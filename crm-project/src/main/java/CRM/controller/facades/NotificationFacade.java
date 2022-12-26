@@ -6,6 +6,7 @@ import CRM.entity.requests.ObjectsIdsRequest;
 import CRM.entity.response.Response;
 import CRM.service.NotificationService;
 import CRM.utils.Validations;
+import CRM.utils.enums.Regex;
 import CRM.utils.enums.SuccessMessage;
 import com.google.api.client.http.HttpStatusCodes;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,10 +24,10 @@ public class NotificationFacade {
     private NotificationService notificationService;
 
     //TODO:DOCUMENTATION
-    public Response getAllNotificationsForUserInBoard(ObjectsIdsRequest objectsIdsRequest) {
+    public Response getAllForUserPerBoard(ObjectsIdsRequest objectsIdsRequest) {
         try {
             Validations.validateIDs(objectsIdsRequest.getUserId(), objectsIdsRequest.getBoardId());
-            List<Notification> notificationList = notificationService.getAllNotificationsForUserInBoard(objectsIdsRequest);
+            List<Notification> notificationList = notificationService.getAllForUserPerBoard(objectsIdsRequest);
             return Response.builder()
                     .message(SuccessMessage.FOUND.toString())
                     .status(HttpStatus.FOUND)
@@ -42,7 +43,36 @@ public class NotificationFacade {
         } catch (NullPointerException e) {
             return Response.builder()
                     .statusCode(HttpStatusCodes.STATUS_CODE_SERVER_ERROR)
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .message(e.getMessage())
+                    .build();
+        }
+    }
+
+    public Response delete(List<Long> notificationsIds) {
+        try {
+            notificationsIds.forEach(id -> {
+                try {
+                    Validations.validate(id, Regex.ID.getRegex());
+                } catch (IllegalArgumentException | NullPointerException e) {
+                }
+            });
+            notificationService.delete(notificationsIds);
+            return Response.builder()
+                    .message(SuccessMessage.DELETED.toString())
+                    .status(HttpStatus.NO_CONTENT)
+                    .statusCode(HttpStatusCodes.STATUS_CODE_NO_CONTENT)
+                    .build();
+        } catch (IllegalArgumentException | NoSuchElementException e) {
+            return Response.builder()
+                    .statusCode(HttpStatusCodes.STATUS_CODE_BAD_REQUEST)
                     .status(HttpStatus.BAD_REQUEST)
+                    .message(e.getMessage())
+                    .build();
+        } catch (NullPointerException e) {
+            return Response.builder()
+                    .statusCode(HttpStatusCodes.STATUS_CODE_SERVER_ERROR)
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .message(e.getMessage())
                     .build();
         }
