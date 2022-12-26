@@ -11,7 +11,7 @@ public enum ExceptionMessage {
     ADMIN_CANT_CHANGE_HIS_PERMISSION("Admin cannot change his own permission in the board he has created"),
     MULTIPLE_AUTO_INCREMENT("A table can not contain multiple auto increment fields."),
     TRUNCATE("Couldn't truncate the table properly."),
-    ILLEGAL_SQL_QUERY("Sql query is not legal."),
+    PERMISSION_FAILED("This user doesn't have permission to this board"),
     PERMISSION_NOT_ALLOWED("Cant assign another admin to this board"),
     ATTRIBUTE_ALREADY_IN_DB("Attribute with the same name already exists in this board"),
     NULL_INPUT("cannot set the content of the argument to null"),

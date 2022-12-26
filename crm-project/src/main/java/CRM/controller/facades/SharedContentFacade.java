@@ -329,6 +329,33 @@ public class SharedContentFacade {
         }
     }
 
+    //TODO documentation
+    public Response assignToUser(ObjectsIdsRequest objIds, Class clz) {
+        try {
+            Validations.validateIDs(objIds.getBoardId(), objIds.getSectionId(), objIds.getItemId(), objIds.getUserId());
+
+            return Response.builder()
+                    .data(convertFromClassToService(clz).assignToUser(objIds).stream().map(entity -> convertFromServiceOutputToDTOEntity(entity, clz)))
+                    .message(SuccessMessage.FOUND.toString())
+                    .status(HttpStatus.OK)
+                    .statusCode(HttpStatusCodes.STATUS_CODE_OK)
+                    .build();
+
+        } catch (IllegalArgumentException | NoSuchElementException e) {
+            return Response.builder()
+                    .message(e.getMessage())
+                    .status(HttpStatus.BAD_REQUEST)
+                    .statusCode(HttpStatusCodes.STATUS_CODE_BAD_REQUEST)
+                    .build();
+        } catch (NullPointerException e) {
+            return Response.builder()
+                    .message(e.getMessage())
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .statusCode(HttpStatusCodes.STATUS_CODE_SERVER_ERROR)
+                    .build();
+        }
+    }
+
     /**
      * Converts a given Class object to the corresponding AttributeService object.
      *

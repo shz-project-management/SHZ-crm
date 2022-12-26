@@ -60,8 +60,8 @@ public class BoardController {
      * @return A ResponseEntity object containing the Response object with the board information and the HTTP status code.
      */
     @GetMapping(value = "{boardId}")
-    public ResponseEntity<Response> get(@PathVariable Long boardId) {
-        Response response = boardFacade.get(boardId);
+    public ResponseEntity<Response> get(@PathVariable Long boardId, @RequestAttribute Long userId) {
+        Response response = boardFacade.get(boardId, userId);
         return new ResponseEntity<>(response, response.getStatus());
     }
 

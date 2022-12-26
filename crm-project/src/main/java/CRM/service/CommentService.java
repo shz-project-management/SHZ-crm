@@ -128,6 +128,12 @@ public class CommentService implements ServiceInterface {
         return new ArrayList<>(board.getAllCommentsInItem(objectsIdsRequest.getSectionId(), objectsIdsRequest.getItemId()));
     }
 
+    //TODO + documentation
+    @Override
+    public List<SharedContent> assignToUser(ObjectsIdsRequest objectsIdsRequest){
+        return null;
+    }
+
     /**
      * Retrieves all comments in the board with the specified ID.
      *

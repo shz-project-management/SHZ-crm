@@ -1,8 +1,11 @@
 package CRM.entity;
 
 import CRM.entity.requests.UpdateObjectRequest;
+import CRM.utils.enums.ExceptionMessage;
+import CRM.utils.enums.Permission;
 import lombok.*;
 
+import javax.naming.NoPermissionException;
 import javax.persistence.*;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -233,6 +236,17 @@ public class Board {
                 .filter(section -> section.getId().equals(sectionId))
                 .findFirst()
                 .orElse(null);
+    }
+
+    public Integer getUserPermissionByUserId(Long userId) throws NoPermissionException {
+        if(creatorUser.getId().equals(userId)){
+            return Permission.ADMIN.ordinal();
+        }
+        Optional<UserPermission> userPerm = getUsersPermissions().stream().filter(userPermission -> userPermission.getUser().getId().equals(userId)).findFirst();
+        if(userPerm.isPresent()){
+            return userPerm.get().getPermission().ordinal();
+        }
+        throw new NoPermissionException(ExceptionMessage.PERMISSION_FAILED.toString());
     }
 
     public Item getItemById(long itemId, long sectionId) {

@@ -64,7 +64,7 @@ public class Item extends SharedContent {
 
         Item item = new Item();
         item.setSection(section);
-        item.setImportance(itemRequest.getImportance());
+        item.setImportance(1);
         item.setStatus(status);
         item.setType(type);
         item.setUser(user);

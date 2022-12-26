@@ -1,6 +1,7 @@
 package CRM.entity.DTO;
 
 import CRM.entity.*;
+import CRM.utils.enums.Permission;
 import lombok.*;
 
 import java.util.*;
@@ -19,6 +20,7 @@ public class BoardDTO {
     private List<SectionDTO> sections;
     private List<AttributeDTO> types;
     private List<AttributeDTO> statuses;
+    private Integer userPermission;
 
     public static BoardDTO getBoardFromDB(Board board) {
         BoardDTO boardDTO = new BoardDTO();
