@@ -91,13 +91,29 @@ public class BoardService {
      * @throws NullPointerException     if the specified user id is null.
      */
     //TODO
-    public List<Board> getAllBoardsOfUser(long userId) throws AccountNotFoundException {
+    public Map<String, List<Board>> getAllBoardsOfUser(long userId) throws AccountNotFoundException {
+        User user;
         try {
-            User user = Validations.doesIdExists(userId, userRepository);
-            return boardRepository.findByCreatorUser(user);
+            user = Validations.doesIdExists(userId, userRepository);
         } catch (NoSuchElementException e) {
             throw new AccountNotFoundException(ExceptionMessage.ACCOUNT_DOES_NOT_EXISTS.toString());
         }
+
+        //get all the boards of the creator user
+        Map<String,List<Board>> userBoards = new HashMap<>();
+        List<Board> creatorBoards =  boardRepository.findByCreatorUser(user);
+        userBoards.put("My_Boards", creatorBoards);
+
+        //get all the boards of the user he is shared with
+        List<Board> allBoards = boardRepository.findAll();
+        List<Board> sharedBoards = new ArrayList<>();
+        for (Board board: allBoards) {
+            if(board.getAllUsersInBoard().contains(user)){
+                sharedBoards.add(board);
+            }
+        }
+        userBoards.put("Shared_Boards", sharedBoards);
+        return userBoards;
     }
 
     /**

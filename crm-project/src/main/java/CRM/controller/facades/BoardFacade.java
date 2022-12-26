@@ -1,5 +1,6 @@
 package CRM.controller.facades;
 
+import CRM.entity.Board;
 import CRM.entity.DTO.BoardDTO;
 import CRM.entity.requests.BoardRequest;
 import CRM.entity.requests.UpdateObjectRequest;
@@ -15,6 +16,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
 import javax.security.auth.login.AccountNotFoundException;
+import java.util.List;
+import java.util.Map;
 import java.util.NoSuchElementException;
 
 @Component
@@ -151,8 +154,9 @@ public class BoardFacade {
     public Response getAllBoardsOfUser(Long userId) {
         try {
             Validations.validate(userId, Regex.ID.getRegex());
+
             return Response.builder()
-                    .data(BoardDTO.getListOfBoardPreviewsFromDB(boardService.getAllBoardsOfUser(userId)))
+                    .data(BoardDTO.getMapWithAllBoardsForUser(boardService.getAllBoardsOfUser(userId)))
                     .message(SuccessMessage.FOUND.toString())
                     .status(HttpStatus.OK)
                     .statusCode(HttpStatusCodes.STATUS_CODE_OK)
