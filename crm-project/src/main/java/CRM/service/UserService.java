@@ -1,11 +1,14 @@
 package CRM.service;
 
 import CRM.entity.*;
+import CRM.entity.requests.NotificationRequest;
 import CRM.entity.requests.ObjectsIdsRequest;
 import CRM.repository.BoardRepository;
 import CRM.repository.NotificationSettingRepository;
 import CRM.repository.UserRepository;
+import CRM.repository.UserSettingRepository;
 import CRM.utils.Common;
+import CRM.utils.NotificationSender;
 import CRM.utils.Validations;
 import CRM.utils.enums.ExceptionMessage;
 import CRM.utils.enums.Permission;
@@ -32,6 +35,9 @@ public class UserService {
     private BoardRepository boardRepository;
     @Autowired
     private NotificationSettingRepository notificationSettingRepository;
+    @Autowired
+    private NotificationSender notificationSender;
+
 
     /**
      * findByEmail search in the database for a user based on the email we have.
@@ -164,6 +170,9 @@ public class UserService {
         List<User> users = board.getAllUsersInBoard(board, userPermissionsSet);
 
         boardRepository.save(board);
+        notificationSender.
+                sendUserAddedNotificationToUsersInBoard(
+                        NotificationRequest.createUserAddedRequest(board, user), users);
         return users;
     }
 

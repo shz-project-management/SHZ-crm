@@ -34,37 +34,6 @@ public class NotificationService {
     @Autowired
     private BoardRepository boardRepository;
 
-    //TODO: Refactor and DOCUMENTATION
-    public Notification create(NotificationRequest notificationRequest) {
-        UserSetting wantedUserSetting = null;
-        Notification notification = new Notification();
-        List<UserSetting> userSettingsInBoard = userSettingRepository.getUserSettingsInBoard(notificationRequest.getUserId(), notificationRequest.getBoardId());
-        for (UserSetting userSetting : userSettingsInBoard) {
-            if(Objects.equals(userSetting.getSetting().getNotificationNumber(), notificationRequest.getNotificationNumber()))
-                wantedUserSetting = userSetting;
-        }
-        boolean inApp = wantedUserSetting.isInApp();
-        boolean inEmail = wantedUserSetting.isInEmail();
-        if (inApp) {
-            User user = Common.getUser(notificationRequest.getUserId(), userRepository);
-            User fromUser = Common.getUser(notificationRequest.getFromUserId(), userRepository);
-            Board board = Common.getBoard(notificationRequest.getBoardId(), boardRepository);
-            notification = createInAppNotification(user, fromUser, board, wantedUserSetting);
-        }
-        if (inEmail) {
-            System.out.println("Sending an email notification");
-        }
-        return notification;
-    }
-
-    //TODO:refactor, DOCUMENTATION
-    private Notification createInAppNotification(User user, User fromUser, Board board, UserSetting userSetting){
-        Notification notification = new Notification(0L, user, board, fromUser, userSetting.getSetting().getName(),
-                userSetting.getSetting().getDescription(), LocalDateTime.now());
-        notificationRepository.save(notification);
-        return notification;
-    }
-
     //TODO:DOCUMENTATION
     public List<Notification> getAllNotificationsForUserInBoard(ObjectsIdsRequest objectsIdsRequest) throws AccountNotFoundException {
         if(!Validations.checkIfUserExistsInBoard(objectsIdsRequest.getUserId(), objectsIdsRequest.getBoardId(), userRepository, boardRepository))

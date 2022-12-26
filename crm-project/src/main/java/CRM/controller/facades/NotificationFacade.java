@@ -28,33 +28,6 @@ public class NotificationFacade {
     @Autowired
     private NotificationService notificationService;
 
-    public Response create(NotificationRequest notificationRequest) {
-        try {
-            Validations.validateIDs(notificationRequest.getUserId(), notificationRequest.getFromUserId(),
-                    notificationRequest.getBoardId());
-            Validations.validateNotificationNumber(notificationRequest.getNotificationNumber());
-            //validate user and board exists and user belongs to board
-            Notification notification = notificationService.create(notificationRequest);
-            return new Response.Builder()
-                    .status(HttpStatus.CREATED)
-                    .statusCode(201)
-                    .data(NotificationDTO.createNotificationDTO(notification))
-                    .build();
-        } catch (IllegalArgumentException | NonUniqueObjectException | NoSuchElementException e) {
-            return new Response.Builder()
-                    .message(e.getMessage())
-                    .status(HttpStatus.BAD_REQUEST)
-                    .statusCode(400)
-                    .build();
-        } catch (NullPointerException e) {
-            return new Response.Builder()
-                    .message(e.getMessage())
-                    .status(HttpStatus.BAD_REQUEST)
-                    .statusCode(500)
-                    .build();
-        }
-    }
-
     //TODO:DOCUMENTATION
     public Response getAllNotificationsForUserInBoard(ObjectsIdsRequest objectsIdsRequest) {
         try {

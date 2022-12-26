@@ -20,19 +20,6 @@ public class NotificationController {
     @Autowired
     private NotificationFacade notificationFacade;
 
-    /**
-     * This function maps HTTP POST requests to the /create endpoint to the create function in the BoardFacade class.
-     * It consumes "application/json" and expects a BoardRequest object to be passed as the request body.
-     *
-     * @param notificationRequest The request body, containing the necessary information to create a new board.
-     * @return A ResponseEntity containing a Response object with the status of the create operation and the created board object.
-     */
-    @PostMapping(consumes = "application/json")
-    public ResponseEntity<Response> create(@RequestBody NotificationRequest notificationRequest) {
-        Response response = notificationFacade.create(notificationRequest);
-        return new ResponseEntity<>(response, response.getStatus());
-    }
-
     //TODO:DOCUMENTATION
     @GetMapping(value = "getAll-user-in-board")
     public ResponseEntity<Response> getAllNotificationsForUserInBoard(@RequestBody ObjectsIdsRequest objectsIdsRequest) {
