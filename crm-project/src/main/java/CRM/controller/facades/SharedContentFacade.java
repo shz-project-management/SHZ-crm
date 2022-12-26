@@ -1,5 +1,6 @@
 package CRM.controller.facades;
 
+import CRM.entity.Board;
 import CRM.entity.Comment;
 import CRM.entity.DTO.CommentDTO;
 import CRM.entity.DTO.ItemDTO;
@@ -9,13 +10,10 @@ import CRM.entity.Item;
 import CRM.entity.SharedContent;
 import CRM.entity.requests.*;
 import CRM.entity.response.Response;
-import CRM.service.CommentService;
-import CRM.service.ItemService;
-import CRM.service.ServiceInterface;
+import CRM.service.*;
+import CRM.utils.NotificationSender;
 import CRM.utils.Validations;
-import CRM.utils.enums.ExceptionMessage;
-import CRM.utils.enums.Regex;
-import CRM.utils.enums.SuccessMessage;
+import CRM.utils.enums.*;
 import com.google.api.client.http.HttpStatusCodes;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -36,6 +34,14 @@ public class SharedContentFacade {
     private ItemService itemService;
     @Autowired
     private CommentService commentService;
+    @Autowired
+    private BoardService boardService;
+    @Autowired
+    private UserService userService;
+    @Autowired
+    private SettingsService settingsService;
+    @Autowired
+    private NotificationSender notificationSender;
 
     /**
      * Creates a new item in the system and stores it in the database.
@@ -95,8 +101,15 @@ public class SharedContentFacade {
 
             // call commentService with create function to create a new comment
             // return the response with the new comment as a data inside response entity.
+            List<CommentDTO> commentDTOS = CommentDTO.getCommentDTOList(commentService.create(comment));
+            notificationSender.sendNotificationToManyUsers(
+                    NotificationRequest.createCommentAddedRequest(userService.get(comment.getUserId()),
+                            boardService.get(comment.getBoardId()), comment.getParentItemId(),
+                            comment.getDescription(), userService.get(comment.getUserId()),
+                            settingsService.getNotificationSettingFromDB(Notifications.COMMENT_ADDED.name)),
+                    userService.getAllInBoard(comment.getBoardId()));
             return Response.builder()
-                    .data(CommentDTO.getCommentDTOList(commentService.create(comment)))
+                    .data(commentDTOS)
                     .message(SuccessMessage.CREATE.toString())
                     .status(HttpStatus.ACCEPTED)
                     .statusCode(HttpStatusCodes.STATUS_CODE_CREATED)
@@ -139,8 +152,15 @@ public class SharedContentFacade {
             }
         });
         // call the correct service using convertFromClassToService(clz) function with delete function in it
+        int deleteData = convertFromClassToService(clz).delete(correctIds, boardId);
+        Board board = boardService.get(boardId);
+        for (Long id: correctIds) {
+            notificationSender.sendNotificationToManyUsers(NotificationRequest.createDeletedItemRequest(board,
+                    id, settingsService.getNotificationSettingFromDB(Notifications.ITEM_DELETED.name)),
+                    board.getAllUsersInBoard());
+        }
         return Response.builder()
-                .data(convertFromClassToService(clz).delete(correctIds, boardId))
+                .data(deleteData)
                 .message(SuccessMessage.DELETED.toString())
                 .status(HttpStatus.NO_CONTENT)
                 .statusCode(HttpStatusCodes.STATUS_CODE_NO_CONTENT)
@@ -154,18 +174,28 @@ public class SharedContentFacade {
         // call the correct service using convertFromClassToService(clz) function
         // with update function in it.
         try {
+            //updateObject.getObjectsIdsRequest().getUpdateObjId();
             // validate the id using the Validations.validate function
             Validations.validateSharedContent(updateObject.getObjectsIdsRequest());
-
             // call the correct service using convertFromClassToService(clz) function with find function in it
+            SectionDTO sectionDTO = SectionDTO.createSectionDTO(convertFromClassToService(clz).update(updateObject));
+            if (clz.equals(Item.class)){
+                notificationSender.sendNotificationToManyUsers(
+                        NotificationRequest.createItemChangeRequest(userService.get(updateObject.getObjectsIdsRequest().getUserId()),
+                                boardService.get(updateObject.getObjectsIdsRequest().getBoardId()),
+                                updateObject.getObjectsIdsRequest().getItemId(),
+                                updateObject.getFieldName().toString(), updateObject.getContent(),
+                                settingsService.getNotificationSettingFromDB(Notifications.ITEM_DATA_CHANGED.name)),
+                        userService.getAllInBoard(updateObject.getObjectsIdsRequest().getBoardId()));
+            }
             return Response.builder()
-                    .data(SectionDTO.createSectionDTO(convertFromClassToService(clz).update(updateObject)))
+                    .data(sectionDTO)
                     .message(SuccessMessage.FOUND.toString())
                     .status(HttpStatus.OK)
                     .statusCode(HttpStatusCodes.STATUS_CODE_OK)
                     .build();
 
-        } catch (IllegalArgumentException | NoSuchFieldException | NoSuchElementException e) {
+        } catch (IllegalArgumentException | NoSuchFieldException | NoSuchElementException | AccountNotFoundException e) {
             return Response.builder()
                     .message(e.getMessage())
                     .status(HttpStatus.BAD_REQUEST)

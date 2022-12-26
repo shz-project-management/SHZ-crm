@@ -48,7 +48,8 @@ public class UserSetting {
         UserSetting wantedUserSetting = null;
         Set<UserSetting> userSettingsInBoard = notificationRequest.getBoard().getUsersSettings();
         for (UserSetting userSetting : userSettingsInBoard) {
-            if(Objects.equals(userSetting.getSetting().getName(), wantedNotificationSetting.getName()))
+            if(notificationRequest.getUser().getId() == userSetting.getUser().getId() &&
+                    Objects.equals(userSetting.getSetting().getName(), wantedNotificationSetting.getName()))
                 wantedUserSetting = userSetting;
         }
         return wantedUserSetting;
