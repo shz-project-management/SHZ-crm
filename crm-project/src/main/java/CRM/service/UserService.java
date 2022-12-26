@@ -11,6 +11,7 @@ import CRM.utils.Common;
 import CRM.utils.NotificationSender;
 import CRM.utils.Validations;
 import CRM.utils.enums.ExceptionMessage;
+import CRM.utils.enums.Notifications;
 import CRM.utils.enums.Permission;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -170,9 +171,9 @@ public class UserService {
         List<User> users = board.getAllUsersInBoard(board, userPermissionsSet);
 
         boardRepository.save(board);
-        notificationSender.
-                sendUserAddedNotificationToUsersInBoard(
-                        NotificationRequest.createUserAddedRequest(board, user), users);
+        notificationSender.sendUserAddedNotificationToUsersInBoard(
+                        NotificationRequest.createUserAddedRequest(board, user,
+                                notificationSettingRepository.findByName(Notifications.USER_ADDED.name).get()), users);
         return users;
     }
 

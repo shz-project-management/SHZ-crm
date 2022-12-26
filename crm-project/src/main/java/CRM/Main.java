@@ -1,6 +1,7 @@
 package CRM;
 
 import CRM.entity.NotificationSetting;
+import CRM.repository.NotificationRepository;
 import CRM.repository.NotificationSettingRepository;
 import CRM.utils.enums.Notifications;
 import org.springframework.beans.factory.InitializingBean;
@@ -16,6 +17,8 @@ public class Main {
 
     @Autowired
     private NotificationSettingRepository notificationSettingRepository;
+    @Autowired
+    private NotificationRepository notificationRepository;
 
     public static void main(String[] args) {
         SpringApplication.run(Main.class, args);
@@ -24,6 +27,7 @@ public class Main {
     @Bean
     InitializingBean initNotificationsInDB(){
         return ()->{
+            notificationSettingRepository.deleteAll();
             for (Notifications notification : Notifications.values()) {
                 if(!notificationSettingRepository.findByName(notification.name).isPresent()){
                     NotificationSetting notificationSetting = new NotificationSetting(0L, notification.name);

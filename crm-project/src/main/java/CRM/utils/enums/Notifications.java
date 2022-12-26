@@ -1,10 +1,11 @@
 package CRM.utils.enums;
 
-import javax.persistence.criteria.CriteriaBuilder;
+import lombok.Getter;
 
 /**
  * enum class that creates different notifications
  */
+@Getter
 public enum Notifications {
     ASSIGNED_TO_ME("Item assigned to me"),
     STATUS_CHANGED("Item status changed"),
