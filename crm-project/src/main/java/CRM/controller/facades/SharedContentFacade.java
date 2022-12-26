@@ -96,7 +96,7 @@ public class SharedContentFacade {
             // call commentService with create function to create a new comment
             // return the response with the new comment as a data inside response entity.
             return Response.builder()
-                    .data(CommentDTO.getCommentDTOList(new HashSet<>(commentService.create(comment))))
+                    .data(CommentDTO.getCommentDTOList(commentService.create(comment)))
                     .message(SuccessMessage.CREATE.toString())
                     .status(HttpStatus.ACCEPTED)
                     .statusCode(HttpStatusCodes.STATUS_CODE_CREATED)
@@ -219,7 +219,7 @@ public class SharedContentFacade {
             // call the correct service using convertFromClassToService(clz) function
             // with getAllInItem function in it.
             return Response.builder()
-                    .data(itemService.getAllInSection(objectsIdsRequest).stream().map(ItemDTO::getSharedContentFromDB).collect(Collectors.toList()))
+                    .data(ItemDTO.getItemsDTOList(itemService.getAllInSection(objectsIdsRequest)))
                     .message(SuccessMessage.FOUND.toString())
                     .status(HttpStatus.OK)
                     .statusCode(HttpStatusCodes.STATUS_CODE_OK)
@@ -255,7 +255,7 @@ public class SharedContentFacade {
             Validations.validate(boardId, Regex.ID.getRegex());
 
             return Response.builder()
-                    .data(commentService.getAllCommentsInBoard(boardId).stream().map(CommentDTO::getSharedContentFromDB).collect(Collectors.toList()))
+                    .data(CommentDTO.getCommentDTOList(commentService.getAllCommentsInBoard(boardId)))
                     .message(SuccessMessage.FOUND.toString())
                     .status(HttpStatus.OK)
                     .statusCode(HttpStatusCodes.STATUS_CODE_OK)
@@ -308,7 +308,7 @@ public class SharedContentFacade {
             Validations.validateIDs(objectsIdsRequest.getBoardId(), objectsIdsRequest.getSectionId());
 
             return Response.builder()
-                    .data(commentService.getAllCommentsInSection(objectsIdsRequest).stream().map(CommentDTO::getSharedContentFromDB).collect(Collectors.toList()))
+                    .data(CommentDTO.getCommentDTOList(commentService.getAllCommentsInSection(objectsIdsRequest)))
                     .message(SuccessMessage.FOUND.toString())
                     .status(HttpStatus.OK)
                     .statusCode(HttpStatusCodes.STATUS_CODE_OK)

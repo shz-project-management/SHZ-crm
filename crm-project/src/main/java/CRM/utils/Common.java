@@ -1,6 +1,7 @@
 package CRM.utils;
 
 import CRM.entity.*;
+import CRM.entity.requests.UpdateObjectRequest;
 import CRM.utils.enums.ExceptionMessage;
 import CRM.utils.enums.UpdateField;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -8,6 +9,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import javax.persistence.EntityManager;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.time.LocalDateTime;
 import java.util.*;
 
 public class Common {
@@ -111,6 +113,22 @@ public class Common {
                 return Section.class;
             default:
                 return null;
+        }
+    }
+
+    /**
+     * Helper function for updating a primitive or known object field.
+     *
+     * @param updateObject the request object containing the updates to be made
+     * @param obj         the object being updated
+     * @throws NoSuchFieldException if the field does not exist in the item object
+     */
+    public static void fieldIsPrimitiveOrKnownObjectHelper(UpdateObjectRequest updateObject, Object obj) throws NoSuchFieldException {
+        if (Validations.checkIfFieldIsNonPrimitive(updateObject.getFieldName())) {
+            LocalDateTime dueDate = LocalDateTime.now().plusDays(Long.valueOf((Integer) updateObject.getContent()));
+            Validations.setContentToFieldIfFieldExists(obj, updateObject.getFieldName(), dueDate);
+        } else {
+            Validations.setContentToFieldIfFieldExists(obj, updateObject.getFieldName(), updateObject.getContent());
         }
     }
 

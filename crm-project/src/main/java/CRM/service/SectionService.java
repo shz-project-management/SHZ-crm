@@ -2,6 +2,7 @@ package CRM.service;
 
 import CRM.entity.*;
 import CRM.entity.requests.AttributeRequest;
+import CRM.entity.requests.UpdateObjectRequest;
 import CRM.repository.BoardRepository;
 import CRM.utils.Common;
 import CRM.utils.Validations;
@@ -22,8 +23,8 @@ public class SectionService {
     private BoardRepository boardRepository;
 
     //FIXME - maybe to put it outside
-    @Autowired
-    private EntityManager entityManager;
+//    @Autowired
+//    private EntityManager entityManager;
     @Autowired
     private EntityManagerFactory entityManagerFactory;
 
@@ -52,12 +53,15 @@ public class SectionService {
     }
 
     //TODO + documentation
-//    public Status update(UpdateObjectRequest statusRequest, long statusId) throws NoSuchFieldException {
-//        //get in method signature the board id, get the attributeRequest and attributeId and Class clz (type,section,status)
-//        //find the board in db
-//        //check if attribute exists, if it exists get the attribute and update it
-//        //use update method in the board entity
-//    }
+    public Section update(UpdateObjectRequest updateObject) throws NoSuchFieldException {
+        Board board = Validations.doesIdExists(updateObject.getObjectsIdsRequest().getBoardId(), boardRepository);
+        Section section = board.getSectionFromBoard(updateObject.getObjectsIdsRequest().getSectionId());
+
+        Common.fieldIsPrimitiveOrKnownObjectHelper(updateObject, section);
+
+        boardRepository.save(board);
+        return board.getSectionFromBoard(updateObject.getObjectsIdsRequest().getSectionId());
+    }
 
     //TODO documentation
     public List<Section> getAllSectionsInBoard(long boardId) {

@@ -2,6 +2,7 @@ package CRM.controller.facades;
 
 import CRM.entity.DTO.SectionDTO;
 import CRM.entity.requests.AttributeRequest;
+import CRM.entity.requests.UpdateObjectRequest;
 import CRM.entity.response.Response;
 import CRM.service.*;
 import CRM.utils.Validations;
@@ -168,40 +169,29 @@ public class SectionFacade {
                 .build();
     }
 
-    /**
-     * Updates an attribute in the database.
-     *
-     * @param statusId      the id of the attribute to update
-     * @param statusRequest the data of the update(fieldName and content)
-     * @return a response object with a status code and message
-     * @throws IllegalArgumentException if the attribute ID does not match the expected format
-     * @throws NoSuchElementException   if the attribute to update is not found in the database
-     * @throws NullPointerException     if the attribute object is null
-     */
-    //TODO + DTO
-//    public Response update(UpdateObjectRequest statusRequest, Long statusId, Class clz) {
-//        try {
-//            Validations.validate(statusId, Regex.ID.getRegex());
-//
-//            return Response.builder()
-//                    .data(AttributeDTO.createAttributeDTO(attributeService.update(statusRequest, statusId)))
-//                    .message(SuccessMessage.FOUND.toString())
-//                    .status(HttpStatus.OK)
-//                    .statusCode(HttpStatusCodes.STATUS_CODE_OK)
-//                    .build();
-//
-//        } catch (IllegalArgumentException | NoSuchElementException | NoSuchFieldException e) {
-//            return new Response.Builder()
-//                    .message(e.getMessage())
-//                    .status(HttpStatus.BAD_REQUEST)
-//                    .statusCode(HttpStatusCodes.STATUS_CODE_BAD_REQUEST)
-//                    .build();
-//        } catch (NullPointerException e) {
-//            return new Response.Builder()
-//                    .message(e.getMessage())
-//                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
-//                    .statusCode(HttpStatusCodes.STATUS_CODE_SERVER_ERROR)
-//                    .build();
-//        }
-//    }
+
+    //TODO + documentation
+    public Response update(UpdateObjectRequest updateItemRequest) {
+        try {
+            return Response.builder()
+                    .data(SectionDTO.createSectionDTO(sectionService.update(updateItemRequest)))
+                    .message(SuccessMessage.FOUND.toString())
+                    .status(HttpStatus.OK)
+                    .statusCode(HttpStatusCodes.STATUS_CODE_OK)
+                    .build();
+
+        } catch (IllegalArgumentException | NoSuchElementException | NoSuchFieldException e) {
+            return Response.builder()
+                    .message(e.getMessage())
+                    .status(HttpStatus.BAD_REQUEST)
+                    .statusCode(HttpStatusCodes.STATUS_CODE_BAD_REQUEST)
+                    .build();
+        } catch (NullPointerException e) {
+            return Response.builder()
+                    .message(e.getMessage())
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .statusCode(HttpStatusCodes.STATUS_CODE_SERVER_ERROR)
+                    .build();
+        }
+    }
 }

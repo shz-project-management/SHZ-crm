@@ -35,7 +35,7 @@ public class CommentService implements ServiceInterface {
      * @throws AccountNotFoundException if the user specified in the comment request does not exist
      */
     //TODO documentation
-    public List<Comment> create(CommentRequest commentRequest) throws AccountNotFoundException {
+    public Set<Comment> create(CommentRequest commentRequest) throws AccountNotFoundException {
         Board board = Validations.doesIdExists(commentRequest.getBoardId(), boardRepository);
         User user;
 
@@ -128,14 +128,14 @@ public class CommentService implements ServiceInterface {
      * @return a list of comments in the board
      */
     //TODO documentation
-    public List<Comment> getAllCommentsInBoard(long boardId) {
+    public Set<Comment> getAllCommentsInBoard(long boardId) {
         Board board = Validations.doesIdExists(boardId, boardRepository);
 
         List<Item> items = new ArrayList<>();
         Set<Section> sectionsInBoard = board.getSections();
         sectionsInBoard.forEach(section -> items.addAll(section.getItems()));
 
-        List<Comment> commentList = new ArrayList<>();
+        Set<Comment> commentList = new HashSet<>();
 
         for (Item item : items) {
             commentList.addAll(item.getComments());
@@ -145,10 +145,10 @@ public class CommentService implements ServiceInterface {
 
 
     //TODO + documentation
-    public List<Comment> getAllCommentsInSection(ObjectsIdsRequest objectsIdsRequest) {
+    public Set<Comment> getAllCommentsInSection(ObjectsIdsRequest objectsIdsRequest) {
 //        Status status = Validations.doesIdExists(statusId, statusRepository);
 //        Set<Item> itemsInStatus = itemRepository.findAllByStatus(status);
-        List<Comment> commentList = new ArrayList<>();
+        Set<Comment> commentList = new HashSet<>();
 //        for (Item item : itemsInStatus) {
 //            commentList.addAll(commentRepository.findAllByParentItem(item));
 //        }
