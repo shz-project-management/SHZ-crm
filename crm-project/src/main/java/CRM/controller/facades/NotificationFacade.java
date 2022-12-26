@@ -43,7 +43,7 @@ public class NotificationFacade {
         } catch (NullPointerException e) {
             return Response.builder()
                     .statusCode(HttpStatusCodes.STATUS_CODE_SERVER_ERROR)
-                    .status(HttpStatus.BAD_REQUEST)
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .message(e.getMessage())
                     .build();
         }
@@ -59,9 +59,9 @@ public class NotificationFacade {
             });
             notificationService.delete(notificationsIds);
             return Response.builder()
-                    .message(SuccessMessage.FOUND.toString())
-                    .status(HttpStatus.FOUND)
-                    .statusCode(HttpStatusCodes.STATUS_CODE_OK)
+                    .message(SuccessMessage.DELETED.toString())
+                    .status(HttpStatus.NO_CONTENT)
+                    .statusCode(HttpStatusCodes.STATUS_CODE_NO_CONTENT)
                     .build();
         } catch (IllegalArgumentException | NoSuchElementException e) {
             return Response.builder()
@@ -72,7 +72,7 @@ public class NotificationFacade {
         } catch (NullPointerException e) {
             return Response.builder()
                     .statusCode(HttpStatusCodes.STATUS_CODE_SERVER_ERROR)
-                    .status(HttpStatus.BAD_REQUEST)
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .message(e.getMessage())
                     .build();
         }
