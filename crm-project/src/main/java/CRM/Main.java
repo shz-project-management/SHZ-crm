@@ -1,7 +1,6 @@
 package CRM;
 
 import CRM.entity.NotificationSetting;
-import CRM.repository.NotificationRepository;
 import CRM.repository.NotificationSettingRepository;
 import CRM.utils.enums.Notifications;
 import org.springframework.beans.factory.InitializingBean;
@@ -17,8 +16,6 @@ public class Main {
 
     @Autowired
     private NotificationSettingRepository notificationSettingRepository;
-    @Autowired
-    private NotificationRepository notificationRepository;
 
     public static void main(String[] args) {
         SpringApplication.run(Main.class, args);
