@@ -238,13 +238,21 @@ public class Board {
                 .orElse(null);
     }
 
-    public Integer getUserPermissionByUserId(Long userId) throws NoPermissionException {
+    public Integer getUserPermissionIntegerByUserId(Long userId) throws NoPermissionException {
         if(creatorUser.getId().equals(userId)){
             return Permission.ADMIN.ordinal();
         }
         Optional<UserPermission> userPerm = getUsersPermissions().stream().filter(userPermission -> userPermission.getUser().getId().equals(userId)).findFirst();
         if(userPerm.isPresent()){
             return userPerm.get().getPermission().ordinal();
+        }
+        throw new NoPermissionException(ExceptionMessage.PERMISSION_FAILED.toString());
+    }
+
+    public Permission getUserPermissionWithoutAdminByUserId(Long userId) throws NoPermissionException {
+        Optional<UserPermission> userPerm = getUsersPermissions().stream().filter(userPermission -> userPermission.getUser().getId().equals(userId)).findFirst();
+        if(userPerm.isPresent()){
+            return userPerm.get().getPermission();
         }
         throw new NoPermissionException(ExceptionMessage.PERMISSION_FAILED.toString());
     }

@@ -8,7 +8,6 @@ import CRM.entity.response.Response;
 import CRM.service.BoardService;
 import CRM.utils.Validations;
 import CRM.utils.enums.ExceptionMessage;
-import CRM.utils.enums.Permission;
 import CRM.utils.enums.Regex;
 import CRM.utils.enums.SuccessMessage;
 import com.google.api.client.http.HttpStatusCodes;
@@ -18,8 +17,6 @@ import org.springframework.stereotype.Component;
 
 import javax.naming.NoPermissionException;
 import javax.security.auth.login.AccountNotFoundException;
-import java.util.List;
-import java.util.Map;
 import java.util.NoSuchElementException;
 
 @Component
@@ -109,7 +106,7 @@ public class BoardFacade {
             Validations.validateIDs(boardId, userId);
             Board board = boardService.get(boardId);
             BoardDTO boardDTO = BoardDTO.getBoardFromDB(board);
-            boardDTO.setUserPermission(board.getUserPermissionByUserId(userId));
+            boardDTO.setUserPermission(board.getUserPermissionIntegerByUserId(userId));
 
             return Response.builder()
                     .data(boardDTO)

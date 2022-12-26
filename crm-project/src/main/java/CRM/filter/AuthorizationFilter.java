@@ -40,24 +40,18 @@ public class AuthorizationFilter extends GenericFilterBean {
         HttpServletRequest httpRequest = (HttpServletRequest) request;
         HttpServletResponse httpResponse = (HttpServletResponse) response;
 
-        String token = httpRequest.getParameter("token");
+        String token = httpRequest.getHeader("token");
         String path = httpRequest.getRequestURI();
         if (permissionPathsForAll.stream().noneMatch(path::contains)) {
             try {
-                authService.checkTokenToUserInDB(token);
+                Long userId = authService.checkTokenToUserInDB(token);
+                httpRequest.setAttribute("userId", userId);
             } catch (AccountNotFoundException e) {
                 httpResponse.setStatus(HttpServletResponse.SC_FORBIDDEN);
                 httpResponse.sendError(HttpServletResponse.SC_FORBIDDEN);
                 return;
             }
         }
-        // create a list of things that are authorized to pass the filters (such as option method) and let them through.
-
-        // if it's not one of those, get the token from the request and parse it to userId using authService.
-        // of course, make sure this user exists in the db.
-
-        // if found, let through. else, kick out with a res.SendError() function.
-
         chain.doFilter(request, response);
     }
 }
