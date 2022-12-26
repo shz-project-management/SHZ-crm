@@ -14,4 +14,8 @@ public class Util {
         return Arrays.asList(SharedContent.class, Attribute.class);
     }
 
+    public static List<String> permissionPathsForAll = List.of("auth", "board");
+    public static List<String> permissionPathsForRegisters = List.of("/board");
+
+
 }
