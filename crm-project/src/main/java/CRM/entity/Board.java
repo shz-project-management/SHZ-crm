@@ -113,8 +113,8 @@ public class Board {
                 .insertComment(comment);
     }
 
-    public List<Comment> getAllCommentsInItem(long sectionId, long itemId) {
-        return new ArrayList<>(getSectionFromBoard(sectionId)
+    public Set<Comment> getAllCommentsInItem(long sectionId, long itemId) {
+        return new HashSet<>(getSectionFromBoard(sectionId)
                 .getItemById(itemId)
                 .getComments());
     }

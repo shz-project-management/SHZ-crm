@@ -2,6 +2,7 @@ package CRM.controller.controllers;
 
 import CRM.controller.facades.AttributeFacade;
 import CRM.controller.facades.SectionFacade;
+import CRM.entity.Item;
 import CRM.entity.Section;
 import CRM.entity.requests.AttributeRequest;
 import CRM.entity.requests.UpdateObjectRequest;
@@ -80,15 +81,10 @@ public class SectionController {
         return new ResponseEntity<>(response, response.getStatus());
     }
 
-//    /**
-//     * Handles PUT requests to update type.
-//     *
-//     * @param sectionRequest An object containing the fields to update for the type.
-//     * @return A response object indicating the status of the update operation.
-//     */
-//    @PatchMapping(value = "/update/{typeId}", consumes = "application/json")
-//    public ResponseEntity<Response> update(@RequestBody UpdateObjectRequest sectionRequest, @PathVariable Long typeId) {
-//        Response response = attributeFacade.update(sectionRequest, typeId, Section.class);
-//        return new ResponseEntity<>(response, response.getStatus());
-//    }
+    //TODO documentation
+    @PatchMapping(value = "/update", consumes = "application/json")
+    public ResponseEntity<Response> update(@RequestBody UpdateObjectRequest updateItemRequest) {
+        Response response = sectionFacade.update(updateItemRequest);
+        return new ResponseEntity<>(response, response.getStatus());
+    }
 }

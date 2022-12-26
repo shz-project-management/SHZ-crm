@@ -102,7 +102,7 @@ public class ItemService implements ServiceInterface {
         if (Validations.checkIfFieldIsCustomObject(updateObject.getFieldName())) {
             fieldIsCustomObjectHelper(updateObject, item, board, updateObject.getObjectsIdsRequest().getUpdateObjId());
         } else {
-            fieldIsPrimitiveOrKnownObjectHelper(updateObject, item);
+            Common.fieldIsPrimitiveOrKnownObjectHelper(updateObject, item);
         }
         boardRepository.save(board);
         return board.getSectionFromBoard(updateObject.getObjectsIdsRequest().getSectionId());
@@ -117,9 +117,9 @@ public class ItemService implements ServiceInterface {
     }
 
     //TODO Documentation
-    public List<Item> getAllInSection(ObjectsIdsRequest objectsIdsRequest) {
+    public Set<Item> getAllInSection(ObjectsIdsRequest objectsIdsRequest) {
         Board board = Validations.doesIdExists(objectsIdsRequest.getBoardId(), boardRepository);
-        return new ArrayList<>(board.getSectionFromBoard(objectsIdsRequest.getSectionId()).getItems());
+        return board.getSectionFromBoard(objectsIdsRequest.getSectionId()).getItems();
     }
 
 
@@ -145,21 +145,5 @@ public class ItemService implements ServiceInterface {
 
         Validations.checkIfParentItemIsNotTheSameItem(updateObject.getFieldName(), itemId, Long.valueOf((Integer) updateObject.getContent()));
         Validations.setContentToFieldIfFieldExists(item, updateObject.getFieldName(), contentObj);
-    }
-
-    /**
-     * Helper function for updating a primitive or known object field.
-     *
-     * @param updateObject the request object containing the updates to be made
-     * @param item         the item object being updated
-     * @throws NoSuchFieldException if the field does not exist in the item object
-     */
-    private void fieldIsPrimitiveOrKnownObjectHelper(UpdateObjectRequest updateObject, Item item) throws NoSuchFieldException {
-        if (Validations.checkIfFieldIsNonPrimitive(updateObject.getFieldName())) {
-            LocalDateTime dueDate = LocalDateTime.now().plusDays(Long.valueOf((Integer) updateObject.getContent()));
-            Validations.setContentToFieldIfFieldExists(item, updateObject.getFieldName(), dueDate);
-        } else {
-            Validations.setContentToFieldIfFieldExists(item, updateObject.getFieldName(), updateObject.getContent());
-        }
     }
 }
