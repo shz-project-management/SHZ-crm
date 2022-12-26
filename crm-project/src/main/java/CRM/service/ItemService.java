@@ -83,10 +83,10 @@ public class ItemService implements ServiceInterface {
 
     //TODO Documentation
     @Override
-    public SharedContent get(ObjectsIdsRequest objectsIdsRequest, long searchId) {
+    public SharedContent get(ObjectsIdsRequest objectsIdsRequest) {
         Board board = Common.getBoard(objectsIdsRequest.getBoardId(), boardRepository);
         Section section = Common.getSection(board, objectsIdsRequest.getSectionId());
-        return Common.getItem(section, searchId);
+        return Common.getItem(section, objectsIdsRequest.getSearchId());
     }
 
 
@@ -109,14 +109,12 @@ public class ItemService implements ServiceInterface {
     public List<SharedContent> getAllInItem(ObjectsIdsRequest objectsIdsRequest) {
         //long itemId, long sectionId, long boardId
         Board board = Common.getBoard(objectsIdsRequest.getBoardId(), boardRepository); // but instead of itemId, put board id
-
         return new ArrayList<>(board.getSectionFromBoard(objectsIdsRequest.getSectionId()).getItems());
     }
 
     //TODO Documentation
     public List<Item> getAllInSection(ObjectsIdsRequest objectsIdsRequest) {
         Board board = Validations.doesIdExists(objectsIdsRequest.getBoardId(), boardRepository);
-
         return new ArrayList<>(board.getSectionFromBoard(objectsIdsRequest.getSectionId()).getItems());
     }
 

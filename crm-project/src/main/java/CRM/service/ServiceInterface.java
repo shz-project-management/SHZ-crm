@@ -9,7 +9,7 @@ import java.util.List;
 
 public interface ServiceInterface {
     int delete(List<Long> ids, long boardId);
-    SharedContent get(ObjectsIdsRequest objectsIdsRequest, long searchId);
+    SharedContent get(ObjectsIdsRequest objectsIdsRequest);
     SharedContent update(UpdateObjectRequest updateObject, long updateObjectId) throws NoSuchFieldException;
     List<SharedContent> getAllInItem(ObjectsIdsRequest objectsIdsRequest);
 

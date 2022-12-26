@@ -110,13 +110,13 @@ public class CommentService implements ServiceInterface {
 
     //TODO documentation
     @Override
-    public SharedContent get(ObjectsIdsRequest objectsIdsRequest, long searchId) {
+    public SharedContent get(ObjectsIdsRequest objectsIdsRequest) {
         Board board = Validations.doesIdExists(objectsIdsRequest.getBoardId(), boardRepository);
         Section section = Common.getSection(board, objectsIdsRequest.getSectionId());
 
         if(objectsIdsRequest.getParentId() != null) {
             Item item = Common.getItem(section, objectsIdsRequest.getParentId());
-            return Common.getComment(item, searchId);
+            return Common.getComment(item, objectsIdsRequest.getSearchId());
         }
         throw new NoSuchElementException(ExceptionMessage.PARENT_ITEM_NOT_FOUND.toString());
     }

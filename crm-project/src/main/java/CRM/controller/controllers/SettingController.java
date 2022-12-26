@@ -19,20 +19,21 @@ public class SettingController {
     private SettingsFacade settingsFacade;
 
     /**
-     * This method is used to handle HTTP GET requests to the specified URL (settings/get-user-settings-in-board).
-     * The method takes the ids of the user and board and uses them to retrieve all the notifications settings of that user in this specific board.
+     * This endpoint is used to retrieve all user settings in a specific board.
      *
-     * @param objectsIdsRequest The ids of the user and the board where the user settings are to be retrieved from.
-     * @return A ResponseEntity object containing the Response object with the retrieved settings and the HTTP status code.
+     * @param userId  The ID of the user for which the settings will be retrieved.
+     * @param boardId The ID of the board for which the settings will be retrieved.
+     * @return A ResponseEntity object containing the response with the retrieved user settings.
      */
-    @GetMapping(value = "get-user-settings-in-board")
-    public ResponseEntity<Response> getAllUserSettingsInBoard(@RequestBody ObjectsIdsRequest objectsIdsRequest){
+    @GetMapping(value = "get-user-settings-in-board/{boardId}")
+    public ResponseEntity<Response> getAllUserSettingsInBoard(@RequestParam Long userId, @PathVariable Long boardId) {
+        ObjectsIdsRequest objectsIdsRequest = ObjectsIdsRequest.boardUserIds(userId, boardId);
         Response response = settingsFacade.getAllUserSettingsInBoard(objectsIdsRequest);
         return new ResponseEntity<>(response, response.getStatus());
     }
 
     @PatchMapping(value = "user/{userId}/board/{boardId}")
-    public ResponseEntity<Response> changeUserSettingInBoard(@PathVariable Long userId, @PathVariable Long boardId, @RequestParam Long settingId, @RequestParam Boolean shouldBeActive){
+    public ResponseEntity<Response> changeUserSettingInBoard(@PathVariable Long userId, @PathVariable Long boardId, @RequestParam Long settingId, @RequestParam Boolean shouldBeActive) {
         return null;
     }
 }
