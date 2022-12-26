@@ -11,6 +11,7 @@ import CRM.repository.NotificationRepository;
 import CRM.repository.UserRepository;
 import CRM.repository.UserSettingRepository;
 import CRM.utils.Common;
+import CRM.utils.NotificationSender;
 import CRM.utils.Validations;
 import CRM.utils.enums.ExceptionMessage;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,8 +29,6 @@ public class NotificationService {
     @Autowired
     private NotificationRepository notificationRepository;
     @Autowired
-    private UserSettingRepository userSettingRepository;
-    @Autowired
     private UserRepository userRepository;
     @Autowired
     private BoardRepository boardRepository;
@@ -39,5 +38,13 @@ public class NotificationService {
         if(!Validations.checkIfUserExistsInBoard(objectsIdsRequest.getUserId(), objectsIdsRequest.getBoardId(), userRepository, boardRepository))
             throw new NoSuchElementException(ExceptionMessage.USER_DOES_NOT_EXISTS_IN_BOARD.toString());
         return notificationRepository.findByUser_IdAndBoard_Id(objectsIdsRequest.getUserId(), objectsIdsRequest.getBoardId());
+    }
+
+    //TODO: DOCUMENTATION
+    public void createInAppNotification(NotificationRequest notificationRequest, UserSetting userSetting){
+        Notification notification = new Notification(0L, notificationRequest.getUser(), notificationRequest.getBoard(),
+                notificationRequest.getFromUser(), userSetting.getSetting().getName(),
+                NotificationSender.createNotificationDescription(notificationRequest), LocalDateTime.now());
+        notificationRepository.save(notification);
     }
 }

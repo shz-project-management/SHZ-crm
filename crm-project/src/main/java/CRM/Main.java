@@ -26,7 +26,7 @@ public class Main {
         return ()->{
             for (Notifications notification : Notifications.values()) {
                 if(!notificationSettingRepository.findByName(notification.name).isPresent()){
-                    NotificationSetting notificationSetting = new NotificationSetting(0L, notification.name, notification.number);
+                    NotificationSetting notificationSetting = new NotificationSetting(0L, notification.name);
                     notificationSettingRepository.save(notificationSetting);
                 }
             }

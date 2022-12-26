@@ -4,10 +4,12 @@ import CRM.entity.Board;
 import CRM.entity.Comment;
 import CRM.entity.Item;
 import CRM.entity.User;
+import CRM.utils.enums.Notifications;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.aspectj.weaver.ast.Not;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -17,7 +19,8 @@ public class NotificationRequest {
     private User user;
     private Board board;
     private User fromUser;
-    private Long notificationNumber;
+
+    private Notifications notificationType;
     private Item item;
     private Comment comment;
     private String pastContent;
@@ -29,7 +32,7 @@ public class NotificationRequest {
         notificationRequest.user = forUser;
         notificationRequest.board = inBoard;
         notificationRequest.item = item;
-        notificationRequest.notificationNumber = 1L;
+        notificationRequest.notificationType = Notifications.ASSIGNED_TO_ME;
         return notificationRequest;
     }
 
@@ -40,7 +43,7 @@ public class NotificationRequest {
         notificationRequest.item = item;
         notificationRequest.pastContent = pastStatus;
         notificationRequest.presentContent = presentStatus;
-        notificationRequest.notificationNumber = 2L;
+        notificationRequest.notificationType = Notifications.STATUS_CHANGED;
         return notificationRequest;
     }
 
@@ -51,7 +54,7 @@ public class NotificationRequest {
         notificationRequest.item = item;
         notificationRequest.comment = addedComment;
         notificationRequest.fromUser = commenter;
-        notificationRequest.notificationNumber = 3L;
+        notificationRequest.notificationType = Notifications.COMMENT_ADDED;
         return notificationRequest;
     }
 
@@ -60,7 +63,7 @@ public class NotificationRequest {
         notificationRequest.user = forUser;
         notificationRequest.board = inBoard;
         notificationRequest.item = item;
-        notificationRequest.notificationNumber = 4L;
+        notificationRequest.notificationType = Notifications.ITEM_DELETED;
         return notificationRequest;
     }
 
@@ -72,7 +75,7 @@ public class NotificationRequest {
         notificationRequest.pastContent = past;
         notificationRequest.presentContent = present;
         notificationRequest.changedFieldName = fieldName;
-        notificationRequest.notificationNumber = 5L;
+        notificationRequest.notificationType = Notifications.ITEM_DATA_CHANGED;
         return notificationRequest;
     }
 
@@ -80,7 +83,7 @@ public class NotificationRequest {
         NotificationRequest notificationRequest = new NotificationRequest();
         notificationRequest.board = inBoard;
         notificationRequest.fromUser = addedUser;
-        notificationRequest.notificationNumber = 6L;
+        notificationRequest.notificationType = Notifications.USER_ADDED;
         return notificationRequest;
     }
 }
