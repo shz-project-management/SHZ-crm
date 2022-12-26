@@ -6,6 +6,8 @@ import CRM.entity.User;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -23,5 +25,13 @@ public class NotificationDTO {
 
     public static NotificationDTO createNotificationDTO(Notification notification)    {
         return new NotificationDTO(notification.getId(), notification.getName(), notification.getDescription(), notification.getNotificationDateTime());
+    }
+
+    public static List<NotificationDTO> createNotificationsDTOList(List<Notification> notificationList) {
+        List<NotificationDTO> notificationDTOList = new ArrayList<>();
+        for (Notification notification : notificationList) {
+            notificationDTOList.add(createNotificationDTO(notification));
+        }
+        return notificationDTOList;
     }
 }

@@ -283,6 +283,7 @@ public class Validations {
         }
     }
 
+    //TODO: refactor and remove from here
     public static void validateNotificationNumber(Long notificationNumber){
         if (notificationNumber == null)
             throw new NullPointerException(ExceptionMessage.NULL_INPUT.toString());
