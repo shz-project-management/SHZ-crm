@@ -279,7 +279,7 @@ public class Validations {
         try {
             user = Validations.doesIdExists(userId, userRepo);
             board = Validations.doesIdExists(boardId, boardRepo);
-            return board.getAllUsersInBoard().contains(user);
+            return board.getAllUsersInBoard().contains(user) || board.getCreatorUser().equals(user);
         } catch (NoSuchElementException e) {
             throw new AccountNotFoundException(ExceptionMessage.ACCOUNT_DOES_NOT_EXISTS.toString());
         }

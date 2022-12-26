@@ -2,6 +2,7 @@ package CRM.controller.facades;
 
 import CRM.entity.DTO.SettingsDTO;
 import CRM.entity.requests.ObjectsIdsRequest;
+import CRM.entity.requests.SettingUpdateRequest;
 import CRM.entity.response.Response;
 import CRM.service.SettingsService;
 import CRM.utils.Validations;
@@ -59,9 +60,28 @@ public class SettingsFacade {
         }
     }
 
-    public Response changeUserSettingInBoard(Long userId, Long boardId, Long settingId, Boolean shouldBeActive) {
-        // validate the parameters using Validations.validate function
-        // call settingsService and ask to change the setting for the user in the board
-        return null;
+    public Response changeUserSettingsInBoard(SettingUpdateRequest settingUpdateRequest) {
+        try {
+            Validations.validateIDs(settingUpdateRequest.getUserId(), settingUpdateRequest.getBoardId());
+            return Response.builder()
+                    .data(SettingsDTO.createUserSettingsList(settingsService.changeUserSettingsInBoard(settingUpdateRequest)))
+                    .message(SuccessMessage.FOUND.toString())
+                    .status(HttpStatus.OK)
+                    .statusCode(HttpStatusCodes.STATUS_CODE_OK)
+                    .build();
+
+        } catch (IllegalArgumentException | NoSuchElementException | AccountNotFoundException e) {
+            return Response.builder()
+                    .statusCode(HttpStatusCodes.STATUS_CODE_BAD_REQUEST)
+                    .status(HttpStatus.BAD_REQUEST)
+                    .message(e.getMessage())
+                    .build();
+        } catch (NullPointerException e) {
+            return Response.builder()
+                    .message(e.getMessage())
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .statusCode(HttpStatusCodes.STATUS_CODE_SERVER_ERROR)
+                    .build();
+        }
     }
 }

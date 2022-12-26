@@ -1,8 +1,11 @@
 package CRM.service;
 
+import CRM.entity.Board;
 import CRM.entity.NotificationSetting;
+import CRM.entity.User;
 import CRM.entity.UserSetting;
 import CRM.entity.requests.ObjectsIdsRequest;
+import CRM.entity.requests.SettingUpdateRequest;
 import CRM.repository.BoardRepository;
 import CRM.repository.NotificationSettingRepository;
 import CRM.repository.UserRepository;
@@ -16,9 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.security.auth.login.AccountNotFoundException;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class SettingsService {
@@ -55,5 +56,29 @@ public class SettingsService {
     public NotificationSetting getNotificationSettingFromDB(String notificationName){
         Optional<NotificationSetting> notificationSetting = notificationSettingRepository.findByName(notificationName);
         return notificationSetting.orElse(null);
+    }
+
+    public List<UserSetting> changeUserSettingsInBoard(SettingUpdateRequest settingUpdateRequest) throws AccountNotFoundException {
+        if(!Validations.checkIfUserExistsInBoard(settingUpdateRequest.getUserId(), settingUpdateRequest.getBoardId(), userRepository, boardRepository))
+            throw new NoSuchElementException(ExceptionMessage.USER_DOES_NOT_EXISTS_IN_BOARD.toString());
+
+        Board board = Validations.doesIdExists(settingUpdateRequest.getBoardId(), boardRepository);
+        User user = Validations.doesIdExists(settingUpdateRequest.getUserId(), userRepository);
+
+        UserSetting userSetting = UserSetting.getRelevantUserSetting(board, user, settingUpdateRequest.getNotificationName());
+
+        if(settingUpdateRequest.getInApp() != null){
+            userSetting.setInApp(settingUpdateRequest.getInApp());
+        }
+        if(settingUpdateRequest.getInEmail() != null){
+            userSetting.setInEmail(settingUpdateRequest.getInEmail());
+        }
+
+        Set<UserSetting> userSettingsInBoard = board.getUsersSettings();
+        userSettingsInBoard.add(userSetting);
+        board.setUsersSettings(userSettingsInBoard);
+
+        boardRepository.save(board);
+        return Arrays.asList(userSetting);
     }
 }
