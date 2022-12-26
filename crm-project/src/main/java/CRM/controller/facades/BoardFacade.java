@@ -8,6 +8,7 @@ import CRM.entity.response.Response;
 import CRM.service.BoardService;
 import CRM.utils.Validations;
 import CRM.utils.enums.ExceptionMessage;
+import CRM.utils.enums.Permission;
 import CRM.utils.enums.Regex;
 import CRM.utils.enums.SuccessMessage;
 import com.google.api.client.http.HttpStatusCodes;
@@ -15,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
+import javax.naming.NoPermissionException;
 import javax.security.auth.login.AccountNotFoundException;
 import java.util.List;
 import java.util.Map;
@@ -102,12 +104,15 @@ public class BoardFacade {
      * @throws IllegalArgumentException if the specified id is invalid.
      * @throws NullPointerException     if the specified id is null.
      */
-    public Response get(Long boardId) {
+    public Response get(Long boardId, Long userId) {
         try {
-            Validations.validate(boardId, Regex.ID.getRegex());
+            Validations.validateIDs(boardId, userId);
+            Board board = boardService.get(boardId);
+            BoardDTO boardDTO = BoardDTO.getBoardFromDB(board);
+            boardDTO.setUserPermission(board.getUserPermissionByUserId(userId));
 
             return Response.builder()
-                    .data(BoardDTO.getBoardFromDB(boardService.get(boardId)))
+                    .data(boardDTO)
                     .message(SuccessMessage.FOUND.toString())
                     .status(HttpStatus.OK)
                     .statusCode(HttpStatusCodes.STATUS_CODE_OK)
@@ -118,6 +123,12 @@ public class BoardFacade {
                     .message(e.getMessage())
                     .status(HttpStatus.BAD_REQUEST)
                     .statusCode(HttpStatusCodes.STATUS_CODE_BAD_REQUEST)
+                    .build();
+        }catch (NoPermissionException e){
+            return Response.builder()
+                    .message(e.getMessage())
+                    .status(HttpStatus.FORBIDDEN)
+                    .statusCode(HttpStatusCodes.STATUS_CODE_FORBIDDEN)
                     .build();
         } catch (NullPointerException e) {
             return Response.builder()

@@ -122,6 +122,16 @@ public class ItemService implements ServiceInterface {
         return board.getSectionFromBoard(objectsIdsRequest.getSectionId()).getItems();
     }
 
+    @Override
+    public List<SharedContent> assignToUser(ObjectsIdsRequest objectsIdsRequest){
+        User user = Validations.doesIdExists(objectsIdsRequest.getUserId(), userRepository);
+        Board board = Validations.doesIdExists(objectsIdsRequest.getBoardId(), boardRepository);
+        Item item = board.getItemFromSectionById(objectsIdsRequest.getUpdateObjId(),
+                objectsIdsRequest.getSectionId());
+
+        return null;
+    }
+
 
     /**
      * Helper function for updating a custom object field.

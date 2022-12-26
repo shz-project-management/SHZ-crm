@@ -60,4 +60,11 @@ public class ItemController {
         Response response = sharedContentFacade.getAllItemsInSection(objectsIdsRequest);
         return new ResponseEntity<>(response, response.getStatus());
     }
+
+    @PostMapping(value = "assign-to-user")
+    public ResponseEntity<Response> assignToUser(@RequestBody ObjectsIdsRequest objIds, @RequestAttribute Long userId) {
+        objIds.setUserId(userId);
+        Response response = sharedContentFacade.assignToUser(objIds, Item.class);
+        return new ResponseEntity<>(response, response.getStatus());
+    }
 }
