@@ -1,21 +1,22 @@
 package CRM.utils.enums;
 
+import lombok.Getter;
+
 /**
  * enum class that creates different notifications
  */
+@Getter
 public enum Notifications {
-    ASSIGNED_TO_ME("Items assigned to me", "One or multiple items were assigned to me"),
-    STATUS_CHANGED("Items status changed", "Item that is related to me has it status changed"),
-    COMMENT_ADDED("Items comment added", "Item that is related to me has a new comment"),
-    ITEM_DELETED("Items deleted", "Item that is related to me has been deleted"),
-    ITEM_DATA_CHANGED("Items data changed", "Item that is related to me has had a change in some data"),
-    USER_ADDED("User added to the system", "A new user has been added to this board");
+    ASSIGNED_TO_ME("Item assigned to me"),
+    STATUS_CHANGED("Item status changed"),
+    COMMENT_ADDED("Comment added"),
+    ITEM_DELETED("Item deleted"),
+    ITEM_DATA_CHANGED("Item data changed"),
+    USER_ADDED("User added to the system");
 
     public final String name;
-    public final String description;
 
-    private Notifications(String name, String description) {
+    private Notifications(String name) {
         this.name = name;
-        this.description = description;
     }
 }

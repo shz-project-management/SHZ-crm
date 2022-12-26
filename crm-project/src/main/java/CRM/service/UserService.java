@@ -1,13 +1,17 @@
 package CRM.service;
 
 import CRM.entity.*;
+import CRM.entity.requests.NotificationRequest;
 import CRM.entity.requests.ObjectsIdsRequest;
 import CRM.repository.BoardRepository;
 import CRM.repository.NotificationSettingRepository;
 import CRM.repository.UserRepository;
+import CRM.repository.UserSettingRepository;
 import CRM.utils.Common;
+import CRM.utils.NotificationSender;
 import CRM.utils.Validations;
 import CRM.utils.enums.ExceptionMessage;
+import CRM.utils.enums.Notifications;
 import CRM.utils.enums.Permission;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -32,6 +36,7 @@ public class UserService {
     private BoardRepository boardRepository;
     @Autowired
     private NotificationSettingRepository notificationSettingRepository;
+
 
     /**
      * findByEmail search in the database for a user based on the email we have.

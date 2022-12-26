@@ -1,9 +1,12 @@
 package CRM.entity;
 
+import CRM.entity.requests.NotificationRequest;
 import lombok.*;
 import org.hibernate.annotations.Cascade;
 
 import javax.persistence.*;
+import java.util.Objects;
+import java.util.Set;
 
 @Data
 @AllArgsConstructor
@@ -39,5 +42,15 @@ public class UserSetting {
         userSetting.setUser(user);
         userSetting.setSetting(notificationSetting);
         return userSetting;
+    }
+
+    public static UserSetting getRelevantUserSetting(NotificationRequest notificationRequest, NotificationSetting wantedNotificationSetting){
+        UserSetting wantedUserSetting = null;
+        Set<UserSetting> userSettingsInBoard = notificationRequest.getBoard().getUsersSettings();
+        for (UserSetting userSetting : userSettingsInBoard) {
+            if(Objects.equals(userSetting.getSetting().getName(), wantedNotificationSetting.getName()))
+                wantedUserSetting = userSetting;
+        }
+        return wantedUserSetting;
     }
 }
