@@ -23,10 +23,10 @@ public class NotificationFacade {
     private NotificationService notificationService;
 
     //TODO:DOCUMENTATION
-    public Response getAllNotificationsForUserInBoard(ObjectsIdsRequest objectsIdsRequest) {
+    public Response getAllForUserPerBoard(ObjectsIdsRequest objectsIdsRequest) {
         try {
             Validations.validateIDs(objectsIdsRequest.getUserId(), objectsIdsRequest.getBoardId());
-            List<Notification> notificationList = notificationService.getAllNotificationsForUserInBoard(objectsIdsRequest);
+            List<Notification> notificationList = notificationService.getAllForUserPerBoard(objectsIdsRequest);
             return Response.builder()
                     .message(SuccessMessage.FOUND.toString())
                     .status(HttpStatus.FOUND)
@@ -34,6 +34,30 @@ public class NotificationFacade {
                     .data(NotificationDTO.createNotificationsDTOList(notificationList))
                     .build();
         } catch (AccountNotFoundException | IllegalArgumentException | NoSuchElementException e) {
+            return Response.builder()
+                    .statusCode(HttpStatusCodes.STATUS_CODE_BAD_REQUEST)
+                    .status(HttpStatus.BAD_REQUEST)
+                    .message(e.getMessage())
+                    .build();
+        } catch (NullPointerException e) {
+            return Response.builder()
+                    .statusCode(HttpStatusCodes.STATUS_CODE_SERVER_ERROR)
+                    .status(HttpStatus.BAD_REQUEST)
+                    .message(e.getMessage())
+                    .build();
+        }
+    }
+
+    public Response delete(Long notificationId) {
+        try {
+            Validations.validateIDs(notificationId);
+            notificationService.delete(notificationId);
+            return Response.builder()
+                    .message(SuccessMessage.FOUND.toString())
+                    .status(HttpStatus.FOUND)
+                    .statusCode(HttpStatusCodes.STATUS_CODE_OK)
+                    .build();
+        } catch (IllegalArgumentException | NoSuchElementException e) {
             return Response.builder()
                     .statusCode(HttpStatusCodes.STATUS_CODE_BAD_REQUEST)
                     .status(HttpStatus.BAD_REQUEST)

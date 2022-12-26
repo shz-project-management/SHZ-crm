@@ -22,8 +22,14 @@ public class NotificationController {
 
     //TODO:DOCUMENTATION
     @GetMapping(value = "getAll-user-in-board")
-    public ResponseEntity<Response> getAllNotificationsForUserInBoard(@RequestBody ObjectsIdsRequest objectsIdsRequest) {
-        Response response = notificationFacade.getAllNotificationsForUserInBoard(objectsIdsRequest);
+    public ResponseEntity<Response> getAllForUserPerBoard(@RequestBody ObjectsIdsRequest objectsIdsRequest) {
+        Response response = notificationFacade.getAllForUserPerBoard(objectsIdsRequest);
+        return new ResponseEntity<>(response, response.getStatus());
+    }
+
+    @DeleteMapping(value = "delete/{notificationId}")
+    public ResponseEntity<Response> delete(@PathVariable Long notificationId) {
+        Response response = notificationFacade.delete(notificationId);
         return new ResponseEntity<>(response, response.getStatus());
     }
 }
