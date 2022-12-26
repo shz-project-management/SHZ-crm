@@ -199,5 +199,19 @@ public class Board {
     public void addUserSettingToBoard(UserSetting userSetting) {
         usersSettings.add(userSetting);
     }
+
+    public Type getTypeByName(String typeName) {
+        return types.stream()
+                .filter(type -> type.getName().equals(typeName))
+                .findFirst()
+                .orElse(null);
+    }
+
+    public Status getStatusByName(String statusName) {
+        return statuses.stream()
+                .filter(type -> type.getName().equals(statusName))
+                .findFirst()
+                .orElse(null);
+    }
 }
 
