@@ -1,15 +1,13 @@
 package CRM.controller.facades;
 
-import CRM.entity.DTO.ItemDTO;
 import CRM.entity.DTO.SectionDTO;
-import CRM.entity.Item;
-import CRM.entity.Section;
 import CRM.entity.requests.AttributeRequest;
 import CRM.entity.response.Response;
 import CRM.service.*;
 import CRM.utils.Validations;
 import CRM.utils.enums.Regex;
 import CRM.utils.enums.SuccessMessage;
+import com.google.api.client.http.HttpStatusCodes;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.hibernate.NonUniqueObjectException;
@@ -18,7 +16,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Component
 public class SectionFacade {
@@ -39,27 +36,27 @@ public class SectionFacade {
      *                         for info is the same for both classes Status and Type.
      * @return A Response object with the status of the create operation and the created attribute object, or an error message if the operation fails.
      */
-    //TODO DTO
     public Response create(AttributeRequest attributeRequest) {
         try {
             Validations.validate(attributeRequest.getName(), Regex.NAME.getRegex());
 
-            return new Response.Builder()
+            return Response.builder()
                     .status(HttpStatus.CREATED)
-                    .statusCode(201)
+                    .statusCode(HttpStatusCodes.STATUS_CODE_CREATED)
                     .data(SectionDTO.getSectionsDTOList(sectionService.create(attributeRequest)))
                     .build();
+
         } catch (IllegalArgumentException | NonUniqueObjectException | NoSuchElementException e) {
-            return new Response.Builder()
+            return Response.builder()
                     .message(e.getMessage())
                     .status(HttpStatus.BAD_REQUEST)
-                    .statusCode(400)
+                    .statusCode(HttpStatusCodes.STATUS_CODE_BAD_REQUEST)
                     .build();
         } catch (NullPointerException e) {
-            return new Response.Builder()
+            return Response.builder()
                     .message(e.getMessage())
-                    .status(HttpStatus.BAD_REQUEST)
-                    .statusCode(500)
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .statusCode(HttpStatusCodes.STATUS_CODE_SERVER_ERROR)
                     .build();
         }
     }
@@ -70,22 +67,23 @@ public class SectionFacade {
             Validations.validateIDs(boardId, attributeId);
             sectionService.delete(boardId, attributeId);
 
-            return new Response.Builder()
+            return Response.builder()
                     .status(HttpStatus.NO_CONTENT)
-                    .statusCode(204)
+                    .statusCode(HttpStatusCodes.STATUS_CODE_NO_CONTENT)
                     .message(SuccessMessage.DELETED.toString())
                     .build();
+
         } catch (NoSuchElementException | IllegalArgumentException e) {
-            return new Response.Builder()
+            return Response.builder()
                     .message(e.getMessage())
                     .status(HttpStatus.BAD_REQUEST)
-                    .statusCode(400)
+                    .statusCode(HttpStatusCodes.STATUS_CODE_BAD_REQUEST)
                     .build();
         } catch (NullPointerException e) {
-            return new Response.Builder()
+            return Response.builder()
                     .message(e.getMessage())
-                    .status(HttpStatus.BAD_REQUEST)
-                    .statusCode(500)
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .statusCode(HttpStatusCodes.STATUS_CODE_SERVER_ERROR)
                     .build();
         }
     }
@@ -99,27 +97,28 @@ public class SectionFacade {
      * @throws IllegalArgumentException if the specified id is invalid.
      * @throws NullPointerException     if the specified id is null.
      */
-    //TODO Validation function + DTO
     public Response get(Long attributeId, Long boardId) {
         try {
             Validations.validateIDs(boardId, attributeId);
-            return new Response.Builder()
-                    .data(sectionService.get(attributeId, boardId))
+
+            return Response.builder()
+                    .data(SectionDTO.createSectionDTO(sectionService.get(attributeId, boardId)))
                     .message(SuccessMessage.FOUND.toString())
                     .status(HttpStatus.OK)
-                    .statusCode(200)
+                    .statusCode(HttpStatusCodes.STATUS_CODE_OK)
                     .build();
+
         } catch (NoSuchElementException | IllegalArgumentException e) {
-            return new Response.Builder()
+            return Response.builder()
                     .message(e.getMessage())
                     .status(HttpStatus.BAD_REQUEST)
-                    .statusCode(400)
+                    .statusCode(HttpStatusCodes.STATUS_CODE_BAD_REQUEST)
                     .build();
         } catch (NullPointerException e) {
-            return new Response.Builder()
+            return Response.builder()
                     .message(e.getMessage())
-                    .status(HttpStatus.BAD_REQUEST)
-                    .statusCode(500)
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .statusCode(HttpStatusCodes.STATUS_CODE_SERVER_ERROR)
                     .build();
         }
     }
@@ -133,38 +132,39 @@ public class SectionFacade {
      * @throws NullPointerException     if the specified board id is null.
      * @throws NoSuchElementException   if the board with the specified id is not found.
      */
-    //TODO DTO
     public Response getAllSectionsInBoard(Long boardId) {
         try {
             Validations.validate(boardId, Regex.ID.getRegex());
-            return new Response.Builder()
+
+            return Response.builder()
                     .data(SectionDTO.getSectionsDTOList(new HashSet<>(sectionService.getAllSectionsInBoard(boardId))))
                     .message(SuccessMessage.FOUND.toString())
                     .status(HttpStatus.OK)
-                    .statusCode(200)
+                    .statusCode(HttpStatusCodes.STATUS_CODE_OK)
                     .build();
+
         } catch (IllegalArgumentException | NoSuchElementException e) {
-            return new Response.Builder()
+            return Response.builder()
                     .message(e.getMessage())
                     .status(HttpStatus.BAD_REQUEST)
-                    .statusCode(400)
+                    .statusCode(HttpStatusCodes.STATUS_CODE_BAD_REQUEST)
                     .build();
         } catch (NullPointerException e) {
-            return new Response.Builder()
+            return Response.builder()
                     .message(e.getMessage())
-                    .status(HttpStatus.BAD_REQUEST)
-                    .statusCode(500)
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .statusCode(HttpStatusCodes.STATUS_CODE_SERVER_ERROR)
                     .build();
         }
     }
 
     //TODO + documentation
     public Response getFilteredItems(Map<String, List<String>> filters, Long boardId) {
-        return new Response.Builder()
+        return Response.builder()
                 .data(SectionDTO.getSectionsDTOList(sectionService.getQuery(filters, boardId)))
                 .message(SuccessMessage.FOUND.toString())
                 .status(HttpStatus.OK)
-                .statusCode(200)
+                .statusCode(HttpStatusCodes.STATUS_CODE_OK)
                 .build();
     }
 
@@ -182,23 +182,25 @@ public class SectionFacade {
 //    public Response update(UpdateObjectRequest statusRequest, Long statusId, Class clz) {
 //        try {
 //            Validations.validate(statusId, Regex.ID.getRegex());
-//            return new Response.Builder()
+//
+//            return Response.builder()
 //                    .data(AttributeDTO.createAttributeDTO(attributeService.update(statusRequest, statusId)))
 //                    .message(SuccessMessage.FOUND.toString())
 //                    .status(HttpStatus.OK)
-//                    .statusCode(200)
+//                    .statusCode(HttpStatusCodes.STATUS_CODE_OK)
 //                    .build();
+//
 //        } catch (IllegalArgumentException | NoSuchElementException | NoSuchFieldException e) {
 //            return new Response.Builder()
 //                    .message(e.getMessage())
 //                    .status(HttpStatus.BAD_REQUEST)
-//                    .statusCode(400)
+//                    .statusCode(HttpStatusCodes.STATUS_CODE_BAD_REQUEST)
 //                    .build();
 //        } catch (NullPointerException e) {
 //            return new Response.Builder()
 //                    .message(e.getMessage())
-//                    .status(HttpStatus.BAD_REQUEST)
-//                    .statusCode(500)
+//                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+//                    .statusCode(HttpStatusCodes.STATUS_CODE_SERVER_ERROR)
 //                    .build();
 //        }
 //    }
