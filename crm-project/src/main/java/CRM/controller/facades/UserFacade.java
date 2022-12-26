@@ -164,7 +164,7 @@ public class UserFacade {
             Validations.validateUpdateUserToBoard(objectsIdsRequest.getBoardId(), objectsIdsRequest.getUserId(),
                     objectsIdsRequest.getPermissionId());
             List<User> users = userService.updateUserToBoard(objectsIdsRequest);
-            notificationSender.sendUserAddedNotificationToUsersInBoard(
+            notificationSender.sendNotificationToManyUsers(
                     NotificationRequest.createUserAddedRequest(boardService.get(objectsIdsRequest.getBoardId()),
                             userService.get(objectsIdsRequest.getUserId()),
                             settingsService.getNotificationSettingFromDB(Notifications.USER_ADDED.name)), users);
