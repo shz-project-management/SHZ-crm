@@ -2,6 +2,7 @@ package CRM.utils;
 
 import CRM.entity.*;
 import CRM.utils.enums.ExceptionMessage;
+import CRM.utils.enums.UpdateField;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import javax.persistence.EntityManager;
@@ -95,6 +96,21 @@ public class Common {
             }
         } finally {
             entityManager.close();
+        }
+    }
+
+    public static Class getObjectOfField(UpdateField fieldName) {
+        switch (fieldName) {
+            case STATUS:
+                return Status.class;
+            case TYPE:
+                return Type.class;
+            case PARENT_ITEM:
+                return Item.class;
+            case SECTION:
+                return Section.class;
+            default:
+                return null;
         }
     }
 

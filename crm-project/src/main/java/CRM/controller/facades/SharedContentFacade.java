@@ -148,20 +148,18 @@ public class SharedContentFacade {
     }
 
 
-    //TODO + Documentation
-    public Response update(UpdateObjectRequest updateObject, Long updateObjectId, Class clz) {
+    //TODO Documentation
+    public Response update(UpdateObjectRequest updateObject, Class clz) {
         // validate params using the Validations.validate function
         // call the correct service using convertFromClassToService(clz) function
         // with update function in it.
         try {
             // validate the id using the Validations.validate function
-            Validations.validateSharedContent(updateObject.getObjectsIdsRequest().getBoardId(),
-                    updateObject.getObjectsIdsRequest().getSectionId(),
-                    updateObjectId, null);
+            Validations.validateSharedContent(updateObject.getObjectsIdsRequest());
 
             // call the correct service using convertFromClassToService(clz) function with find function in it
             return Response.builder()
-                    .data(convertFromServiceOutputToDTOEntity(convertFromClassToService(clz).update(updateObject, updateObjectId), clz))
+                    .data(SectionDTO.createSectionDTO(convertFromClassToService(clz).update(updateObject)))
                     .message(SuccessMessage.FOUND.toString())
                     .status(HttpStatus.OK)
                     .statusCode(HttpStatusCodes.STATUS_CODE_OK)
@@ -187,10 +185,7 @@ public class SharedContentFacade {
     public Response get(ObjectsIdsRequest objectsIdsRequest, Class clz) {
         try {
             // validate the id using the Validations.validate function
-            Validations.validateSharedContent(objectsIdsRequest.getBoardId(),
-                    objectsIdsRequest.getSectionId(),
-                    objectsIdsRequest.getSearchId(),
-                    objectsIdsRequest.getParentId());
+            Validations.validateSharedContent(objectsIdsRequest);
 
             // call the correct service using convertFromClassToService(clz) function with find function in it
             return Response.builder()

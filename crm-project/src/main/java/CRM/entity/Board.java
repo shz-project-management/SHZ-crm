@@ -89,7 +89,7 @@ public class Board {
         for (Section section : sections) {
             if (section.getId() == sectionId) return section;
         }
-        throw new IllegalArgumentException("Could not find this section in the db!");
+        throw new IllegalArgumentException("Could not find this section in the db!"); // FIXME: return null
     }
 
     public void addSectionToBoard(Section section) {
@@ -143,7 +143,7 @@ public class Board {
         for (Attribute attribute : attributes) {
             if (attribute.getId() == id) return attribute;
         }
-        throw new NoSuchElementException("Could not find this attribute in the db");
+        throw new NoSuchElementException("Could not find this attribute in the db"); // FIXME: return null
     }
 
     public void addAttributeToBoard(Attribute attribute, Class clz) {
@@ -184,7 +184,7 @@ public class Board {
         if (clz == Type.class) return (Set<T>) types;
         if (clz == Status.class) return (Set<T>) statuses;
 
-        throw new IllegalArgumentException("Invalid Attribute class: " + clz);
+        throw new IllegalArgumentException("Invalid Attribute class: " + clz); // FIXME: return null
     }
 
 
@@ -192,7 +192,7 @@ public class Board {
         List<Attribute> list = (List<Attribute>) getAttributeSet(clz).stream().collect(Collectors.toList());
         for (Attribute attribute : list) {
             if (attribute.getName().equals(name))
-                throw new IllegalArgumentException("This name already exists"); // FIXME:
+                throw new IllegalArgumentException("This name already exists"); // FIXME: return null
         }
     }
 
@@ -209,9 +209,49 @@ public class Board {
 
     public Status getStatusByName(String statusName) {
         return statuses.stream()
-                .filter(type -> type.getName().equals(statusName))
+                .filter(status -> status.getName().equals(statusName))
                 .findFirst()
                 .orElse(null);
+    }
+
+    public Status getStatusById(long statusId) {
+        return statuses.stream()
+                .filter(status -> status.getId().equals(statusId))
+                .findFirst()
+                .orElse(null);
+    }
+
+    public Type getTypeById(long typeId) {
+        return types.stream()
+                .filter(type -> type.getId().equals(typeId))
+                .findFirst()
+                .orElse(null);
+    }
+
+    public Section getSectionById(long sectionId) {
+        return sections.stream()
+                .filter(section -> section.getId().equals(sectionId))
+                .findFirst()
+                .orElse(null);
+    }
+
+    public Item getItemById(long itemId, long sectionId) {
+        return getItemFromSectionById(itemId, sectionId);
+    }
+
+
+    public Object getObjectByItsClass(Integer content, Class objClass, Long sectionId) {
+        if (objClass == Status.class) {
+            return getStatusById(content);
+        } else if (objClass == Type.class) {
+            return getTypeById(content);
+        } else if (objClass == Section.class) {
+            return getSectionById(content);
+        } else if (objClass == Item.class) {
+            return getItemById(content, sectionId);
+        } else {
+            return null;
+        }
     }
 }
 

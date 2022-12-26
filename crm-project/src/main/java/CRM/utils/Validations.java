@@ -129,9 +129,10 @@ public class Validations {
             throw new NullPointerException(ExceptionMessage.VALIDATION_FAILED.toString());
     }
 
-    public static void validateSharedContent(Long boardId, Long sectionId, Long updateObjectId, Long parentId) {
-        Validations.validateIDs(boardId, sectionId, updateObjectId);
-        if (parentId != null) Validations.validate(parentId, Regex.ID.getRegex());
+    public static void validateSharedContent(ObjectsIdsRequest obj) {
+        Validations.validateIDs(obj.getBoardId(), obj.getSectionId(), obj.getUpdateObjId());
+        if (obj.getParentId() != null)
+            Validations.validate(obj.getParentId(), Regex.ID.getRegex());
     }
 
     //TODO documentation
@@ -229,7 +230,8 @@ public class Validations {
      * @return true if the field is a custom object field, false otherwise
      */
     public static boolean checkIfFieldIsCustomObject(UpdateField fieldName) {
-        return fieldName.equals(STATUS) || fieldName.equals(TYPE) || fieldName.equals(PARENT_ITEM) || fieldName.equals(SECTION);
+        return fieldName.equals(STATUS) || fieldName.equals(TYPE) ||
+                fieldName.equals(PARENT_ITEM) || fieldName.equals(SECTION);
     }
 
     /**
