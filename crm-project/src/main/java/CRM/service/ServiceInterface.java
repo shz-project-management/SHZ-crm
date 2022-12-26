@@ -14,5 +14,6 @@ public interface ServiceInterface {
     Section update(UpdateObjectRequest updateObject) throws NoSuchFieldException;
 
     List<SharedContent> getAllInItem(ObjectsIdsRequest objectsIdsRequest);
+    List<SharedContent> assignToUser(ObjectsIdsRequest objectsIdsRequest);
 
 }
