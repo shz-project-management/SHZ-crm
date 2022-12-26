@@ -148,16 +148,14 @@ public class SharedContentFacade {
     }
 
 
-    //TODO + Documentation
+    //TODO Documentation
     public Response update(UpdateObjectRequest updateObject, Class clz) {
         // validate params using the Validations.validate function
         // call the correct service using convertFromClassToService(clz) function
         // with update function in it.
         try {
             // validate the id using the Validations.validate function
-            Validations.validateSharedContent(updateObject.getObjectsIdsRequest().getBoardId(),
-                    updateObject.getObjectsIdsRequest().getSectionId(),
-                    updateObject.getObjectsIdsRequest().getUpdateObjId(), null);
+            Validations.validateSharedContent(updateObject.getObjectsIdsRequest());
 
             // call the correct service using convertFromClassToService(clz) function with find function in it
             return Response.builder()
@@ -187,10 +185,7 @@ public class SharedContentFacade {
     public Response get(ObjectsIdsRequest objectsIdsRequest, Class clz) {
         try {
             // validate the id using the Validations.validate function
-            Validations.validateSharedContent(objectsIdsRequest.getBoardId(),
-                    objectsIdsRequest.getSectionId(),
-                    objectsIdsRequest.getSearchId(),
-                    objectsIdsRequest.getParentId());
+            Validations.validateSharedContent(objectsIdsRequest);
 
             // call the correct service using convertFromClassToService(clz) function with find function in it
             return Response.builder()

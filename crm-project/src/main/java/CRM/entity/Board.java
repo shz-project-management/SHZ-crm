@@ -89,7 +89,7 @@ public class Board {
         for (Section section : sections) {
             if (section.getId() == sectionId) return section;
         }
-        throw new IllegalArgumentException("Could not find this section in the db!");
+        throw new IllegalArgumentException("Could not find this section in the db!"); // FIXME: return null
     }
 
     public void addSectionToBoard(Section section) {
@@ -143,7 +143,7 @@ public class Board {
         for (Attribute attribute : attributes) {
             if (attribute.getId() == id) return attribute;
         }
-        throw new NoSuchElementException("Could not find this attribute in the db");
+        throw new NoSuchElementException("Could not find this attribute in the db"); // FIXME: return null
     }
 
     public void addAttributeToBoard(Attribute attribute, Class clz) {
@@ -184,7 +184,7 @@ public class Board {
         if (clz == Type.class) return (Set<T>) types;
         if (clz == Status.class) return (Set<T>) statuses;
 
-        throw new IllegalArgumentException("Invalid Attribute class: " + clz);
+        throw new IllegalArgumentException("Invalid Attribute class: " + clz); // FIXME: return null
     }
 
 
@@ -192,7 +192,7 @@ public class Board {
         List<Attribute> list = (List<Attribute>) getAttributeSet(clz).stream().collect(Collectors.toList());
         for (Attribute attribute : list) {
             if (attribute.getName().equals(name))
-                throw new IllegalArgumentException("This name already exists"); // FIXME:
+                throw new IllegalArgumentException("This name already exists"); // FIXME: return null
         }
     }
 
