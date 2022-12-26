@@ -1,27 +1,18 @@
 package CRM.controller.controllers;
 
 import CRM.controller.facades.AuthFacade;
-import CRM.entity.Board;
-import CRM.entity.User;
 import CRM.entity.requests.LoginUserRequest;
 import CRM.entity.requests.RegisterUserRequest;
 import CRM.entity.response.Response;
-import CRM.utils.Common;
-import CRM.utils.Validations;
+
 import lombok.AllArgsConstructor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 
 @Controller
 @RequestMapping(value = "/user/auth")
@@ -37,6 +28,7 @@ public class AuthController {
     /**
      * Register function is responsible for creating new users and adding them to the database.
      * Users will use their personal information to create a new account: email, password, name.
+     *
      * @param user - User with email, name and password
      * @return ResponseEntity with our Response with data and status 201 if good or 400 if something went wrong.
      */
@@ -53,6 +45,7 @@ public class AuthController {
      * This function accepts only 2 parameters: email, password.
      * If the credentials match to the database's information, it will allow the user to use its functionalities.
      * A token will be returned in a successful request.
+     *
      * @param user - user's details with email and password to check if correct
      * @return ResponseEntity with our Response with user's token and status 200 if good or 400 if something went wrong.
      */
@@ -62,6 +55,12 @@ public class AuthController {
 
         Response response = authFacade.login(user);
         return new ResponseEntity<>(response, response.getStatus());
+    }
+
+    @PostMapping("/third-party-login")
+    public ResponseEntity<Response> callback(@RequestParam String code) {
+            Response response = authFacade.thirdPartyLogin(code);
+            return new ResponseEntity<>(response, response.getStatus());
     }
 }
 
