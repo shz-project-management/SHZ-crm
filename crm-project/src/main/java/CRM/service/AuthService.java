@@ -45,6 +45,17 @@ public class AuthService {
         return userRepository.save(User.newUser(user));
     }
 
+    //TODO: documentation
+    public String thirdPartyLogin(RegisterUserRequest user) {
+        logger.info("in AuthService -> thirdPartyLogin");
+
+        User storedUser = findByEmail(user.getEmail());
+        if (storedUser == null)
+            storedUser = userRepository.save(User.newUser(user));
+
+        return generateToken(storedUser.getId());
+    }
+
     /**
      * Attempts to login the user with the provided email and password.
      *

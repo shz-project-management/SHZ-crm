@@ -12,7 +12,6 @@ import java.util.stream.Stream;
 @NoArgsConstructor
 @Getter
 @Setter
-@ToString
 @Entity
 @Table(name = "boards")
 public class Board {
