@@ -86,7 +86,7 @@ public class BoardController {
      */
     @PatchMapping(value = "/update", consumes = "application/json")
     public ResponseEntity<Response> updateBoard(@RequestBody UpdateObjectRequest boardRequest) {
-        Response response = boardFacade.updateBoard(boardRequest, boardRequest.getObjectsIdsRequest().getBoardId());
+        Response response = boardFacade.updateBoard(boardRequest);
         return new ResponseEntity<>(response, response.getStatus());
     }
 

@@ -206,10 +206,10 @@ class BoardFacadeTest {
 //        assertEquals(400, boardFacade.updateBoard(boardRequest, 1L).getStatusCode());
 //    }
 
-    @Test
-    @DisplayName("Test update board with null input")
-    public void testUpdateBoardWithNullInput() {
-        UpdateObjectRequest boardRequest = null;
-        assertEquals(500, boardFacade.updateBoard(boardRequest, 1L).getStatusCode());
-    }
+//    @Test
+//    @DisplayName("Test update board with null input")
+//    public void testUpdateBoardWithNullInput() {
+//        UpdateObjectRequest boardRequest = null;
+//        assertEquals(500, boardFacade.updateBoard(boardRequest, 1L).getStatusCode());
+//    }
 }
