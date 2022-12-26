@@ -69,15 +69,11 @@ public class TypeController {
         return new ResponseEntity<>(response, response.getStatus());
     }
 
-//    /**
-//     * Handles PATCH requests to update type.
-//     *
-//     * @param typeRequest An object containing the fields to update for the type.
-//     * @return A response object indicating the status of the update operation.
-//     */
-//    @PatchMapping(value = "/update/{typeId}", consumes = "application/json")
-//    public ResponseEntity<Response> update(@RequestBody UpdateObjectRequest typeRequest, @PathVariable Long typeId) {
-//        Response response = attributeFacade.update(typeRequest, typeId, Type.class);
-//        return new ResponseEntity<>(response, response.getStatus());
-//    }
+
+    //TODO documentation
+    @PatchMapping(value = "/update", consumes = "application/json")
+    public ResponseEntity<Response> update(@RequestBody UpdateObjectRequest typeRequest) {
+        Response response = attributeFacade.update(typeRequest, Type.class);
+        return new ResponseEntity<>(response, response.getStatus());
+    }
 }

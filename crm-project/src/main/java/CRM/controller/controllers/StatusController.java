@@ -69,15 +69,10 @@ public class StatusController {
         return new ResponseEntity<>(response, response.getStatus());
     }
 
-//    /**
-//     * Handles PATCH requests to update status.
-//     *
-//     * @param statusRequest An object containing the fields to update for the status.
-//     * @return A response object indicating the status of the update operation.
-//     */
-//    @PatchMapping(value = "/update/{statusId}", consumes = "application/json")
-//    public ResponseEntity<Response> update(@RequestBody UpdateObjectRequest statusRequest, @PathVariable Long statusId) {
-//        Response response = attributeFacade.update(statusRequest, statusId, Status.class);
-//        return new ResponseEntity<>(response, response.getStatus());
-//    }
+    //TODO documentation
+    @PatchMapping(value = "/update", consumes = "application/json")
+    public ResponseEntity<Response> update(@RequestBody UpdateObjectRequest updateObjectRequest) {
+        Response response = attributeFacade.update(updateObjectRequest, Status.class);
+        return new ResponseEntity<>(response, response.getStatus());
+    }
 }

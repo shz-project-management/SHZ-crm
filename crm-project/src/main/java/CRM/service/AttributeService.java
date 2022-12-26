@@ -2,12 +2,15 @@ package CRM.service;
 
 import CRM.entity.*;
 import CRM.entity.requests.AttributeRequest;
+import CRM.entity.requests.UpdateObjectRequest;
 import CRM.repository.BoardRepository;
+import CRM.utils.Common;
 import CRM.utils.Validations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Set;
 
 @Service
 public class AttributeService {
@@ -44,28 +47,21 @@ public class AttributeService {
     }
 
 
-//    public Status update(UpdateObjectRequest statusRequest, long statusId) throws NoSuchFieldException {
-//        //get in method signature the board id, get the attributeRequest and attributeId and Class clz (type,section,status)
-//        //find the board in db
-//        //check if attribute exists, if it exists get the attribute and update it
-//        //use update method in the board entity
-//    }
-
-//    /**
-//     * This method is used to retrieve all the statuses.
-//     *
-//     * @return A list containing all the statuses.
-//     */
-//    @Override
-//    public List<Status> getAll() {
-//        get Class clz and boardId in method signature
-//        findAll method in board entity.
-//
-//        return statusRepository.findAll();
-//    }
+    public Board update(UpdateObjectRequest updateObjReq, Class clz) throws NoSuchFieldException {
+        Board board = Validations.doesIdExists(updateObjReq.getObjectsIdsRequest().getBoardId(), boardRepository);
+        updateBoard(board, updateObjReq, clz);
+        return boardRepository.save(board);
+    }
 
     public List<Attribute> getAllAttributesInBoard(long boardId, Class clz) {
         Board board = Validations.doesIdExists(boardId, boardRepository);
         return board.getAllAttributeInBoard(clz);
+    }
+
+    private void updateBoard(Board board, UpdateObjectRequest updateObjReq, Class clz) throws NoSuchFieldException {
+        Attribute attribute;
+        if (clz == Status.class) attribute = board.getStatusById(updateObjReq.getObjectsIdsRequest().getUpdateObjId());
+        else attribute = board.getTypeById(updateObjReq.getObjectsIdsRequest().getUpdateObjId());
+        Common.fieldIsPrimitiveOrKnownObjectHelper(updateObjReq, attribute);
     }
 }
