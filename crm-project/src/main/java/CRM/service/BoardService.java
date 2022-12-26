@@ -117,9 +117,9 @@ public class BoardService {
      * @throws NoSuchFieldException if the boardReq with the given field does not exist
      */
     //TODO
-    public Board updateBoard(UpdateObjectRequest boardReq, long boardId) throws NoSuchFieldException {
-        Board board = Validations.doesIdExists(boardId, boardRepository);
-        Validations.setContentToFieldIfFieldExists(board, boardReq.getFieldName(), boardReq.getContent());
+    public Board updateBoard(UpdateObjectRequest updateObjReq) throws NoSuchFieldException {
+        Board board = Validations.doesIdExists(updateObjReq.getObjectsIdsRequest().getBoardId(), boardRepository);
+        Common.fieldIsPrimitiveOrKnownObjectHelper(updateObjReq, board);
         return boardRepository.save(board);
     }
 

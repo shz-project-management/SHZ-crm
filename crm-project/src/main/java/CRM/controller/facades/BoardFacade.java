@@ -177,21 +177,13 @@ public class BoardFacade {
         }
     }
 
-    /**
-     * Updates a board in the database.
-     *
-     * @param board the board to update
-     * @return a response object with a status code and message
-     * @throws IllegalArgumentException if the board name or ID does not match the expected format
-     * @throws NoSuchElementException   if the board to update is not found in the database
-     * @throws NullPointerException     if the board object is null
-     */
-    public Response updateBoard(UpdateObjectRequest board, Long boardId) {
+    //TODO documentation
+    public Response updateBoard(UpdateObjectRequest updateObjReq) {
         try {
-            Validations.validate(boardId, Regex.ID.getRegex());
+            Validations.validate(updateObjReq.getObjectsIdsRequest().getBoardId(), Regex.ID.getRegex());
 
             return Response.builder()
-                    .data(BoardDTO.getBoardFromDB(boardService.updateBoard(board, boardId)))
+                    .data(BoardDTO.getBoardFromDB(boardService.updateBoard(updateObjReq)))
                     .message(SuccessMessage.FOUND.toString())
                     .status(HttpStatus.OK)
                     .statusCode(HttpStatusCodes.STATUS_CODE_OK)
