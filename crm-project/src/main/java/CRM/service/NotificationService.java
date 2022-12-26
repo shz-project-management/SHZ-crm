@@ -6,10 +6,7 @@ import CRM.entity.User;
 import CRM.entity.UserSetting;
 import CRM.entity.requests.NotificationRequest;
 import CRM.entity.requests.ObjectsIdsRequest;
-import CRM.repository.BoardRepository;
-import CRM.repository.NotificationRepository;
-import CRM.repository.UserRepository;
-import CRM.repository.UserSettingRepository;
+import CRM.repository.*;
 import CRM.utils.Common;
 import CRM.utils.NotificationSender;
 import CRM.utils.Validations;
@@ -32,6 +29,8 @@ public class NotificationService {
     private UserRepository userRepository;
     @Autowired
     private BoardRepository boardRepository;
+    @Autowired
+    private NotificationSettingRepository notificationSettingRepository;
 
     //TODO:DOCUMENTATION
     public List<Notification> getAllNotificationsForUserInBoard(ObjectsIdsRequest objectsIdsRequest) throws AccountNotFoundException {
@@ -42,9 +41,7 @@ public class NotificationService {
 
     //TODO: DOCUMENTATION
     public void createInAppNotification(NotificationRequest notificationRequest, UserSetting userSetting){
-        Notification notification = new Notification(0L, notificationRequest.getUser(), notificationRequest.getBoard(),
-                notificationRequest.getFromUser(), userSetting.getSetting().getName(),
-                NotificationSender.createNotificationDescription(notificationRequest), LocalDateTime.now());
+        Notification notification = Notification.createNewNotification(notificationRequest, userSetting);
         notificationRepository.save(notification);
     }
 }

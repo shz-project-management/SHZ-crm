@@ -29,7 +29,7 @@ public class NotificationSender {
     public void sendNotification(NotificationRequest notificationRequest) throws AccountNotFoundException {
         Validations.checkIfUserExistsInBoard(notificationRequest.getUser().getId(), notificationRequest.getBoard().getId(), userRepository, boardRepository);
         UserSetting userSettingsInBoard = UserSetting.getRelevantUserSetting(notificationRequest,
-                settingsService.getNotificationSettingFromDB(notificationRequest.getNotificationType()));
+                settingsService.getNotificationSettingFromDB(notificationRequest.getNotificationType().getName()));
         if (userSettingsInBoard.isInApp()) {
             notificationService.createInAppNotification(notificationRequest, userSettingsInBoard);
         }

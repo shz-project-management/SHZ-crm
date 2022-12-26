@@ -52,10 +52,8 @@ public class SettingsService {
         return null;
     }
 
-    public NotificationSetting getNotificationSettingFromDB(NotificationSetting notification){
-        Optional<NotificationSetting> notificationSetting = notificationSettingRepository.findByName(notification.getName());
-        if (notificationSetting.isPresent())
-            return notificationSetting.get();
-        return null;
+    public NotificationSetting getNotificationSettingFromDB(String notificationName){
+        Optional<NotificationSetting> notificationSetting = notificationSettingRepository.findByName(notificationName);
+        return notificationSetting.orElse(null);
     }
 }

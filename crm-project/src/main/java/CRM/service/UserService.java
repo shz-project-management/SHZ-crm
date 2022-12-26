@@ -36,8 +36,6 @@ public class UserService {
     private BoardRepository boardRepository;
     @Autowired
     private NotificationSettingRepository notificationSettingRepository;
-    @Autowired
-    private NotificationSender notificationSender;
 
 
     /**
@@ -171,9 +169,6 @@ public class UserService {
         List<User> users = board.getAllUsersInBoard(board, userPermissionsSet);
 
         boardRepository.save(board);
-        notificationSender.sendUserAddedNotificationToUsersInBoard(
-                        NotificationRequest.createUserAddedRequest(board, user,
-                                notificationSettingRepository.findByName(Notifications.USER_ADDED.name).get()), users);
         return users;
     }
 

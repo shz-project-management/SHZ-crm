@@ -6,6 +6,8 @@ import CRM.entity.UserPermission;
 import CRM.entity.requests.NotificationRequest;
 import CRM.entity.requests.ObjectsIdsRequest;
 import CRM.entity.response.Response;
+import CRM.service.BoardService;
+import CRM.service.SettingsService;
 import CRM.service.UserService;
 import CRM.utils.Common;
 import CRM.utils.NotificationSender;
@@ -28,6 +30,12 @@ public class UserFacade {
 
     @Autowired
     private UserService userService;
+    @Autowired
+    private BoardService boardService;
+    @Autowired
+    private NotificationSender notificationSender;
+    @Autowired
+    private SettingsService settingsService;
 
     /**
      * Retrieves a user by their unique ID.
@@ -156,7 +164,10 @@ public class UserFacade {
             Validations.validateUpdateUserToBoard(objectsIdsRequest.getBoardId(), objectsIdsRequest.getUserId(),
                     objectsIdsRequest.getPermissionId());
             List<User> users = userService.updateUserToBoard(objectsIdsRequest);
-
+            notificationSender.sendUserAddedNotificationToUsersInBoard(
+                    NotificationRequest.createUserAddedRequest(boardService.get(objectsIdsRequest.getBoardId()),
+                            userService.get(objectsIdsRequest.getUserId()),
+                            settingsService.getNotificationSettingFromDB(Notifications.USER_ADDED.name)), users);
             return Response.builder()
                     .message(SuccessMessage.FOUND.toString())
                     .data(UserDTO.getListOfUsersDTO(users))
