@@ -63,10 +63,10 @@ public class SectionFacade {
     }
 
     //TODO documentation
-    public Response delete(Long boardId, Long attributeId) {
+    public Response delete(Long boardId, Long sectionId) {
         try {
-            Validations.validateIDs(boardId, attributeId);
-            sectionService.delete(boardId, attributeId);
+            Validations.validateIDs(boardId, sectionId);
+            sectionService.delete(boardId, sectionId);
 
             return Response.builder()
                     .status(HttpStatus.NO_CONTENT)

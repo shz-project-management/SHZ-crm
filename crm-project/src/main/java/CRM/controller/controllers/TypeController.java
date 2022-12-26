@@ -34,16 +34,16 @@ public class TypeController {
         return new ResponseEntity<>(response, response.getStatus());
     }
 
-    /**
-     * Handle HTTP DELETE requests to delete a type.
-     *
-     * @return A ResponseEntity with the appropriate status and response body.
-     */
-    @DeleteMapping(value = "{boardId}/{sectionId}")
-    public ResponseEntity<Response> delete(@PathVariable Long boardId, @PathVariable Long sectionId) {
-        Response response = attributeFacade.delete(boardId, sectionId, Type.class);
-        return new ResponseEntity<>(response, response.getStatus());
-    }
+//    /**
+//     * Handle HTTP DELETE requests to delete a type.
+//     *
+//     * @return A ResponseEntity with the appropriate status and response body.
+//     */
+//    @DeleteMapping(value = "{boardId}/{sectionId}")
+//    public ResponseEntity<Response> delete(@PathVariable Long boardId, @PathVariable Long sectionId) {
+//        Response response = attributeFacade.delete(boardId, sectionId, Type.class);
+//        return new ResponseEntity<>(response, response.getStatus());
+//    }
 
 //    /**
 //     This method is used to handle HTTP GET requests to the specified URL (type/{id}).

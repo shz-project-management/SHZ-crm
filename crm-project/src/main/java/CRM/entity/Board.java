@@ -6,6 +6,7 @@ import lombok.*;
 import javax.persistence.*;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -237,6 +238,18 @@ public class Board {
 
     public Item getItemById(long itemId, long sectionId) {
         return getItemFromSectionById(itemId, sectionId);
+    }
+
+    public List<Comment> findCommentsByIds(List<Long> ids) {
+        // Filter the sections by id and flatten the sections into a stream of items
+        Stream<Item> items = getSections().stream().flatMap(section -> section.getItems().stream());
+
+        // Filter the items by id and flatten the items into a stream of comments
+        Stream<Comment> comments = items.flatMap(item -> item.getComments().stream())
+                .filter(comment -> ids.contains(comment.getId()));
+
+        // Collect the matching comments into a list
+        return comments.collect(Collectors.toList());
     }
 
 

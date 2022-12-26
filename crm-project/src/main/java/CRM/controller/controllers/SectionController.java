@@ -56,8 +56,8 @@ public class SectionController {
      *
      * @return A ResponseEntity object containing the Response object with the type information and the HTTP status code.
      */
-    @GetMapping(value = "{boardId}/{sectionId}")
-    public ResponseEntity<Response> get(@PathVariable Long boardId,@PathVariable Long sectionId) {
+    @GetMapping(value = "{sectionId}")
+    public ResponseEntity<Response> get(@PathVariable Long sectionId, @RequestParam Long boardId) {
         Response response = sectionFacade.get(boardId, sectionId);
         return new ResponseEntity<>(response, response.getStatus());
     }

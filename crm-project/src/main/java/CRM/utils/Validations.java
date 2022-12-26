@@ -202,7 +202,7 @@ public class Validations {
      */
     public static <T> void setContentToFieldIfFieldExists(T object, UpdateField fieldName, Object content) throws NoSuchFieldException {
         if(object == null){
-            throw new IllegalArgumentException(ExceptionMessage.FIELD_OBJECT_NOT_EXISTS.toString().toString());
+            throw new IllegalArgumentException(ExceptionMessage.FIELD_OBJECT_NOT_EXISTS.toString());
         }
 
         String fieldNameModified = fieldName.toString().replaceAll("_", "");

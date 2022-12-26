@@ -71,7 +71,7 @@ public class ItemService implements ServiceInterface {
         for (Section section : sections) {
             for (Iterator<Item> iterator = section.getItems().iterator(); iterator.hasNext(); ) {
                 Item item = iterator.next();
-                if (ids.contains(item.getId()) || ids.contains(item.getParentItem().getId())) {
+                if (ids.contains(item.getId()) || (item.getParentItem() != null && ids.contains(item.getParentItem().getId()))) {
                     item.getItems().clear();
                     iterator.remove();
                     counter++;
