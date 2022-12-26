@@ -5,6 +5,7 @@ import CRM.entity.requests.LoginUserRequest;
 import CRM.entity.requests.RegisterUserRequest;
 import CRM.entity.response.Response;
 import CRM.service.AuthService;
+import CRM.utils.GithubCodeDecoder;
 import CRM.utils.Validations;
 import CRM.utils.enums.SuccessMessage;
 import com.google.api.client.http.HttpStatusCodes;
@@ -16,6 +17,7 @@ import org.springframework.stereotype.Component;
 
 import javax.naming.AuthenticationException;
 import javax.security.auth.login.AccountNotFoundException;
+import java.io.IOException;
 
 @Component
 public class AuthFacade {
@@ -24,6 +26,8 @@ public class AuthFacade {
 
     @Autowired
     private AuthService authService;
+    @Autowired
+    private GithubCodeDecoder githubCodeDecoder;
 
     /**
      * Registers a new user in the system.
@@ -53,6 +57,32 @@ public class AuthFacade {
                     .build();
 
         } catch (IllegalArgumentException e) {
+            return Response.builder()
+                    .message(e.getMessage())
+                    .status(HttpStatus.BAD_REQUEST)
+                    .statusCode(HttpStatusCodes.STATUS_CODE_BAD_REQUEST)
+                    .build();
+        } catch (NullPointerException e) {
+            return Response.builder()
+                    .message(e.getMessage())
+                    .status(HttpStatus.BAD_REQUEST)
+                    .statusCode(HttpStatusCodes.STATUS_CODE_SERVER_ERROR)
+                    .build();
+        }
+    }
+
+    public Response thirdPartyLogin(String code) {
+        try {
+            RegisterUserRequest user = githubCodeDecoder.getUserDataFromCode(code);
+
+            return Response.builder()
+                    .data(authService.thirdPartyLogin(user))
+                    .message(SuccessMessage.REGISTER.toString())
+                    .status(HttpStatus.ACCEPTED)
+                    .statusCode(HttpStatusCodes.STATUS_CODE_OK)
+                    .build();
+
+        } catch (IOException e) {
             return Response.builder()
                     .message(e.getMessage())
                     .status(HttpStatus.BAD_REQUEST)
