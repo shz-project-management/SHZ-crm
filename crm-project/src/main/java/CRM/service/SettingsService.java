@@ -61,18 +61,23 @@ public class SettingsService {
     public List<UserSetting> changeUserSettingsInBoard(SettingUpdateRequest settingUpdateRequest) throws AccountNotFoundException {
         if(!Validations.checkIfUserExistsInBoard(settingUpdateRequest.getUserId(), settingUpdateRequest.getBoardId(), userRepository, boardRepository))
             throw new NoSuchElementException(ExceptionMessage.USER_DOES_NOT_EXISTS_IN_BOARD.toString());
-        Board board = boardRepository.findById(settingUpdateRequest.getBoardId()).get();
-        User user = userRepository.findById(settingUpdateRequest.getUserId()).get();
+
+        Board board = Validations.doesIdExists(settingUpdateRequest.getBoardId(), boardRepository);
+        User user = Validations.doesIdExists(settingUpdateRequest.getUserId(), userRepository);
+
         UserSetting userSetting = UserSetting.getRelevantUserSetting(board, user, settingUpdateRequest.getNotificationName());
+
         if(settingUpdateRequest.getInApp() != null){
             userSetting.setInApp(settingUpdateRequest.getInApp());
         }
         if(settingUpdateRequest.getInEmail() != null){
             userSetting.setInEmail(settingUpdateRequest.getInEmail());
         }
+
         Set<UserSetting> userSettingsInBoard = board.getUsersSettings();
         userSettingsInBoard.add(userSetting);
         board.setUsersSettings(userSettingsInBoard);
+
         boardRepository.save(board);
         return Arrays.asList(userSetting);
     }
