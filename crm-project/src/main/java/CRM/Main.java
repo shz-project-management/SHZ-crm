@@ -27,7 +27,6 @@ public class Main {
     @Bean
     InitializingBean initNotificationsInDB(){
         return ()->{
-            notificationSettingRepository.deleteAll();
             for (Notifications notification : Notifications.values()) {
                 if(!notificationSettingRepository.findByName(notification.name).isPresent()){
                     NotificationSetting notificationSetting = new NotificationSetting(0L, notification.name);
