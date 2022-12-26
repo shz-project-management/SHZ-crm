@@ -12,19 +12,17 @@ import CRM.entity.response.Response;
 import CRM.service.CommentService;
 import CRM.service.ItemService;
 import CRM.service.ServiceInterface;
-import CRM.utils.Common;
 import CRM.utils.Validations;
 import CRM.utils.enums.ExceptionMessage;
 import CRM.utils.enums.Regex;
 import CRM.utils.enums.SuccessMessage;
+import com.google.api.client.http.HttpStatusCodes;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
-import javax.persistence.EntityManager;
-import javax.persistence.Query;
 import javax.security.auth.login.AccountNotFoundException;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -57,23 +55,25 @@ public class SharedContentFacade {
 
             // call itemService with create function to create a new item
             // return the response with the new item as a data inside response entity.
-            return new Response.Builder()
+            return Response.builder()
                     .data(SectionDTO.createSectionDTO(itemService.create(item)))
                     .message(SuccessMessage.CREATE.toString())
                     .status(HttpStatus.ACCEPTED)
-                    .statusCode(201)
+                    .statusCode(HttpStatusCodes.STATUS_CODE_CREATED)
                     .build();
 
         } catch (IllegalArgumentException | AccountNotFoundException | NoSuchElementException e) {
-            return new Response.Builder()
+            return Response.builder()
                     .message(e.getMessage())
                     .status(HttpStatus.BAD_REQUEST)
-                    .statusCode(400).build();
+                    .statusCode(HttpStatusCodes.STATUS_CODE_BAD_REQUEST)
+                    .build();
         } catch (NullPointerException e) {
-            return new Response.Builder()
+            return Response.builder()
                     .message(e.getMessage())
-                    .status(HttpStatus.BAD_REQUEST)
-                    .statusCode(500).build();
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .statusCode(HttpStatusCodes.STATUS_CODE_SERVER_ERROR)
+                    .build();
         }
     }
 
@@ -95,23 +95,25 @@ public class SharedContentFacade {
 
             // call commentService with create function to create a new comment
             // return the response with the new comment as a data inside response entity.
-            return new Response.Builder()
-                    .data(CommentDTO.getSharedContentFromDB(commentService.create(comment)))
+            return Response.builder()
+                    .data(CommentDTO.getCommentDTOList(new HashSet<>(commentService.create(comment))))
                     .message(SuccessMessage.CREATE.toString())
                     .status(HttpStatus.ACCEPTED)
-                    .statusCode(201)
+                    .statusCode(HttpStatusCodes.STATUS_CODE_CREATED)
                     .build();
 
         } catch (IllegalArgumentException | AccountNotFoundException | NoSuchElementException e) {
-            return new Response.Builder()
+            return Response.builder()
                     .message(e.getMessage())
                     .status(HttpStatus.BAD_REQUEST)
-                    .statusCode(400).build();
+                    .statusCode(HttpStatusCodes.STATUS_CODE_BAD_REQUEST)
+                    .build();
         } catch (NullPointerException e) {
-            return new Response.Builder()
+            return Response.builder()
                     .message(e.getMessage())
-                    .status(HttpStatus.BAD_REQUEST)
-                    .statusCode(500).build();
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .statusCode(HttpStatusCodes.STATUS_CODE_SERVER_ERROR)
+                    .build();
         }
     }
 
@@ -137,11 +139,11 @@ public class SharedContentFacade {
             }
         });
         // call the correct service using convertFromClassToService(clz) function with delete function in it
-        return new Response.Builder()
+        return Response.builder()
                 .data(convertFromClassToService(clz).delete(correctIds, boardId))
                 .message(SuccessMessage.DELETED.toString())
                 .status(HttpStatus.NO_CONTENT)
-                .statusCode(204)
+                .statusCode(HttpStatusCodes.STATUS_CODE_NO_CONTENT)
                 .build();
     }
 
@@ -157,96 +159,89 @@ public class SharedContentFacade {
                     updateObject.getObjectsIdsRequest().getSectionId(),
                     updateObjectId, null);
 
-
             // call the correct service using convertFromClassToService(clz) function with find function in it
-            return new Response.Builder()
-                    .data(convertFromServiceOutputToDTOEntity(convertFromClassToService(clz).update(updateObject ,updateObjectId), clz))
+            return Response.builder()
+                    .data(convertFromServiceOutputToDTOEntity(convertFromClassToService(clz).update(updateObject, updateObjectId), clz))
                     .message(SuccessMessage.FOUND.toString())
                     .status(HttpStatus.OK)
-                    .statusCode(200)
+                    .statusCode(HttpStatusCodes.STATUS_CODE_OK)
                     .build();
 
         } catch (IllegalArgumentException | NoSuchFieldException | NoSuchElementException e) {
-            return new Response.Builder()
+            return Response.builder()
                     .message(e.getMessage())
                     .status(HttpStatus.BAD_REQUEST)
-                    .statusCode(400).build();
+                    .statusCode(HttpStatusCodes.STATUS_CODE_BAD_REQUEST)
+                    .build();
         } catch (NullPointerException e) {
-            return new Response.Builder()
+            return Response.builder()
                     .message(e.getMessage())
-                    .status(HttpStatus.BAD_REQUEST)
-                    .statusCode(500).build();
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .statusCode(HttpStatusCodes.STATUS_CODE_SERVER_ERROR)
+                    .build();
         }
     }
 
 
-    /**
-     * Returns an object with the given id and class type.
-     *
-     * @param searchId the id of the object
-     * @param clz      the class type of the object
-     * @return a {@link Response} object with the object and a status message. If the object with the given
-     * id and class type does not exist, a BAD_REQUEST status with a message indicating the error is
-     * returned. If the id is not valid, a BAD_REQUEST status with a message indicating the error is
-     * returned. If a NullPointerException is thrown, a BAD_REQUEST status with a message indicating the
-     * error is returned.
-     */
-    public Response get(ObjectsIdsRequest objectsIdsRequest, Long searchId ,Class clz) {
+    //TODO documentation
+    public Response get(ObjectsIdsRequest objectsIdsRequest, Class clz) {
         try {
             // validate the id using the Validations.validate function
             Validations.validateSharedContent(objectsIdsRequest.getBoardId(),
                     objectsIdsRequest.getSectionId(),
-                    searchId,
+                    objectsIdsRequest.getSearchId(),
                     objectsIdsRequest.getParentId());
 
             // call the correct service using convertFromClassToService(clz) function with find function in it
-            return new Response.Builder()
-                    .data(convertFromServiceOutputToDTOEntity(convertFromClassToService(clz).get(objectsIdsRequest, searchId), clz))
+            return Response.builder()
+                    .data(convertFromServiceOutputToDTOEntity(convertFromClassToService(clz).get(objectsIdsRequest), clz))
                     .message(SuccessMessage.FOUND.toString())
                     .status(HttpStatus.OK)
-                    .statusCode(200)
+                    .statusCode(HttpStatusCodes.STATUS_CODE_OK)
                     .build();
 
         } catch (IllegalArgumentException | NoSuchElementException e) {
-            return new Response.Builder()
+            return Response.builder()
                     .message(e.getMessage())
                     .status(HttpStatus.BAD_REQUEST)
-                    .statusCode(400).build();
+                    .statusCode(HttpStatusCodes.STATUS_CODE_BAD_REQUEST)
+                    .build();
         } catch (NullPointerException e) {
-            return new Response.Builder()
+            return Response.builder()
                     .message(e.getMessage())
-                    .status(HttpStatus.BAD_REQUEST)
-                    .statusCode(500).build();
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .statusCode(HttpStatusCodes.STATUS_CODE_SERVER_ERROR)
+                    .build();
         }
     }
 
-    //TODO + DTO + Documentation
+    //TODO + Documentation
     public Response getAllItemsInSection(ObjectsIdsRequest objectsIdsRequest) {
         try {
             // validate the id using the Validations.validate function
-            Validations.validate(objectsIdsRequest.getSectionId(), Regex.ID.getRegex());
-            Validations.validate(objectsIdsRequest.getBoardId(), Regex.ID.getRegex());
+            Validations.validateIDs(objectsIdsRequest.getSectionId(), objectsIdsRequest.getBoardId());
 
             // call the correct service using convertFromClassToService(clz) function
             // with getAllInItem function in it.
-            //FIXME- itemDTO list
-            return new Response.Builder()
+            return Response.builder()
                     .data(itemService.getAllInSection(objectsIdsRequest).stream().map(ItemDTO::getSharedContentFromDB).collect(Collectors.toList()))
                     .message(SuccessMessage.FOUND.toString())
                     .status(HttpStatus.OK)
-                    .statusCode(200)
+                    .statusCode(HttpStatusCodes.STATUS_CODE_OK)
                     .build();
 
         } catch (IllegalArgumentException | NoSuchElementException e) {
-            return new Response.Builder()
+            return Response.builder()
                     .message(e.getMessage())
                     .status(HttpStatus.BAD_REQUEST)
-                    .statusCode(400).build();
+                    .statusCode(HttpStatusCodes.STATUS_CODE_BAD_REQUEST)
+                    .build();
         } catch (NullPointerException e) {
-            return new Response.Builder()
+            return Response.builder()
                     .message(e.getMessage())
-                    .status(HttpStatus.BAD_REQUEST)
-                    .statusCode(500).build();
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .statusCode(HttpStatusCodes.STATUS_CODE_SERVER_ERROR)
+                    .build();
         }
     }
 
@@ -263,49 +258,52 @@ public class SharedContentFacade {
     public Response getAllCommentsInBoard(Long boardId) {
         try {
             Validations.validate(boardId, Regex.ID.getRegex());
-            //FIXME- commentDTO list
-            return new Response.Builder()
+
+            return Response.builder()
                     .data(commentService.getAllCommentsInBoard(boardId).stream().map(CommentDTO::getSharedContentFromDB).collect(Collectors.toList()))
                     .message(SuccessMessage.FOUND.toString())
                     .status(HttpStatus.OK)
-                    .statusCode(200)
+                    .statusCode(HttpStatusCodes.STATUS_CODE_OK)
                     .build();
 
         } catch (IllegalArgumentException | NoSuchElementException e) {
-            return new Response.Builder()
+            return Response.builder()
                     .message(e.getMessage())
                     .status(HttpStatus.BAD_REQUEST)
-                    .statusCode(400).build();
+                    .statusCode(HttpStatusCodes.STATUS_CODE_BAD_REQUEST)
+                    .build();
         } catch (NullPointerException e) {
-            return new Response.Builder()
+            return Response.builder()
                     .message(e.getMessage())
-                    .status(HttpStatus.BAD_REQUEST)
-                    .statusCode(500).build();
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .statusCode(HttpStatusCodes.STATUS_CODE_SERVER_ERROR)
+                    .build();
         }
     }
 
     public Response getAllInItem(ObjectsIdsRequest objectsIdsRequest, Class clz) {
         try {
-            Validations.validate(objectsIdsRequest.getItemId(), Regex.ID.getRegex());
-            Validations.validate(objectsIdsRequest.getSectionId(), Regex.ID.getRegex());
-            Validations.validate(objectsIdsRequest.getBoardId(), Regex.ID.getRegex());
-            return new Response.Builder()
+            Validations.validateIDs(objectsIdsRequest.getItemId(), objectsIdsRequest.getSectionId(), objectsIdsRequest.getBoardId());
+
+            return Response.builder()
                     .data(convertFromClassToService(clz).getAllInItem(objectsIdsRequest).stream().map(entity -> convertFromServiceOutputToDTOEntity(entity, clz)).collect(Collectors.toList()))
                     .message(SuccessMessage.FOUND.toString())
                     .status(HttpStatus.OK)
-                    .statusCode(200)
+                    .statusCode(HttpStatusCodes.STATUS_CODE_OK)
                     .build();
 
         } catch (IllegalArgumentException | NoSuchElementException e) {
-            return new Response.Builder()
+            return Response.builder()
                     .message(e.getMessage())
                     .status(HttpStatus.BAD_REQUEST)
-                    .statusCode(400).build();
+                    .statusCode(HttpStatusCodes.STATUS_CODE_BAD_REQUEST)
+                    .build();
         } catch (NullPointerException e) {
-            return new Response.Builder()
+            return Response.builder()
                     .message(e.getMessage())
-                    .status(HttpStatus.BAD_REQUEST)
-                    .statusCode(500).build();
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .statusCode(HttpStatusCodes.STATUS_CODE_SERVER_ERROR)
+                    .build();
         }
     }
 
@@ -313,23 +311,26 @@ public class SharedContentFacade {
     public Response getAllCommentsInSection(ObjectsIdsRequest objectsIdsRequest) {
         try {
             Validations.validateIDs(objectsIdsRequest.getBoardId(), objectsIdsRequest.getSectionId());
-            return new Response.Builder()
+
+            return Response.builder()
                     .data(commentService.getAllCommentsInSection(objectsIdsRequest).stream().map(CommentDTO::getSharedContentFromDB).collect(Collectors.toList()))
                     .message(SuccessMessage.FOUND.toString())
                     .status(HttpStatus.OK)
-                    .statusCode(200)
+                    .statusCode(HttpStatusCodes.STATUS_CODE_OK)
                     .build();
 
         } catch (IllegalArgumentException | NoSuchElementException e) {
-            return new Response.Builder()
+            return Response.builder()
                     .message(e.getMessage())
                     .status(HttpStatus.BAD_REQUEST)
-                    .statusCode(400).build();
+                    .statusCode(HttpStatusCodes.STATUS_CODE_BAD_REQUEST)
+                    .build();
         } catch (NullPointerException e) {
-            return new Response.Builder()
+            return Response.builder()
                     .message(e.getMessage())
-                    .status(HttpStatus.BAD_REQUEST)
-                    .statusCode(500).build();
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .statusCode(HttpStatusCodes.STATUS_CODE_SERVER_ERROR)
+                    .build();
         }
     }
 

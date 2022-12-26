@@ -3,6 +3,7 @@ package CRM.entity.response;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.ToString;
 import org.springframework.http.HttpStatus;
@@ -11,6 +12,7 @@ import org.springframework.http.HttpStatus;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @ToString
 @Getter
+@Builder
 public class Response {
     @JsonProperty("message")
     private String message;
@@ -20,51 +22,4 @@ public class Response {
     private Object data;
     @JsonProperty("statusCode")
     private Integer statusCode;
-
-
-    public static class Builder {
-
-        private String message;
-        private HttpStatus status;
-        private Integer statusCode;
-        private Object data;
-
-        public Builder() {
-            this.status = null;
-            this.message = null;
-            this.data = null;
-            this.statusCode = null;
-        }
-
-        public Builder message(String message) {
-            this.message = message;
-            return this;
-        }
-
-        public Builder status(HttpStatus status) {
-            this.status = status;
-            return this;
-        }
-
-        public Builder statusCode(Integer statusCode){
-            this.statusCode = statusCode;
-            return this;
-        }
-
-        public <T> Builder data(Object data) {
-            this.data = data;
-            return this;
-        }
-
-        public Response build() {
-            return new Response(this);
-        }
-    }
-
-    private Response(Builder builder) {
-        this.status = builder.status;
-        this.message = builder.message;
-        this.data = builder.data;
-        this.statusCode = builder.statusCode;
-    }
 }

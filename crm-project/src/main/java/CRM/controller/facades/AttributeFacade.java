@@ -2,14 +2,13 @@ package CRM.controller.facades;
 
 import CRM.entity.*;
 import CRM.entity.DTO.AttributeDTO;
-import CRM.entity.DTO.BoardDTO;
 import CRM.entity.requests.AttributeRequest;
-import CRM.entity.requests.UpdateObjectRequest;
 import CRM.entity.response.Response;
 import CRM.service.*;
 import CRM.utils.Validations;
 import CRM.utils.enums.Regex;
 import CRM.utils.enums.SuccessMessage;
+import com.google.api.client.http.HttpStatusCodes;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.hibernate.NonUniqueObjectException;
@@ -20,6 +19,7 @@ import org.springframework.stereotype.Component;
 import java.util.HashSet;
 import java.util.NoSuchElementException;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Component
 public class AttributeFacade {
@@ -45,24 +45,22 @@ public class AttributeFacade {
         try {
             Validations.validate(attributeRequest.getName(), Regex.NAME.getRegex());
 
-            Attribute savedAttribute = attributeService.create(attributeRequest, clz);
-
-            return new Response.Builder()
+            return Response.builder()
                     .status(HttpStatus.CREATED)
-                    .statusCode(201)
-                    .data(AttributeDTO.createAttributeDTO(savedAttribute))
+                    .statusCode(HttpStatusCodes.STATUS_CODE_CREATED)
+                    .data(AttributeDTO.getListOfAttributesFromDB(new HashSet<>(attributeService.create(attributeRequest, clz))))
                     .build();
         } catch (IllegalArgumentException | NonUniqueObjectException | NoSuchElementException e) {
-            return new Response.Builder()
+            return Response.builder()
                     .message(e.getMessage())
                     .status(HttpStatus.BAD_REQUEST)
-                    .statusCode(400)
+                    .statusCode(HttpStatusCodes.STATUS_CODE_BAD_REQUEST)
                     .build();
         } catch (NullPointerException e) {
-            return new Response.Builder()
+            return Response.builder()
                     .message(e.getMessage())
                     .status(HttpStatus.BAD_REQUEST)
-                    .statusCode(500)
+                    .statusCode(HttpStatusCodes.STATUS_CODE_SERVER_ERROR)
                     .build();
         }
     }
@@ -76,27 +74,25 @@ public class AttributeFacade {
      */
     public Response delete(Long boardId, Long attributeId, Class clz) {
         try {
-            Validations.validate(attributeId, Regex.ID.getRegex());
-            Validations.validate(boardId, Regex.ID.getRegex());
-
+            Validations.validateIDs(attributeId, boardId);
             attributeService.delete(boardId, attributeId, clz);
 
-            return new Response.Builder()
+            return Response.builder()
                     .status(HttpStatus.NO_CONTENT)
-                    .statusCode(204)
+                    .statusCode(HttpStatusCodes.STATUS_CODE_NO_CONTENT)
                     .message(SuccessMessage.DELETED.toString())
                     .build();
         } catch (NoSuchElementException | IllegalArgumentException e) {
-            return new Response.Builder()
+            return Response.builder()
                     .message(e.getMessage())
                     .status(HttpStatus.BAD_REQUEST)
-                    .statusCode(400)
+                    .statusCode(HttpStatusCodes.STATUS_CODE_BAD_REQUEST)
                     .build();
         } catch (NullPointerException e) {
-            return new Response.Builder()
+            return Response.builder()
                     .message(e.getMessage())
                     .status(HttpStatus.BAD_REQUEST)
-                    .statusCode(500)
+                    .statusCode(HttpStatusCodes.STATUS_CODE_SERVER_ERROR)
                     .build();
         }
     }
@@ -110,28 +106,27 @@ public class AttributeFacade {
      * @throws IllegalArgumentException if the specified id is invalid.
      * @throws NullPointerException     if the specified id is null.
      */
-    public Response get(Long attributeId, Long boardId,  Class clz) {
+    public Response get(Long attributeId, Long boardId, Class clz) {
         try {
-            Validations.validate(attributeId, Regex.ID.getRegex());
-            Validations.validate(boardId, Regex.ID.getRegex());
+            Validations.validateIDs(attributeId, boardId);
 
-            return new Response.Builder()
+            return Response.builder()
                     .data(AttributeDTO.createAttributeDTO(attributeService.get(attributeId, boardId, clz)))
                     .message(SuccessMessage.FOUND.toString())
                     .status(HttpStatus.OK)
-                    .statusCode(200)
+                    .statusCode(HttpStatusCodes.STATUS_CODE_OK)
                     .build();
         } catch (NoSuchElementException | IllegalArgumentException e) {
-            return new Response.Builder()
+            return Response.builder()
                     .message(e.getMessage())
                     .status(HttpStatus.BAD_REQUEST)
-                    .statusCode(400)
+                    .statusCode(HttpStatusCodes.STATUS_CODE_BAD_REQUEST)
                     .build();
         } catch (NullPointerException e) {
-            return new Response.Builder()
+            return Response.builder()
                     .message(e.getMessage())
                     .status(HttpStatus.BAD_REQUEST)
-                    .statusCode(500)
+                    .statusCode(HttpStatusCodes.STATUS_CODE_SERVER_ERROR)
                     .build();
         }
     }
@@ -149,23 +144,23 @@ public class AttributeFacade {
         try {
             Validations.validate(boardId, Regex.ID.getRegex());
             Set<Attribute> targetSet = new HashSet<>(attributeService.getAllAttributesInBoard(boardId, clz));
-            return new Response.Builder()
+            return Response.builder()
                     .data(AttributeDTO.getListOfAttributesFromDB(targetSet))
                     .message(SuccessMessage.FOUND.toString())
                     .status(HttpStatus.OK)
-                    .statusCode(200)
+                    .statusCode(HttpStatusCodes.STATUS_CODE_OK)
                     .build();
         } catch (IllegalArgumentException | NoSuchElementException e) {
-            return new Response.Builder()
+            return Response.builder()
                     .message(e.getMessage())
                     .status(HttpStatus.BAD_REQUEST)
-                    .statusCode(400)
+                    .statusCode(HttpStatusCodes.STATUS_CODE_BAD_REQUEST)
                     .build();
         } catch (NullPointerException e) {
-            return new Response.Builder()
+            return Response.builder()
                     .message(e.getMessage())
                     .status(HttpStatus.BAD_REQUEST)
-                    .statusCode(500)
+                    .statusCode(HttpStatusCodes.STATUS_CODE_SERVER_ERROR)
                     .build();
         }
     }
@@ -183,23 +178,24 @@ public class AttributeFacade {
 //    public Response update(UpdateObjectRequest statusRequest, Long statusId, Class clz) {
 //        try {
 //            Validations.validate(statusId, Regex.ID.getRegex());
-//            return new Response.Builder()
+//
+//            return Response.builder()
 //                    .data(AttributeDTO.createAttributeDTO(attributeService.update(statusRequest, statusId)))
 //                    .message(SuccessMessage.FOUND.toString())
 //                    .status(HttpStatus.OK)
-//                    .statusCode(200)
+//                    .statusCode(HttpStatusCodes.STATUS_CODE_OK)
 //                    .build();
 //        } catch (IllegalArgumentException | NoSuchElementException | NoSuchFieldException e) {
-//            return new Response.Builder()
+//            return Response.builder()
 //                    .message(e.getMessage())
 //                    .status(HttpStatus.BAD_REQUEST)
-//                    .statusCode(400)
+//                    .statusCode(HttpStatusCodes.STATUS_CODE_BAD_REQUEST)
 //                    .build();
 //        } catch (NullPointerException e) {
-//            return new Response.Builder()
+//            return Response.builder()
 //                    .message(e.getMessage())
 //                    .status(HttpStatus.BAD_REQUEST)
-//                    .statusCode(500)
+//                    .statusCode(HttpStatusCodes.STATUS_CODE_SERVER_ERROR)
 //                    .build();
 //        }
 //    }

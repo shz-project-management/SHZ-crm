@@ -74,7 +74,7 @@ public class SectionController {
         return new ResponseEntity<>(response, response.getStatus());
     }
 
-    @GetMapping(value = "filter-items/{boardId}")
+    @PostMapping(value = "filter-items/{boardId}")
     public ResponseEntity<Response> getFilteredItems(@RequestBody Map<String, List<String>> filters, @PathVariable Long boardId) {
         Response response = sectionFacade.getFilteredItems(filters, boardId);
         return new ResponseEntity<>(response, response.getStatus());
