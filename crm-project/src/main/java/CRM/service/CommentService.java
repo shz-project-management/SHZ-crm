@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import javax.security.auth.login.AccountNotFoundException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class CommentService implements ServiceInterface {
@@ -45,7 +46,7 @@ public class CommentService implements ServiceInterface {
             throw new AccountNotFoundException(ExceptionMessage.ACCOUNT_DOES_NOT_EXISTS.toString());
         }
 
-        if (commentRequest.getParentItemId() == null){
+        if (commentRequest.getParentItemId() == null) {
             throw new IllegalArgumentException(ExceptionMessage.PARENT_ITEM_NOT_FOUND.toString());
         }
 
@@ -66,39 +67,45 @@ public class CommentService implements ServiceInterface {
     @Override
     public int delete(List<Long> ids, long boardId) {
         Board board = Validations.doesIdExists(boardId, boardRepository);
-        List<Section> sections = new ArrayList<>(board.getSections());
-        int counter = 0;
 
-        for (Section section : sections) {
+        // Find the comments to delete
+        List<Comment> commentsToDelete = board.findCommentsByIds(ids);
+
+        // Remove the comments from all items that reference them
+        for (Comment comment : commentsToDelete) comment.getParentItem().getComments().remove(comment);
+
+        // Update the board
+        int counter = 0;
+        for (Section section : board.getSections()) {
             for (Item item : section.getItems()) {
-                for (Iterator<Comment> commentIterator = item.getComments().iterator(); commentIterator.hasNext(); ) {
-                    Comment comment = commentIterator.next();
-                    if (ids.contains(comment.getId())) {
-                        commentIterator.remove();
-                        counter++;
-                    }
-                }
+                item.getComments().removeIf(comment -> ids.contains(comment.getId()));
+                counter += item.getComments().size();
             }
         }
 
+        // Save the updated board
         boardRepository.save(board);
 
         return counter;
     }
 
 
-    //TODO + Documentation
+    //TODO Documentation
     @Override
     public Section update(UpdateObjectRequest updateObject) throws NoSuchFieldException {
         Board board = Validations.doesIdExists(updateObject.getObjectsIdsRequest().getBoardId(), boardRepository);
+        Comment comment = board.getCommentFromItemInSection(updateObject.getObjectsIdsRequest().getUpdateObjId(),
+                updateObject.getObjectsIdsRequest().getItemId(),
+                updateObject.getObjectsIdsRequest().getSectionId());
 
-//        if (Validations.checkIfFieldIsCustomObject(updateObject.getFieldName())) {
-//            throw new NoSuchFieldException(ExceptionMessage.FIELD_OBJECT_NOT_EXISTS.toString());
-//        } else {
-//            fieldIsPrimitiveOrKnownObjectHelper(updateObject, comment);
-//        }
-//        return commentRepository.save(comment);
-        return null;
+        if (Validations.checkIfFieldIsCustomObject(updateObject.getFieldName())) {
+            throw new NoSuchFieldException(ExceptionMessage.FIELD_OBJECT_NOT_EXISTS.toString());
+        } else {
+            Common.fieldIsPrimitiveOrKnownObjectHelper(updateObject, comment);
+        }
+
+        boardRepository.save(board);
+        return board.getSectionFromBoard(updateObject.getObjectsIdsRequest().getSectionId());
     }
 
     //TODO documentation
@@ -107,7 +114,7 @@ public class CommentService implements ServiceInterface {
         Board board = Validations.doesIdExists(objectsIdsRequest.getBoardId(), boardRepository);
         Section section = Common.getSection(board, objectsIdsRequest.getSectionId());
 
-        if(objectsIdsRequest.getParentId() != null) {
+        if (objectsIdsRequest.getParentId() != null) {
             Item item = Common.getItem(section, objectsIdsRequest.getParentId());
             return Common.getComment(item, objectsIdsRequest.getSearchId());
         }
@@ -154,20 +161,4 @@ public class CommentService implements ServiceInterface {
 //        }
         return commentList;
     }
-
-    /**
-     * Helper function for updating a primitive or known object field.
-     *
-     * @param updateObject the request object containing the updates to be made
-     * @param comment      the item object being updated
-     * @throws NoSuchFieldException if the field does not exist in the item object
-     */
-//    private void fieldIsPrimitiveOrKnownObjectHelper(UpdateObjectRequest updateObject, Comment comment) throws NoSuchFieldException {
-//        if (Validations.checkIfFieldIsNonPrimitive(updateObject.getFieldName())) {
-//            LocalDateTime dueDate = LocalDateTime.now().plusDays(Long.valueOf((Integer) updateObject.getContent()));
-//            Validations.setContentToFieldIfFieldExists(comment, updateObject.getFieldName(), dueDate);
-//        } else {
-//            Validations.setContentToFieldIfFieldExists(comment, updateObject.getFieldName(), updateObject.getContent());
-//        }
-//    }
 }
