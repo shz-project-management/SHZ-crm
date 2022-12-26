@@ -45,7 +45,7 @@ public class NotificationService {
         notificationRepository.save(notification);
     }
 
-    public void delete(Long notificationId){
-        notificationRepository.deleteById(notificationId);
+    public void delete(List<Long> notificationsIds){
+        notificationRepository.deleteAllById(notificationsIds);
     }
 }

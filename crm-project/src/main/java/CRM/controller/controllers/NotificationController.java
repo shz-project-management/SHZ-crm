@@ -11,6 +11,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @Controller
 @RequestMapping(value = "/notification")
 @AllArgsConstructor
@@ -27,9 +29,9 @@ public class NotificationController {
         return new ResponseEntity<>(response, response.getStatus());
     }
 
-    @DeleteMapping(value = "delete/{notificationId}")
-    public ResponseEntity<Response> delete(@PathVariable Long notificationId) {
-        Response response = notificationFacade.delete(notificationId);
+    @DeleteMapping(value = "delete")
+    public ResponseEntity<Response> delete(@RequestBody List<Long> notificationsIds) {
+        Response response = notificationFacade.delete(notificationsIds);
         return new ResponseEntity<>(response, response.getStatus());
     }
 }

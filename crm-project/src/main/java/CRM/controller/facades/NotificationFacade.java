@@ -6,6 +6,7 @@ import CRM.entity.requests.ObjectsIdsRequest;
 import CRM.entity.response.Response;
 import CRM.service.NotificationService;
 import CRM.utils.Validations;
+import CRM.utils.enums.Regex;
 import CRM.utils.enums.SuccessMessage;
 import com.google.api.client.http.HttpStatusCodes;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,10 +49,15 @@ public class NotificationFacade {
         }
     }
 
-    public Response delete(Long notificationId) {
+    public Response delete(List<Long> notificationsIds) {
         try {
-            Validations.validateIDs(notificationId);
-            notificationService.delete(notificationId);
+            notificationsIds.forEach(id -> {
+                try {
+                    Validations.validate(id, Regex.ID.getRegex());
+                } catch (IllegalArgumentException | NullPointerException e) {
+                }
+            });
+            notificationService.delete(notificationsIds);
             return Response.builder()
                     .message(SuccessMessage.FOUND.toString())
                     .status(HttpStatus.FOUND)
