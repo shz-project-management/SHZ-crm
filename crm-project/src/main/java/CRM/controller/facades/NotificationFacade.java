@@ -75,11 +75,12 @@ public class NotificationFacade {
                 } catch (IllegalArgumentException | NullPointerException e) {
                 }
             });
-            notificationService.delete(notificationsIds);
+            List<Notification> remainingNotifications = notificationService.delete(notificationsIds);
             return Response.builder()
                     .message(SuccessMessage.DELETED.toString())
-                    .status(HttpStatus.NO_CONTENT)
-                    .statusCode(HttpStatusCodes.STATUS_CODE_NO_CONTENT)
+                    .status(HttpStatus.OK)
+                    .statusCode(204)
+                    .data(NotificationDTO.createNotificationsDTOList(remainingNotifications))
                     .build();
         } catch (IllegalArgumentException | NoSuchElementException e) {
             return Response.builder()
