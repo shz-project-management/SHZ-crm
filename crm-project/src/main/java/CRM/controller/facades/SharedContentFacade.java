@@ -10,6 +10,7 @@ import CRM.entity.Item;
 import CRM.entity.SharedContent;
 import CRM.entity.requests.*;
 import CRM.entity.response.Response;
+import CRM.repository.UserRepository;
 import CRM.service.*;
 import CRM.utils.NotificationSender;
 import CRM.utils.Validations;
@@ -42,6 +43,8 @@ public class SharedContentFacade {
     private SettingsService settingsService;
     @Autowired
     private NotificationSender notificationSender;
+    @Autowired
+    private UserRepository userRepository;
 
     /**
      * Creates a new item in the system and stores it in the database.
@@ -192,13 +195,30 @@ public class SharedContentFacade {
             Validations.validateSharedContent(updateObject.getObjectsIdsRequest());
             // call the correct service using convertFromClassToService(clz) function with find function in it
             SectionDTO sectionDTO = SectionDTO.createSectionDTO(convertFromClassToService(clz).update(updateObject));
+            //send notification if item status/type/data updated
             if (clz.equals(Item.class)) {
-                notificationSender.sendNotificationToManyUsers(
-                        NotificationRequest.createItemChangeRequest(userService.get(updateObject.getObjectsIdsRequest().getUserId()),
-                                boardService.get(updateObject.getObjectsIdsRequest().getBoardId()),
-                                updateObject.getObjectsIdsRequest().getItemId(),
-                                updateObject.getFieldName().toString(), updateObject.getContent(),
-                                settingsService.getNotificationSettingFromDB(Notifications.ITEM_DATA_CHANGED.name)),
+                NotificationRequest request;
+                //status
+                if (updateObject.getFieldName().equals(UpdateField.STATUS))
+                    request = NotificationRequest.createStatusChangeRequest(userService.get(updateObject.getObjectsIdsRequest().getUserId()),
+                            boardService.get(updateObject.getObjectsIdsRequest().getBoardId()),
+                            updateObject.getObjectsIdsRequest().getItemId(), updateObject.getContent(),
+                            settingsService.getNotificationSettingFromDB(Notifications.STATUS_CHANGED.name));
+                //type
+                else if (updateObject.getFieldName().equals(UpdateField.TYPE)) {
+                    request = NotificationRequest.createTypeChangeRequest(userService.get(updateObject.getObjectsIdsRequest().getUserId()),
+                            boardService.get(updateObject.getObjectsIdsRequest().getBoardId()),
+                            updateObject.getObjectsIdsRequest().getItemId(), updateObject.getContent(),
+                            settingsService.getNotificationSettingFromDB(Notifications.TYPE_CHANGED.name));
+                }
+                //data
+                else request = NotificationRequest.createItemChangeRequest(userService.get(updateObject.getObjectsIdsRequest().getUserId()),
+                        boardService.get(updateObject.getObjectsIdsRequest().getBoardId()),
+                        updateObject.getObjectsIdsRequest().getItemId(),
+                        updateObject.getFieldName().toString(), updateObject.getContent(),
+                        settingsService.getNotificationSettingFromDB(Notifications.ITEM_DATA_CHANGED.name));
+
+                notificationSender.sendNotificationToManyUsers(request,
                         userService.getAllInBoard(updateObject.getObjectsIdsRequest().getBoardId()));
             }
             return Response.builder()
