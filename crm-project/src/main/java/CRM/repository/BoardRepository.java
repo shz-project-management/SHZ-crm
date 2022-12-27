@@ -15,7 +15,7 @@ import java.util.List;
 @Transactional
 @Repository
 public interface BoardRepository extends JpaRepository<Board, Long> {
-
+    List<Board> findByCreatorUser_Id(Long id);
     @Query("SELECT b from Board b WHERE b.creatorUser = ?1")
     List<Board> findAllByUser(User user);
 
@@ -27,6 +27,4 @@ public interface BoardRepository extends JpaRepository<Board, Long> {
     @Transactional
     @Modifying
     void removeByCreatorUser(User user);
-
-    List<Board> findByCreatorUser(User user);
 }

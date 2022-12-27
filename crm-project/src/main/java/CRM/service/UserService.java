@@ -115,8 +115,8 @@ public class UserService {
             boardRepository.save(board);
         }
 
-        List<Board> boardss = boardRepository.findByCreatorUser(user);
-        for (Board board : boardss) {
+        List<Board> boardsOfCreator = boardRepository.findByCreatorUser_Id(user.getId());
+        for (Board board : boardsOfCreator) {
             boardRepository.delete(board);
         }
         userRepository.delete(user);
