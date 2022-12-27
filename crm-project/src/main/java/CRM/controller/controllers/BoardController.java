@@ -66,19 +66,6 @@ public class BoardController {
     }
 
     /**
-     * This method is used to handle HTTP GET requests to the specified URL (board/getAll/{userId}).
-     * The method takes the id of the user as a path variable and uses it to retrieve all the boards created by the user using the boardFacade object.
-     *
-     * @param userId The id of the user whose boards are to be retrieved.
-     * @return A ResponseEntity object containing the Response object with the retrieved boards and the HTTP status code.
-     */
-    @GetMapping(value = "getAll/{userId}")
-    public ResponseEntity<Response> getAllBoardsOfUser(@PathVariable Long userId) {
-        Response response = boardFacade.getAllBoardsOfUser(userId);
-        return new ResponseEntity<>(response, response.getStatus());
-    }
-
-    /**
      * Handles PUT requests to update board.
      *
      * @param boardRequest An object containing the fields to update for the board.

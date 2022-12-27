@@ -20,10 +20,11 @@ import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityManager;
 import javax.security.auth.login.AccountNotFoundException;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
+
+import static CRM.utils.Util.SharedBoards;
+import static CRM.utils.Util.myBoards;
 
 @Service
 public class UserService {
@@ -150,6 +151,28 @@ public class UserService {
     }
 
     /**
+     * Retrieves all boards belonging to the specified user.
+     *
+     * @param userId the id of the user
+     * @return a map containing two lists of boards: "myBoards" (boards created by the user) and "SharedBoards" (boards shared with the user)
+     * @throws AccountNotFoundException if the user does not exist
+     */
+    public Map<String, List<Board>> getAllBoardsOfUser(long userId) throws AccountNotFoundException {
+        User user;
+        try {
+            user = Validations.doesIdExists(userId, userRepository);
+        } catch (NoSuchElementException e) {
+            throw new AccountNotFoundException(ExceptionMessage.ACCOUNT_DOES_NOT_EXISTS.toString());
+        }
+
+        //get all the boards of the creator user
+        Map<String, List<Board>> userBoards = new HashMap<>();
+        userBoards.put(myBoards, boardRepository.findByCreatorUser_Id(user.getId()));
+        userBoards.put(SharedBoards, getSharedBoardsOfUser(user));
+        return userBoards;
+    }
+
+    /**
      * This method updates a user's permission on a board.
      *
      * @param objectsIdsRequest an {@link ObjectsIdsRequest} object which contains the ID of the user, board, and requested permission
@@ -232,5 +255,23 @@ public class UserService {
             userPermissionInBoard.setPermission(permissionRequest);
         }
         return userPermissionsSet;
+    }
+
+    /**
+     * Private method to retrieve all boards shared with the specified user.
+     *
+     * @param user the user
+     * @return a list of boards shared with the user
+     */
+    private List<Board> getSharedBoardsOfUser(User user) {
+        //get all the boards of the user he is shared with
+        List<Board> allBoards = boardRepository.findAll();
+        List<Board> sharedBoards = new ArrayList<>();
+        for (Board board : allBoards) {
+            if (board.getAllUsersInBoard().contains(user)) {
+                sharedBoards.add(board);
+            }
+        }
+        return sharedBoards;
     }
 }
