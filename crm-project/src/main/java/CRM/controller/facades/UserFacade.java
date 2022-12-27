@@ -2,18 +2,15 @@ package CRM.controller.facades;
 
 import CRM.entity.DTO.UserDTO;
 import CRM.entity.User;
-import CRM.entity.UserPermission;
 import CRM.entity.requests.NotificationRequest;
 import CRM.entity.requests.ObjectsIdsRequest;
 import CRM.entity.response.Response;
 import CRM.service.BoardService;
 import CRM.service.SettingsService;
 import CRM.service.UserService;
-import CRM.utils.Common;
 import CRM.utils.NotificationSender;
 import CRM.utils.Validations;
 import CRM.utils.enums.Notifications;
-import CRM.utils.enums.Permission;
 import CRM.utils.enums.Regex;
 import CRM.utils.enums.SuccessMessage;
 import com.google.api.client.http.HttpStatusCodes;
@@ -72,19 +69,15 @@ public class UserFacade {
     }
 
     /**
-     * Deletes a user from the database.
+     * Method to delete a user.
      *
      * @param id the id of the user to delete
-     * @return a Response object with a message, status, and status code indicating the result of the delete operation
-     * if the delete operation was successful, the message field will contain the SuccessMessage.FOUND message,
-     * the status field will be HttpStatus.OK, and the statusCode field will be 200
-     * if the user with the given id does not exist in the database, the message field will contain the
-     * AccountNotFoundException message, the status field will be HttpStatus.BAD_REQUEST, and the statusCode field
-     * will be 400
-     * if the id input is invalid, the message field will contain the IllegalArgumentException message,
-     * the status field will be HttpStatus.BAD_REQUEST, and the statusCode field will be 400
-     * if there is a null pointer exception, the message field will contain the NullPointerException message,
-     * the status field will be HttpStatus.BAD_REQUEST, and the statusCode field will be 500
+     * @return a response object with a data field equal to the number of deleted users,
+     * a message field indicating success or failure, and a status field indicating the status of the request
+     * @throws AccountNotFoundException if the user associated with the id cannot be found
+     * @throws NoSuchElementException   if the user associated with the id is not a member of a board
+     * @throws IllegalArgumentException if the id is invalid
+     * @throws NullPointerException     if the id parameter is null
      */
     public Response delete(Long id) {
         try {
@@ -158,7 +151,17 @@ public class UserFacade {
         }
     }
 
-    //TODO documentation
+    /**
+     * Method to update a user's membership in a board.
+     *
+     * @param objectsIdsRequest an object containing the id of the user, board, and permission level to update
+     * @return a response object with a data field equal to a list of user DTOs, a message field indicating
+     * success or failure, and a status field indicating the status of the request
+     * @throws AccountNotFoundException if the user or board associated with the request cannot be found
+     * @throws IllegalArgumentException if the objectsIdsRequest or its contained ids are invalid
+     * @throws NoSuchElementException   if the board or permission level associated with the request cannot be found
+     * @throws NullPointerException     if the objectsIdsRequest parameter is null
+     */
     public Response updateUserToBoard(ObjectsIdsRequest objectsIdsRequest) {
         try {
             Validations.validateUpdateUserToBoard(objectsIdsRequest.getBoardId(), objectsIdsRequest.getUserId(),

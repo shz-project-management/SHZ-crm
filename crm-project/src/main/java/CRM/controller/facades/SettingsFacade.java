@@ -60,6 +60,16 @@ public class SettingsFacade {
         }
     }
 
+    /**
+     * Changes the user settings in a board.
+     *
+     * @param settingUpdateRequest request containing the user and board ids and the new settings
+     * @return a response object with the updated settings for the user in the board
+     * @throws IllegalArgumentException if the user or board id is invalid
+     * @throws NoSuchElementException   if the user or board does not exist
+     * @throws AccountNotFoundException if the user does not have access to the board
+     * @throws NullPointerException     if an error occurs while processing the request
+     */
     public Response changeUserSettingsInBoard(SettingUpdateRequest settingUpdateRequest) {
         try {
             Validations.validateIDs(settingUpdateRequest.getUserId(), settingUpdateRequest.getBoardId());

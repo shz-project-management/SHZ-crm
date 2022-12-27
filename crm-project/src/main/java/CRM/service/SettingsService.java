@@ -39,27 +39,41 @@ public class SettingsService {
      *
      * @param objectsIdsRequest contains the user and board ids which we will use to retrieve the settings.
      * @return A Response object containing all the retrieved settings or an error message if the user does not belong to that board.
-     * @throws NoSuchElementException   if the user does not belong to that board.
+     * @throws NoSuchElementException if the user does not belong to that board.
      */
     public List<UserSetting> getAllUserSettingsInBoard(ObjectsIdsRequest objectsIdsRequest) throws AccountNotFoundException {
-        if(!Validations.checkIfUserExistsInBoard(objectsIdsRequest.getUserId(), objectsIdsRequest.getBoardId(), userRepository, boardRepository))
+        if (!Validations.checkIfUserExistsInBoard(objectsIdsRequest.getUserId(), objectsIdsRequest.getBoardId(), userRepository, boardRepository))
             throw new NoSuchElementException(ExceptionMessage.USER_DOES_NOT_EXISTS_IN_BOARD.toString());
         return userSettingRepository.getUserSettingsInBoard(objectsIdsRequest.getUserId(), objectsIdsRequest.getBoardId());
     }
 
-    public Boolean changeUserSettingInBoard(Long userId, Long boardId, Long settingId, Boolean shouldBeActive){
+    public Boolean changeUserSettingInBoard(Long userId, Long boardId, Long settingId, Boolean shouldBeActive) {
         // make sure there is such a user in board in the db -> checkIfExists
         // if so, change the setting to the new setting. else, throw NoSuchElement exception
         return null;
     }
 
-    public NotificationSetting getNotificationSettingFromDB(String notificationName){
+    /**
+     * Retrieve a notification setting from the database by its name.
+     *
+     * @param notificationName the name of the notification setting to retrieve
+     * @return the notification setting with the specified name, or null if it does not exist
+     */
+    public NotificationSetting getNotificationSettingFromDB(String notificationName) {
         Optional<NotificationSetting> notificationSetting = notificationSettingRepository.findByName(notificationName);
         return notificationSetting.orElse(null);
     }
 
+    /**
+     * Update a user's notification settings in a board.
+     *
+     * @param settingUpdateRequest the request object containing the user, board, and notification settings information to update
+     * @return the list of updated user settings
+     * @throws AccountNotFoundException if the user or board with the specified IDs do not exist
+     * @throws NoSuchElementException   if the user is not a member of the specified board
+     */
     public List<UserSetting> changeUserSettingsInBoard(SettingUpdateRequest settingUpdateRequest) throws AccountNotFoundException {
-        if(!Validations.checkIfUserExistsInBoard(settingUpdateRequest.getUserId(), settingUpdateRequest.getBoardId(), userRepository, boardRepository))
+        if (!Validations.checkIfUserExistsInBoard(settingUpdateRequest.getUserId(), settingUpdateRequest.getBoardId(), userRepository, boardRepository))
             throw new NoSuchElementException(ExceptionMessage.USER_DOES_NOT_EXISTS_IN_BOARD.toString());
 
         Board board = Validations.doesIdExists(settingUpdateRequest.getBoardId(), boardRepository);
@@ -67,10 +81,10 @@ public class SettingsService {
 
         UserSetting userSetting = UserSetting.getRelevantUserSetting(board, user, settingUpdateRequest.getNotificationName());
 
-        if(settingUpdateRequest.getInApp() != null){
+        if (settingUpdateRequest.getInApp() != null) {
             userSetting.setInApp(settingUpdateRequest.getInApp());
         }
-        if(settingUpdateRequest.getInEmail() != null){
+        if (settingUpdateRequest.getInEmail() != null) {
             userSetting.setInEmail(settingUpdateRequest.getInEmail());
         }
 

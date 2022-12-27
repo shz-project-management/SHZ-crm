@@ -23,7 +23,16 @@ public class NotificationFacade {
     @Autowired
     private NotificationService notificationService;
 
-    //TODO:DOCUMENTATION
+    /**
+     * Retrieves a list of notifications for a specified user on a specified board.
+     *
+     * @param objectsIdsRequest the objects IDs request containing the user ID and board ID
+     * @return a response object with a status code and message indicating the success or failure of the operation, and a list of notification objects
+     * @throws AccountNotFoundException if the specified user does not exist
+     * @throws IllegalArgumentException if the user ID or board ID is invalid or not provided
+     * @throws NoSuchElementException   if the specified board does not exist
+     * @throws NullPointerException     if the objects IDs request object is null
+     */
     public Response getAllForUserPerBoard(ObjectsIdsRequest objectsIdsRequest) {
         try {
             Validations.validateIDs(objectsIdsRequest.getUserId(), objectsIdsRequest.getBoardId());
@@ -49,6 +58,15 @@ public class NotificationFacade {
         }
     }
 
+    /**
+     * Deletes a list of notifications by ID.
+     *
+     * @param notificationsIds a list of notification IDs
+     * @return a response object with a status code and message indicating the success or failure of the operation
+     * @throws IllegalArgumentException if any of the notification IDs are invalid or not provided
+     * @throws NoSuchElementException   if any of the specified notifications do not exist
+     * @throws NullPointerException     if the notifications IDs list is null
+     */
     public Response delete(List<Long> notificationsIds) {
         try {
             notificationsIds.forEach(id -> {

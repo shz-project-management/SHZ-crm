@@ -3,7 +3,6 @@ package CRM.controller.facades;
 import CRM.entity.*;
 import CRM.entity.DTO.AttributeDTO;
 import CRM.entity.DTO.BoardDTO;
-import CRM.entity.DTO.SectionDTO;
 import CRM.entity.requests.AttributeRequest;
 import CRM.entity.requests.UpdateObjectRequest;
 import CRM.entity.response.Response;
@@ -22,7 +21,6 @@ import org.springframework.stereotype.Component;
 import java.util.HashSet;
 import java.util.NoSuchElementException;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @Component
 public class AttributeFacade {
@@ -32,17 +30,15 @@ public class AttributeFacade {
     private AttributeService attributeService;
 
     /**
-     * This function creates a new attribute which could be status or type, both classes inherit from attribute and have no extra data.
-     * It validates the attribute name using the NAME regex from the Regex enum,
-     * finds the board it belongs to using the getBoardId from the attributeRequest object, creates a new Attribute object,
-     * and calls the create function in the service that matches the class type that we get as a parameter,
-     * with the help of convertFromClassToService function which gives us the relevant service based on clz Class which will hold Status or Type
-     * the create function that we called will persist the attribute into the database.
+     * Creates a new attribute for a board object.
      *
-     * @param attributeRequest The request body, containing the necessary information to create a new attribute.
-     *                         for info is the same for both classes Status and Type.
-     * @param clz              hold the Class type of the attributeRequest details (Status or Type)
-     * @return A Response object with the status of the create operation and the created attribute object, or an error message if the operation fails.
+     * @param attributeRequest the request object containing the attribute name and board ID
+     * @param clz              the class of the attribute to create (either {@link Status} or {@link Type})
+     * @return a response object with a status code and message indicating the success or failure of the operation
+     * @throws NonUniqueObjectException if an attribute with the same name already exists for the specified board
+     * @throws NoSuchElementException   if the specified board does not exist
+     * @throws IllegalArgumentException if the attribute name is invalid or the board ID is not provided
+     * @throws NullPointerException     if the attribute request object is null
      */
     public Response create(AttributeRequest attributeRequest, Class clz) {
         try {
@@ -69,11 +65,15 @@ public class AttributeFacade {
     }
 
     /**
-     * Deletes an attribute(status/type) with the given ID.
+     * Deletes an attribute from a board object.
      *
+     * @param boardId     the ID of the board containing the attribute
      * @param attributeId the ID of the attribute to delete
-     * @return a response object indicating the status of the deletion operation
-     * @throws NoSuchElementException if no attribute with the given ID exists
+     * @param clz         the class of the attribute to delete (either {@link Status} or {@link Type})
+     * @return a response object with a status code and message indicating the success or failure of the operation
+     * @throws NoSuchElementException   if the specified attribute or board does not exist
+     * @throws IllegalArgumentException if the attribute or board ID is invalid
+     * @throws NullPointerException     if one of the ID parameters is null
      */
     public Response delete(Long boardId, Long attributeId, Class clz) {
         try {
@@ -101,13 +101,15 @@ public class AttributeFacade {
     }
 
     /**
-     * This method is used to retrieve an attribute(status/type) with the specified id.
+     * Retrieves an attribute from a board object.
      *
-     * @param attributeId The id of the attribute to be retrieved.
-     * @return A Response object containing the retrieved attribute or an error message if the attribute is not found or the id is invalid.
-     * @throws NoSuchElementException   if the attribute with the specified id is not found.
-     * @throws IllegalArgumentException if the specified id is invalid.
-     * @throws NullPointerException     if the specified id is null.
+     * @param attributeId the ID of the attribute to retrieve
+     * @param boardId     the ID of the board containing the attribute
+     * @param clz         the class of the attribute to retrieve (either {@link Status} or {@link Type})
+     * @return a response object with a status code and message indicating the success or failure of the operation, and the retrieved attribute
+     * @throws NoSuchElementException   if the specified attribute or board does not exist
+     * @throws IllegalArgumentException if the attribute or board ID is invalid
+     * @throws NullPointerException     if one of the ID parameters is null
      */
     public Response get(Long attributeId, Long boardId, Class clz) {
         try {
@@ -135,13 +137,14 @@ public class AttributeFacade {
     }
 
     /**
-     * This method is used to retrieve all the attributes(statuses/types) that belongs to a board with the specified id.
+     * Retrieves all attributes of a given class (either {@link Status} or {@link Type}) from a board object.
      *
-     * @param boardId The id of the board whose attributes are to be retrieved.
-     * @return A Response object containing all the retrieved attributes or an error message if the board is not found or the id is invalid.
-     * @throws IllegalArgumentException if the specified board id is invalid.
-     * @throws NullPointerException     if the specified board id is null.
-     * @throws NoSuchElementException   if the board with the specified id is not found.
+     * @param boardId the ID of the board to retrieve attributes from
+     * @param clz     the class of the attributes to retrieve (either {@link Status} or {@link Type})
+     * @return a response object with a status code and message indicating the success or failure of the operation, and a list of retrieved attributes
+     * @throws NoSuchElementException   if the specified board does not exist
+     * @throws IllegalArgumentException if the board ID is invalid
+     * @throws NullPointerException     if the board ID is null
      */
     public Response getAllAttributesInBoard(Long boardId, Class clz) {
         try {
@@ -168,7 +171,17 @@ public class AttributeFacade {
         }
     }
 
-    //TODO documentation
+    /**
+     * Updates an attribute of a board object with the provided update object request.
+     *
+     * @param updateObjectRequest the update object request containing the required id's
+     * @param clz                 the class of the attribute to update (either {@link Status} or {@link Type})
+     * @return a response object with a status code and message indicating the success or failure of the operation, and the updated board object
+     * @throws NoSuchElementException   if the specified attribute or board does not exist
+     * @throws IllegalArgumentException if the attribute ID or board ID is invalid
+     * @throws NoSuchFieldException     if the specified attribute does not exist on the board object
+     * @throws NullPointerException     if the update object request object is null
+     */
     public Response update(UpdateObjectRequest updateObjectRequest, Class clz) {
         try {
             Validations.validateIDs(updateObjectRequest.getObjectsIdsRequest().getUpdateObjId(),

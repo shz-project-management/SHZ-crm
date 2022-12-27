@@ -26,28 +26,25 @@ public class SectionFacade {
     private SectionService sectionService;
 
     /**
-     * This function creates a new attribute which could be status or type, both classes inherit from attribute and have no extra data.
-     * It validates the attribute name using the NAME regex from the Regex enum,
-     * finds the board it belongs to using the getBoardId from the attributeRequest object, creates a new Attribute object,
-     * and calls the create function in the service that matches the class type that we get as a parameter,
-     * with the help of convertFromClassToService function which gives us the relevant service based on clz Class which will hold Status or Type
-     * the create function that we called will persist the attribute into the database.
+     * Creates a new attribute in the board with the given attribute request.
      *
-     * @param attributeRequest The request body, containing the necessary information to create a new attribute.
-     *                         for info is the same for both classes Status and Type.
-     * @return A Response object with the status of the create operation and the created attribute object, or an error message if the operation fails.
+     * @param sectionRequest the request containing the attribute information
+     * @return a response object with the created attribute and relevant status information
+     * @throws IllegalArgumentException if the attribute name is invalid
+     * @throws NoSuchElementException   if the board with the given id does not exist
+     * @throws NullPointerException     if an error occurs while creating the attribute
      */
-    public Response create(AttributeRequest attributeRequest) {
+    public Response create(AttributeRequest sectionRequest) {
         try {
-            Validations.validate(attributeRequest.getName(), Regex.NAME.getRegex());
+            Validations.validate(sectionRequest.getName(), Regex.NAME.getRegex());
 
             return Response.builder()
                     .status(HttpStatus.CREATED)
                     .statusCode(HttpStatusCodes.STATUS_CODE_CREATED)
-                    .data(SectionDTO.getSectionsDTOList(sectionService.create(attributeRequest)))
+                    .data(SectionDTO.getSectionsDTOList(sectionService.create(sectionRequest)))
                     .build();
 
-        } catch (IllegalArgumentException | NonUniqueObjectException | NoSuchElementException e) {
+        } catch (IllegalArgumentException | NoSuchElementException e) {
             return Response.builder()
                     .message(e.getMessage())
                     .status(HttpStatus.BAD_REQUEST)
@@ -62,7 +59,16 @@ public class SectionFacade {
         }
     }
 
-    //TODO documentation
+    /**
+     * Deletes the attribute with the given id from the board with the given id.
+     *
+     * @param boardId   the id of the board that the attribute belongs to
+     * @param sectionId the id of the attribute to delete
+     * @return a response object with relevant status information
+     * @throws NoSuchElementException   if the attribute or the board with the given ids do not exist
+     * @throws IllegalArgumentException if the attribute or board ids are invalid
+     * @throws NullPointerException     if an error occurs while deleting the attribute
+     */
     public Response delete(Long boardId, Long sectionId) {
         try {
             Validations.validateIDs(boardId, sectionId);
@@ -90,13 +96,14 @@ public class SectionFacade {
     }
 
     /**
-     * This method is used to retrieve an attribute(status/type) with the specified id.
+     * This method retrieves an attribute by its ID and the ID of the board it belongs to.
      *
-     * @param attributeId The id of the attribute to be retrieved.
-     * @return A Response object containing the retrieved attribute or an error message if the attribute is not found or the id is invalid.
-     * @throws NoSuchElementException   if the attribute with the specified id is not found.
-     * @throws IllegalArgumentException if the specified id is invalid.
-     * @throws NullPointerException     if the specified id is null.
+     * @param attributeId the ID of the attribute to be retrieved
+     * @param boardId     the ID of the board the attribute belongs to
+     * @return a Response object containing the retrieved attribute, a status message and the corresponding HTTP status code
+     * @throws NoSuchElementException   if the attribute or board with the provided IDs do not exist
+     * @throws IllegalArgumentException if the provided attribute or board IDs are invalid
+     * @throws NullPointerException     if any of the provided IDs is null
      */
     public Response get(Long attributeId, Long boardId) {
         try {
@@ -159,7 +166,14 @@ public class SectionFacade {
         }
     }
 
-    //TODO + documentation
+    /**
+     * Returns a response with a list of sections that match the given filters for a specific board.
+     *
+     * @param filters a map of filters to be applied to the sections
+     * @param boardId the ID of the board to which the sections belong
+     * @return a response with a list of sections that match the given filters
+     */
+
     public Response getFilteredItems(Map<String, List<String>> filters, Long boardId) {
         return Response.builder()
                 .data(SectionDTO.getSectionsDTOList(sectionService.getQuery(filters, boardId)))
@@ -170,7 +184,16 @@ public class SectionFacade {
     }
 
 
-    //TODO + documentation
+    /**
+     * Updates a section with new data.
+     *
+     * @param updateItemRequest the request object containing the new data for the section
+     * @return a response with the updated section
+     * @throws IllegalArgumentException if the input is invalid
+     * @throws NoSuchElementException   if the section to be updated does not exist
+     * @throws NoSuchFieldException     if the field to be updated does not exist
+     * @throws NullPointerException     if an unexpected null value is encountered
+     */
     public Response update(UpdateObjectRequest updateItemRequest) {
         try {
             return Response.builder()

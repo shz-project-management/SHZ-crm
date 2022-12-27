@@ -8,7 +8,6 @@ import CRM.entity.response.Response;
 import CRM.service.BoardService;
 import CRM.utils.Validations;
 import CRM.utils.enums.ExceptionMessage;
-import CRM.utils.enums.Permission;
 import CRM.utils.enums.Regex;
 import CRM.utils.enums.SuccessMessage;
 import com.google.api.client.http.HttpStatusCodes;
@@ -18,8 +17,6 @@ import org.springframework.stereotype.Component;
 
 import javax.naming.NoPermissionException;
 import javax.security.auth.login.AccountNotFoundException;
-import java.util.List;
-import java.util.Map;
 import java.util.NoSuchElementException;
 
 @Component
@@ -29,12 +26,14 @@ public class BoardFacade {
     private BoardService boardService;
 
     /**
-     * This function creates a new board. It validates the board name using the NAME regex from the Regex enum,
-     * finds the creator user using the creatorUserId from the BoardRequest object, creates a new Board object,
-     * and calls the create function in the BoardService class to persist the board to the database.
+     * Creates a new board with the provided request object.
      *
-     * @param boardRequest The request body, containing the necessary information to create a new board.
-     * @return A Response object with the status of the create operation and the created board object, or an error message if the operation fails.
+     * @param boardRequest the request object containing the new board's name and owner ID
+     * @return a response object with a status code and message indicating the success or failure of the operation, and the created board object
+     * @throws AccountNotFoundException if the specified owner does not exist
+     * @throws NoSuchElementException   if the specified board name is already in use
+     * @throws IllegalArgumentException if the board name or owner ID is invalid or not provided
+     * @throws NullPointerException     if the board request object is null
      */
     public Response create(BoardRequest boardRequest) {
         try {
@@ -96,13 +95,15 @@ public class BoardFacade {
     }
 
     /**
-     * This method is used to retrieve a board with the specified id.
+     * Retrieves a board with the specified ID and returns its details, along with the user's permission for the board.
      *
-     * @param boardId The id of the board to be retrieved.
-     * @return A Response object containing the retrieved board or an error message if the board is not found or the id is invalid.
-     * @throws NoSuchElementException   if the board with the specified id is not found.
-     * @throws IllegalArgumentException if the specified id is invalid.
-     * @throws NullPointerException     if the specified id is null.
+     * @param boardId the ID of the board to retrieve
+     * @param userId  the ID of the user whose permission for the board will be returned
+     * @return a response object with a status code and message indicating the success or failure of the operation, and the retrieved board object with the user's permission
+     * @throws NoSuchElementException   if the specified board or user does not exist
+     * @throws IllegalArgumentException if the board ID or user ID is invalid
+     * @throws NoPermissionException    if the user does not have permission to view the board
+     * @throws NullPointerException     if any of the parameters are null
      */
     public Response get(Long boardId, Long userId) {
         try {
@@ -124,7 +125,7 @@ public class BoardFacade {
                     .status(HttpStatus.BAD_REQUEST)
                     .statusCode(HttpStatusCodes.STATUS_CODE_BAD_REQUEST)
                     .build();
-        }catch (NoPermissionException e){
+        } catch (NoPermissionException e) {
             return Response.builder()
                     .message(e.getMessage())
                     .status(HttpStatus.FORBIDDEN)
@@ -188,7 +189,16 @@ public class BoardFacade {
         }
     }
 
-    //TODO documentation
+    /**
+     * Updates a board with the provided update object request.
+     *
+     * @param updateObjReq the update object request containing the new board name and board ID
+     * @return a response object with a status code and message indicating the success or failure of the operation, and the updated board object
+     * @throws NoSuchFieldException     if the specified board name does not exist on the board object
+     * @throws IllegalArgumentException if the board ID is invalid or not provided
+     * @throws NoSuchElementException   if the specified board does not exist
+     * @throws NullPointerException     if the update object request object is null
+     */
     public Response updateBoard(UpdateObjectRequest updateObjReq) {
         try {
             Validations.validate(updateObjReq.getObjectsIdsRequest().getBoardId(), Regex.ID.getRegex());
