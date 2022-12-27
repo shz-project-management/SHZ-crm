@@ -29,7 +29,9 @@ public class ItemController {
     @PostMapping(consumes = "application/json")
     public ResponseEntity<Response> create(@RequestBody ItemRequest item, @RequestAttribute Long userId,
                                            @RequestAttribute Long boardId) {
-        Response response = sharedContentFacade.create(item, userId, boardId);
+        item.setBoardId(boardId);
+        item.setUserId(userId);
+        Response response = sharedContentFacade.create(item);
         return new ResponseEntity<>(response, response.getStatus());
     }
 
