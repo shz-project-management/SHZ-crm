@@ -237,8 +237,6 @@ public class UserFacade {
             Validations.validateUpdateUserToBoard(objectsIdsRequest.getBoardId(), objectsIdsRequest.getUserId(),
                     objectsIdsRequest.getPermissionId());
             Set<UserPermission> usersPermissions = userService.updateUserToBoard(objectsIdsRequest);
-            sendUserAddedNotification(objectsIdsRequest, usersPermissions.stream().map(UserPermission::getUser).collect(Collectors.toList()));
-            List<User> users = userService.updateUserToBoard(objectsIdsRequest);
             sendUserAddedNotification(objectsIdsRequest, boardService.get(objectsIdsRequest.getBoardId()).getBoardUsersSet());
             return Response.builder()
                     .message(SuccessMessage.FOUND.toString())
