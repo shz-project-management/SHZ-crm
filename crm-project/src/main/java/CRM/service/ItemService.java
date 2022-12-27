@@ -14,7 +14,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.security.auth.login.AccountNotFoundException;
-import java.time.LocalDateTime;
 import java.util.*;
 
 @Service
@@ -61,7 +60,13 @@ public class ItemService implements ServiceInterface {
         return section;
     }
 
-    //TODO Documentation
+    /**
+     * Delete a list of items from a board.
+     *
+     * @param ids     the IDs of the items to delete
+     * @param boardId the ID of the board containing the items
+     * @return the number of items deleted
+     */
     @Override
     public int delete(List<Long> ids, long boardId) {
         Board board = Validations.doesIdExists(boardId, boardRepository);
@@ -83,7 +88,12 @@ public class ItemService implements ServiceInterface {
         return counter;
     }
 
-    //TODO Documentation
+    /**
+     * Get a shared content object (item or label) from a board.
+     *
+     * @param objectsIdsRequest the request object containing the board, section, and shared content IDs to get
+     * @return the shared content object
+     */
     @Override
     public SharedContent get(ObjectsIdsRequest objectsIdsRequest) {
         Board board = Validations.doesIdExists(objectsIdsRequest.getBoardId(), boardRepository);
@@ -92,7 +102,13 @@ public class ItemService implements ServiceInterface {
     }
 
 
-    //TODO + Documentation
+    /**
+     * Update a shared content object (item or label) in a board.
+     *
+     * @param updateObject the request object containing the updated information for the shared content object
+     * @return the updated shared content object
+     * @throws NoSuchFieldException if the field to update does not exist in the shared content object
+     */
     @Override
     public Section update(UpdateObjectRequest updateObject) throws NoSuchFieldException {
         Board board = Validations.doesIdExists(updateObject.getObjectsIdsRequest().getBoardId(), boardRepository);
@@ -108,7 +124,12 @@ public class ItemService implements ServiceInterface {
         return board.getSectionFromBoard(updateObject.getObjectsIdsRequest().getSectionId());
     }
 
-    //TODO Documentation
+    /**
+     * Get all shared content objects (items or labels) within a shared content object (item or label).
+     *
+     * @param objectsIdsRequest the request object containing the board, section, and shared content IDs to get the objects within
+     * @return the list of shared content objects within the specified object
+     */
     @Override
     public List<SharedContent> getAllInItem(ObjectsIdsRequest objectsIdsRequest) {
         //long itemId, long sectionId, long boardId
@@ -116,14 +137,20 @@ public class ItemService implements ServiceInterface {
         return new ArrayList<>(board.getSectionFromBoard(objectsIdsRequest.getSectionId()).getItems());
     }
 
-    //TODO Documentation
+    /**
+     * Get all shared content objects (items or labels) within a section.
+     *
+     * @param objectsIdsRequest the request object containing the board and section IDs to get the objects within
+     * @return the set of shared content objects within the specified section
+     */
     public Set<Item> getAllInSection(ObjectsIdsRequest objectsIdsRequest) {
         Board board = Validations.doesIdExists(objectsIdsRequest.getBoardId(), boardRepository);
         return board.getSectionFromBoard(objectsIdsRequest.getSectionId()).getItems();
     }
 
+    //TODO assignToUser
     @Override
-    public List<SharedContent> assignToUser(ObjectsIdsRequest objectsIdsRequest){
+    public List<SharedContent> assignToUser(ObjectsIdsRequest objectsIdsRequest) {
         User user = Validations.doesIdExists(objectsIdsRequest.getUserId(), userRepository);
         Board board = Validations.doesIdExists(objectsIdsRequest.getBoardId(), boardRepository);
         Item item = board.getItemFromSectionById(objectsIdsRequest.getUpdateObjId(),
@@ -131,7 +158,6 @@ public class ItemService implements ServiceInterface {
 
         return null;
     }
-
 
     /**
      * Helper function for updating a custom object field.
@@ -143,13 +169,13 @@ public class ItemService implements ServiceInterface {
      */
     private void fieldIsCustomObjectHelper(UpdateObjectRequest updateObject, Item item, Board board, long itemId) throws NoSuchFieldException {
         Class objClass = Common.getObjectOfField(updateObject.getFieldName());
-        if(objClass == null){
+        if (objClass == null) {
             throw new NoSuchFieldException(ExceptionMessage.FIELD_OBJECT_NOT_EXISTS.toString());
         }
 
         Object contentObj = board.getObjectByItsClass(((Integer) updateObject.getContent()), objClass,
                 updateObject.getObjectsIdsRequest().getSectionId());
-        if(contentObj == null){
+        if (contentObj == null) {
             throw new IllegalArgumentException(ExceptionMessage.NO_SUCH_ID.toString());
         }
 

@@ -37,7 +37,13 @@ public class BoardService {
     private EntityManager entityManager;
 
 
-    //TODO documentation
+    /**
+     * Creates a new board with the given request parameters.
+     *
+     * @param boardRequest a request object containing the creator user id and the name and description of the board
+     * @return the created board
+     * @throws AccountNotFoundException if the creator user id does not correspond to a user in the system
+     */
     @Transactional
     public Board create(BoardRequest boardRequest) throws AccountNotFoundException {
         User user;
@@ -47,7 +53,7 @@ public class BoardService {
             throw new AccountNotFoundException(ExceptionMessage.ACCOUNT_DOES_NOT_EXISTS.toString());
         }
         Board board = Board.createBoard(user, boardRequest.getName(), boardRequest.getDescription());
-        Common.createDefaultSettingForNewUserInBoard(user,board,notificationSettingRepository, entityManager);
+        Common.createDefaultSettingForNewUserInBoard(user, board, notificationSettingRepository, entityManager);
         return boardRepository.save(board);
     }
 
@@ -85,15 +91,12 @@ public class BoardService {
     }
 
     /**
-     * This method is used to retrieve all the boards created by a user with the specified id.
+     * Retrieves all boards belonging to the specified user.
      *
-     * @param userId The id of the user whose boards are to be retrieved.
-     * @return A list containing all the boards created by the user with the specified id.
-     * @throws NoSuchElementException   if the user with the specified id is not found.
-     * @throws IllegalArgumentException if the specified user id is invalid.
-     * @throws NullPointerException     if the specified user id is null.
+     * @param userId the id of the user
+     * @return a map containing two lists of boards: "myBoards" (boards created by the user) and "SharedBoards" (boards shared with the user)
+     * @throws AccountNotFoundException if the user does not exist
      */
-    //TODO
     public Map<String, List<Board>> getAllBoardsOfUser(long userId) throws AccountNotFoundException {
         User user;
         try {
@@ -103,40 +106,37 @@ public class BoardService {
         }
 
         //get all the boards of the creator user
-        Map<String,List<Board>> userBoards = new HashMap<>();
+        Map<String, List<Board>> userBoards = new HashMap<>();
         userBoards.put(myBoards, boardRepository.findByCreatorUser(user));
         userBoards.put(SharedBoards, getSharedBoardsOfUser(user));
         return userBoards;
     }
 
     /**
-     * Updates a board with the given information.
+     * Updates the specified board with the provided update object request.
      *
-     * @param boardReq the request object containing the update      information for the board
+     * @param updateObjReq the update object request containing the field and value to update
      * @return the updated board
-     * @throws NoSuchFieldException if the boardReq with the given field does not exist
+     * @throws NoSuchFieldException if the field to update does not exist in the board object
      */
-    //TODO
     public Board updateBoard(UpdateObjectRequest updateObjReq) throws NoSuchFieldException {
         Board board = Validations.doesIdExists(updateObjReq.getObjectsIdsRequest().getBoardId(), boardRepository);
         Common.fieldIsPrimitiveOrKnownObjectHelper(updateObjReq, board);
         return boardRepository.save(board);
     }
 
-    private void createDefaultSettingForNewUserInBoard(User user, Board board) {
-        List<NotificationSetting> notificationSettingList = notificationSettingRepository.findAll();
-        for (NotificationSetting notificationSetting : notificationSettingList) {
-            UserSetting userSetting = UserSetting.createUserSetting(user, notificationSetting);
-            board.addUserSettingToBoard(userSetting);
-        }
-    }
-
-    private List<Board> getSharedBoardsOfUser(User user){
+    /**
+     * Private method to retrieve all boards shared with the specified user.
+     *
+     * @param user the user
+     * @return a list of boards shared with the user
+     */
+    private List<Board> getSharedBoardsOfUser(User user) {
         //get all the boards of the user he is shared with
         List<Board> allBoards = boardRepository.findAll();
         List<Board> sharedBoards = new ArrayList<>();
-        for (Board board: allBoards) {
-            if(board.getAllUsersInBoard().contains(user)){
+        for (Board board : allBoards) {
+            if (board.getAllUsersInBoard().contains(user)) {
                 sharedBoards.add(board);
             }
         }

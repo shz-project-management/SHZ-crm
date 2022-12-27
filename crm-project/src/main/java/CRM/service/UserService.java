@@ -149,7 +149,14 @@ public class UserService {
         return board.getAllUsersInBoard();
     }
 
-    //TODO documentation
+    /**
+     * This method updates a user's permission on a board.
+     *
+     * @param objectsIdsRequest an {@link ObjectsIdsRequest} object which contains the ID of the user, board, and requested permission
+     * @return a list of {@link User} objects representing all users in the board
+     * @throws AccountNotFoundException if the user or board does not exist
+     * @throws IllegalArgumentException if the requested permission is not allowed or the board's creator is trying to change their own permission
+     */
     public List<User> updateUserToBoard(ObjectsIdsRequest objectsIdsRequest) throws AccountNotFoundException {
         User user;
         Board board;
@@ -159,8 +166,8 @@ public class UserService {
         } catch (NoSuchElementException e) {
             throw new AccountNotFoundException(ExceptionMessage.ACCOUNT_DOES_NOT_EXISTS.toString());
         }
-            
-        if(user.equals(board.getCreatorUser())){
+
+        if (user.equals(board.getCreatorUser())) {
             throw new IllegalArgumentException(ExceptionMessage.ADMIN_CANT_CHANGE_HIS_PERMISSION.toString());
         }
 
@@ -172,7 +179,12 @@ public class UserService {
         return users;
     }
 
-    //TODO documentation
+    /**
+     * Create default notification settings for a new user in a board.
+     *
+     * @param user  the user to create default settings for
+     * @param board the board to add the default settings to
+     */
     private void createDefaultSettingForNewUserInBoard(User user, Board board) {
         List<NotificationSetting> notificationSettingList = notificationSettingRepository.findAll();
         for (NotificationSetting notificationSetting : notificationSettingList) {
@@ -181,17 +193,31 @@ public class UserService {
         }
     }
 
-    //TODO documentation
-    private void createNewUserPermission(User user, Permission permission, Board board){
+    /**
+     * Create a new user permission in a board.
+     *
+     * @param user       the user to create the permission for
+     * @param permission the permission to assign to the user
+     * @param board      the board to add the user permission to
+     */
+    private void createNewUserPermission(User user, Permission permission, Board board) {
         UserPermission userPermission = UserPermission.newUserPermission(user, permission);
         board.addUserPermissionToBoard(userPermission);
         createDefaultSettingForNewUserInBoard(user, board);
     }
 
-    //TODO documentation
+    /**
+     * Update the user's permission in a board.
+     *
+     * @param user              the user to update the permission for
+     * @param permissionRequest the requested permission
+     * @param board             the board to update the user's permission in
+     * @return the set of user permissions in the board after the update
+     * @throws IllegalArgumentException if the requested permission is not allowed
+     */
     private Set<UserPermission> updateUserPermission(User user, Permission permissionRequest, Board board) {
         Set<UserPermission> userPermissionsSet = board.getUsersPermissions();
-        UserPermission userPermissionInBoard = board.getUserPermissionById(board, user.getId() ,userPermissionsSet);
+        UserPermission userPermissionInBoard = board.getUserPermissionById(board, user.getId(), userPermissionsSet);
 
         if (permissionRequest.equals(Permission.ADMIN)) {
             throw new IllegalArgumentException(ExceptionMessage.PERMISSION_NOT_ALLOWED.toString());
@@ -200,10 +226,9 @@ public class UserService {
         if (permissionRequest.equals(Permission.UNAUTHORIZED)) {
             userPermissionsSet.removeIf(userPerm -> userPermissionInBoard.getId().equals(userPerm.getId()));
             board.removeSettingsByUserPermission(userPermissionInBoard);
-        }
-        else if (userPermissionInBoard == null) {
+        } else if (userPermissionInBoard == null) {
             createNewUserPermission(user, permissionRequest, board);
-        } else{
+        } else {
             userPermissionInBoard.setPermission(permissionRequest);
         }
         return userPermissionsSet;

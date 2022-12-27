@@ -45,7 +45,13 @@ public class AuthService {
         return userRepository.save(User.newUser(user));
     }
 
-    //TODO: documentation
+    /**
+     * Attempts to log in a user using a third party service.
+     * If the user does not exist in the database, it will be created.
+     *
+     * @param user the user to log in
+     * @return a JWT token for the logged in user
+     */
     public String thirdPartyLogin(RegisterUserRequest user) {
         logger.info("in AuthService -> thirdPartyLogin");
 
@@ -118,6 +124,13 @@ public class AuthService {
         return id;
     }
 
+    /**
+     * Find a user by their ID.
+     *
+     * @param creatorUserId The ID of the user to find.
+     * @return The user with the provided ID.
+     * @throws AccountNotFoundException If no user with the provided ID is found.
+     */
     public User findById(long creatorUserId) throws AccountNotFoundException {
         try {
             return Validations.doesIdExists(creatorUserId, userRepository);
@@ -126,6 +139,13 @@ public class AuthService {
         }
     }
 
+
+    /**
+     * Find a user by their email.
+     *
+     * @param email The email of the user to find.
+     * @return The user with the provided email, or null if no such user is found.
+     */
     public User findByEmail(String email) {
         Optional<User> user = userRepository.findByEmail(email);
         if (!user.isPresent())
