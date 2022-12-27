@@ -67,11 +67,11 @@ public class CommentController {
         return new ResponseEntity<>(response, response.getStatus());
     }
 
-    @GetMapping(value = "all-in-section")
-    public ResponseEntity<Response> getAllCommentsInSection(@RequestParam Long boardId, @RequestParam Long sectionId) {
-        ObjectsIdsRequest objectsIdsRequest = ObjectsIdsRequest.boardSectionIds(boardId, sectionId);
-        Response response = sharedContentFacade.getAllCommentsInSection(objectsIdsRequest);
-        return new ResponseEntity<>(response, response.getStatus());
-    }
+//    @GetMapping(value = "all-in-section")
+//    public ResponseEntity<Response> getAllCommentsInSection(@RequestParam Long boardId, @RequestParam Long sectionId) {
+//        ObjectsIdsRequest objectsIdsRequest = ObjectsIdsRequest.boardSectionIds(boardId, sectionId);
+//        Response response = sharedContentFacade.getAllCommentsInSection(objectsIdsRequest);
+//        return new ResponseEntity<>(response, response.getStatus());
+//    }
 
 }
