@@ -105,12 +105,7 @@ public class SharedContentFacade {
             // call commentService with create function to create a new comment
             // return the response with the new comment as a data inside response entity.
             List<CommentDTO> commentDTOS = CommentDTO.getCommentDTOList(commentService.create(comment));
-            notificationSender.sendNotificationToManyUsers(
-                    NotificationRequest.createCommentAddedRequest(userService.get(comment.getUserId()),
-                            boardService.get(comment.getBoardId()), comment.getParentItemId(),
-                            comment.getDescription(), userService.get(comment.getUserId()),
-                            settingsService.getNotificationSettingFromDB(Notifications.COMMENT_ADDED.name)),
-                    userService.getAllInBoard(comment.getBoardId()));
+            sendCommentCreatedNotification(comment);
             return Response.builder()
                     .data(commentDTOS)
                     .message(SuccessMessage.CREATE.toString())
@@ -157,12 +152,7 @@ public class SharedContentFacade {
         });
         // call the correct service using convertFromClassToService(clz) function with delete function in it
         int deleteData = convertFromClassToService(clz).delete(correctIds, boardId);
-        Board board = boardService.get(boardId);
-        for (Long id : correctIds) {
-            notificationSender.sendNotificationToManyUsers(NotificationRequest.createDeletedItemRequest(board,
-                            id, settingsService.getNotificationSettingFromDB(Notifications.ITEM_DELETED.name)),
-                    board.getAllUsersInBoard());
-        }
+        sendItemDeleteNotification(correctIds, boardId);
         return Response.builder()
                 .data(deleteData)
                 .message(SuccessMessage.DELETED.toString())
@@ -195,31 +185,8 @@ public class SharedContentFacade {
             Validations.validateSharedContent(updateObject.getObjectsIdsRequest());
             // call the correct service using convertFromClassToService(clz) function with find function in it
             SectionDTO sectionDTO = SectionDTO.createSectionDTO(convertFromClassToService(clz).update(updateObject));
-            //send notification if item status/type/data updated
             if (clz.equals(Item.class)) {
-                NotificationRequest request;
-                //status
-                if (updateObject.getFieldName().equals(UpdateField.STATUS))
-                    request = NotificationRequest.createStatusChangeRequest(userService.get(updateObject.getObjectsIdsRequest().getUserId()),
-                            boardService.get(updateObject.getObjectsIdsRequest().getBoardId()),
-                            updateObject.getObjectsIdsRequest().getUpdateObjId(), updateObject.getContent(),
-                            settingsService.getNotificationSettingFromDB(Notifications.STATUS_CHANGED.name));
-                //type
-                else if (updateObject.getFieldName().equals(UpdateField.TYPE)) {
-                    request = NotificationRequest.createTypeChangeRequest(userService.get(updateObject.getObjectsIdsRequest().getUserId()),
-                            boardService.get(updateObject.getObjectsIdsRequest().getBoardId()),
-                            updateObject.getObjectsIdsRequest().getUpdateObjId(), updateObject.getContent(),
-                            settingsService.getNotificationSettingFromDB(Notifications.TYPE_CHANGED.name));
-                }
-                //data
-                else request = NotificationRequest.createItemChangeRequest(userService.get(updateObject.getObjectsIdsRequest().getUserId()),
-                        boardService.get(updateObject.getObjectsIdsRequest().getBoardId()),
-                        updateObject.getObjectsIdsRequest().getUpdateObjId(),
-                        updateObject.getFieldName().toString(), updateObject.getContent(),
-                        settingsService.getNotificationSettingFromDB(Notifications.ITEM_DATA_CHANGED.name));
-
-                notificationSender.sendNotificationToManyUsers(request,
-                        userService.getAllInBoard(updateObject.getObjectsIdsRequest().getBoardId()));
+                sendRelevantNotification(updateObject);
             }
             return Response.builder()
                     .data(sectionDTO)
@@ -490,5 +457,46 @@ public class SharedContentFacade {
             return CommentDTO.getSharedContentFromDB((Comment) content);
 
         throw new IllegalArgumentException(ExceptionMessage.NO_SUCH_CLASS.toString());
+    }
+
+    private void sendRelevantNotification(UpdateObjectRequest updateObject) throws AccountNotFoundException {
+        NotificationRequest request;
+        if (updateObject.getFieldName().equals(UpdateField.STATUS))
+            request = NotificationRequest.createStatusChangeRequest(userService.get(updateObject.getObjectsIdsRequest().getUserId()),
+                    boardService.get(updateObject.getObjectsIdsRequest().getBoardId()),
+                    updateObject.getObjectsIdsRequest().getUpdateObjId(), updateObject.getContent(),
+                    settingsService.getNotificationSettingFromDB(Notifications.STATUS_CHANGED.name));
+        else if (updateObject.getFieldName().equals(UpdateField.TYPE)) {
+            request = NotificationRequest.createTypeChangeRequest(userService.get(updateObject.getObjectsIdsRequest().getUserId()),
+                    boardService.get(updateObject.getObjectsIdsRequest().getBoardId()),
+                    updateObject.getObjectsIdsRequest().getUpdateObjId(), updateObject.getContent(),
+                    settingsService.getNotificationSettingFromDB(Notifications.TYPE_CHANGED.name));
+        }
+        else request = NotificationRequest.createItemChangeRequest(userService.get(updateObject.getObjectsIdsRequest().getUserId()),
+                    boardService.get(updateObject.getObjectsIdsRequest().getBoardId()),
+                    updateObject.getObjectsIdsRequest().getUpdateObjId(),
+                    updateObject.getFieldName().toString(), updateObject.getContent(),
+                    settingsService.getNotificationSettingFromDB(Notifications.ITEM_DATA_CHANGED.name));
+
+        notificationSender.sendNotificationToManyUsers(request,
+                userService.getAllInBoard(updateObject.getObjectsIdsRequest().getBoardId()));
+    }
+
+    private void sendCommentCreatedNotification(CommentRequest comment) throws AccountNotFoundException {
+        notificationSender.sendNotificationToManyUsers(
+                NotificationRequest.createCommentAddedRequest(userService.get(comment.getUserId()),
+                        boardService.get(comment.getBoardId()), comment.getParentItemId(),
+                        comment.getDescription(), userService.get(comment.getUserId()),
+                        settingsService.getNotificationSettingFromDB(Notifications.COMMENT_ADDED.name)),
+                userService.getAllInBoard(comment.getBoardId()));
+    }
+
+    private void sendItemDeleteNotification(List<Long> correctIds, Long boardId){
+        Board board = boardService.get(boardId);
+        for (Long id : correctIds) {
+            notificationSender.sendNotificationToManyUsers(NotificationRequest.createDeletedItemRequest(board,
+                            id, settingsService.getNotificationSettingFromDB(Notifications.ITEM_DELETED.name)),
+                    board.getAllUsersInBoard());
+        }
     }
 }
