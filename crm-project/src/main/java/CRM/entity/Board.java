@@ -174,6 +174,12 @@ public class Board {
                 .stream().map(UserPermission::getUser).collect(Collectors.toList());
     }
 
+    public Boolean doesBoardIncludeUser(long userId) {
+        for (UserSetting userSetting : usersSettings) {
+            if (userSetting.getUser().getId() == userId) return true;
+        }
+        return false;
+    }
 
     //--------------------------------------Settings--------------------------------------//
     public void removeSettingsByUserPermission(UserPermission userPermissionInBoard) {

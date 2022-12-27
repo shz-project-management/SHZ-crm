@@ -28,7 +28,7 @@ public class SettingController {
      */
     @GetMapping(value = "get-user-settings-in-board")
     public ResponseEntity<Response> getAllUserSettingsInBoard(@RequestAttribute Long userId, @RequestAttribute Long boardId) {
-        ObjectsIdsRequest objectsIdsRequest = ObjectsIdsRequest.boardUserIds(userId, boardId);
+        ObjectsIdsRequest objectsIdsRequest = ObjectsIdsRequest.boardUserIds(boardId, userId);
         Response response = settingsFacade.getAllUserSettingsInBoard(objectsIdsRequest);
         return new ResponseEntity<>(response, response.getStatus());
     }

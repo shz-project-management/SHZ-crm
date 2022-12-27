@@ -60,20 +60,23 @@ public class PermissionFilter extends GenericFilterBean {
         String boardId = httpRequest.getHeader("boardId");
         String path = httpRequest.getRequestURI();
 
+        Board board = null;
+        if (boardId != null) {
+            board = boardService.get(Long.parseLong(boardId));
+            httpRequest.setAttribute("boardId", board.getId());
+        }
+
         if (httpRequest.getMethod().equals("GET")) {
             chain.doFilter(request, response);
-        }
-        else if (isPermittedPath(path)) {
-            Board board;
+        } else if (isPermittedPath(path)) {
             User user;
             Permission permission;
 
             try {
                 Long userId = authService.checkTokenToUserInDB(token);
-                board = boardService.get(Long.parseLong(boardId));
+//                board = boardService.get(Long.parseLong(boardId));
                 user = authService.findById(userId);
                 permission = board.getUserPermissionWithoutAdminByUserId(user.getId());
-                httpRequest.setAttribute("boardId", board.getId());
             } catch (AccountNotFoundException | NoPermissionException e) {
                 sendForbiddenResponse(httpResponse);
                 return;
@@ -94,8 +97,11 @@ public class PermissionFilter extends GenericFilterBean {
     }
 
     private boolean isValidRequest(HttpServletRequest httpRequest, String path, Permission permission) throws IOException {
-        if (permission == Permission.LEADER) { return isPermittedForLeaders(path) && isValidUpdateForLeaders(httpRequest); }
-        else if (permission == Permission.USER) { return isPermittedForUsers(path) && isValidUpdateForUsers(httpRequest, path); }
+        if (permission == Permission.LEADER) {
+            return isPermittedForLeaders(path) && isValidUpdateForLeaders(httpRequest);
+        } else if (permission == Permission.USER) {
+            return isPermittedForUsers(path) && isValidUpdateForUsers(httpRequest, path);
+        }
         return false;
     }
 

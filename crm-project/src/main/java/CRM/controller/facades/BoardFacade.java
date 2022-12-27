@@ -35,12 +35,12 @@ public class BoardFacade {
      * @throws IllegalArgumentException if the board name or owner ID is invalid or not provided
      * @throws NullPointerException     if the board request object is null
      */
-    public Response create(BoardRequest boardRequest, Long userId) {
+    public Response create(BoardRequest boardRequest) {
         try {
-            Validations.validateNewBoard(boardRequest, userId);
+            Validations.validateNewBoard(boardRequest);
 
             return Response.builder()
-                    .data(BoardDTO.getBoardFromDB(boardService.create(boardRequest, userId)))
+                    .data(BoardDTO.getBoardFromDB(boardService.create(boardRequest)))
                     .message(SuccessMessage.CREATE.toString())
                     .status(HttpStatus.CREATED)
                     .statusCode(HttpStatusCodes.STATUS_CODE_CREATED)
