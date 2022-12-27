@@ -1,24 +1,16 @@
 package CRM.controller.controllers;
 
 import CRM.controller.facades.BoardFacade;
-import CRM.entity.Board;
 import CRM.entity.requests.BoardRequest;
 import CRM.entity.requests.ObjectsIdsRequest;
 import CRM.entity.requests.UpdateObjectRequest;
 import CRM.entity.response.Response;
-import CRM.utils.Common;
-import CRM.utils.enums.UpdateField;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 @Controller
 @RequestMapping(value = "/board")
@@ -28,6 +20,8 @@ public class BoardController {
 
     @Autowired
     private BoardFacade boardFacade;
+    @Autowired
+    private SimpMessagingTemplate messagingTemplate;
 
     /**
      * This function maps HTTP POST requests to the /create endpoint to the create function in the BoardFacade class.
@@ -36,7 +30,7 @@ public class BoardController {
      * @param boardRequest The request body, containing the necessary information to create a new board.
      * @return A ResponseEntity containing a Response object with the status of the create operation and the created board object.
      */
-    @PostMapping( value = "/create" , consumes = "application/json")
+    @PostMapping(value = "/create", consumes = "application/json")
     public ResponseEntity<Response> create(@RequestBody BoardRequest boardRequest, @RequestAttribute Long userId) {
         boardRequest.setCreatorUserId(userId);
         Response response = boardFacade.create(boardRequest);
@@ -75,35 +69,13 @@ public class BoardController {
      * @return A response object indicating the status of the update operation.
      */
     @PatchMapping(value = "update", consumes = "application/json")
-    public ResponseEntity<Response> updateBoard(@RequestBody UpdateObjectRequest boardRequest,
-                                                @RequestAttribute Long boardId) {
+    public ResponseEntity<Response> updateBoard(@RequestBody UpdateObjectRequest boardRequest, @RequestAttribute Long boardId) {
         boardRequest.setObjectsIdsRequest(new ObjectsIdsRequest());
         boardRequest.getObjectsIdsRequest().setBoardId(boardId);
         Response response = boardFacade.updateBoard(boardRequest);
-        return new ResponseEntity<>(response, response.getStatus());
+        messagingTemplate.convertAndSend("/board/" + boardId, response);
+        return ResponseEntity.noContent().build();
     }
 
-//    @RequestMapping(value = "query", method = RequestMethod.GET)
-//    public ResponseEntity<String> query() {
-//        Map<String, List<String>> filters = new HashMap<>();
-//
-//        List<String> types = new ArrayList<>();
-//        List<String> statuses = new ArrayList<>();
-//        List<String> importances = new ArrayList<>();
-//
-//        types.add("Bug");
-//
-//        statuses.add("Done");
-//        statuses.add("Open");
-//
-//        importances.add("1");
-//        importances.add("3");
-//        importances.add("5");
-//
-//        filters.put("type", types);
-//        filters.put("status", statuses);
-//        filters.put("importance", importances);
-//
-//        return new ResponseEntity<>(Common.generateQuery(filters), HttpStatus.OK);
-//    }
+
 }
