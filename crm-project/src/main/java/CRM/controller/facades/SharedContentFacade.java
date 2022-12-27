@@ -1,13 +1,7 @@
 package CRM.controller.facades;
 
-import CRM.entity.Board;
-import CRM.entity.Comment;
-import CRM.entity.DTO.CommentDTO;
-import CRM.entity.DTO.ItemDTO;
-import CRM.entity.DTO.SectionDTO;
-import CRM.entity.DTO.SharedContentDTO;
-import CRM.entity.Item;
-import CRM.entity.SharedContent;
+import CRM.entity.*;
+import CRM.entity.DTO.*;
 import CRM.entity.requests.*;
 import CRM.entity.response.Response;
 import CRM.service.*;
@@ -398,10 +392,11 @@ public class SharedContentFacade {
      */
     public Response assignToUser(ObjectsIdsRequest objIds, Class clz) {
         try {
-            Validations.validateIDs(objIds.getBoardId(), objIds.getSectionId(), objIds.getItemId(), objIds.getUserId());
+            Validations.validateIDs(objIds.getBoardId(), objIds.getSectionId(), objIds.getUpdateObjId());
+            Validations.validate(objIds.getEmail(), Regex.EMAIL.getRegex());
 
             return Response.builder()
-                    .data(convertFromClassToService(clz).assignToUser(objIds).stream().map(entity -> convertFromServiceOutputToDTOEntity(entity, clz)))
+                    .data(UserPermissionDTO.getListOfUserPermissionFromDB(new ArrayList<>(convertFromClassToService(clz).assignToUser(objIds))))
                     .message(SuccessMessage.FOUND.toString())
                     .status(HttpStatus.OK)
                     .statusCode(HttpStatusCodes.STATUS_CODE_OK)

@@ -33,8 +33,8 @@ public class Item extends SharedContent {
     @JoinColumn(name = "section_id")
     private Section section;
 
-    @Column(name = "assigned_to_user_id")
-    private Long assignedToUserId;
+    @Column(name = "assigned_to_user")
+    private String assignedToUserId;
 
     @Column(name = "due_date")
     private LocalDateTime dueDate;

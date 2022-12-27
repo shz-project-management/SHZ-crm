@@ -150,13 +150,11 @@ public class ItemService implements ServiceInterface {
 
     //TODO assignToUser
     @Override
-    public List<SharedContent> assignToUser(ObjectsIdsRequest objectsIdsRequest) {
-        User user = Validations.doesIdExists(objectsIdsRequest.getUserId(), userRepository);
+    public Set<UserPermission> assignToUser(ObjectsIdsRequest objectsIdsRequest) {
         Board board = Validations.doesIdExists(objectsIdsRequest.getBoardId(), boardRepository);
-        Item item = board.getItemFromSectionById(objectsIdsRequest.getUpdateObjId(),
-                objectsIdsRequest.getSectionId());
-
-        return null;
+        board.assignUserToItem(objectsIdsRequest.getUpdateObjId(), objectsIdsRequest.getSectionId(), objectsIdsRequest.getEmail());
+        boardRepository.save(board);
+        return board.getUsersPermissions();
     }
 
     /**

@@ -319,5 +319,9 @@ public class Board {
             return null;
         }
     }
+
+    public void assignUserToItem(Long updateObjId, Long sectionId, String userEmail) {
+        getItemFromSectionById(updateObjId, sectionId).setAssignedToUserId(userEmail);
+    }
 }
 

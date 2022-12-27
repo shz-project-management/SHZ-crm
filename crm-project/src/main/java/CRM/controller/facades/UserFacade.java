@@ -2,7 +2,9 @@ package CRM.controller.facades;
 
 import CRM.entity.DTO.BoardDTO;
 import CRM.entity.DTO.UserDTO;
+import CRM.entity.DTO.UserPermissionDTO;
 import CRM.entity.User;
+import CRM.entity.UserPermission;
 import CRM.entity.requests.NotificationRequest;
 import CRM.entity.requests.ObjectsIdsRequest;
 import CRM.entity.response.Response;
@@ -21,9 +23,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
 import javax.security.auth.login.AccountNotFoundException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Component
 public class UserFacade {
@@ -153,6 +157,33 @@ public class UserFacade {
                     .build();
         }
     }
+
+    public Response getAllUserPermissionsInBoard(Long boardId) {
+        try {
+            Validations.validate(boardId, Regex.ID.getRegex());
+
+            return Response.builder()
+                    .data(UserPermissionDTO.getListOfUserPermissionFromDB(new ArrayList<>(userService.getAllUserPermissionsInBoard(boardId))))
+                    .message(SuccessMessage.FOUND.toString())
+                    .status(HttpStatus.OK)
+                    .statusCode(HttpStatusCodes.STATUS_CODE_OK)
+                    .build();
+
+        } catch (IllegalArgumentException | NoSuchElementException e) {
+            return Response.builder()
+                    .message(e.getMessage())
+                    .status(HttpStatus.BAD_REQUEST)
+                    .statusCode(HttpStatusCodes.STATUS_CODE_BAD_REQUEST)
+                    .build();
+        } catch (NullPointerException e) {
+            return Response.builder()
+                    .message(e.getMessage())
+                    .status(HttpStatus.BAD_REQUEST)
+                    .statusCode(HttpStatusCodes.STATUS_CODE_SERVER_ERROR)
+                    .build();
+        }
+    }
+
 
     /**
      * This method is used to retrieve all the boards created by a user with the specified id.
