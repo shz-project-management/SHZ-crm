@@ -167,10 +167,7 @@ public class UserFacade {
             Validations.validateUpdateUserToBoard(objectsIdsRequest.getBoardId(), objectsIdsRequest.getUserId(),
                     objectsIdsRequest.getPermissionId());
             List<User> users = userService.updateUserToBoard(objectsIdsRequest);
-            notificationSender.sendNotificationToManyUsers(
-                    NotificationRequest.createUserAddedRequest(boardService.get(objectsIdsRequest.getBoardId()),
-                            userService.get(objectsIdsRequest.getUserId()),
-                            settingsService.getNotificationSettingFromDB(Notifications.USER_ADDED.name)), users);
+            sendUserAddedNotification(objectsIdsRequest, users);
             return Response.builder()
                     .message(SuccessMessage.FOUND.toString())
                     .data(UserDTO.getListOfUsersDTO(users))
@@ -191,5 +188,12 @@ public class UserFacade {
                     .statusCode(HttpStatusCodes.STATUS_CODE_SERVER_ERROR)
                     .build();
         }
+    }
+
+    private void sendUserAddedNotification(ObjectsIdsRequest objectsIdsRequest, List<User> users) throws AccountNotFoundException {
+        notificationSender.sendNotificationToManyUsers(
+                NotificationRequest.createUserAddedRequest(boardService.get(objectsIdsRequest.getBoardId()),
+                        userService.get(objectsIdsRequest.getUserId()),
+                        settingsService.getNotificationSettingFromDB(Notifications.USER_ADDED.name)), users);
     }
 }
