@@ -71,7 +71,7 @@ public class SettingsFacade {
      */
     public Response changeUserSettingsInBoard(SettingUpdateRequest settingUpdateRequest) {
         try {
-            Validations.validateIDs(settingUpdateRequest.getUserSettingId());
+            Validations.validateIDs(settingUpdateRequest.getUserSettingId(), settingUpdateRequest.getBoardId());
             return Response.builder()
                     .data(SettingsDTO.createUserSettingsList(settingsService.changeUserSettingsInBoard(settingUpdateRequest)))
                     .message(SuccessMessage.FOUND.toString())
