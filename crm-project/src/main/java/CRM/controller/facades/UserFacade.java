@@ -26,6 +26,7 @@ import javax.security.auth.login.AccountNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Component
@@ -235,11 +236,11 @@ public class UserFacade {
         try {
             Validations.validateUpdateUserToBoard(objectsIdsRequest.getBoardId(), objectsIdsRequest.getUserId(),
                     objectsIdsRequest.getPermissionId());
-            List<User> users = userService.updateUserToBoard(objectsIdsRequest);
-            sendUserAddedNotification(objectsIdsRequest, users);
+            Set<UserPermission> usersPermissions = userService.updateUserToBoard(objectsIdsRequest);
+            sendUserAddedNotification(objectsIdsRequest, usersPermissions.stream().map(UserPermission::getUser).collect(Collectors.toList()));
             return Response.builder()
                     .message(SuccessMessage.FOUND.toString())
-                    .data(UserDTO.getListOfUsersDTO(users))
+                    .data(UserPermissionDTO.getListOfUserPermissionFromDB(new ArrayList<>(usersPermissions)))
                     .status(HttpStatus.OK)
                     .statusCode(HttpStatusCodes.STATUS_CODE_OK)
                     .build();

@@ -1,45 +1,41 @@
-//package CRM.controller.facades;
-//
-//import static org.junit.jupiter.api.Assertions.*;
-//import static org.mockito.Mockito.*;
-//
-//import CRM.entity.Attribute;
-//import CRM.entity.Board;
-//import CRM.entity.DTO.AttributeDTO;
-//import CRM.entity.Status;
-//import CRM.entity.Type;
-//import CRM.entity.requests.AttributeRequest;
-//import CRM.entity.response.Response;
-//import CRM.service.BoardService;
-//import CRM.service.StatusService;
-//import CRM.service.TypeService;
-//import CRM.utils.enums.ExceptionMessage;
-//import CRM.utils.enums.SuccessMessage;
-//import org.junit.jupiter.api.DisplayName;
-//import org.junit.jupiter.api.Test;
-//import org.junit.jupiter.api.extension.ExtendWith;
-//import org.mockito.InjectMocks;
-//import org.mockito.Mock;
-//import org.mockito.junit.jupiter.MockitoExtension;
-//import org.springframework.http.HttpStatus;
-//
-//import java.util.*;
-//
-//@ExtendWith(MockitoExtension.class)
-//class AttributeFacadeTest {
-//
-//    @Mock
-//    private StatusService statusService;
-//
-//    @Mock
-//    private TypeService typeService;
-//
-//    @Mock
-//    private BoardService boardService;
-//
-//    @InjectMocks
-//    private AttributeFacade attributeFacade;
-//
+package CRM.controller.facades;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
+
+import CRM.entity.Attribute;
+import CRM.entity.Board;
+import CRM.entity.DTO.AttributeDTO;
+import CRM.entity.Status;
+import CRM.entity.Type;
+import CRM.entity.requests.AttributeRequest;
+import CRM.entity.response.Response;
+import CRM.service.AttributeService;
+import CRM.service.BoardService;
+import CRM.utils.enums.ExceptionMessage;
+import CRM.utils.enums.SuccessMessage;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.HttpStatus;
+
+import java.util.*;
+
+@ExtendWith(MockitoExtension.class)
+class AttributeFacadeTest {
+
+    @Mock
+    private AttributeService attributeService;
+
+    @Mock
+    private BoardService boardService;
+
+    @InjectMocks
+    private AttributeFacade attributeFacade;
+
 //    /**
 //     * Create method tests for status
 //     */
@@ -54,10 +50,10 @@
 //        board.setId(id);
 //        Status status = new Status();
 //        status.setId(id);
-//        status.setBoard(board);
+//        List<Status> statuses = List.of(status);
 //
 //        // Set up the mock StatusService to return the mock Attribute object when create is called
-//        when(statusService.create(any(Attribute.class))).thenReturn(status);
+//        when(attributeService.create().thenReturn(statuses);
 //
 //        // Call the create method and store the result in a Response object
 //        Response response = attributeFacade.create(StatusRequest, Status.class);
@@ -71,62 +67,62 @@
 //        // Assert that the AttributeDTO object has the correct name and description
 //        assertEquals(id, attributeDTO.getId());
 //    }
-//
-//    @Test
-//    @DisplayName("Should return 400 when status name is illegal and validate message")
-//    void testCreateStatusWithInvalidNameInput() {
-//        // Create a test AttributeRequest object with an invalid name
-//        AttributeRequest request = new AttributeRequest(1L, "Test Attribute!", "Test Description");
-//
-//        // Call the create method and store the result in a Response object
-//        Response response = attributeFacade.create(request, Status.class);
-//
-//        // Assert that the response status code is 400 (BAD_REQUEST)
-//        assertEquals(HttpStatus.BAD_REQUEST.value(), response.getStatusCode());
-//
-//        // Assert that the response message is "Invalid input: name"
-//        assertEquals("Could not approve the given information: Test Attribute!", response.getMessage());
-//    }
-//
-//    @Test
-//    @DisplayName("Should throw 500 when board is null when trying to create a status")
-//    void testCreateStatusWithNullBoard() {
-//        // Set up test data
-//        AttributeRequest statusRequest = new AttributeRequest(null, "Test Attribute", "Test Description");
-//
-//        // Call the create method with Status.class
-//        Response response = attributeFacade.create(statusRequest, Status.class);
-//
-//        // Call method under test and verify exception is thrown
-//        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR.value(), response.getStatusCode());
-//    }
-//
-//    @Test
-//    @DisplayName("Should throw 500 when name is null when creating a status")
-//    void testCreateStatusWithNullName() {
-//        // Set up test data
-//        AttributeRequest statusRequest = new AttributeRequest(1L, null, "Test Description");
-//
-//        // Call the create method with Status.class
-//        Response response = attributeFacade.create(statusRequest, Status.class);
-//
-//        // Call method under test and verify exception is thrown
-//        assertEquals(500, response.getStatusCode());
-//    }
-//
-//    @Test
-//    @DisplayName("Should throw 400 when name is empty")
-//    void testCreateStatusWithEmptyName() {
-//        // Set up test data
-//        AttributeRequest statusRequest = new AttributeRequest(1L, "", "Test Description");
-//
-//        // Call the create method with Status.class
-//        Response response = attributeFacade.create(statusRequest, Status.class);
-//
-//        // Call method under test and verify exception is thrown
-//        assertEquals(400, response.getStatusCode());
-//    }
-//
+
+    @Test
+    @DisplayName("Should return 400 when status name is illegal and validate message")
+    void testCreateStatusWithInvalidNameInput() {
+        // Create a test AttributeRequest object with an invalid name
+        AttributeRequest request = new AttributeRequest(1L, "Test Attribute!", "Test Description");
+
+        // Call the create method and store the result in a Response object
+        Response response = attributeFacade.create(request, Status.class);
+
+        // Assert that the response status code is 400 (BAD_REQUEST)
+        assertEquals(HttpStatus.BAD_REQUEST.value(), response.getStatusCode());
+
+        // Assert that the response message is "Invalid input: name"
+        assertEquals("Could not approve the given information: Test Attribute!", response.getMessage());
+    }
+
+    @Test
+    @DisplayName("Should throw 500 when board is null when trying to create a status")
+    void testCreateStatusWithNullBoard() {
+        // Set up test data
+        AttributeRequest statusRequest = new AttributeRequest(null, "Test Attribute", "Test Description");
+
+        // Call the create method with Status.class
+        Response response = attributeFacade.create(statusRequest, Status.class);
+
+        // Call method under test and verify exception is thrown
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR.value(), response.getStatusCode());
+    }
+
+    @Test
+    @DisplayName("Should throw 500 when name is null when creating a status")
+    void testCreateStatusWithNullName() {
+        // Set up test data
+        AttributeRequest statusRequest = new AttributeRequest(1L, null, "Test Description");
+
+        // Call the create method with Status.class
+        Response response = attributeFacade.create(statusRequest, Status.class);
+
+        // Call method under test and verify exception is thrown
+        assertEquals(500, response.getStatusCode());
+    }
+
+    @Test
+    @DisplayName("Should throw 400 when name is empty")
+    void testCreateStatusWithEmptyName() {
+        // Set up test data
+        AttributeRequest statusRequest = new AttributeRequest(1L, "", "Test Description");
+
+        // Call the create method with Status.class
+        Response response = attributeFacade.create(statusRequest, Status.class);
+
+        // Call method under test and verify exception is thrown
+        assertEquals(400, response.getStatusCode());
+    }
+
 //    /**
 //     * Create method tests for type
 //     */
@@ -142,7 +138,6 @@
 //        board.setId(id);
 //        Type type = new Type();
 //        type.setId(id);
-//        type.setBoard(board);
 //
 //        // Set up the mock StatusService to return the mock Attribute object when create is called
 //        when(typeService.create(any(Attribute.class))).thenReturn(type);
@@ -159,62 +154,62 @@
 //        // Assert that the AttributeDTO object has the correct name and description
 //        assertEquals(id, attributeDTO.getId());
 //    }
-//
-//    @Test
-//    @DisplayName("Should return 400 when type name is illegal and validate message")
-//    void testCreateTypeWithInvalidNameInput() {
-//        // Create a test AttributeRequest object with an invalid name
-//        AttributeRequest request = new AttributeRequest(1L, "Test Attribute!", "Test Description");
-//
-//        // Call the create method and store the result in a Response object
-//        Response response = attributeFacade.create(request, Type.class);
-//
-//        // Assert that the response status code is 400 (BAD_REQUEST)
-//        assertEquals(HttpStatus.BAD_REQUEST.value(), response.getStatusCode());
-//
-//        // Assert that the response message is "Invalid input: name"
-//        assertEquals("Could not approve the given information: Test Attribute!", response.getMessage());
-//    }
-//
-//    @Test
-//    @DisplayName("Should throw 500 when board is null when trying to create a type")
-//    void testCreateTypeWithNullBoard() {
-//        // Set up test data
-//        AttributeRequest statusRequest = new AttributeRequest(null, "Test Attribute", "Test Description");
-//
-//        // Call the create method with Status.class
-//        Response response = attributeFacade.create(statusRequest, Type.class);
-//
-//        // Call method under test and verify exception is thrown
-//        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR.value(), response.getStatusCode());
-//    }
-//
-//    @Test
-//    @DisplayName("Should throw 500 when name is null when creating a type")
-//    void testCreateTypeWithNullName() {
-//        // Set up test data
-//        AttributeRequest statusRequest = new AttributeRequest(1L, null, "Test Description");
-//
-//        // Call the create method with Status.class
-//        Response response = attributeFacade.create(statusRequest, Type.class);
-//
-//        // Call method under test and verify exception is thrown
-//        assertEquals(500, response.getStatusCode());
-//    }
-//
-//    @Test
-//    @DisplayName("Should throw 400 when name is empty")
-//    void testCreateTypeWithEmptyName() {
-//        // Set up test data
-//        AttributeRequest statusRequest = new AttributeRequest(1L, "", "Test Description");
-//
-//        // Call the create method with Status.class
-//        Response response = attributeFacade.create(statusRequest, Type.class);
-//
-//        // Call method under test and verify exception is thrown
-//        assertEquals(400, response.getStatusCode());
-//    }
-//
+
+    @Test
+    @DisplayName("Should return 400 when type name is illegal and validate message")
+    void testCreateTypeWithInvalidNameInput() {
+        // Create a test AttributeRequest object with an invalid name
+        AttributeRequest request = new AttributeRequest(1L, "Test Attribute!", "Test Description");
+
+        // Call the create method and store the result in a Response object
+        Response response = attributeFacade.create(request, Type.class);
+
+        // Assert that the response status code is 400 (BAD_REQUEST)
+        assertEquals(HttpStatus.BAD_REQUEST.value(), response.getStatusCode());
+
+        // Assert that the response message is "Invalid input: name"
+        assertEquals("Could not approve the given information: Test Attribute!", response.getMessage());
+    }
+
+    @Test
+    @DisplayName("Should throw 500 when board is null when trying to create a type")
+    void testCreateTypeWithNullBoard() {
+        // Set up test data
+        AttributeRequest statusRequest = new AttributeRequest(null, "Test Attribute", "Test Description");
+
+        // Call the create method with Status.class
+        Response response = attributeFacade.create(statusRequest, Type.class);
+
+        // Call method under test and verify exception is thrown
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR.value(), response.getStatusCode());
+    }
+
+    @Test
+    @DisplayName("Should throw 500 when name is null when creating a type")
+    void testCreateTypeWithNullName() {
+        // Set up test data
+        AttributeRequest statusRequest = new AttributeRequest(1L, null, "Test Description");
+
+        // Call the create method with Status.class
+        Response response = attributeFacade.create(statusRequest, Type.class);
+
+        // Call method under test and verify exception is thrown
+        assertEquals(500, response.getStatusCode());
+    }
+
+    @Test
+    @DisplayName("Should throw 400 when name is empty")
+    void testCreateTypeWithEmptyName() {
+        // Set up test data
+        AttributeRequest statusRequest = new AttributeRequest(1L, "", "Test Description");
+
+        // Call the create method with Status.class
+        Response response = attributeFacade.create(statusRequest, Type.class);
+
+        // Call method under test and verify exception is thrown
+        assertEquals(400, response.getStatusCode());
+    }
+
 //    /**
 //     * Delete method for status and type
 //     */
@@ -638,15 +633,15 @@
 //        Response response = attributeFacade.getAllAttributesInBoard(boardId, Type.class);
 //        assertEquals(exceptionMessage, response.getMessage());
 //    }
-//
-//    @Test
-//    @DisplayName("Test getAllTypeInBoard method with null board ID")
-//    public void testGetAllTypesInBoardInvalidBoardId() {
-//        // Call the method under test
-//        Response response = attributeFacade.getAllAttributesInBoard(null, Type.class);
-//
-//        // Verify the results
-//        assertEquals(HttpStatus.BAD_REQUEST, response.getStatus());
-//        assertEquals(ExceptionMessage.EMPTY_NOTNULL_FIELD.toString(), response.getMessage());
-//    }
-//}
+
+    @Test
+    @DisplayName("Test getAllTypeInBoard method with null board ID")
+    public void testGetAllTypesInBoardInvalidBoardId() {
+        // Call the method under test
+        Response response = attributeFacade.getAllAttributesInBoard(null, Type.class);
+
+        // Verify the results
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatus());
+        assertEquals(ExceptionMessage.EMPTY_NOTNULL_FIELD.toString(), response.getMessage());
+    }
+}
