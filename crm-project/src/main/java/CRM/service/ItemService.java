@@ -132,7 +132,6 @@ public class ItemService implements ServiceInterface {
      */
     @Override
     public List<SharedContent> getAllInItem(ObjectsIdsRequest objectsIdsRequest) {
-        //long itemId, long sectionId, long boardId
         Board board = Validations.doesIdExists(objectsIdsRequest.getBoardId(), boardRepository);
         return new ArrayList<>(board.getSectionFromBoard(objectsIdsRequest.getSectionId()).getItems());
     }
@@ -148,7 +147,12 @@ public class ItemService implements ServiceInterface {
         return board.getSectionFromBoard(objectsIdsRequest.getSectionId()).getItems();
     }
 
-    //TODO assignToUser
+    /**
+     * Assign a user to an item in the board.
+     *
+     * @param objectsIdsRequest the request containing the IDs of the board, the item, and the user
+     * @return the updated set of user permissions for the board
+     */
     @Override
     public Set<UserPermission> assignToUser(ObjectsIdsRequest objectsIdsRequest) {
         Board board = Validations.doesIdExists(objectsIdsRequest.getBoardId(), boardRepository);
