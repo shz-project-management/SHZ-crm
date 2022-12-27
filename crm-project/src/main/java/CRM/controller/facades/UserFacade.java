@@ -261,9 +261,14 @@ public class UserFacade {
     }
 
     private void sendUserAddedNotification(ObjectsIdsRequest objectsIdsRequest, Set<User> users) throws AccountNotFoundException {
+        User user = null;
+        if(objectsIdsRequest.getEmail() != null){
+            user = userService.get(objectsIdsRequest.getEmail());
+        } else{
+          user = userService.get(objectsIdsRequest.getUserId());
+        }
         notificationSender.sendNotificationToManyUsers(
-                NotificationRequest.createUserAddedRequest(boardService.get(objectsIdsRequest.getBoardId()),
-                        userService.get(objectsIdsRequest.getUserId()),
+                NotificationRequest.createUserAddedRequest(boardService.get(objectsIdsRequest.getBoardId()), user,
                         settingsService.getNotificationSettingFromDB(Notifications.USER_ADDED.name)), users);
     }
 }

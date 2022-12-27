@@ -139,8 +139,9 @@ public class Validations {
         }
     }
 
-    public static void validateUpdateUserToBoard(Long firstId, Long secondId, Long permissionId) {
-        validateIDs(firstId, secondId);
+    public static void validateUpdateUserToBoard(Long boardId, Long userId, Long permissionId) {
+        if(userId != null) validate(userId, Regex.ID.getRegex());
+        validate(boardId, Regex.ID.getRegex());
         validate(permissionId, Regex.ID.getRegex());
         if (permissionId < 0 || permissionId > 3) {
             throw new IllegalArgumentException(ExceptionMessage.PERMISSION_NOT_FOUND.toString());

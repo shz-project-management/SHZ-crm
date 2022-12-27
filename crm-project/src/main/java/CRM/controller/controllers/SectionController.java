@@ -45,8 +45,8 @@ public class SectionController {
      *
      * @return A ResponseEntity with the appropriate status and response body.
      */
-    @DeleteMapping
-    public ResponseEntity<Response> delete(@RequestAttribute Long boardId, @RequestAttribute Long sectionId) {
+    @DeleteMapping(value = "{sectionId}")
+    public ResponseEntity<Response> delete(@RequestAttribute Long boardId, @PathVariable Long sectionId) {
         Response response = sectionFacade.delete(boardId, sectionId);
         return new ResponseEntity<>(response, response.getStatus());
     }
