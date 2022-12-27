@@ -250,6 +250,9 @@ public class Board {
     }
 
     public Permission getUserPermissionWithoutAdminByUserId(Long userId) throws NoPermissionException {
+        if(creatorUser.getId().equals(userId)){
+            return Permission.ADMIN;
+        }
         Optional<UserPermission> userPerm = getUsersPermissions().stream().filter(userPermission -> userPermission.getUser().getId().equals(userId)).findFirst();
         if(userPerm.isPresent()){
             return userPerm.get().getPermission();
