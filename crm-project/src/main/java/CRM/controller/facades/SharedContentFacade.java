@@ -53,7 +53,7 @@ public class SharedContentFacade {
      * @throws NoSuchElementException   if the board ID, type ID, or status ID specified in the request object do not correspond to existing entities.
      * @throws NullPointerException     if the parent item ID is null.
      */
-    public Response create(ItemRequest item, Long userId, Long boardId) {
+    public Response create(ItemRequest item) {
         try {
             // make sure the params are correct using Validations.validateCreatedItem()
             // catch exception if relevant

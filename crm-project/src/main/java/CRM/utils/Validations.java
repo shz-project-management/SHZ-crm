@@ -107,9 +107,6 @@ public class Validations {
 //        validate(item.getStatusId(), Regex.ID.getRegex());
 //        validate(item.getTypeId(), Regex.ID.getRegex());
 
-        if (item.getImportance() < 0 || item.getImportance() > 5)
-            throw new IllegalArgumentException(ExceptionMessage.VALIDATION_FAILED.toString());
-
         if (item.getName() == null)
             throw new NullPointerException(ExceptionMessage.VALIDATION_FAILED.toString());
     }
