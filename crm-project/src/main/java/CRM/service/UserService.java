@@ -191,7 +191,7 @@ public class UserService {
         Permission permission = Permission.values()[Math.toIntExact(request.getPermissionId())];
         Set<UserPermission> userPermissionsSet = updateUserPermission(user, permission, board);
         User admin = board.getCreatorUser();
-        userPermissionsSet.add(UserPermission.newUserPermission(admin, Permission.ADMIN));
+        addAdminToUsersPermissionIfNotExists(userPermissionsSet, admin);
 
         boardRepository.save(board);
         return userPermissionsSet;
@@ -237,8 +237,9 @@ public class UserService {
     public Set<UserPermission> getAllUserPermissionsInBoard(Long boardId) {
         Board board = Validations.doesIdExists(boardId, boardRepository);
         Set<UserPermission> userPermissions = board.getUsersPermissions();
-        User user = board.getCreatorUser();
-        userPermissions.add(UserPermission.newUserPermission(user, Permission.ADMIN));
+        User admin = board.getCreatorUser();
+        addAdminToUsersPermissionIfNotExists(userPermissions, admin);
+
         return userPermissions;
     }
 
@@ -313,5 +314,10 @@ public class UserService {
             }
         }
         return sharedBoards;
+    }
+
+    private void addAdminToUsersPermissionIfNotExists(Set<UserPermission> userPermissions, User admin){
+        if (userPermissions.stream().noneMatch(userPerm -> userPerm.getUser().getId().equals(admin.getId())))
+            userPermissions.add(UserPermission.newUserPermission(admin, Permission.ADMIN));
     }
 }
