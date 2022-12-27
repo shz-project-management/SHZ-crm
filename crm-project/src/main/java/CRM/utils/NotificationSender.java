@@ -20,6 +20,7 @@ import javax.security.auth.login.AccountNotFoundException;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 
 @Component
 public class NotificationSender {
@@ -41,7 +42,7 @@ public class NotificationSender {
         }catch (AccountNotFoundException e){
             return false;
         }
-        UserSetting userSettingsInBoard = UserSetting.getRelevantUserSetting(notificationRequest.getBoard(), notificationRequest.getUser(),
+        UserSetting userSettingsInBoard = UserSetting.getRelevantUserSetting(notificationRequest.getBoard(), notificationRequest.getUser().getId(),
                 settingsService.getNotificationSettingFromDB(notificationRequest.getNotificationType().getName()).getName());
         if (userSettingsInBoard.isInApp()) {
             notificationService.createInAppNotification(notificationRequest, userSettingsInBoard);
@@ -57,7 +58,7 @@ public class NotificationSender {
         return true;
     }
 
-    public void sendNotificationToManyUsers(NotificationRequest notificationRequest, List<User> usersInBoard) {
+    public void sendNotificationToManyUsers(NotificationRequest notificationRequest, Set<User> usersInBoard) {
         for (User userInBoard: usersInBoard) {
             notificationRequest.setUser(userInBoard);
             sendNotification(notificationRequest);
