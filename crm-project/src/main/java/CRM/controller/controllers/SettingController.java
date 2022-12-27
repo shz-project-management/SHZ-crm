@@ -2,6 +2,7 @@ package CRM.controller.controllers;
 
 import CRM.controller.facades.SettingsFacade;
 import CRM.entity.requests.ObjectsIdsRequest;
+import CRM.entity.requests.SettingUpdateRequest;
 import CRM.entity.response.Response;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,8 +33,9 @@ public class SettingController {
         return new ResponseEntity<>(response, response.getStatus());
     }
 
-    @PatchMapping(value = "user/{userId}/board/{boardId}")
-    public ResponseEntity<Response> changeUserSettingInBoard(@PathVariable Long userId, @PathVariable Long boardId, @RequestParam Long settingId, @RequestParam Boolean shouldBeActive) {
-        return null;
+    @PatchMapping(consumes = "application/json")
+    public ResponseEntity<Response> changeUserSettingsInBoard(@RequestBody SettingUpdateRequest settingUpdateRequest) {
+        Response response = settingsFacade.changeUserSettingsInBoard(settingUpdateRequest);
+        return new ResponseEntity<>(response, response.getStatus());
     }
 }

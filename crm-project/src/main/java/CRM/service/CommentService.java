@@ -27,15 +27,14 @@ public class CommentService implements ServiceInterface {
     @Autowired
     private BoardRepository boardRepository;
 
-
     /**
-     * Creates a new comment based on the information provided in the comment request.
+     * Creates a new Comment object and adds it to the parent Item in the specified Section of the given Board.
      *
-     * @param commentRequest the comment request containing the information for the new comment
-     * @return the created comment
-     * @throws AccountNotFoundException if the user specified in the comment request does not exist
+     * @param commentRequest a request object containing the userId, boardId, sectionId, and parentItemId of the Comment
+     * @return a Set of all Comments in the parent Item
+     * @throws AccountNotFoundException if the userId provided does not correspond to an existing User
+     * @throws IllegalArgumentException if the parentItemId is null
      */
-    //TODO documentation
     public Set<Comment> create(CommentRequest commentRequest) throws AccountNotFoundException {
         Board board = Validations.doesIdExists(commentRequest.getBoardId(), boardRepository);
         User user;
@@ -58,12 +57,12 @@ public class CommentService implements ServiceInterface {
     }
 
     /**
-     * Deletes the comments with the specified IDs.
+     * Deletes the specified Comments from their parent Items in the given Board.
      *
-     * @param ids the IDs of the comments to delete
-     * @return the number of comments that were successfully deleted
+     * @param ids     a List of the Comment IDs to delete
+     * @param boardId the ID of the Board containing the Comments
+     * @return the number of Comments removed from Items in the Board
      */
-    //TODO documentation
     @Override
     public int delete(List<Long> ids, long boardId) {
         Board board = Validations.doesIdExists(boardId, boardRepository);
@@ -90,7 +89,13 @@ public class CommentService implements ServiceInterface {
     }
 
 
-    //TODO Documentation
+    /**
+     * Updates the specified Comment with the provided field update information.
+     *
+     * @param updateObject a request object containing the field name and value to update, as well as the ids of the Comment, Item, Section, and Board
+     * @return the updated Section containing the Comment
+     * @throws NoSuchFieldException if the field name provided is not a valid field of the Comment object
+     */
     @Override
     public Section update(UpdateObjectRequest updateObject) throws NoSuchFieldException {
         Board board = Validations.doesIdExists(updateObject.getObjectsIdsRequest().getBoardId(), boardRepository);
@@ -108,7 +113,13 @@ public class CommentService implements ServiceInterface {
         return board.getSectionFromBoard(updateObject.getObjectsIdsRequest().getSectionId());
     }
 
-    //TODO documentation
+    /**
+     * Retrieves the specified Comment from its parent Item in the specified Section of the given Board.
+     *
+     * @param objectsIdsRequest a request object containing the ids of the Comment, Item, Section, and Board
+     * @return the requested Comment
+     * @throws NoSuchElementException if the parentItemId is null or if the Comment cannot be found in the parent Item
+     */
     @Override
     public SharedContent get(ObjectsIdsRequest objectsIdsRequest) {
         Board board = Validations.doesIdExists(objectsIdsRequest.getBoardId(), boardRepository);
@@ -121,26 +132,36 @@ public class CommentService implements ServiceInterface {
         throw new NoSuchElementException(ExceptionMessage.PARENT_ITEM_NOT_FOUND.toString());
     }
 
-    //TODO + documentation
+    /**
+     * Retrieves all Comments in the specified Item of the given Board.
+     *
+     * @param objectsIdsRequest a request object containing the ids of the Item, Section, and Board
+     * @return a List of all Comments in the Item
+     */
     @Override
     public List<SharedContent> getAllInItem(ObjectsIdsRequest objectsIdsRequest) {
         Board board = Validations.doesIdExists(objectsIdsRequest.getBoardId(), boardRepository);
         return new ArrayList<>(board.getAllCommentsInItem(objectsIdsRequest.getSectionId(), objectsIdsRequest.getItemId()));
     }
 
-    //TODO + documentation
+    /**
+     * Assigns the specified Comment to the given User.
+     *
+     * @param objectsIdsRequest a request object containing the ids of the Comment, Item, Section, Board, and User
+     * @return a List of all Comments in the Item
+     */
     @Override
-    public List<SharedContent> assignToUser(ObjectsIdsRequest objectsIdsRequest){
+    public List<SharedContent> assignToUser(ObjectsIdsRequest objectsIdsRequest) {
         return null;
     }
 
     /**
-     * Retrieves all comments in the board with the specified ID.
+     * Retrieves all comments in a board.
      *
-     * @param boardId the ID of the board
-     * @return a list of comments in the board
+     * @param boardId the ID of the board to retrieve comments from
+     * @return a set of all comments in the board
+     * @throws NoSuchElementException if the board does not exist
      */
-    //TODO documentation
     public Set<Comment> getAllCommentsInBoard(long boardId) {
         Board board = Validations.doesIdExists(boardId, boardRepository);
 
@@ -157,14 +178,14 @@ public class CommentService implements ServiceInterface {
     }
 
 
-    //TODO + documentation
-    public Set<Comment> getAllCommentsInSection(ObjectsIdsRequest objectsIdsRequest) {
-//        Status status = Validations.doesIdExists(statusId, statusRepository);
-//        Set<Item> itemsInStatus = itemRepository.findAllByStatus(status);
-        Set<Comment> commentList = new HashSet<>();
-//        for (Item item : itemsInStatus) {
-//            commentList.addAll(commentRepository.findAllByParentItem(item));
-//        }
-        return commentList;
-    }
+//    //TODO + documentation
+//    public Set<Comment> getAllCommentsInSection(ObjectsIdsRequest objectsIdsRequest) {
+////        Status status = Validations.doesIdExists(statusId, statusRepository);
+////        Set<Item> itemsInStatus = itemRepository.findAllByStatus(status);
+//        Set<Comment> commentList = new HashSet<>();
+////        for (Item item : itemsInStatus) {
+////            commentList.addAll(commentRepository.findAllByParentItem(item));
+////        }
+//        return commentList;
+//    }
 }

@@ -11,6 +11,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @Controller
 @RequestMapping(value = "/notification")
 @AllArgsConstructor
@@ -22,8 +24,14 @@ public class NotificationController {
 
     //TODO:DOCUMENTATION
     @GetMapping(value = "getAll-user-in-board")
-    public ResponseEntity<Response> getAllNotificationsForUserInBoard(@RequestBody ObjectsIdsRequest objectsIdsRequest) {
-        Response response = notificationFacade.getAllNotificationsForUserInBoard(objectsIdsRequest);
+    public ResponseEntity<Response> getAllForUserPerBoard(@RequestBody ObjectsIdsRequest objectsIdsRequest) {
+        Response response = notificationFacade.getAllForUserPerBoard(objectsIdsRequest);
+        return new ResponseEntity<>(response, response.getStatus());
+    }
+
+    @DeleteMapping(value = "delete")
+    public ResponseEntity<Response> delete(@RequestBody List<Long> notificationsIds) {
+        Response response = notificationFacade.delete(notificationsIds);
         return new ResponseEntity<>(response, response.getStatus());
     }
 }

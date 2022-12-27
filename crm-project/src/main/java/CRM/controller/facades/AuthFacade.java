@@ -71,6 +71,14 @@ public class AuthFacade {
         }
     }
 
+    /**
+     * Attempts to log in a user through a third party provider (e.g. GitHub) using the provided code.
+     *
+     * @param code the authorization code returned by the third party provider after the user grants access
+     * @return a response object with a status code and message indicating the success or failure of the operation, and the user's login information
+     * @throws IOException          if there is an error while communicating with the third party provider
+     * @throws NullPointerException if the code parameter is null
+     */
     public Response thirdPartyLogin(String code) {
         try {
             RegisterUserRequest user = githubCodeDecoder.getUserDataFromCode(code);

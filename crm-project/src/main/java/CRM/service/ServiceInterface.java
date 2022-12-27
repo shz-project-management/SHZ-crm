@@ -12,7 +12,6 @@ public interface ServiceInterface {
     int delete(List<Long> ids, long boardId);
     SharedContent get(ObjectsIdsRequest objectsIdsRequest);
     Section update(UpdateObjectRequest updateObject) throws NoSuchFieldException;
-
     List<SharedContent> getAllInItem(ObjectsIdsRequest objectsIdsRequest);
     List<SharedContent> assignToUser(ObjectsIdsRequest objectsIdsRequest);
 
