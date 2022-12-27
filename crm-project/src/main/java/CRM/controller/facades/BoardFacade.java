@@ -110,7 +110,7 @@ public class BoardFacade {
             Validations.validateIDs(boardId, userId);
             Board board = boardService.get(boardId);
             BoardDTO boardDTO = BoardDTO.getBoardFromDB(board);
-            boardDTO.setUserPermission(board.getUserPermissionByUserId(userId));
+            boardDTO.setUserPermission(board.getUserPermissionIntegerByUserId(userId));
 
             return Response.builder()
                     .data(boardDTO)
