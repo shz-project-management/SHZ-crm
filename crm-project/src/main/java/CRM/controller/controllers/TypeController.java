@@ -1,7 +1,6 @@
 package CRM.controller.controllers;
 
 import CRM.controller.facades.AttributeFacade;
-import CRM.entity.Status;
 import CRM.entity.Type;
 import CRM.entity.requests.AttributeRequest;
 import CRM.entity.requests.UpdateObjectRequest;
@@ -10,6 +9,7 @@ import CRM.utils.enums.UpdateField;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,6 +21,8 @@ public class TypeController {
 
     @Autowired
     private AttributeFacade attributeFacade;
+    @Autowired
+    private SimpMessagingTemplate messagingTemplate;
 
     /**
      * This function maps HTTP POST requests to the /create endpoint to the create function in the attributeFacade class.
@@ -33,7 +35,8 @@ public class TypeController {
     public ResponseEntity<Response> create(@RequestBody AttributeRequest sectionRequest, @RequestAttribute Long boardId) {
         sectionRequest.setBoardId(boardId);
         Response response = attributeFacade.create(sectionRequest, Type.class);
-        return new ResponseEntity<>(response, response.getStatus());
+        messagingTemplate.convertAndSend("/attribute/" + boardId, response);
+        return ResponseEntity.noContent().build();
     }
 
     /**
@@ -44,7 +47,8 @@ public class TypeController {
     @DeleteMapping(value = "{sectionId}")
     public ResponseEntity<Response> delete(@RequestAttribute Long boardId, @PathVariable Long sectionId) {
         Response response = attributeFacade.delete(boardId, sectionId, Type.class);
-        return new ResponseEntity<>(response, response.getStatus());
+        messagingTemplate.convertAndSend("/attribute/" + boardId, response);
+        return ResponseEntity.noContent().build();
     }
 
 //    /**
@@ -76,6 +80,7 @@ public class TypeController {
     @PatchMapping(value = "/update", consumes = "application/json")
     public ResponseEntity<Response> update(@RequestBody UpdateObjectRequest typeRequest, @RequestParam UpdateField field) {
         Response response = attributeFacade.update(typeRequest, Type.class);
-        return new ResponseEntity<>(response, response.getStatus());
+        messagingTemplate.convertAndSend("/attribute/" + typeRequest.getObjectsIdsRequest().getBoardId(), response);
+        return ResponseEntity.noContent().build();
     }
 }
