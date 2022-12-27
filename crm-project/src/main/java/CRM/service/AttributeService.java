@@ -42,14 +42,13 @@ public class AttributeService {
      * @param attributeId the id of the attribute to be deleted
      * @param clz         the class of the attribute to be deleted, either Type or Status
      */
-    public void delete(long boardId, long attributeId, Class clz) {
+    public Board delete(long boardId, long attributeId, Class clz) {
         // get the board Id and make sure it exsits
         Board board = Validations.doesIdExists(boardId, boardRepository);
 
-        // get the lists of attributes so we can delete this specific attribute
+        board.removeAttributeFromItems(attributeId, clz);
         board.removeAttribute(attributeId, clz);
-
-        boardRepository.save(board);
+        return boardRepository.save(board);
     }
 
     /**

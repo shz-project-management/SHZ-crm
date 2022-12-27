@@ -78,10 +78,10 @@ public class AttributeFacade {
     public Response delete(Long boardId, Long attributeId, Class clz) {
         try {
             Validations.validateIDs(attributeId, boardId);
-            attributeService.delete(boardId, attributeId, clz);
 
             return Response.builder()
-                    .status(HttpStatus.NO_CONTENT)
+                    .data(BoardDTO.getBoardFromDB(attributeService.delete(boardId, attributeId, clz)))
+                    .status(HttpStatus.OK)
                     .statusCode(HttpStatusCodes.STATUS_CODE_NO_CONTENT)
                     .message(SuccessMessage.DELETED.toString())
                     .build();

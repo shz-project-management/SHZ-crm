@@ -35,8 +35,8 @@ public class SectionController {
      * @return A ResponseEntity containing a Response object with the status of the create operation and the created type object.
      */
     @PostMapping(consumes = "application/json")
-    public ResponseEntity<Response> create(@RequestBody AttributeRequest sectionRequest) {
-        Response response = sectionFacade.create(sectionRequest);
+    public ResponseEntity<Response> create(@RequestBody AttributeRequest sectionRequest, @RequestAttribute Long boardId) {
+        Response response = sectionFacade.create(sectionRequest, boardId);
         return new ResponseEntity<>(response, response.getStatus());
     }
 
@@ -45,8 +45,8 @@ public class SectionController {
      *
      * @return A ResponseEntity with the appropriate status and response body.
      */
-    @DeleteMapping(value = "{boardId}/{sectionId}")
-    public ResponseEntity<Response> delete(@PathVariable Long boardId,@PathVariable Long sectionId) {
+    @DeleteMapping
+    public ResponseEntity<Response> delete(@RequestAttribute Long boardId, @RequestAttribute Long sectionId) {
         Response response = sectionFacade.delete(boardId, sectionId);
         return new ResponseEntity<>(response, response.getStatus());
     }
@@ -58,7 +58,7 @@ public class SectionController {
      * @return A ResponseEntity object containing the Response object with the type information and the HTTP status code.
      */
     @GetMapping(value = "{sectionId}")
-    public ResponseEntity<Response> get(@PathVariable Long sectionId, @RequestParam Long boardId) {
+    public ResponseEntity<Response> get(@PathVariable Long sectionId, @RequestAttribute Long boardId) {
         Response response = sectionFacade.get(boardId, sectionId);
         return new ResponseEntity<>(response, response.getStatus());
     }
@@ -70,8 +70,8 @@ public class SectionController {
      * @param boardId The id of the board whose types are to be retrieved.
      * @return A ResponseEntity object containing the Response object with the retrieved types and the HTTP status code.
      */
-    @GetMapping(value = "getAll/{boardId}")
-    public ResponseEntity<Response> getAllInBoard(@PathVariable Long boardId) {
+    @GetMapping(value = "getAll")
+    public ResponseEntity<Response> getAllInBoard(@RequestAttribute Long boardId) {
         Response response = sectionFacade.getAllSectionsInBoard(boardId);
         return new ResponseEntity<>(response, response.getStatus());
     }
@@ -84,7 +84,9 @@ public class SectionController {
 
     //TODO documentation
     @PatchMapping(value = "/update", consumes = "application/json")
-    public ResponseEntity<Response> update(@RequestBody UpdateObjectRequest updateItemRequest, @RequestParam UpdateField field) {
+    public ResponseEntity<Response> update(@RequestBody UpdateObjectRequest updateItemRequest, @RequestParam UpdateField field,
+                                           @RequestAttribute Long boardId) {
+        updateItemRequest.getObjectsIdsRequest().setBoardId(boardId);
         Response response = sectionFacade.update(updateItemRequest);
         return new ResponseEntity<>(response, response.getStatus());
     }

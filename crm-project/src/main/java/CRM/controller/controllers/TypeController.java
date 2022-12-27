@@ -30,21 +30,22 @@ public class TypeController {
      * @return A ResponseEntity containing a Response object with the status of the create operation and the created type object.
      */
     @PostMapping(consumes = "application/json")
-    public ResponseEntity<Response> create(@RequestBody AttributeRequest sectionRequest) {
+    public ResponseEntity<Response> create(@RequestBody AttributeRequest sectionRequest, @RequestAttribute Long boardId) {
+        sectionRequest.setBoardId(boardId);
         Response response = attributeFacade.create(sectionRequest, Type.class);
         return new ResponseEntity<>(response, response.getStatus());
     }
 
-//    /**
-//     * Handle HTTP DELETE requests to delete a type.
-//     *
-//     * @return A ResponseEntity with the appropriate status and response body.
-//     */
-//    @DeleteMapping(value = "{boardId}/{sectionId}")
-//    public ResponseEntity<Response> delete(@PathVariable Long boardId, @PathVariable Long sectionId) {
-//        Response response = attributeFacade.delete(boardId, sectionId, Type.class);
-//        return new ResponseEntity<>(response, response.getStatus());
-//    }
+    /**
+     * Handle HTTP DELETE requests to delete a type.
+     *
+     * @return A ResponseEntity with the appropriate status and response body.
+     */
+    @DeleteMapping(value = "{sectionId}")
+    public ResponseEntity<Response> delete(@RequestAttribute Long boardId, @PathVariable Long sectionId) {
+        Response response = attributeFacade.delete(boardId, sectionId, Type.class);
+        return new ResponseEntity<>(response, response.getStatus());
+    }
 
 //    /**
 //     This method is used to handle HTTP GET requests to the specified URL (type/{id}).
