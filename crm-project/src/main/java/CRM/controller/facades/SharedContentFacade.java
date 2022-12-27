@@ -474,11 +474,11 @@ public class SharedContentFacade {
                 userService.getAllInBoard(updateObject.getObjectsIdsRequest().getBoardId()));
     }
 
-    private void sendCommentCreatedNotification(CommentRequest comment, Long userId, Long boardId) throws AccountNotFoundException {
+    private void sendCommentCreatedNotification(CommentRequest comment, long userId, long boardId) throws AccountNotFoundException {
         notificationSender.sendNotificationToManyUsers(
                 NotificationRequest.createCommentAddedRequest(userService.get(userId),
                         boardService.get(boardId), comment.getParentItemId(),
-                        comment.getDescription(), userService.get(boardId),
+                        comment.getDescription(), userService.get(userId),
                         settingsService.getNotificationSettingFromDB(Notifications.COMMENT_ADDED.name)),
                 userService.getAllInBoard(boardId));
     }
