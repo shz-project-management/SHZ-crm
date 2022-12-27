@@ -151,7 +151,7 @@ public class CommentService implements ServiceInterface {
      * @return a List of all Comments in the Item
      */
     @Override
-    public List<SharedContent> assignToUser(ObjectsIdsRequest objectsIdsRequest) {
+    public Set<UserPermission> assignToUser(ObjectsIdsRequest objectsIdsRequest) {
         return null;
     }
 

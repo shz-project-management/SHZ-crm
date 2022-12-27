@@ -66,9 +66,7 @@ public class ItemController {
     }
 
     @PostMapping(value = "assign-to-user")
-    public ResponseEntity<Response> assignToUser(@RequestBody ObjectsIdsRequest objIds, @RequestAttribute Long userId,
-                                                 @RequestAttribute Long boardId) {
-        objIds.setUserId(userId);
+    public ResponseEntity<Response> assignToUser(@RequestBody ObjectsIdsRequest objIds, @RequestAttribute Long boardId) {
         objIds.setUserId(boardId);
         Response response = sharedContentFacade.assignToUser(objIds, Item.class);
         return new ResponseEntity<>(response, response.getStatus());

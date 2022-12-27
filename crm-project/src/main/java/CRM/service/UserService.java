@@ -175,31 +175,70 @@ public class UserService {
     /**
      * This method updates a user's permission on a board.
      *
-     * @param objectsIdsRequest an {@link ObjectsIdsRequest} object which contains the ID of the user, board, and requested permission
+     * @param request an {@link ObjectsIdsRequest} object which contains the ID of the user, board, and requested permission
      * @return a list of {@link User} objects representing all users in the board
      * @throws AccountNotFoundException if the user or board does not exist
      * @throws IllegalArgumentException if the requested permission is not allowed or the board's creator is trying to change their own permission
      */
-    public List<User> updateUserToBoard(ObjectsIdsRequest objectsIdsRequest) throws AccountNotFoundException {
-        User user;
-        Board board;
-        try {
-            user = Validations.doesIdExists(objectsIdsRequest.getUserId(), userRepository);
-            board = Validations.doesIdExists(objectsIdsRequest.getBoardId(), boardRepository);
-        } catch (NoSuchElementException e) {
-            throw new AccountNotFoundException(ExceptionMessage.ACCOUNT_DOES_NOT_EXISTS.toString());
-        }
+    public List<User> updateUserToBoard(ObjectsIdsRequest request) throws AccountNotFoundException {
+        User user = getUserFromRequest(request);
+        Board board = getBoardFromRequest(request);
 
         if (user.equals(board.getCreatorUser())) {
             throw new IllegalArgumentException(ExceptionMessage.ADMIN_CANT_CHANGE_HIS_PERMISSION.toString());
         }
 
-        Permission permissionRequest = Permission.values()[Math.toIntExact(objectsIdsRequest.getPermissionId())];
-        Set<UserPermission> userPermissionsSet = updateUserPermission(user, permissionRequest, board);
+        Permission permission = Permission.values()[Math.toIntExact(request.getPermissionId())];
+        Set<UserPermission> userPermissionsSet = updateUserPermission(user, permission, board);
         List<User> users = board.getAllUsersInBoard(board, userPermissionsSet);
 
         boardRepository.save(board);
         return users;
+    }
+
+    /**
+     * Returns the user from the request. If the request contains an email, the method
+     * attempts to find a user with that email. If the request contains a user ID, the method
+     * uses the ID to find the user. If no user is found, an AccountNotFoundException is thrown.
+     *
+     * @param request the request containing the email or user ID
+     * @return the user found in the request
+     * @throws AccountNotFoundException if no user is found in the request
+     */
+    private User getUserFromRequest(ObjectsIdsRequest request) throws AccountNotFoundException {
+        if (request.getEmail() != null) {
+            Optional<User> optionalUser = userRepository.findByEmail(request.getEmail());
+            if (optionalUser.isPresent()) {
+                return optionalUser.get();
+            }
+        } else {
+            return Validations.doesIdExists(request.getUserId(), userRepository);
+        }
+        throw new AccountNotFoundException(ExceptionMessage.ACCOUNT_DOES_NOT_EXISTS.toString());
+    }
+
+    /**
+     * Returns the board from the request. The method uses the board ID in the request
+     * to find the board. If no board is found, an AccountNotFoundException is thrown.
+     *
+     * @param request the request containing the board ID
+     * @return the board found in the request
+     * @throws AccountNotFoundException if no board is found in the request
+     */
+    private Board getBoardFromRequest(ObjectsIdsRequest request) throws AccountNotFoundException {
+        try {
+            return Validations.doesIdExists(request.getBoardId(), boardRepository);
+        } catch (NoSuchElementException e) {
+            throw new AccountNotFoundException(ExceptionMessage.ACCOUNT_DOES_NOT_EXISTS.toString());
+        }
+    }
+
+    public Set<UserPermission> getAllUserPermissionsInBoard(Long boardId) {
+        Board board = Validations.doesIdExists(boardId, boardRepository);
+        Set<UserPermission> userPermissions = board.getUsersPermissions();
+        User user = board.getCreatorUser();
+        userPermissions.add(UserPermission.newUserPermission(user, Permission.ADMIN));
+        return userPermissions;
     }
 
     /**
