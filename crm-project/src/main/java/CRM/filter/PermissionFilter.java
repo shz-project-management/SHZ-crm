@@ -16,17 +16,13 @@ import org.springframework.web.filter.GenericFilterBean;
 
 import javax.naming.NoPermissionException;
 import javax.security.auth.login.AccountNotFoundException;
-import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
+import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedReader;
 import java.io.IOException;
 
 import static CRM.utils.Util.*;
-
 
 @Component
 public class PermissionFilter extends GenericFilterBean {
@@ -79,7 +75,8 @@ public class PermissionFilter extends GenericFilterBean {
                 return;
             }
 
-            if (permission.equals(Permission.ADMIN) || isValidRequest(httpRequest, path, permission)) {
+            JsonObject jsonBody = createBody(httpRequest);
+            if (permission.equals(Permission.ADMIN) || isValidRequest(httpRequest, path, jsonBody, permission)) {
                 chain.doFilter(request, response);
             } else {
                 sendForbiddenResponse(httpResponse);
@@ -93,19 +90,16 @@ public class PermissionFilter extends GenericFilterBean {
         return permissionPathsForAll.stream().noneMatch(path::contains);
     }
 
-    private boolean isValidRequest(HttpServletRequest httpRequest, String path, Permission permission) throws IOException {
-        if (permission == Permission.LEADER) { return isPermittedForLeaders(path) && isValidUpdateForLeaders(httpRequest); }
-        else if (permission == Permission.USER) { return isPermittedForUsers(path) && isValidUpdateForUsers(httpRequest, path); }
+    private boolean isValidRequest(HttpServletRequest httpRequest, String path, JsonObject jsonBody, Permission permission) throws IOException {
+        if (permission == Permission.LEADER) { return isPermittedForLeaders(path) && isValidUpdateForLeaders(httpRequest, jsonBody); }
+        else if (permission == Permission.USER) { return isPermittedForUsers(path) && isValidUpdateForUsers(httpRequest, jsonBody, path); }
         return false;
     }
 
-    private boolean isValidUpdateForLeaders(HttpServletRequest httpRequest) throws IOException {
+    private boolean isValidUpdateForLeaders(HttpServletRequest httpRequest, JsonObject body) throws IOException {
         if (httpRequest.getMethod().equals("POST")) {
             return true;
         } else if (httpRequest.getMethod().equals("PATCH")) {
-            String jsonBody = createBody(httpRequest);
-            Gson gson = new Gson();
-            JsonObject body = gson.fromJson(jsonBody, JsonObject.class);
             String fieldName = body.get("fieldName").getAsString();
             return fieldName.equals("STATUS") || fieldName.equals("TYPE");
         }
@@ -120,13 +114,10 @@ public class PermissionFilter extends GenericFilterBean {
         return permissionPathsForLeaders.stream().anyMatch(path::contains);
     }
 
-    private boolean isValidUpdateForUsers(HttpServletRequest httpRequest, String path) throws IOException {
+    private boolean isValidUpdateForUsers(HttpServletRequest httpRequest, JsonObject body, String path) throws IOException {
         if (httpRequest.getMethod().equals("POST") && path.contains("comment")) {
             return true;
         } else if (httpRequest.getMethod().equals("PATCH") && path.contains("item")) {
-            String jsonBody = createBody(httpRequest);
-            Gson gson = new Gson();
-            JsonObject body = gson.fromJson(jsonBody, JsonObject.class);
             String fieldName = body.get("fieldName").getAsString();
             return fieldName.equals("STATUS") || fieldName.equals("TYPE");
         }
@@ -138,12 +129,22 @@ public class PermissionFilter extends GenericFilterBean {
         httpResponse.sendError(HttpServletResponse.SC_FORBIDDEN);
     }
 
-    private String createBody(HttpServletRequest httpRequest) throws IOException {
-        BufferedReader reader = httpRequest.getReader();
+    private JsonObject createBody(HttpServletRequest httpRequest) throws IOException {
+        String requestBody = getRequestBody(httpRequest);
+        Gson gson = new Gson();
+        return gson.fromJson(requestBody, JsonObject.class);
+    }
+
+    private String getRequestBody(HttpServletRequest request) throws IOException {
         StringBuilder sb = new StringBuilder();
-        String line;
-        while ((line = reader.readLine()) != null) {
-            sb.append(line);
+        BufferedReader reader = request.getReader();
+        try {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                sb.append(line).append('\n');
+            }
+        } finally {
+            reader.close();
         }
         return sb.toString();
     }

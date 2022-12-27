@@ -34,9 +34,9 @@ public class BoardController {
      * @param boardRequest The request body, containing the necessary information to create a new board.
      * @return A ResponseEntity containing a Response object with the status of the create operation and the created board object.
      */
-    @PostMapping( value = "create" , consumes = "application/json")
-    public ResponseEntity<Response> create(@RequestBody BoardRequest boardRequest) {
-        Response response = boardFacade.create(boardRequest);
+    @PostMapping( value = "/create" , consumes = "application/json")
+    public ResponseEntity<Response> create(@RequestBody BoardRequest boardRequest, @RequestAttribute Long userId) {
+        Response response = boardFacade.create(boardRequest, userId);
         return new ResponseEntity<>(response, response.getStatus());
     }
 
@@ -73,7 +73,7 @@ public class BoardController {
      * @return A ResponseEntity object containing the Response object with the retrieved boards and the HTTP status code.
      */
     @GetMapping(value = "getAll/{userId}")
-    public ResponseEntity<Response> getAllBoardsOfUser(@PathVariable Long userId) {
+    public ResponseEntity<Response> getAllBoardsOfUser(@RequestAttribute Long userId) {
         Response response = boardFacade.getAllBoardsOfUser(userId);
         return new ResponseEntity<>(response, response.getStatus());
     }

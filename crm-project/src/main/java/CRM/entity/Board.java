@@ -45,7 +45,7 @@ public class Board {
     @JoinColumn(name = "board_id")
     private Set<Section> sections = new HashSet<>();
 
-    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "board_id")
     private Set<UserPermission> usersPermissions = new HashSet<>();
 
