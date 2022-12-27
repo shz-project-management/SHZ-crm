@@ -214,7 +214,7 @@ public class SharedContentFacade {
                 //data
                 else request = NotificationRequest.createItemChangeRequest(userService.get(updateObject.getObjectsIdsRequest().getUserId()),
                         boardService.get(updateObject.getObjectsIdsRequest().getBoardId()),
-                        updateObject.getObjectsIdsRequest().getItemId(),
+                        updateObject.getObjectsIdsRequest().getUpdateObjId(),
                         updateObject.getFieldName().toString(), updateObject.getContent(),
                         settingsService.getNotificationSettingFromDB(Notifications.ITEM_DATA_CHANGED.name));
 
