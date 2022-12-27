@@ -65,14 +65,13 @@ public class SettingsFacade {
      *
      * @param settingUpdateRequest request containing the user and board ids and the new settings
      * @return a response object with the updated settings for the user in the board
-     * @throws IllegalArgumentException if the user or board id is invalid
-     * @throws NoSuchElementException   if the user or board does not exist
-     * @throws AccountNotFoundException if the user does not have access to the board
+     * @throws IllegalArgumentException if setting id does not match id regex
+     * @throws NoSuchElementException   if the setting does not exist the DB
      * @throws NullPointerException     if an error occurs while processing the request
      */
     public Response changeUserSettingsInBoard(SettingUpdateRequest settingUpdateRequest) {
         try {
-            Validations.validateIDs(settingUpdateRequest.getUserId(), settingUpdateRequest.getBoardId());
+            Validations.validateIDs(settingUpdateRequest.getUserSettingId());
             return Response.builder()
                     .data(SettingsDTO.createUserSettingsList(settingsService.changeUserSettingsInBoard(settingUpdateRequest)))
                     .message(SuccessMessage.FOUND.toString())
@@ -80,7 +79,7 @@ public class SettingsFacade {
                     .statusCode(HttpStatusCodes.STATUS_CODE_OK)
                     .build();
 
-        } catch (IllegalArgumentException | NoSuchElementException | AccountNotFoundException e) {
+        } catch (IllegalArgumentException | NoSuchElementException e) {
             return Response.builder()
                     .statusCode(HttpStatusCodes.STATUS_CODE_BAD_REQUEST)
                     .status(HttpStatus.BAD_REQUEST)

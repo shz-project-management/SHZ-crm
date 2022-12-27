@@ -14,6 +14,7 @@ import java.util.List;
 @Setter
 @ToString
 public class SettingsDTO {
+    private Long settingId;
     private NotificationSetting setting;
     private boolean inApp;
     private boolean inEmail;
@@ -22,6 +23,7 @@ public class SettingsDTO {
         List<SettingsDTO> userSettingsDTO = new ArrayList<>();
         for (UserSetting userSetting : userSettings) {
             SettingsDTO settingsDTO = new SettingsDTO();
+            settingsDTO.setSettingId(userSetting.getId());
             settingsDTO.setSetting(userSetting.getSetting());
             settingsDTO.setInApp(userSetting.isInApp());
             settingsDTO.setInEmail(userSetting.isInEmail());
