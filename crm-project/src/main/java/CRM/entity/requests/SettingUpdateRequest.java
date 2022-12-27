@@ -8,9 +8,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Getter
 public class SettingUpdateRequest {
-    Long userId;
-    Long boardId;
-    String notificationName;
+    Long userSettingId;
     Boolean inApp;
     Boolean inEmail;
 }

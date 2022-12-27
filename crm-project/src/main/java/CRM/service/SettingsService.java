@@ -47,12 +47,6 @@ public class SettingsService {
         return userSettingRepository.getUserSettingsInBoard(objectsIdsRequest.getUserId(), objectsIdsRequest.getBoardId());
     }
 
-    public Boolean changeUserSettingInBoard(Long userId, Long boardId, Long settingId, Boolean shouldBeActive) {
-        // make sure there is such a user in board in the db -> checkIfExists
-        // if so, change the setting to the new setting. else, throw NoSuchElement exception
-        return null;
-    }
-
     /**
      * Retrieve a notification setting from the database by its name.
      *
@@ -67,32 +61,23 @@ public class SettingsService {
     /**
      * Update a user's notification settings in a board.
      *
-     * @param settingUpdateRequest the request object containing the user, board, and notification settings information to update
-     * @return the list of updated user settings
-     * @throws AccountNotFoundException if the user or board with the specified IDs do not exist
-     * @throws NoSuchElementException   if the user is not a member of the specified board
+     * @param settingUpdateRequest the request object containing the settingId, and notification settings information to update
+     * @return the updated user settings
+     * @throws NoSuchElementException   if setting/setting id does not exist in the database
      */
-    public List<UserSetting> changeUserSettingsInBoard(SettingUpdateRequest settingUpdateRequest) throws AccountNotFoundException {
-        if (!Validations.checkIfUserExistsInBoard(settingUpdateRequest.getUserId(), settingUpdateRequest.getBoardId(), userRepository, boardRepository))
-            throw new NoSuchElementException(ExceptionMessage.USER_DOES_NOT_EXISTS_IN_BOARD.toString());
-
-        Board board = Validations.doesIdExists(settingUpdateRequest.getBoardId(), boardRepository);
-        User user = Validations.doesIdExists(settingUpdateRequest.getUserId(), userRepository);
-
-        UserSetting userSetting = UserSetting.getRelevantUserSetting(board, user, settingUpdateRequest.getNotificationName());
-
+    public List<UserSetting> changeUserSettingsInBoard(SettingUpdateRequest settingUpdateRequest) {
+        Optional<UserSetting> userSettingOptional = userSettingRepository.findById(settingUpdateRequest.getUserSettingId());
+        if (!userSettingOptional.isPresent()){
+            throw new NoSuchElementException(ExceptionMessage.FIELD_OBJECT_NOT_EXISTS.toString());
+        }
+        UserSetting userSetting = userSettingOptional.get();
         if (settingUpdateRequest.getInApp() != null) {
             userSetting.setInApp(settingUpdateRequest.getInApp());
         }
         if (settingUpdateRequest.getInEmail() != null) {
             userSetting.setInEmail(settingUpdateRequest.getInEmail());
         }
-
-        Set<UserSetting> userSettingsInBoard = board.getUsersSettings();
-        userSettingsInBoard.add(userSetting);
-        board.setUsersSettings(userSettingsInBoard);
-
-        boardRepository.save(board);
-        return Arrays.asList(userSetting);
+        userSettingRepository.save(userSetting);
+        return userSettingRepository.findByUser_Id(userSetting.getUser().getId());
     }
 }

@@ -33,6 +33,12 @@ public class SettingController {
         return new ResponseEntity<>(response, response.getStatus());
     }
 
+    /**
+     * This endpoint is used to update a specific user settings in a specific board.
+     *
+     * @param settingUpdateRequest Includes userSettingId which is the id of the setting to update and the setting new data.
+     * @return A ResponseEntity object containing the response with the all the user's settings in that board.
+     */
     @PatchMapping(consumes = "application/json")
     public ResponseEntity<Response> changeUserSettingsInBoard(@RequestBody SettingUpdateRequest settingUpdateRequest) {
         Response response = settingsFacade.changeUserSettingsInBoard(settingUpdateRequest);
