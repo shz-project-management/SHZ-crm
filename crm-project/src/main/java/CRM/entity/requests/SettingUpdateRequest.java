@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 @Getter
 public class SettingUpdateRequest {
     Long userSettingId;
+    Long boardId;
     Boolean inApp;
     Boolean inEmail;
 }
