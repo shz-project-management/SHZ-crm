@@ -45,10 +45,10 @@ public class BoardService {
      * @throws AccountNotFoundException if the creator user id does not correspond to a user in the system
      */
     @Transactional
-    public Board create(BoardRequest boardRequest, Long userId) throws AccountNotFoundException {
+    public Board create(BoardRequest boardRequest) throws AccountNotFoundException {
         User user;
         try {
-            user = Validations.doesIdExists(userId, userRepository);
+            user = Validations.doesIdExists(boardRequest.getCreatorUserId(), userRepository);
         } catch (NoSuchElementException e) {
             throw new AccountNotFoundException(ExceptionMessage.ACCOUNT_DOES_NOT_EXISTS.toString());
         }

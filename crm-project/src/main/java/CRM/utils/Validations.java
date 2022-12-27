@@ -80,8 +80,8 @@ public class Validations {
      * @return true if the board request is valid, false otherwise
      * @throws IllegalArgumentException if the board name or creator user id does not match the expected format
      */
-    public static boolean validateNewBoard(BoardRequest board, Long userId) {
-        validateIDs(userId, board.getCreatorUserId());
+    public static boolean validateNewBoard(BoardRequest board) {
+        validate(board.getCreatorUserId(), Regex.ID.getRegex());
         validate(board.getName(), Regex.BOARD_NAME.getRegex());
         return true;
     }

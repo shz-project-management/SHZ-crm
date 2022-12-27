@@ -4,6 +4,7 @@ import lombok.*;
 
 @AllArgsConstructor
 @NoArgsConstructor
+@Setter
 @Getter
 public class BoardRequest {
     private Long creatorUserId;

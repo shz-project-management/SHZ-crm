@@ -67,8 +67,8 @@ public class UserController {
     }
 
     @PostMapping(value = "update-user-to-board")
-    public ResponseEntity<Response> updateUserToBoard(@RequestBody ObjectsIdsRequest objectsIdsRequest){
-
+    public ResponseEntity<Response> updateUserToBoard(@RequestBody ObjectsIdsRequest objectsIdsRequest, @RequestAttribute Long boardId){
+        objectsIdsRequest.setBoardId(boardId);
         Response response = userFacade.updateUserToBoard(objectsIdsRequest);
         return new ResponseEntity<>(response, response.getStatus());
     }

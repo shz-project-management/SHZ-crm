@@ -3,6 +3,7 @@ package CRM.controller.controllers;
 import CRM.controller.facades.BoardFacade;
 import CRM.entity.Board;
 import CRM.entity.requests.BoardRequest;
+import CRM.entity.requests.ObjectsIdsRequest;
 import CRM.entity.requests.UpdateObjectRequest;
 import CRM.entity.response.Response;
 import CRM.utils.Common;
@@ -37,7 +38,8 @@ public class BoardController {
      */
     @PostMapping( value = "/create" , consumes = "application/json")
     public ResponseEntity<Response> create(@RequestBody BoardRequest boardRequest, @RequestAttribute Long userId) {
-        Response response = boardFacade.create(boardRequest, userId);
+        boardRequest.setCreatorUserId(userId);
+        Response response = boardFacade.create(boardRequest);
         return new ResponseEntity<>(response, response.getStatus());
     }
 
@@ -72,9 +74,10 @@ public class BoardController {
      * @param boardRequest An object containing the fields to update for the board.
      * @return A response object indicating the status of the update operation.
      */
-    @PatchMapping(value = "/update", consumes = "application/json")
-    public ResponseEntity<Response> updateBoard(@RequestBody UpdateObjectRequest boardRequest, @RequestParam UpdateField field,
+    @PatchMapping(value = "update", consumes = "application/json")
+    public ResponseEntity<Response> updateBoard(@RequestBody UpdateObjectRequest boardRequest,
                                                 @RequestAttribute Long boardId) {
+        boardRequest.setObjectsIdsRequest(new ObjectsIdsRequest());
         boardRequest.getObjectsIdsRequest().setBoardId(boardId);
         Response response = boardFacade.updateBoard(boardRequest);
         return new ResponseEntity<>(response, response.getStatus());
