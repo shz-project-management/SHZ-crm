@@ -149,7 +149,8 @@ public class Common {
             List<String> values = entry.getValue();
 
             if (column == null || values == null || values.isEmpty()) {
-                throw new IllegalArgumentException("column and values cannot be null or empty");
+//                throw new IllegalArgumentException("column and values cannot be null or empty");
+                continue;
             }
 
             // Use parameterized queries to avoid SQL injection attacks
