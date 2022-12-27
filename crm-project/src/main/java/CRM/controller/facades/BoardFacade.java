@@ -155,41 +155,6 @@ public class BoardFacade {
     }
 
     /**
-     * This method is used to retrieve all the boards created by a user with the specified id.
-     *
-     * @param userId The id of the user whose boards are to be retrieved.
-     * @return A Response object containing all the retrieved boards or an error message if the user is not found or the id is invalid.
-     * @throws IllegalArgumentException if the specified user id is invalid.
-     * @throws NullPointerException     if the specified user id is null.
-     * @throws NoSuchElementException   if the user with the specified id is not found.
-     */
-    public Response getAllBoardsOfUser(Long userId) {
-        try {
-            Validations.validate(userId, Regex.ID.getRegex());
-
-            return Response.builder()
-                    .data(BoardDTO.getMapWithAllBoardsForUser(boardService.getAllBoardsOfUser(userId)))
-                    .message(SuccessMessage.FOUND.toString())
-                    .status(HttpStatus.OK)
-                    .statusCode(HttpStatusCodes.STATUS_CODE_OK)
-                    .build();
-
-        } catch (AccountNotFoundException | IllegalArgumentException | NoSuchElementException e) {
-            return Response.builder()
-                    .statusCode(HttpStatusCodes.STATUS_CODE_BAD_REQUEST)
-                    .status(HttpStatus.BAD_REQUEST)
-                    .message(ExceptionMessage.NULL_INPUT.toString())
-                    .build();
-        } catch (NullPointerException e) {
-            return Response.builder()
-                    .statusCode(HttpStatusCodes.STATUS_CODE_SERVER_ERROR)
-                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .message(e.getMessage())
-                    .build();
-        }
-    }
-
-    /**
      * Updates a board with the provided update object request.
      *
      * @param updateObjReq the update object request containing the new board name and board ID
