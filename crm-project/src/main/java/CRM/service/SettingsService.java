@@ -78,6 +78,6 @@ public class SettingsService {
             userSetting.setInEmail(settingUpdateRequest.getInEmail());
         }
         userSettingRepository.save(userSetting);
-        return userSettingRepository.findByUser_Id(userSetting.getUser().getId());
+        return userSettingRepository.getUserSettingsInBoard(userSetting.getUser().getId(), settingUpdateRequest.getBoardId());
     }
 }
