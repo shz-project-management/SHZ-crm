@@ -46,13 +46,7 @@ public class UserService {
      * @return entity of user that found in database.
      */
     public User get(String email) throws AccountNotFoundException {
-        // Ask for the repo to find the user, by the given email address input
-        // Since the repo returns an option, check if this option is not empty
-
-        // If it is empty, throw "AccountNotFound" exception
-
-        // Return the user back to the controller
-        return null;
+        return userRepository.findByEmail(email).get();
     }
 
     /**
