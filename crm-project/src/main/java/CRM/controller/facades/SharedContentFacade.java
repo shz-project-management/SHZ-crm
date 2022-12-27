@@ -202,13 +202,13 @@ public class SharedContentFacade {
                 if (updateObject.getFieldName().equals(UpdateField.STATUS))
                     request = NotificationRequest.createStatusChangeRequest(userService.get(updateObject.getObjectsIdsRequest().getUserId()),
                             boardService.get(updateObject.getObjectsIdsRequest().getBoardId()),
-                            updateObject.getObjectsIdsRequest().getItemId(), updateObject.getContent(),
+                            updateObject.getObjectsIdsRequest().getUpdateObjId(), updateObject.getContent(),
                             settingsService.getNotificationSettingFromDB(Notifications.STATUS_CHANGED.name));
                 //type
                 else if (updateObject.getFieldName().equals(UpdateField.TYPE)) {
                     request = NotificationRequest.createTypeChangeRequest(userService.get(updateObject.getObjectsIdsRequest().getUserId()),
                             boardService.get(updateObject.getObjectsIdsRequest().getBoardId()),
-                            updateObject.getObjectsIdsRequest().getItemId(), updateObject.getContent(),
+                            updateObject.getObjectsIdsRequest().getUpdateObjId(), updateObject.getContent(),
                             settingsService.getNotificationSettingFromDB(Notifications.TYPE_CHANGED.name));
                 }
                 //data
