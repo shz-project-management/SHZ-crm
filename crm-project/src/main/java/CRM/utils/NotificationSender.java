@@ -7,13 +7,18 @@ import CRM.entity.response.Response;
 import CRM.repository.*;
 import CRM.service.NotificationService;
 import CRM.service.SettingsService;
+import CRM.utils.email.EmailUtil;
 import CRM.utils.enums.ExceptionMessage;
 import com.google.api.client.http.HttpStatusCodes;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.mail.MailSendException;
 import org.springframework.stereotype.Component;
 
+import javax.mail.MessagingException;
 import javax.security.auth.login.AccountNotFoundException;
+import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 
 @Component
@@ -42,7 +47,12 @@ public class NotificationSender {
             notificationService.createInAppNotification(notificationRequest, userSettingsInBoard);
         }
         if (userSettingsInBoard.isInEmail()) {
-            System.out.println("Sending an email notification");
+            try{
+                System.out.println("Sending an email notification");
+                EmailUtil.send(notificationRequest.getUser().getEmail(), createNotificationDescription(notificationRequest), notificationRequest.getNotificationType().getName());
+            }catch (MessagingException | IOException exception){
+                throw new MailSendException(ExceptionMessage.EMAIL_SENDING_FAILED.toString());
+            }
         }
         return true;
     }
