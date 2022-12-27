@@ -33,10 +33,10 @@ public class NotificationFacade {
      * @throws NoSuchElementException   if the specified board does not exist
      * @throws NullPointerException     if the objects IDs request object is null
      */
-    public Response getAllForUserPerBoard(ObjectsIdsRequest objectsIdsRequest) {
+    public Response getAllinBoard(ObjectsIdsRequest objectsIdsRequest) {
         try {
             Validations.validateIDs(objectsIdsRequest.getUserId(), objectsIdsRequest.getBoardId());
-            List<Notification> notificationList = notificationService.getAllForUserPerBoard(objectsIdsRequest);
+            List<Notification> notificationList = notificationService.getAllinBoard(objectsIdsRequest);
             return Response.builder()
                     .message(SuccessMessage.FOUND.toString())
                     .status(HttpStatus.FOUND)

@@ -32,7 +32,7 @@ public class NotificationService {
      * @throws AccountNotFoundException if the user or board with the specified IDs do not exist
      * @throws NoSuchElementException   if the user is not a member of the specified board
      */
-    public List<Notification> getAllForUserPerBoard(ObjectsIdsRequest objectsIdsRequest) throws AccountNotFoundException {
+    public List<Notification> getAllinBoard(ObjectsIdsRequest objectsIdsRequest) throws AccountNotFoundException {
         if (!Validations.checkIfUserExistsInBoard(objectsIdsRequest.getUserId(), objectsIdsRequest.getBoardId(), userRepository, boardRepository))
             throw new NoSuchElementException(ExceptionMessage.USER_DOES_NOT_EXISTS_IN_BOARD.toString());
         return notificationRepository.findByUser_IdAndBoard_Id(objectsIdsRequest.getUserId(), objectsIdsRequest.getBoardId());
