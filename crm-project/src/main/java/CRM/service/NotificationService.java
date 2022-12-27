@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import javax.security.auth.login.AccountNotFoundException;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 
 @Service
 public class NotificationService {
@@ -54,7 +55,13 @@ public class NotificationService {
      *
      * @param notificationsIds the IDs of the notifications to delete
      */
-    public void delete(List<Long> notificationsIds) {
+    public List<Notification> delete(List<Long> notificationsIds) {
+        Optional<Notification> notificationOptional = notificationRepository.findById(notificationsIds.stream().findFirst().get());
+        Notification notification = null;
+        if (notificationOptional.isPresent()){
+             notification = notificationOptional.get();
+        }
         notificationRepository.deleteAllById(notificationsIds);
+        return notificationRepository.findByUser_IdAndBoard_Id(notification.getUser().getId(), notification.getBoard().getId());
     }
 }
