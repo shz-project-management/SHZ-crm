@@ -6,6 +6,7 @@ import CRM.entity.requests.BoardRequest;
 import CRM.entity.requests.UpdateObjectRequest;
 import CRM.entity.response.Response;
 import CRM.utils.Common;
+import CRM.utils.enums.UpdateField;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -34,9 +35,9 @@ public class BoardController {
      * @param boardRequest The request body, containing the necessary information to create a new board.
      * @return A ResponseEntity containing a Response object with the status of the create operation and the created board object.
      */
-    @PostMapping( value = "create" , consumes = "application/json")
-    public ResponseEntity<Response> create(@RequestBody BoardRequest boardRequest) {
-        Response response = boardFacade.create(boardRequest);
+    @PostMapping( value = "/create" , consumes = "application/json")
+    public ResponseEntity<Response> create(@RequestBody BoardRequest boardRequest, @RequestAttribute Long userId) {
+        Response response = boardFacade.create(boardRequest, userId);
         return new ResponseEntity<>(response, response.getStatus());
     }
 
@@ -46,8 +47,8 @@ public class BoardController {
      * @param boardId The ID of the board to delete.
      * @return A ResponseEntity with the appropriate status and response body.
      */
-    @DeleteMapping(value = "{boardId}")
-    public ResponseEntity<Response> delete(@PathVariable Long boardId) {
+    @DeleteMapping
+    public ResponseEntity<Response> delete(@RequestAttribute Long boardId) {
         Response response = boardFacade.delete(boardId);
         return new ResponseEntity<>(response, response.getStatus());
     }
@@ -59,8 +60,8 @@ public class BoardController {
      * @param boardId The id of the board to retrieve.
      * @return A ResponseEntity object containing the Response object with the board information and the HTTP status code.
      */
-    @GetMapping(value = "{boardId}")
-    public ResponseEntity<Response> get(@PathVariable Long boardId, @RequestAttribute Long userId) {
+    @GetMapping
+    public ResponseEntity<Response> get(@RequestAttribute Long boardId, @RequestAttribute Long userId) {
         Response response = boardFacade.get(boardId, userId);
         return new ResponseEntity<>(response, response.getStatus());
     }
@@ -72,7 +73,9 @@ public class BoardController {
      * @return A response object indicating the status of the update operation.
      */
     @PatchMapping(value = "/update", consumes = "application/json")
-    public ResponseEntity<Response> updateBoard(@RequestBody UpdateObjectRequest boardRequest) {
+    public ResponseEntity<Response> updateBoard(@RequestBody UpdateObjectRequest boardRequest, @RequestParam UpdateField field,
+                                                @RequestAttribute Long boardId) {
+        boardRequest.getObjectsIdsRequest().setBoardId(boardId);
         Response response = boardFacade.updateBoard(boardRequest);
         return new ResponseEntity<>(response, response.getStatus());
     }

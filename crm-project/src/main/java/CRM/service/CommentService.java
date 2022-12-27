@@ -35,12 +35,12 @@ public class CommentService implements ServiceInterface {
      * @throws AccountNotFoundException if the userId provided does not correspond to an existing User
      * @throws IllegalArgumentException if the parentItemId is null
      */
-    public Set<Comment> create(CommentRequest commentRequest) throws AccountNotFoundException {
-        Board board = Validations.doesIdExists(commentRequest.getBoardId(), boardRepository);
+    public Set<Comment> create(CommentRequest commentRequest , Long userId, Long boardId) throws AccountNotFoundException {
+        Board board = Validations.doesIdExists(boardId, boardRepository);
         User user;
 
         try {
-            user = Validations.doesIdExists(commentRequest.getUserId(), userRepository);
+            user = Validations.doesIdExists(userId, userRepository);
         } catch (NoSuchElementException e) {
             throw new AccountNotFoundException(ExceptionMessage.ACCOUNT_DOES_NOT_EXISTS.toString());
         }

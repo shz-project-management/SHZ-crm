@@ -10,7 +10,6 @@ import CRM.entity.Item;
 import CRM.entity.SharedContent;
 import CRM.entity.requests.*;
 import CRM.entity.response.Response;
-import CRM.repository.UserRepository;
 import CRM.service.*;
 import CRM.utils.NotificationSender;
 import CRM.utils.Validations;
@@ -43,8 +42,6 @@ public class SharedContentFacade {
     private SettingsService settingsService;
     @Autowired
     private NotificationSender notificationSender;
-    @Autowired
-    private UserRepository userRepository;
 
     /**
      * Creates a new item in the system and stores it in the database.
@@ -96,16 +93,16 @@ public class SharedContentFacade {
      * @throws NoSuchElementException   if the parent item ID specified in the request object does not correspond to an existing item.
      * @throws NullPointerException     if the title is null.
      */
-    public Response create(CommentRequest comment) {
+    public Response create(CommentRequest comment, Long userId, Long boardId) {
         try {
             // make sure the params are correct using Validations.validateCreatedComment()
             // catch exception if relevant
-            Validations.validateCreatedComment(comment);
+            Validations.validateCreatedComment(comment, userId, boardId);
 
             // call commentService with create function to create a new comment
             // return the response with the new comment as a data inside response entity.
-            List<CommentDTO> commentDTOS = CommentDTO.getCommentDTOList(commentService.create(comment));
-            sendCommentCreatedNotification(comment);
+            List<CommentDTO> commentDTOS = CommentDTO.getCommentDTOList(commentService.create(comment, userId, boardId));
+            sendCommentCreatedNotification(comment, userId, boardId);
             return Response.builder()
                     .data(commentDTOS)
                     .message(SuccessMessage.CREATE.toString())
@@ -196,7 +193,7 @@ public class SharedContentFacade {
                     .build();
 
         } catch (IllegalArgumentException | NoSuchFieldException | NoSuchElementException |
-                 AccountNotFoundException e) {
+                AccountNotFoundException e) {
             return Response.builder()
                     .message(e.getMessage())
                     .status(HttpStatus.BAD_REQUEST)
@@ -482,13 +479,13 @@ public class SharedContentFacade {
                 userService.getAllInBoard(updateObject.getObjectsIdsRequest().getBoardId()));
     }
 
-    private void sendCommentCreatedNotification(CommentRequest comment) throws AccountNotFoundException {
+    private void sendCommentCreatedNotification(CommentRequest comment, Long userId, Long boardId) throws AccountNotFoundException {
         notificationSender.sendNotificationToManyUsers(
-                NotificationRequest.createCommentAddedRequest(userService.get(comment.getUserId()),
-                        boardService.get(comment.getBoardId()), comment.getParentItemId(),
-                        comment.getDescription(), userService.get(comment.getUserId()),
+                NotificationRequest.createCommentAddedRequest(userService.get(userId),
+                        boardService.get(boardId), comment.getParentItemId(),
+                        comment.getDescription(), userService.get(boardId),
                         settingsService.getNotificationSettingFromDB(Notifications.COMMENT_ADDED.name)),
-                userService.getAllInBoard(comment.getBoardId()));
+                userService.getAllInBoard(boardId));
     }
 
     private void sendItemDeleteNotification(List<Long> correctIds, Long boardId){

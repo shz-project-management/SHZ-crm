@@ -24,10 +24,8 @@ public class NotificationController {
 
     //TODO:DOCUMENTATION
     @GetMapping(value = "getAll-inBoard")
-    public ResponseEntity<Response> getAllinBoard(@RequestAttribute Long userId, @RequestParam Long boardId) {
-        ObjectsIdsRequest objectsIdsRequest = new ObjectsIdsRequest();
-        objectsIdsRequest.setBoardId(boardId);
-        objectsIdsRequest.setUserId(userId);
+    public ResponseEntity<Response> getAllinBoard(@RequestAttribute Long boardId, @RequestAttribute Long userId) {
+        ObjectsIdsRequest objectsIdsRequest = ObjectsIdsRequest.boardUserIds(boardId, userId);
         Response response = notificationFacade.getAllinBoard(objectsIdsRequest);
         return new ResponseEntity<>(response, response.getStatus());
     }
