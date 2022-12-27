@@ -181,6 +181,14 @@ public class Board {
         return false;
     }
 
+    public Set<User> getBoardUsersSet(){
+        Set<User> userSet = new HashSet<>();
+        for (UserSetting userSetting : usersSettings) {
+            userSet.add(userSetting.getUser());
+        }
+        return userSet;
+    }
+
     //--------------------------------------Settings--------------------------------------//
     public void removeSettingsByUserPermission(UserPermission userPermissionInBoard) {
         usersSettings.removeIf(user -> user.getUser().equals(userPermissionInBoard.getUser()));

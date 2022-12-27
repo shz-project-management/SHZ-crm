@@ -26,7 +26,7 @@ public enum ExceptionMessage {
     PARENT_ITEM_ERROR("Item can't be his own parent"),
     ILLEGAL_AUTH_HEADER("Authorization header is not legal"),
     PASSWORD_DOESNT_MATCH("The given password doesn't match our database's"),
-
+    EMAIL_SENDING_FAILED("Email sending was not successful"),
     USER_IN_BOARD_EXISTS("This user is already assigned to this board"),
     BOARD_DOES_NOT_EXISTS("This board ID does not exist in the database: "),
     NOT_MATCH("Error: email or password does not match"),

@@ -44,11 +44,11 @@ public class UserSetting {
         return userSetting;
     }
 
-    public static UserSetting getRelevantUserSetting(Board board, User user, String wantedSettingName){
+    public static UserSetting getRelevantUserSetting(Board board, Long userId, String wantedSettingName){
         UserSetting wantedUserSetting = null;
         Set<UserSetting> userSettingsInBoard = board.getUsersSettings();
         for (UserSetting userSetting : userSettingsInBoard) {
-            if(Objects.equals(user.getId(), userSetting.getUser().getId()) &&
+            if(Objects.equals(userId, userSetting.getUser().getId()) &&
                     Objects.equals(userSetting.getSetting().getName(), wantedSettingName))
                 wantedUserSetting = userSetting;
         }

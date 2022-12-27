@@ -26,6 +26,7 @@ import javax.security.auth.login.AccountNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Component
@@ -236,7 +237,7 @@ public class UserFacade {
             Validations.validateUpdateUserToBoard(objectsIdsRequest.getBoardId(), objectsIdsRequest.getUserId(),
                     objectsIdsRequest.getPermissionId());
             List<User> users = userService.updateUserToBoard(objectsIdsRequest);
-            sendUserAddedNotification(objectsIdsRequest, users);
+            sendUserAddedNotification(objectsIdsRequest, boardService.get(objectsIdsRequest.getBoardId()).getBoardUsersSet());
             return Response.builder()
                     .message(SuccessMessage.FOUND.toString())
                     .data(UserDTO.getListOfUsersDTO(users))
@@ -259,7 +260,7 @@ public class UserFacade {
         }
     }
 
-    private void sendUserAddedNotification(ObjectsIdsRequest objectsIdsRequest, List<User> users) throws AccountNotFoundException {
+    private void sendUserAddedNotification(ObjectsIdsRequest objectsIdsRequest, Set<User> users) throws AccountNotFoundException {
         notificationSender.sendNotificationToManyUsers(
                 NotificationRequest.createUserAddedRequest(boardService.get(objectsIdsRequest.getBoardId()),
                         userService.get(objectsIdsRequest.getUserId()),
