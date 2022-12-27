@@ -40,7 +40,7 @@ public class AuthorizationFilter extends GenericFilterBean {
         HttpServletRequest httpRequest = (HttpServletRequest) request;
         HttpServletResponse httpResponse = (HttpServletResponse) response;
 
-        String token = httpRequest.getHeader("token");
+        String token = httpRequest.getHeader("authorization");
         String path = httpRequest.getRequestURI();
         if (permissionPathsForAll.stream().noneMatch(path::contains)) {
             try {

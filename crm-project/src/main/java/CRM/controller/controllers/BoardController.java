@@ -34,7 +34,7 @@ public class BoardController {
      * @param boardRequest The request body, containing the necessary information to create a new board.
      * @return A ResponseEntity containing a Response object with the status of the create operation and the created board object.
      */
-    @PostMapping(consumes = "application/json")
+    @PostMapping( value = "create" , consumes = "application/json")
     public ResponseEntity<Response> create(@RequestBody BoardRequest boardRequest) {
         Response response = boardFacade.create(boardRequest);
         return new ResponseEntity<>(response, response.getStatus());
