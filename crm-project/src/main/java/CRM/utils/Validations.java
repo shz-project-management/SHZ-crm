@@ -274,12 +274,12 @@ public class Validations {
      */
     public static boolean checkIfUserExistsInBoard(long userId, long boardId,
                                                    JpaRepository<User, Long> userRepo, JpaRepository<Board, Long> boardRepo) throws AccountNotFoundException {
-        User user;
-        Board board;
         try {
-            user = Validations.doesIdExists(userId, userRepo);
-            board = Validations.doesIdExists(boardId, boardRepo);
-            return board.getAllUsersInBoard().contains(user) || board.getCreatorUser().equals(user);
+            User user = doesIdExists(userId, userRepo);
+            Board board = doesIdExists(boardId, boardRepo);
+            return board.doesBoardIncludeUser(userId);
+//            return board.getAllUsersInBoard().contains(user) || board.getCreatorUser().equals(user);
+
         } catch (NoSuchElementException e) {
             throw new AccountNotFoundException(ExceptionMessage.ACCOUNT_DOES_NOT_EXISTS.toString());
         }

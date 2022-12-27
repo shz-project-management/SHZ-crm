@@ -174,6 +174,12 @@ public class Board {
                 .stream().map(UserPermission::getUser).collect(Collectors.toList());
     }
 
+    public Boolean doesBoardIncludeUser(long userId) {
+        for (UserSetting userSetting : usersSettings) {
+            if (userSetting.getUser().getId() == userId) return true;
+        }
+        return false;
+    }
 
     //--------------------------------------Settings--------------------------------------//
     public void removeSettingsByUserPermission(UserPermission userPermissionInBoard) {
@@ -239,11 +245,11 @@ public class Board {
     }
 
     public Integer getUserPermissionIntegerByUserId(Long userId) throws NoPermissionException {
-        if(creatorUser.getId().equals(userId)){
+        if (creatorUser.getId().equals(userId)) {
             return Permission.ADMIN.ordinal();
         }
         Optional<UserPermission> userPerm = getUsersPermissions().stream().filter(userPermission -> userPermission.getUser().getId().equals(userId)).findFirst();
-        if(userPerm.isPresent()){
+        if (userPerm.isPresent()) {
             return userPerm.get().getPermission().ordinal();
         }
         throw new NoPermissionException(ExceptionMessage.PERMISSION_FAILED.toString());
@@ -251,7 +257,7 @@ public class Board {
 
     public Permission getUserPermissionWithoutAdminByUserId(Long userId) throws NoPermissionException {
         Optional<UserPermission> userPerm = getUsersPermissions().stream().filter(userPermission -> userPermission.getUser().getId().equals(userId)).findFirst();
-        if(userPerm.isPresent()){
+        if (userPerm.isPresent()) {
             return userPerm.get().getPermission();
         }
         throw new NoPermissionException(ExceptionMessage.PERMISSION_FAILED.toString());
