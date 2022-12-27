@@ -94,29 +94,6 @@ public class BoardService {
     }
 
     /**
-     * Retrieves all boards belonging to the specified user.
-     *
-     * @param userId the id of the user
-     * @return a map containing two lists of boards: "myBoards" (boards created by the user) and "SharedBoards" (boards shared with the user)
-     * @throws AccountNotFoundException if the user does not exist
-     */
-    public Map<String, List<Board>> getAllBoardsOfUser(long userId) throws AccountNotFoundException {
-        User user;
-        try {
-            user = Validations.doesIdExists(userId, userRepository);
-        } catch (NoSuchElementException e) {
-            throw new AccountNotFoundException(ExceptionMessage.ACCOUNT_DOES_NOT_EXISTS.toString());
-        }
-
-        //get all the boards of the creator user
-        Map<String, List<Board>> userBoards = new HashMap<>();
-        List<Board> creatorBoards = boardRepository.findByCreatorUser_Id(user.getId());
-        userBoards.put(myBoards, creatorBoards);
-        userBoards.put(SharedBoards, getSharedBoardsOfUser(user));
-        return userBoards;
-    }
-
-    /**
      * Updates the specified board with the provided update object request.
      *
      * @param updateObjReq the update object request containing the field and value to update
@@ -127,23 +104,5 @@ public class BoardService {
         Board board = Validations.doesIdExists(updateObjReq.getObjectsIdsRequest().getBoardId(), boardRepository);
         Common.fieldIsPrimitiveOrKnownObjectHelper(updateObjReq, board);
         return boardRepository.save(board);
-    }
-
-    /**
-     * Private method to retrieve all boards shared with the specified user.
-     *
-     * @param user the user
-     * @return a list of boards shared with the user
-     */
-    private List<Board> getSharedBoardsOfUser(User user) {
-        //get all the boards of the user he is shared with
-        List<Board> allBoards = boardRepository.findAll();
-        List<Board> sharedBoards = new ArrayList<>();
-        for (Board board : allBoards) {
-            if (board.getAllUsersInBoard().contains(user)) {
-                sharedBoards.add(board);
-            }
-        }
-        return sharedBoards;
     }
 }

@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import javax.security.auth.login.AccountNotFoundException;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 
 @Service
 public class NotificationService {
@@ -32,7 +33,7 @@ public class NotificationService {
      * @throws AccountNotFoundException if the user or board with the specified IDs do not exist
      * @throws NoSuchElementException   if the user is not a member of the specified board
      */
-    public List<Notification> getAllForUserPerBoard(ObjectsIdsRequest objectsIdsRequest) throws AccountNotFoundException {
+    public List<Notification> getAllinBoard(ObjectsIdsRequest objectsIdsRequest) throws AccountNotFoundException {
         if (!Validations.checkIfUserExistsInBoard(objectsIdsRequest.getUserId(), objectsIdsRequest.getBoardId(), userRepository, boardRepository))
             throw new NoSuchElementException(ExceptionMessage.USER_DOES_NOT_EXISTS_IN_BOARD.toString());
         return notificationRepository.findByUser_IdAndBoard_Id(objectsIdsRequest.getUserId(), objectsIdsRequest.getBoardId());
@@ -54,7 +55,13 @@ public class NotificationService {
      *
      * @param notificationsIds the IDs of the notifications to delete
      */
-    public void delete(List<Long> notificationsIds) {
+    public List<Notification> delete(List<Long> notificationsIds) {
+        Optional<Notification> notificationOptional = notificationRepository.findById(notificationsIds.stream().findFirst().get());
+        Notification notification = null;
+        if (notificationOptional.isPresent()){
+             notification = notificationOptional.get();
+        }
         notificationRepository.deleteAllById(notificationsIds);
+        return notificationRepository.findByUser_IdAndBoard_Id(notification.getUser().getId(), notification.getBoard().getId());
     }
 }

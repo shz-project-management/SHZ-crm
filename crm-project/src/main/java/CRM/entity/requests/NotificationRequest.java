@@ -40,6 +40,16 @@ public class NotificationRequest {
         return notificationRequest;
     }
 
+    public static NotificationRequest createTypeChangeRequest(User forUser, Board inBoard, Long itemId, Object presentStatus, NotificationSetting notificationType){
+        NotificationRequest notificationRequest = new NotificationRequest();
+        notificationRequest.user = forUser;
+        notificationRequest.board = inBoard;
+        notificationRequest.itemId = itemId;
+        notificationRequest.presentContent = presentStatus;
+        notificationRequest.notificationType = notificationType;
+        return notificationRequest;
+    }
+
     public static NotificationRequest createCommentAddedRequest(User forUser, Board inBoard, Long itemId, String addedComment, User commenter, NotificationSetting notificationType){
         NotificationRequest notificationRequest = new NotificationRequest();
         notificationRequest.user = forUser;

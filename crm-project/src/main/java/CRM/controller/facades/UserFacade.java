@@ -1,5 +1,6 @@
 package CRM.controller.facades;
 
+import CRM.entity.DTO.BoardDTO;
 import CRM.entity.DTO.UserDTO;
 import CRM.entity.User;
 import CRM.entity.requests.NotificationRequest;
@@ -10,6 +11,7 @@ import CRM.service.SettingsService;
 import CRM.service.UserService;
 import CRM.utils.NotificationSender;
 import CRM.utils.Validations;
+import CRM.utils.enums.ExceptionMessage;
 import CRM.utils.enums.Notifications;
 import CRM.utils.enums.Regex;
 import CRM.utils.enums.SuccessMessage;
@@ -152,6 +154,42 @@ public class UserFacade {
     }
 
     /**
+     * This method is used to retrieve all the boards created by a user with the specified id.
+     *
+     * @param userId The id of the user whose boards are to be retrieved.
+     * @return A Response object containing all the retrieved boards or an error message if the user is not found or the id is invalid.
+     * @throws IllegalArgumentException if the specified user id is invalid.
+     * @throws NullPointerException     if the specified user id is null.
+     * @throws NoSuchElementException   if the user with the specified id is not found.
+     */
+    public Response getAllBoardsOfUser(Long userId) {
+        try {
+            Validations.validate(userId, Regex.ID.getRegex());
+
+            return Response.builder()
+                    .data(BoardDTO.getMapWithAllBoardsForUser(userService.getAllBoardsOfUser(userId)))
+                    .message(SuccessMessage.FOUND.toString())
+                    .status(HttpStatus.OK)
+                    .statusCode(HttpStatusCodes.STATUS_CODE_OK)
+                    .build();
+
+        } catch (AccountNotFoundException | IllegalArgumentException | NoSuchElementException e) {
+            return Response.builder()
+                    .statusCode(HttpStatusCodes.STATUS_CODE_BAD_REQUEST)
+                    .status(HttpStatus.BAD_REQUEST)
+                    .message(ExceptionMessage.NULL_INPUT.toString())
+                    .build();
+        } catch (NullPointerException e) {
+            return Response.builder()
+                    .statusCode(HttpStatusCodes.STATUS_CODE_SERVER_ERROR)
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .message(e.getMessage())
+                    .build();
+        }
+    }
+
+
+    /**
      * Method to update a user's membership in a board.
      *
      * @param objectsIdsRequest an object containing the id of the user, board, and permission level to update
@@ -167,10 +205,7 @@ public class UserFacade {
             Validations.validateUpdateUserToBoard(objectsIdsRequest.getBoardId(), objectsIdsRequest.getUserId(),
                     objectsIdsRequest.getPermissionId());
             List<User> users = userService.updateUserToBoard(objectsIdsRequest);
-            notificationSender.sendNotificationToManyUsers(
-                    NotificationRequest.createUserAddedRequest(boardService.get(objectsIdsRequest.getBoardId()),
-                            userService.get(objectsIdsRequest.getUserId()),
-                            settingsService.getNotificationSettingFromDB(Notifications.USER_ADDED.name)), users);
+            sendUserAddedNotification(objectsIdsRequest, users);
             return Response.builder()
                     .message(SuccessMessage.FOUND.toString())
                     .data(UserDTO.getListOfUsersDTO(users))
@@ -191,5 +226,12 @@ public class UserFacade {
                     .statusCode(HttpStatusCodes.STATUS_CODE_SERVER_ERROR)
                     .build();
         }
+    }
+
+    private void sendUserAddedNotification(ObjectsIdsRequest objectsIdsRequest, List<User> users) throws AccountNotFoundException {
+        notificationSender.sendNotificationToManyUsers(
+                NotificationRequest.createUserAddedRequest(boardService.get(objectsIdsRequest.getBoardId()),
+                        userService.get(objectsIdsRequest.getUserId()),
+                        settingsService.getNotificationSettingFromDB(Notifications.USER_ADDED.name)), users);
     }
 }
