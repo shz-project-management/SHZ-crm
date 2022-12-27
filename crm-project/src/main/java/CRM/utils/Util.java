@@ -16,8 +16,8 @@ public class Util {
 
     public static List<String> authPermissionPathsForAll = List.of("auth");
     public static List<String> permissionPathsForAll = List.of("auth", "board/create", "filter-items");
-    public static List<String> permissionPathsForLeaders = List.of("item");
-    public static List<String> permissionPathsForUsers = List.of("item");
+    public static List<String> permissionPathsForLeaders = List.of("item", "comment");
+    public static List<String> permissionPathsForUsers = List.of("item", "comment");
 
 
 

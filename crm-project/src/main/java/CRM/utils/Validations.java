@@ -121,9 +121,9 @@ public class Validations {
      * @throws IllegalArgumentException if any field fails validation.
      * @throws NullPointerException     if the title is null.
      */
-    public static void validateCreatedComment(CommentRequest comment) {
+    public static void validateCreatedComment(CommentRequest comment, Long userId, Long boardId) {
         // validate each field of the item using validate(regex, field)
-        Validations.validateIDs(comment.getParentItemId(), comment.getUserId());
+        Validations.validateIDs(comment.getParentItemId(), userId, boardId);
 
         if (comment.getName() == null)
             throw new NullPointerException(ExceptionMessage.VALIDATION_FAILED.toString());

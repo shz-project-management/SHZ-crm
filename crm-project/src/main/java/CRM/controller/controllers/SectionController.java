@@ -7,6 +7,7 @@ import CRM.entity.Section;
 import CRM.entity.requests.AttributeRequest;
 import CRM.entity.requests.UpdateObjectRequest;
 import CRM.entity.response.Response;
+import CRM.utils.enums.UpdateField;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -75,15 +76,15 @@ public class SectionController {
         return new ResponseEntity<>(response, response.getStatus());
     }
 
-    @PostMapping(value = "filter-items/{boardId}")
-    public ResponseEntity<Response> getFilteredItems(@RequestBody Map<String, List<String>> filters, @PathVariable Long boardId) {
+    @PostMapping(value = "filter-items")
+    public ResponseEntity<Response> getFilteredItems(@RequestBody Map<String, List<String>> filters, @RequestAttribute Long boardId) {
         Response response = sectionFacade.getFilteredItems(filters, boardId);
         return new ResponseEntity<>(response, response.getStatus());
     }
 
     //TODO documentation
     @PatchMapping(value = "/update", consumes = "application/json")
-    public ResponseEntity<Response> update(@RequestBody UpdateObjectRequest updateItemRequest) {
+    public ResponseEntity<Response> update(@RequestBody UpdateObjectRequest updateItemRequest, @RequestParam UpdateField field) {
         Response response = sectionFacade.update(updateItemRequest);
         return new ResponseEntity<>(response, response.getStatus());
     }

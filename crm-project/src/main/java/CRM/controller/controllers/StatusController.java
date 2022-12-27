@@ -6,6 +6,7 @@ import CRM.entity.Status;
 import CRM.entity.requests.AttributeRequest;
 import CRM.entity.requests.UpdateObjectRequest;
 import CRM.entity.response.Response;
+import CRM.utils.enums.UpdateField;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -71,7 +72,7 @@ public class StatusController {
 
     //TODO documentation
     @PatchMapping(value = "/update", consumes = "application/json")
-    public ResponseEntity<Response> update(@RequestBody UpdateObjectRequest updateObjectRequest) {
+    public ResponseEntity<Response> update(@RequestBody UpdateObjectRequest updateObjectRequest, @RequestParam UpdateField field) {
         Response response = attributeFacade.update(updateObjectRequest, Status.class);
         return new ResponseEntity<>(response, response.getStatus());
     }

@@ -6,10 +6,12 @@ import CRM.repository.BoardRepository;
 import CRM.service.AuthService;
 import CRM.service.BoardService;
 import CRM.utils.enums.Permission;
+import CRM.utils.enums.UpdateField;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.hibernate.sql.Update;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.GenericFilterBean;
@@ -21,6 +23,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.PrintWriter;
 
 import static CRM.utils.Util.*;
 
@@ -70,13 +73,13 @@ public class PermissionFilter extends GenericFilterBean {
                 board = boardService.get(Long.parseLong(boardId));
                 user = authService.findById(userId);
                 permission = board.getUserPermissionWithoutAdminByUserId(user.getId());
+                httpRequest.setAttribute("boardId", board.getId());
             } catch (AccountNotFoundException | NoPermissionException e) {
                 sendForbiddenResponse(httpResponse);
                 return;
             }
 
-            JsonObject jsonBody = createBody(httpRequest);
-            if (permission.equals(Permission.ADMIN) || isValidRequest(httpRequest, path, jsonBody, permission)) {
+            if (permission.equals(Permission.ADMIN) || isValidRequest(httpRequest, path, permission)) {
                 chain.doFilter(request, response);
             } else {
                 sendForbiddenResponse(httpResponse);
@@ -90,18 +93,18 @@ public class PermissionFilter extends GenericFilterBean {
         return permissionPathsForAll.stream().noneMatch(path::contains);
     }
 
-    private boolean isValidRequest(HttpServletRequest httpRequest, String path, JsonObject jsonBody, Permission permission) throws IOException {
-        if (permission == Permission.LEADER) { return isPermittedForLeaders(path) && isValidUpdateForLeaders(httpRequest, jsonBody); }
-        else if (permission == Permission.USER) { return isPermittedForUsers(path) && isValidUpdateForUsers(httpRequest, jsonBody, path); }
+    private boolean isValidRequest(HttpServletRequest httpRequest, String path, Permission permission) throws IOException {
+        if (permission == Permission.LEADER) { return isPermittedForLeaders(path) && isValidUpdateForLeaders(httpRequest); }
+        else if (permission == Permission.USER) { return isPermittedForUsers(path) && isValidUpdateForUsers(httpRequest, path); }
         return false;
     }
 
-    private boolean isValidUpdateForLeaders(HttpServletRequest httpRequest, JsonObject body) throws IOException {
+    private boolean isValidUpdateForLeaders(HttpServletRequest httpRequest) {
         if (httpRequest.getMethod().equals("POST")) {
             return true;
         } else if (httpRequest.getMethod().equals("PATCH")) {
-            String fieldName = body.get("fieldName").getAsString();
-            return fieldName.equals("STATUS") || fieldName.equals("TYPE");
+            String updateField = httpRequest.getParameter("field");
+            return updateField.equals(UpdateField.STATUS.toString()) || updateField.equals(UpdateField.TYPE.toString());
         }
         return false;
     }
@@ -114,38 +117,21 @@ public class PermissionFilter extends GenericFilterBean {
         return permissionPathsForLeaders.stream().anyMatch(path::contains);
     }
 
-    private boolean isValidUpdateForUsers(HttpServletRequest httpRequest, JsonObject body, String path) throws IOException {
+    private boolean isValidUpdateForUsers(HttpServletRequest httpRequest, String path) {
         if (httpRequest.getMethod().equals("POST") && path.contains("comment")) {
             return true;
         } else if (httpRequest.getMethod().equals("PATCH") && path.contains("item")) {
-            String fieldName = body.get("fieldName").getAsString();
-            return fieldName.equals("STATUS") || fieldName.equals("TYPE");
+            String updateField = httpRequest.getParameter("field");
+            return updateField.equals(UpdateField.STATUS.toString()) || updateField.equals(UpdateField.TYPE.toString());
         }
         return false;
     }
 
     private void sendForbiddenResponse(HttpServletResponse httpResponse) throws IOException {
         httpResponse.setStatus(HttpServletResponse.SC_FORBIDDEN);
-        httpResponse.sendError(HttpServletResponse.SC_FORBIDDEN);
-    }
-
-    private JsonObject createBody(HttpServletRequest httpRequest) throws IOException {
-        String requestBody = getRequestBody(httpRequest);
-        Gson gson = new Gson();
-        return gson.fromJson(requestBody, JsonObject.class);
-    }
-
-    private String getRequestBody(HttpServletRequest request) throws IOException {
-        StringBuilder sb = new StringBuilder();
-        BufferedReader reader = request.getReader();
-        try {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                sb.append(line).append('\n');
-            }
-        } finally {
-            reader.close();
-        }
-        return sb.toString();
+        httpResponse.setContentType("application/json");
+        PrintWriter writer = httpResponse.getWriter();
+        writer.println("{\"error\":\"Forbidden\", \"message\":\"You do not have permission to access this resource.\"}");
+        writer.flush();
     }
 }
