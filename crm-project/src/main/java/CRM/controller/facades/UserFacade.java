@@ -236,11 +236,11 @@ public class UserFacade {
         try {
             Validations.validateUpdateUserToBoard(objectsIdsRequest.getBoardId(), objectsIdsRequest.getUserId(),
                     objectsIdsRequest.getPermissionId());
-            List<User> users = userService.updateUserToBoard(objectsIdsRequest);
+            Set<UserPermission> usersPermissions = userService.updateUserToBoard(objectsIdsRequest);
             sendUserAddedNotification(objectsIdsRequest, boardService.get(objectsIdsRequest.getBoardId()).getBoardUsersSet());
             return Response.builder()
                     .message(SuccessMessage.FOUND.toString())
-                    .data(UserDTO.getListOfUsersDTO(users))
+                    .data(UserPermissionDTO.getListOfUserPermissionFromDB(new ArrayList<>(usersPermissions)))
                     .status(HttpStatus.OK)
                     .statusCode(HttpStatusCodes.STATUS_CODE_OK)
                     .build();

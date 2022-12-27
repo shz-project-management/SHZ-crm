@@ -180,7 +180,7 @@ public class UserService {
      * @throws AccountNotFoundException if the user or board does not exist
      * @throws IllegalArgumentException if the requested permission is not allowed or the board's creator is trying to change their own permission
      */
-    public List<User> updateUserToBoard(ObjectsIdsRequest request) throws AccountNotFoundException {
+    public Set<UserPermission> updateUserToBoard(ObjectsIdsRequest request) throws AccountNotFoundException {
         User user = getUserFromRequest(request);
         Board board = getBoardFromRequest(request);
 
@@ -190,10 +190,11 @@ public class UserService {
 
         Permission permission = Permission.values()[Math.toIntExact(request.getPermissionId())];
         Set<UserPermission> userPermissionsSet = updateUserPermission(user, permission, board);
-        List<User> users = board.getAllUsersInBoard(board, userPermissionsSet);
+        User admin = board.getCreatorUser();
+        userPermissionsSet.add(UserPermission.newUserPermission(admin, Permission.ADMIN));
 
         boardRepository.save(board);
-        return users;
+        return userPermissionsSet;
     }
 
     /**
@@ -279,7 +280,7 @@ public class UserService {
      */
     private Set<UserPermission> updateUserPermission(User user, Permission permissionRequest, Board board) {
         Set<UserPermission> userPermissionsSet = board.getUsersPermissions();
-        UserPermission userPermissionInBoard = board.getUserPermissionById(board, user.getId(), userPermissionsSet);
+        UserPermission userPermissionInBoard = board.getUserPermissionById(user.getId(), userPermissionsSet);
 
         if (permissionRequest.equals(Permission.ADMIN)) {
             throw new IllegalArgumentException(ExceptionMessage.PERMISSION_NOT_ALLOWED.toString());
