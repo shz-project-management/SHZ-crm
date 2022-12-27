@@ -238,6 +238,8 @@ public class UserFacade {
                     objectsIdsRequest.getPermissionId());
             Set<UserPermission> usersPermissions = userService.updateUserToBoard(objectsIdsRequest);
             sendUserAddedNotification(objectsIdsRequest, usersPermissions.stream().map(UserPermission::getUser).collect(Collectors.toList()));
+            List<User> users = userService.updateUserToBoard(objectsIdsRequest);
+            sendUserAddedNotification(objectsIdsRequest, boardService.get(objectsIdsRequest.getBoardId()).getBoardUsersSet());
             return Response.builder()
                     .message(SuccessMessage.FOUND.toString())
                     .data(UserPermissionDTO.getListOfUserPermissionFromDB(new ArrayList<>(usersPermissions)))
@@ -260,7 +262,7 @@ public class UserFacade {
         }
     }
 
-    private void sendUserAddedNotification(ObjectsIdsRequest objectsIdsRequest, List<User> users) throws AccountNotFoundException {
+    private void sendUserAddedNotification(ObjectsIdsRequest objectsIdsRequest, Set<User> users) throws AccountNotFoundException {
         notificationSender.sendNotificationToManyUsers(
                 NotificationRequest.createUserAddedRequest(boardService.get(objectsIdsRequest.getBoardId()),
                         userService.get(objectsIdsRequest.getUserId()),

@@ -471,7 +471,7 @@ public class SharedContentFacade {
                     settingsService.getNotificationSettingFromDB(Notifications.ITEM_DATA_CHANGED.name));
 
         notificationSender.sendNotificationToManyUsers(request,
-                userService.getAllInBoard(updateObject.getObjectsIdsRequest().getBoardId()));
+                boardService.get(updateObject.getObjectsIdsRequest().getBoardId()).getBoardUsersSet());
     }
 
     private void sendCommentCreatedNotification(CommentRequest comment, long userId, long boardId) throws AccountNotFoundException {
@@ -480,7 +480,7 @@ public class SharedContentFacade {
                         boardService.get(boardId), comment.getParentItemId(),
                         comment.getDescription(), userService.get(userId),
                         settingsService.getNotificationSettingFromDB(Notifications.COMMENT_ADDED.name)),
-                userService.getAllInBoard(boardId));
+                boardService.get(boardId).getBoardUsersSet());
     }
 
     private void sendItemDeleteNotification(List<Long> correctIds, Long boardId){
@@ -488,7 +488,7 @@ public class SharedContentFacade {
         for (Long id : correctIds) {
             notificationSender.sendNotificationToManyUsers(NotificationRequest.createDeletedItemRequest(board,
                             id, settingsService.getNotificationSettingFromDB(Notifications.ITEM_DELETED.name)),
-                    board.getAllUsersInBoard());
+                    boardService.get(boardId).getBoardUsersSet());
         }
     }
 }
