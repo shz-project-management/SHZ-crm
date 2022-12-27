@@ -17,7 +17,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-import static CRM.utils.Util.permissionPathsForAll;
+import static CRM.utils.Util.authPermissionPathsForAll;
 
 @Component
 public class AuthorizationFilter extends GenericFilterBean {
@@ -42,7 +42,7 @@ public class AuthorizationFilter extends GenericFilterBean {
 
         String token = httpRequest.getHeader("authorization");
         String path = httpRequest.getRequestURI();
-        if (permissionPathsForAll.stream().noneMatch(path::contains)) {
+        if (authPermissionPathsForAll.stream().noneMatch(path::contains)) {
             try {
                 Long userId = authService.checkTokenToUserInDB(token);
                 httpRequest.setAttribute("userId", userId);

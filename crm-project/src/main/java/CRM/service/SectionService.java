@@ -30,8 +30,8 @@ public class SectionService {
      * @param sectionRequest the request object containing the board and section information to create
      * @return the set of sections in the board after the new section is added
      */
-    public Set<Section> create(AttributeRequest sectionRequest) {
-        Board board = Validations.doesIdExists(sectionRequest.getBoardId(), boardRepository);
+    public Set<Section> create(AttributeRequest sectionRequest, Long boardId) {
+        Board board = Validations.doesIdExists(boardId, boardRepository);
         Section section = Section.createSection(sectionRequest);
         board.addSectionToBoard(section);
         boardRepository.save(board);

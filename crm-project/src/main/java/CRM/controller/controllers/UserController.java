@@ -39,7 +39,20 @@ public class UserController {
         return new ResponseEntity<>(response, response.getStatus());
     }
 
+    /**
+     * This method is used to handle HTTP GET requests to the specified URL (board/getAll/{userId}).
+     * The method takes the id of the user as a path variable and uses it to retrieve all the boards created by the user using the boardFacade object.
+     *
+     * @param userId The id of the user whose boards are to be retrieved.
+     * @return A ResponseEntity object containing the Response object with the retrieved boards and the HTTP status code.
+     */
     @GetMapping(value = "getAll")
+    public ResponseEntity<Response> getAllBoardsOfUser(@RequestAttribute Long userId) {
+        Response response = userFacade.getAllBoardsOfUser(userId);
+        return new ResponseEntity<>(response, response.getStatus());
+    }
+
+    @GetMapping(value = "get-all-users")
     public ResponseEntity<Response> getAll(){
 
         Response response = userFacade.getAll();
@@ -54,8 +67,8 @@ public class UserController {
     }
 
     @PostMapping(value = "update-user-to-board")
-    public ResponseEntity<Response> updateUserToBoard(@RequestBody ObjectsIdsRequest objectsIdsRequest){
-
+    public ResponseEntity<Response> updateUserToBoard(@RequestBody ObjectsIdsRequest objectsIdsRequest, @RequestAttribute Long boardId){
+        objectsIdsRequest.setBoardId(boardId);
         Response response = userFacade.updateUserToBoard(objectsIdsRequest);
         return new ResponseEntity<>(response, response.getStatus());
     }

@@ -81,7 +81,7 @@ public class Validations {
      * @throws IllegalArgumentException if the board name or creator user id does not match the expected format
      */
     public static boolean validateNewBoard(BoardRequest board) {
-        validate(board.getCreatorUserId().toString(), Regex.ID.getRegex());
+        validate(board.getCreatorUserId(), Regex.ID.getRegex());
         validate(board.getName(), Regex.BOARD_NAME.getRegex());
         return true;
     }
@@ -107,9 +107,6 @@ public class Validations {
 //        validate(item.getStatusId(), Regex.ID.getRegex());
 //        validate(item.getTypeId(), Regex.ID.getRegex());
 
-        if (item.getImportance() < 0 || item.getImportance() > 5)
-            throw new IllegalArgumentException(ExceptionMessage.VALIDATION_FAILED.toString());
-
         if (item.getName() == null)
             throw new NullPointerException(ExceptionMessage.VALIDATION_FAILED.toString());
     }
@@ -121,9 +118,9 @@ public class Validations {
      * @throws IllegalArgumentException if any field fails validation.
      * @throws NullPointerException     if the title is null.
      */
-    public static void validateCreatedComment(CommentRequest comment) {
+    public static void validateCreatedComment(CommentRequest comment, Long userId, Long boardId) {
         // validate each field of the item using validate(regex, field)
-        Validations.validateIDs(comment.getParentItemId(), comment.getUserId());
+        Validations.validateIDs(comment.getParentItemId(), userId, boardId);
 
         if (comment.getName() == null)
             throw new NullPointerException(ExceptionMessage.VALIDATION_FAILED.toString());
@@ -274,12 +271,12 @@ public class Validations {
      */
     public static boolean checkIfUserExistsInBoard(long userId, long boardId,
                                                    JpaRepository<User, Long> userRepo, JpaRepository<Board, Long> boardRepo) throws AccountNotFoundException {
-        User user;
-        Board board;
         try {
-            user = Validations.doesIdExists(userId, userRepo);
-            board = Validations.doesIdExists(boardId, boardRepo);
-            return board.getAllUsersInBoard().contains(user) || board.getCreatorUser().equals(user);
+            User user = doesIdExists(userId, userRepo);
+            Board board = doesIdExists(boardId, boardRepo);
+            return board.doesBoardIncludeUser(userId);
+//            return board.getAllUsersInBoard().contains(user) || board.getCreatorUser().equals(user);
+
         } catch (NoSuchElementException e) {
             throw new AccountNotFoundException(ExceptionMessage.ACCOUNT_DOES_NOT_EXISTS.toString());
         }

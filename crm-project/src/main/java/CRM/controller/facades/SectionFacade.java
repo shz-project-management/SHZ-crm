@@ -34,14 +34,15 @@ public class SectionFacade {
      * @throws NoSuchElementException   if the board with the given id does not exist
      * @throws NullPointerException     if an error occurs while creating the attribute
      */
-    public Response create(AttributeRequest sectionRequest) {
+    public Response create(AttributeRequest sectionRequest, Long boardId) {
         try {
             Validations.validate(sectionRequest.getName(), Regex.NAME.getRegex());
+            Validations.validate(boardId, Regex.ID.getRegex());
 
             return Response.builder()
                     .status(HttpStatus.CREATED)
                     .statusCode(HttpStatusCodes.STATUS_CODE_CREATED)
-                    .data(SectionDTO.getSectionsDTOList(sectionService.create(sectionRequest)))
+                    .data(SectionDTO.getSectionsDTOList(sectionService.create(sectionRequest, boardId)))
                     .build();
 
         } catch (IllegalArgumentException | NoSuchElementException e) {

@@ -38,7 +38,7 @@ public enum ExceptionMessage {
 
     NO_USER_IN_DOCUMENT_IN_DATABASE("Could not locate the find the user that uses this document in the database."),
     UNAUTHORIZED("You are unauthorized to create such a action"),
-    FOLDER_EXISTS("This folder ID already exist in the database: "),
+    USER_REQUEST_DOSENT_MATCH("User cant create a new board to other users"),
     USER_ALREADY_HAS_THIS_PERMISSION("User already has this permission in board"),
     ACCOUNT_DOES_NOT_EXISTS("Could not locate this account in the database"),
     USER_EXISTS_IN_BOARD("This user already exists in this board"),

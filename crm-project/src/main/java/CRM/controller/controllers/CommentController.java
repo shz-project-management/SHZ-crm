@@ -6,6 +6,7 @@ import CRM.entity.requests.CommentRequest;
 import CRM.entity.requests.ObjectsIdsRequest;
 import CRM.entity.requests.UpdateObjectRequest;
 import CRM.entity.response.Response;
+import CRM.utils.enums.UpdateField;
 import lombok.AllArgsConstructor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -28,20 +29,20 @@ public class CommentController {
     SharedContentFacade sharedContentFacade;
 
     @PostMapping(consumes = "application/json")
-    public ResponseEntity<Response> create(@RequestBody CommentRequest comment) {
-
-        Response response = sharedContentFacade.create(comment);
+    public ResponseEntity<Response> create(@RequestBody CommentRequest comment, @RequestAttribute Long userId,
+                                           @RequestAttribute Long boardId) {
+        Response response = sharedContentFacade.create(comment, userId, boardId);
         return new ResponseEntity<>(response, response.getStatus());
     }
 
-    @DeleteMapping(value = "{boardId}")
-    public ResponseEntity<Response> delete(@RequestBody List<Long> commentsIds, @PathVariable Long boardId) {
+    @DeleteMapping
+    public ResponseEntity<Response> delete(@RequestBody List<Long> commentsIds, @RequestAttribute Long boardId) {
         Response response = sharedContentFacade.delete(commentsIds, boardId, Comment.class);
         return new ResponseEntity<>(response, response.getStatus());
     }
 
     @PatchMapping(value = "update")
-    public ResponseEntity<Response> update(@RequestBody UpdateObjectRequest updateObject) {
+    public ResponseEntity<Response> update(@RequestBody UpdateObjectRequest updateObject, @RequestParam UpdateField field) {
         Response response = sharedContentFacade.update(updateObject, Comment.class);
         return new ResponseEntity<>(response, response.getStatus());
     }
@@ -55,14 +56,14 @@ public class CommentController {
     }
 
     @GetMapping(value = "all-in-item/{itemId}")
-    public ResponseEntity<Response> getAllInItem( @PathVariable Long itemId, @RequestParam Long boardId, @RequestParam Long sectionId) {
+    public ResponseEntity<Response> getAllInItem( @PathVariable Long itemId, @RequestAttribute Long boardId, @RequestParam Long sectionId) {
         ObjectsIdsRequest objectsIdsRequest = ObjectsIdsRequest.boardSectionItemIds(boardId, sectionId, itemId);
         Response response = sharedContentFacade.getAllInItem(objectsIdsRequest, Comment.class);
         return new ResponseEntity<>(response, response.getStatus());
     }
 
-    @GetMapping(value = "all-in-board/{boardId}")
-    public ResponseEntity<Response> getAllCommentsInBoard(@PathVariable Long boardId) {
+    @GetMapping(value = "all-in-board")
+    public ResponseEntity<Response> getAllCommentsInBoard(@RequestAttribute Long boardId) {
         Response response = sharedContentFacade.getAllCommentsInBoard(boardId);
         return new ResponseEntity<>(response, response.getStatus());
     }
