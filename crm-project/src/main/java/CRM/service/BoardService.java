@@ -107,8 +107,7 @@ public class BoardService {
 
         //get all the boards of the creator user
         Map<String, List<Board>> userBoards = new HashMap<>();
-        List<Board> allBoards = boardRepository.findByCreatorUser_Id(user.getId());
-        userBoards.put(myBoards, allBoards);
+        userBoards.put(myBoards, boardRepository.findByCreatorUser_Id(user.getId()));
         userBoards.put(SharedBoards, getSharedBoardsOfUser(user));
         return userBoards;
     }
