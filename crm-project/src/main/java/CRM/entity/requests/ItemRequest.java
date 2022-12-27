@@ -11,5 +11,4 @@ public class ItemRequest extends SharedContentRequest{
     private Long statusId;
     private Long typeId;
     private LocalDateTime dueDate;
-    private Integer importance;
 }

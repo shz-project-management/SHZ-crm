@@ -6,6 +6,7 @@ import CRM.entity.Status;
 import CRM.entity.requests.AttributeRequest;
 import CRM.entity.requests.UpdateObjectRequest;
 import CRM.entity.response.Response;
+import CRM.utils.enums.UpdateField;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -29,7 +30,8 @@ public class StatusController {
      * @return A ResponseEntity containing a Response object with the status of the create operation and the created status object.
      */
     @PostMapping(consumes = "application/json")
-    public ResponseEntity<Response> create(@RequestBody AttributeRequest sectionRequest) {
+    public ResponseEntity<Response> create(@RequestBody AttributeRequest sectionRequest, @RequestAttribute Long boardId) {
+        sectionRequest.setBoardId(boardId);
         Response response = attributeFacade.create(sectionRequest, Status.class);
         return new ResponseEntity<>(response, response.getStatus());
     }
@@ -39,11 +41,11 @@ public class StatusController {
 //     *
 //     * @return A ResponseEntity with the appropriate status and response body.
 //     */
-//    @DeleteMapping(value = "{boardId}/{sectionId}")
-//    public ResponseEntity<Response> delete(@PathVariable Long boardId,@PathVariable Long sectionId) {
-//        Response response = attributeFacade.delete(boardId, sectionId, Status.class);
-//        return new ResponseEntity<>(response, response.getStatus());
-//    }
+    @DeleteMapping(value = "{sectionId}")
+    public ResponseEntity<Response> delete(@RequestAttribute Long boardId,@PathVariable Long sectionId) {
+        Response response = attributeFacade.delete(boardId, sectionId, Status.class);
+        return new ResponseEntity<>(response, response.getStatus());
+    }
 
 //    /**
 //     This method is used to handle HTTP GET requests to the specified URL (status/{id}).
@@ -71,7 +73,7 @@ public class StatusController {
 
     //TODO documentation
     @PatchMapping(value = "/update", consumes = "application/json")
-    public ResponseEntity<Response> update(@RequestBody UpdateObjectRequest updateObjectRequest) {
+    public ResponseEntity<Response> update(@RequestBody UpdateObjectRequest updateObjectRequest, @RequestParam UpdateField field) {
         Response response = attributeFacade.update(updateObjectRequest, Status.class);
         return new ResponseEntity<>(response, response.getStatus());
     }

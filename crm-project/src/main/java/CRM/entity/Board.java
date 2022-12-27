@@ -45,7 +45,7 @@ public class Board {
     @JoinColumn(name = "board_id")
     private Set<Section> sections = new HashSet<>();
 
-    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "board_id")
     private Set<UserPermission> usersPermissions = new HashSet<>();
 
@@ -203,6 +203,21 @@ public class Board {
         usersSettings.add(userSetting);
     }
 
+    public void removeAttributeFromItems(long attributeId, Class clz) {
+        getSections().forEach(section ->
+                section.getItems().forEach(item -> {
+                    if (clz == Status.class) {
+                        if (item.getStatus().getId().equals(attributeId)) {
+                            item.setStatus(null);
+                        }
+                    } else {
+                        if (item.getType().getId().equals(attributeId)) {
+                            item.setType(null);
+                        }
+                    }
+                }));
+    }
+
     public Type getTypeByName(String typeName) {
         return types.stream()
                 .filter(type -> type.getName().equals(typeName))
@@ -239,19 +254,22 @@ public class Board {
     }
 
     public Integer getUserPermissionIntegerByUserId(Long userId) throws NoPermissionException {
-        if(creatorUser.getId().equals(userId)){
+        if (creatorUser.getId().equals(userId)) {
             return Permission.ADMIN.ordinal();
         }
         Optional<UserPermission> userPerm = getUsersPermissions().stream().filter(userPermission -> userPermission.getUser().getId().equals(userId)).findFirst();
-        if(userPerm.isPresent()){
+        if (userPerm.isPresent()) {
             return userPerm.get().getPermission().ordinal();
         }
         throw new NoPermissionException(ExceptionMessage.PERMISSION_FAILED.toString());
     }
 
     public Permission getUserPermissionWithoutAdminByUserId(Long userId) throws NoPermissionException {
+        if (creatorUser.getId().equals(userId)) {
+            return Permission.ADMIN;
+        }
         Optional<UserPermission> userPerm = getUsersPermissions().stream().filter(userPermission -> userPermission.getUser().getId().equals(userId)).findFirst();
-        if(userPerm.isPresent()){
+        if (userPerm.isPresent()) {
             return userPerm.get().getPermission();
         }
         throw new NoPermissionException(ExceptionMessage.PERMISSION_FAILED.toString());
