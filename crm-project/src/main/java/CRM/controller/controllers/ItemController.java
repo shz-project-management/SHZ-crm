@@ -42,7 +42,8 @@ public class ItemController {
     @DeleteMapping
     public ResponseEntity<Response> delete(@RequestBody List<Long> itemsIds, @RequestAttribute Long boardId) {
         Response response = sharedContentFacade.delete(itemsIds, boardId, Item.class);
-        return new ResponseEntity<>(response, response.getStatus());
+        messagingTemplate.convertAndSend("/item/" + boardId, response);
+        return ResponseEntity.noContent().build();
     }
 
     @PatchMapping(value = "update")
@@ -52,7 +53,8 @@ public class ItemController {
         updateItemRequest.getObjectsIdsRequest().setBoardId(boardId);
         Response response = sharedContentFacade.update(updateItemRequest, Item.class);
         messagingTemplate.convertAndSend("/item/" + boardId, response);
-        return ResponseEntity.noContent().build();    }
+        return ResponseEntity.noContent().build();
+    }
 
     @GetMapping(value = "{itemId}")
     public ResponseEntity<Response> get(@PathVariable Long itemId, @RequestAttribute Long boardId,
