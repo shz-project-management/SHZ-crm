@@ -1,0 +1,6 @@
+{
+  "authPermissionPathsForAll": ["auth","ws"],
+  "permissionPathsForAll": ["auth", "board/create", "filter-items", "notification", "settings", "ws"],
+  "permissionPathsForLeaders": ["item", "comment"],
+  "permissionPathsForUsers": ["item", "comment"]
+}
