@@ -1,15 +1,17 @@
 package CRM.utils;
 
-import CRM.entity.User;
-import CRM.entity.UserSetting;
+import CRM.entity.*;
 import CRM.entity.requests.NotificationRequest;
 import CRM.entity.response.Response;
 import CRM.repository.*;
+import CRM.service.AttributeService;
 import CRM.service.NotificationService;
 import CRM.service.SettingsService;
 import CRM.utils.email.EmailUtil;
 import CRM.utils.enums.ExceptionMessage;
+import CRM.utils.enums.Permission;
 import com.google.api.client.http.HttpStatusCodes;
+import org.hibernate.tool.schema.internal.StandardTableExporter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.mail.MailSendException;
@@ -72,23 +74,47 @@ public class NotificationSender {
                 return "Item id: " + notificationRequest.getItemId() + " has been assigned to you in board " +
                         notificationRequest.getBoard().getName();
             case 2:
-                return "Item id: " + notificationRequest.getItemId() + " Status has been changed to " +
-                        notificationRequest.getPresentContent() + " in item: " + notificationRequest.getItemId();
+                List<Attribute> statuses = notificationRequest.getBoard().getAllAttributeInBoard(Status.class);
+                Item statusItem = notificationRequest.getBoard().getItemById(notificationRequest.getItemId(), notificationRequest.getSectionId());
+                return "The item's: " + statusItem.getName() + " status has been changed to " + statuses.get((Integer) notificationRequest.getPresentContent()).getName();
             case 3:
-                return "Item id: " + notificationRequest.getItemId() + " Type has been changed to " +
-                        notificationRequest.getPresentContent() + " in item: " + notificationRequest.getItemId();
+                List<Attribute> types = notificationRequest.getBoard().getAllAttributeInBoard(Type.class);
+                Item typeItem = notificationRequest.getBoard().getItemById(notificationRequest.getItemId(), notificationRequest.getSectionId());
+                return "The item's: " + typeItem.getName() + " type has been changed to " + types.get((Integer) notificationRequest.getPresentContent()).getName();
             case 4:
-                return "New comment added on item id: " + notificationRequest.getItemId() + ":\n " +
+                Item commentItem = notificationRequest.getBoard().getItemById(notificationRequest.getItemId(), notificationRequest.getSectionId());
+                return "New comment added on item: " + commentItem.getName() + ":\n " +
                         notificationRequest.getComment() + "\n By: " + notificationRequest.getFromUser().getFullName();
             case 5:
                 return "Item: " + notificationRequest.getItemId() + " has been deleted";
             case 6:
-                return "Field " + notificationRequest.getChangedFieldName() + " has been changed " +
-                        " to " + notificationRequest.getPresentContent() + " in item: " + notificationRequest.getItemId();
+                Item item = notificationRequest.getBoard().getItemById(notificationRequest.getItemId(), notificationRequest.getSectionId());
+                return "The item's" + item.getName() + "Field " + notificationRequest.getChangedFieldName() + " has been changed " +
+                        " to " + notificationRequest.getPresentContent();
             case 7:
-                return notificationRequest.getFromUser().getFullName() + " has been added to the board, Welcome!";
+                getAddUserNotificationDescription(notificationRequest, type);
             default:
                 return null;
         }
+    }
+
+    private static String getAddUserNotificationDescription(NotificationRequest notificationRequest, Long type){
+        Board board = notificationRequest.getBoard();
+        UserPermission userPermission = board.getUserPermissionById(notificationRequest.getFromUser().getId(), board.getUsersPermissions());
+        if(notificationRequest.getFromUser() == notificationRequest.getUser())
+            switch (userPermission.getPermission()){
+                case USER:
+                    notificationRequest.setNotificationType(new NotificationSetting(type, "You have been added to a board"));
+                    return "You have been added to board: " + notificationRequest.getBoard().getName() + " Welcome!";
+                case LEADER:
+                    notificationRequest.setNotificationType(new NotificationSetting(type, "You have been promoted to leader"));
+                    return "You have been promoted to leader in board: " + notificationRequest.getBoard().getName() + " Good luck!";
+                case UNAUTHORIZED:
+                    notificationRequest.setNotificationType(new NotificationSetting(type, "You have been removed from board"));
+                    return "You have been removed from board: " + notificationRequest.getBoard().getName();
+            }
+        else if(userPermission.getPermission() == Permission.USER)
+            return notificationRequest.getFromUser().getFullName() + " has been added to the board, Welcome!";
+        return "User: " + notificationRequest.getFromUser().getFullName() + " permissions has been changed";
     }
 }
