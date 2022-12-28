@@ -223,8 +223,7 @@ public class UserService {
 
     public Set<UserPermission> getAllUserPermissionsInBoard(Long boardId) {
         Board board = Validations.doesIdExists(boardId, boardRepository);
-        Set<UserPermission> userPermissions = board.getUsersPermissions();
-        return userPermissions;
+        return board.getUsersPermissions();
     }
 
     /**

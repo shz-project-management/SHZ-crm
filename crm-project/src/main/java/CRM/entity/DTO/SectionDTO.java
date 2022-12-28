@@ -4,6 +4,7 @@ package CRM.entity.DTO;
 import CRM.entity.Board;
 import CRM.entity.Item;
 import CRM.entity.Section;
+import CRM.entity.User;
 import lombok.*;
 
 import java.util.*;
@@ -30,6 +31,19 @@ public class SectionDTO {
 
         if (section.getItems().size() > 0)
             sectionDTO.setItems(ItemDTO.getItemsDTOList(section.getItems().stream().filter(item -> item.getParentItem() == null).collect(Collectors.toSet())));
+
+        return sectionDTO;
+    }
+
+    public static SectionDTO createSectionWithUserDTO(Section section, User user) {
+        SectionDTO sectionDTO = new SectionDTO();
+
+        sectionDTO.setId(section.getId());
+        sectionDTO.setName(section.getName());
+        sectionDTO.setDescription(section.getDescription());
+
+        if (section.getItems().size() > 0)
+            sectionDTO.setItems(ItemDTO.getItemsDTOListWithUser(section.getItems().stream().filter(item -> item.getParentItem() == null).collect(Collectors.toSet()), user));
 
         return sectionDTO;
     }

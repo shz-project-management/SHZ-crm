@@ -76,7 +76,9 @@ public class ItemController {
         objIds.setUserId(boardId);
         Response response = sharedContentFacade.assignToUser(objIds, Item.class);
         messagingTemplate.convertAndSend("/item/" + boardId, response);
-        return ResponseEntity.noContent().build();
+        return new ResponseEntity<>(response, response.getStatus());
+
+//        return ResponseEntity.noContent().build();
     }
 
 

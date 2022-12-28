@@ -396,13 +396,13 @@ public class SharedContentFacade {
             Validations.validate(objIds.getEmail(), Regex.EMAIL.getRegex());
 
             return Response.builder()
-                    .data(UserPermissionDTO.getListOfUserPermissionFromDB(new ArrayList<>(convertFromClassToService(clz).assignToUser(objIds))))
+                    .data(SectionDTO.createSectionWithUserDTO((convertFromClassToService(clz).assignToUser(objIds)), userService.get(objIds.getEmail())))
                     .message(SuccessMessage.FOUND.toString())
                     .status(HttpStatus.OK)
                     .statusCode(HttpStatusCodes.STATUS_CODE_OK)
                     .build();
 
-        } catch (IllegalArgumentException | NoSuchElementException e) {
+        } catch (IllegalArgumentException | AccountNotFoundException | NoSuchElementException e) {
             return Response.builder()
                     .message(e.getMessage())
                     .status(HttpStatus.BAD_REQUEST)
