@@ -75,20 +75,22 @@ public class NotificationSender {
                         notificationRequest.getBoard().getName();
             case 2:
                 List<Attribute> statuses = notificationRequest.getBoard().getAllAttributeInBoard(Status.class);
-                return " Status has been changed to " + statuses.get((Integer) notificationRequest.getPresentContent()).getName()
-                        + " in item: " + notificationRequest.getItemId();
+                Item statusItem = notificationRequest.getBoard().getItemById(notificationRequest.getItemId(), notificationRequest.getSectionId());
+                return "The item's: " + statusItem.getName() + " status has been changed to " + statuses.get((Integer) notificationRequest.getPresentContent()).getName();
             case 3:
                 List<Attribute> types = notificationRequest.getBoard().getAllAttributeInBoard(Type.class);
-                return " Type has been changed to " + types.get((Integer) notificationRequest.getPresentContent()).getName()
-                        + " in item: " + notificationRequest.getItemId();
+                Item typeItem = notificationRequest.getBoard().getItemById(notificationRequest.getItemId(), notificationRequest.getSectionId());
+                return "The item's: " + typeItem.getName() + " type has been changed to " + types.get((Integer) notificationRequest.getPresentContent()).getName();
             case 4:
-                return "New comment added on item id: " + notificationRequest.getItemId() + ":\n " +
+                Item commentItem = notificationRequest.getBoard().getItemById(notificationRequest.getItemId(), notificationRequest.getSectionId());
+                return "New comment added on item: " + commentItem.getName() + ":\n " +
                         notificationRequest.getComment() + "\n By: " + notificationRequest.getFromUser().getFullName();
             case 5:
                 return "Item: " + notificationRequest.getItemId() + " has been deleted";
             case 6:
-                return "Field " + notificationRequest.getChangedFieldName() + " has been changed " +
-                        " to " + notificationRequest.getPresentContent() + " in item: " + notificationRequest.getItemId();
+                Item item = notificationRequest.getBoard().getItemById(notificationRequest.getItemId(), notificationRequest.getSectionId());
+                return "The item's" + item.getName() + "Field " + notificationRequest.getChangedFieldName() + " has been changed " +
+                        " to " + notificationRequest.getPresentContent();
             case 7:
                 getAddUserNotificationDescription(notificationRequest, type);
             default:
