@@ -7,11 +7,8 @@ import CRM.service.AuthService;
 import CRM.service.BoardService;
 import CRM.utils.enums.Permission;
 import CRM.utils.enums.UpdateField;
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.hibernate.sql.Update;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.GenericFilterBean;
@@ -21,7 +18,6 @@ import javax.security.auth.login.AccountNotFoundException;
 import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 
@@ -76,7 +72,7 @@ public class PermissionFilter extends GenericFilterBean {
                 Long userId = authService.checkTokenToUserInDB(token);
 //                board = boardService.get(Long.parseLong(boardId));
                 user = authService.findById(userId);
-                permission = board.getUserPermissionWithoutAdminByUserId(user.getId());
+                permission = board.getUserPermissionWithAdminByUserId(user.getId());
             } catch (AccountNotFoundException | NoPermissionException e) {
                 sendForbiddenResponse(httpResponse);
                 return;
