@@ -71,7 +71,7 @@ public class StatusController {
 
     //TODO documentation
     @PatchMapping(value = "/update", consumes = "application/json")
-    public ResponseEntity<Response<BoardDTO>> update(@RequestBody UpdateObjectRequest updateObjectRequest, @RequestParam UpdateField field) {
+    public ResponseEntity<Response<BoardDTO>> update(@RequestBody UpdateObjectRequest updateObjectRequest) {
         Response response = attributeFacade.update(updateObjectRequest, Status.class);
         messagingTemplate.convertAndSend("/attribute/" + updateObjectRequest.getObjectsIdsRequest().getBoardId(), response);
         return ResponseEntity.noContent().build();

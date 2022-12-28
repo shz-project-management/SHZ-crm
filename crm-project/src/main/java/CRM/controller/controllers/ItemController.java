@@ -1,7 +1,6 @@
 package CRM.controller.controllers;
 
 import CRM.controller.facades.SharedContentFacade;
-import CRM.entity.DTO.CommentDTO;
 import CRM.entity.DTO.ItemDTO;
 import CRM.entity.DTO.SectionDTO;
 import CRM.entity.DTO.UserPermissionDTO;
@@ -117,6 +116,4 @@ public class ItemController {
         messagingTemplate.convertAndSend("/item/" + boardId, response);
         return ResponseEntity.noContent().build();
     }
-
-
 }
