@@ -216,17 +216,6 @@ public class Validations {
     }
 
     /**
-     * Throws a NonUniqueObjectException with a specific message and attribute ID when an attribute already exists for a board.
-     *
-     * @param attribute The attribute that already exists.
-     * @param className The name of the class where the attribute was found to exist.
-     * @throws NonUniqueObjectException with the attribute ID and class name as parameters.
-     */
-    public static void throwAttributeAlreadyExistsForBoard(Attribute attribute, String className) {
-        throw new NonUniqueObjectException(ExceptionMessage.ATTRIBUTE_ALREADY_IN_DB.toString(), attribute.getId(), className);
-    }
-
-    /**
      * Check if a field is a custom object field.
      *
      * @param fieldName the field to be checked

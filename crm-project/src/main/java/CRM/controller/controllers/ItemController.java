@@ -47,8 +47,7 @@ public class ItemController {
     }
 
     @PatchMapping(value = "update")
-    public ResponseEntity<Response> update(@RequestBody UpdateObjectRequest updateItemRequest, @RequestParam UpdateField field,
-                                           @RequestAttribute Long userId, @RequestAttribute Long boardId) {
+    public ResponseEntity<Response> update(@RequestBody UpdateObjectRequest updateItemRequest, @RequestAttribute Long userId, @RequestAttribute Long boardId) {
         updateItemRequest.getObjectsIdsRequest().setUserId(userId);
         updateItemRequest.getObjectsIdsRequest().setBoardId(boardId);
         Response response = sharedContentFacade.update(updateItemRequest, Item.class);

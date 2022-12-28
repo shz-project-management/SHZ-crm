@@ -458,18 +458,18 @@ public class SharedContentFacade {
             request = NotificationRequest.createStatusChangeRequest(userService.get(updateObject.getObjectsIdsRequest().getUserId()),
                     boardService.get(updateObject.getObjectsIdsRequest().getBoardId()),
                     updateObject.getObjectsIdsRequest().getUpdateObjId(), updateObject.getContent(),
-                    settingsService.getNotificationSettingFromDB(Notifications.STATUS_CHANGED.name));
+                    settingsService.getNotificationSettingFromDB(Notifications.STATUS_CHANGED.name), updateObject.getObjectsIdsRequest().getSectionId());
         else if (updateObject.getFieldName().equals(UpdateField.TYPE)) {
             request = NotificationRequest.createTypeChangeRequest(userService.get(updateObject.getObjectsIdsRequest().getUserId()),
                     boardService.get(updateObject.getObjectsIdsRequest().getBoardId()),
                     updateObject.getObjectsIdsRequest().getUpdateObjId(), updateObject.getContent(),
-                    settingsService.getNotificationSettingFromDB(Notifications.TYPE_CHANGED.name));
+                    settingsService.getNotificationSettingFromDB(Notifications.TYPE_CHANGED.name), updateObject.getObjectsIdsRequest().getSectionId());
         }
         else request = NotificationRequest.createItemChangeRequest(userService.get(updateObject.getObjectsIdsRequest().getUserId()),
                     boardService.get(updateObject.getObjectsIdsRequest().getBoardId()),
                     updateObject.getObjectsIdsRequest().getUpdateObjId(),
                     updateObject.getFieldName().toString(), updateObject.getContent(),
-                    settingsService.getNotificationSettingFromDB(Notifications.ITEM_DATA_CHANGED.name));
+                    settingsService.getNotificationSettingFromDB(Notifications.ITEM_DATA_CHANGED.name), updateObject.getObjectsIdsRequest().getSectionId());
 
         notificationSender.sendNotificationToManyUsers(request,
                 boardService.get(updateObject.getObjectsIdsRequest().getBoardId()).getBoardUsersSet());
@@ -480,7 +480,7 @@ public class SharedContentFacade {
                 NotificationRequest.createCommentAddedRequest(userService.get(userId),
                         boardService.get(boardId), comment.getParentItemId(),
                         comment.getDescription(), userService.get(userId),
-                        settingsService.getNotificationSettingFromDB(Notifications.COMMENT_ADDED.name)),
+                        settingsService.getNotificationSettingFromDB(Notifications.COMMENT_ADDED.name), comment.getSectionId()),
                 boardService.get(boardId).getBoardUsersSet());
     }
 
