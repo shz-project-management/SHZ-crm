@@ -1,6 +1,7 @@
 package CRM.controller.controllers;
 
 import CRM.controller.facades.SettingsFacade;
+import CRM.entity.DTO.SettingsDTO;
 import CRM.entity.requests.ObjectsIdsRequest;
 import CRM.entity.requests.SettingUpdateRequest;
 import CRM.entity.response.Response;
@@ -9,6 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @Controller
 @RequestMapping(value = "/settings")
@@ -27,7 +30,7 @@ public class SettingController {
      * @return A ResponseEntity object containing the response with the retrieved user settings.
      */
     @GetMapping(value = "get-user-settings-in-board")
-    public ResponseEntity<Response> getAllUserSettingsInBoard(@RequestAttribute Long userId, @RequestAttribute Long boardId) {
+    public ResponseEntity<Response<List<SettingsDTO>>> getAllUserSettingsInBoard(@RequestAttribute Long userId, @RequestAttribute Long boardId) {
         ObjectsIdsRequest objectsIdsRequest = ObjectsIdsRequest.boardUserIds(boardId, userId);
         Response response = settingsFacade.getAllUserSettingsInBoard(objectsIdsRequest);
         return new ResponseEntity<>(response, response.getStatus());
@@ -40,8 +43,7 @@ public class SettingController {
      * @return A ResponseEntity object containing the response with the all the user's settings in that board.
      */
     @PatchMapping(consumes = "application/json")
-    public ResponseEntity<Response> changeUserSettingsInBoard(@RequestBody SettingUpdateRequest settingUpdateRequest,
-                                                              @RequestAttribute Long boardId) {
+    public ResponseEntity<Response<List<SettingsDTO>>> changeUserSettingsInBoard(@RequestBody SettingUpdateRequest settingUpdateRequest, @RequestAttribute Long boardId) {
         settingUpdateRequest.setBoardId(boardId);
         Response response = settingsFacade.changeUserSettingsInBoard(settingUpdateRequest);
         return new ResponseEntity<>(response, response.getStatus());

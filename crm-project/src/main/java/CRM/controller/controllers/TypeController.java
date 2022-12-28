@@ -1,6 +1,8 @@
 package CRM.controller.controllers;
 
 import CRM.controller.facades.AttributeFacade;
+import CRM.entity.DTO.AttributeDTO;
+import CRM.entity.DTO.BoardDTO;
 import CRM.entity.Type;
 import CRM.entity.requests.AttributeRequest;
 import CRM.entity.requests.UpdateObjectRequest;
@@ -12,6 +14,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @Controller
 @RequestMapping(value = "/type")
@@ -32,7 +36,7 @@ public class TypeController {
      * @return A ResponseEntity containing a Response object with the status of the create operation and the created type object.
      */
     @PostMapping(consumes = "application/json")
-    public ResponseEntity<Response> create(@RequestBody AttributeRequest sectionRequest, @RequestAttribute Long boardId) {
+    public ResponseEntity<List<AttributeDTO>> create(@RequestBody AttributeRequest sectionRequest, @RequestAttribute Long boardId) {
         sectionRequest.setBoardId(boardId);
         Response response = attributeFacade.create(sectionRequest, Type.class);
         messagingTemplate.convertAndSend("/attribute/" + boardId, response);
@@ -70,15 +74,13 @@ public class TypeController {
      * @return A ResponseEntity object containing the Response object with the retrieved types and the HTTP status code.
      */
     @GetMapping(value = "getAll/{boardId}")
-    public ResponseEntity<Response> getAllInBoard(@PathVariable Long boardId) {
+    public ResponseEntity<Response<List<AttributeDTO>>> getAllInBoard(@PathVariable Long boardId) {
         Response response = attributeFacade.getAllAttributesInBoard(boardId, Type.class);
         return new ResponseEntity<>(response, response.getStatus());
     }
 
-
-    //TODO documentation
     @PatchMapping(value = "/update", consumes = "application/json")
-    public ResponseEntity<Response> update(@RequestBody UpdateObjectRequest typeRequest, @RequestParam UpdateField field) {
+    public ResponseEntity<Response<BoardDTO>> update(@RequestBody UpdateObjectRequest typeRequest, @RequestParam UpdateField field) {
         Response response = attributeFacade.update(typeRequest, Type.class);
         messagingTemplate.convertAndSend("/attribute/" + typeRequest.getObjectsIdsRequest().getBoardId(), response);
         return ResponseEntity.noContent().build();

@@ -41,14 +41,8 @@ public class AuthFacade {
     public Response register(RegisterUserRequest user) {
         logger.info("in FacadeAuthController -> register");
         try {
-            // validate the data given e.g. user.getEmail -> Validations.validate(Regex.EMAIL.getRegex(), email);
-            // reminder: Validations.validate function throws an exception if failed, and doesn't return anything.
-            //           so make sure to put it in a try/catch
             Validations.validateRegisteredUser(user);
 
-            // after all validations are made, call the authService to register the user with the relevant information.
-            // there's no need to send an activation email at the moment (according to Assaf).
-            // If we have time, we'll add it later on.
             return Response.builder()
                     .data(UserDTO.createUserDTO(authService.register(user)))
                     .message(SuccessMessage.REGISTER.toString())

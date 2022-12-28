@@ -1,6 +1,7 @@
 package CRM.controller.controllers;
 
 import CRM.controller.facades.SectionFacade;
+import CRM.entity.DTO.SectionDTO;
 import CRM.entity.requests.AttributeRequest;
 import CRM.entity.requests.UpdateObjectRequest;
 import CRM.entity.response.Response;
@@ -34,7 +35,7 @@ public class SectionController {
      * @return A ResponseEntity containing a Response object with the status of the create operation and the created type object.
      */
     @PostMapping(consumes = "application/json")
-    public ResponseEntity<Response> create(@RequestBody AttributeRequest sectionRequest, @RequestAttribute Long boardId) {
+    public ResponseEntity<Response<List<SectionDTO>>> create(@RequestBody AttributeRequest sectionRequest, @RequestAttribute Long boardId) {
         Response response = sectionFacade.create(sectionRequest, boardId);
         messagingTemplate.convertAndSend("/section/" + boardId, response);
         return ResponseEntity.noContent().build();
@@ -59,7 +60,7 @@ public class SectionController {
      * @return A ResponseEntity object containing the Response object with the type information and the HTTP status code.
      */
     @GetMapping(value = "{sectionId}")
-    public ResponseEntity<Response> get(@PathVariable Long sectionId, @RequestAttribute Long boardId) {
+    public ResponseEntity<Response<SectionDTO>> get(@PathVariable Long sectionId, @RequestAttribute Long boardId) {
         Response response = sectionFacade.get(boardId, sectionId);
         return new ResponseEntity<>(response, response.getStatus());
     }
@@ -72,19 +73,19 @@ public class SectionController {
      * @return A ResponseEntity object containing the Response object with the retrieved types and the HTTP status code.
      */
     @GetMapping(value = "getAll")
-    public ResponseEntity<Response> getAllInBoard(@RequestAttribute Long boardId) {
+    public ResponseEntity<Response<List<SectionDTO>>> getAllInBoard(@RequestAttribute Long boardId) {
         Response response = sectionFacade.getAllSectionsInBoard(boardId);
         return new ResponseEntity<>(response, response.getStatus());
     }
 
     @PostMapping(value = "filter-items")
-    public ResponseEntity<Response> getFilteredItems(@RequestBody Map<String, List<String>> filters, @RequestAttribute Long boardId) {
+    public ResponseEntity<Response<List<SectionDTO>>> getFilteredItems(@RequestBody Map<String, List<String>> filters, @RequestAttribute Long boardId) {
         Response response = sectionFacade.getFilteredItems(filters, boardId);
         return new ResponseEntity<>(response, response.getStatus());
     }
 
     @PatchMapping(value = "/update", consumes = "application/json")
-    public ResponseEntity<Response> update(@RequestBody UpdateObjectRequest updateItemRequest, @RequestAttribute Long boardId) {
+    public ResponseEntity<Response<SectionDTO>> update(@RequestBody UpdateObjectRequest updateItemRequest, @RequestAttribute Long boardId) {
         updateItemRequest.getObjectsIdsRequest().setBoardId(boardId);
         Response response = sectionFacade.update(updateItemRequest);
         messagingTemplate.convertAndSend("/section/" + boardId, response);

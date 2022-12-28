@@ -1,6 +1,9 @@
 package CRM.controller.controllers;
 
 import CRM.controller.facades.UserFacade;
+import CRM.entity.DTO.BoardDTO;
+import CRM.entity.DTO.UserDTO;
+import CRM.entity.DTO.UserPermissionDTO;
 import CRM.entity.requests.ObjectsIdsRequest;
 import CRM.entity.requests.UpdateObjectRequest;
 import CRM.entity.response.Response;
@@ -13,6 +16,9 @@ import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.Map;
 
 @Controller
 @RequestMapping(value = "/user")
@@ -30,8 +36,7 @@ public class UserController {
 
 
     @GetMapping
-    public ResponseEntity<Response> get(@RequestAttribute Long userId){
-
+    public ResponseEntity<Response<UserDTO>> get(@RequestAttribute Long userId){
         Response response = userFacade.get(userId);
         return new ResponseEntity<>(response, response.getStatus());
     }
@@ -51,33 +56,31 @@ public class UserController {
      * @return A ResponseEntity object containing the Response object with the retrieved boards and the HTTP status code.
      */
     @GetMapping(value = "getAll")
-    public ResponseEntity<Response> getAllBoardsOfUser(@RequestAttribute Long userId) {
+    public ResponseEntity<Response<Map<String, List<BoardDTO>>>> getAllBoardsOfUser(@RequestAttribute Long userId) {
         Response response = userFacade.getAllBoardsOfUser(userId);
         return new ResponseEntity<>(response, response.getStatus());
     }
 
     @GetMapping(value = "get-all-users")
-    public ResponseEntity<Response> getAll(){
-
+    public ResponseEntity<Response<List<UserDTO>>> getAll(){
         Response response = userFacade.getAll();
         return new ResponseEntity<>(response, response.getStatus());
     }
 
     @GetMapping(value = "getAll-users-in-board")
-    public ResponseEntity<Response> getAllInBoard(@RequestAttribute Long boardId){
-
+    public ResponseEntity<Response<List<UserDTO>>> getAllInBoard(@RequestAttribute Long boardId){
         Response response = userFacade.getAllInBoard(boardId);
         return new ResponseEntity<>(response, response.getStatus());
     }
 
     @GetMapping(value = "getAll-users-permissions")
-    public ResponseEntity<Response> getAllUserPermissionsInBoard(@RequestAttribute Long boardId){
+    public ResponseEntity<Response<List<UserPermissionDTO>>> getAllUserPermissionsInBoard(@RequestAttribute Long boardId){
         Response response = userFacade.getAllUserPermissionsInBoard(boardId);
         return new ResponseEntity<>(response, response.getStatus());
     }
 
     @PostMapping(value = "update-user-to-board")
-    public ResponseEntity<Response> updateUserToBoard(@RequestBody ObjectsIdsRequest objectsIdsRequest, @RequestAttribute Long boardId){
+    public ResponseEntity<Response<List<UserPermissionDTO>>> updateUserToBoard(@RequestBody ObjectsIdsRequest objectsIdsRequest, @RequestAttribute Long boardId){
         objectsIdsRequest.setBoardId(boardId);
         Response response = userFacade.updateUserToBoard(objectsIdsRequest);
         messagingTemplate.convertAndSend("/userPermission/" + boardId, response);

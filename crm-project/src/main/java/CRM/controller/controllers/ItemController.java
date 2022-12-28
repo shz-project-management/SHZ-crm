@@ -1,10 +1,13 @@
 package CRM.controller.controllers;
 
 import CRM.controller.facades.SharedContentFacade;
+import CRM.entity.DTO.CommentDTO;
+import CRM.entity.DTO.ItemDTO;
+import CRM.entity.DTO.SectionDTO;
+import CRM.entity.DTO.UserPermissionDTO;
 import CRM.entity.Item;
 import CRM.entity.requests.*;
 import CRM.entity.response.Response;
-import CRM.utils.enums.UpdateField;
 import lombok.AllArgsConstructor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -29,9 +32,16 @@ public class ItemController {
     @Autowired
     private SimpMessagingTemplate messagingTemplate;
 
-
+    /**
+     * Handles a request to create a new item.
+     *
+     * @param item    The request body containing the information for the new item.
+     * @param userId  The ID of the user creating the item.
+     * @param boardId The ID of the board the item belongs to.
+     * @return A response indicating the result of the create operation. The response status will reflect the result of the create operation.
+     */
     @PostMapping(consumes = "application/json")
-    public ResponseEntity<Response> create(@RequestBody ItemRequest item, @RequestAttribute Long userId, @RequestAttribute Long boardId) {
+    public ResponseEntity<Response<SectionDTO>> create(@RequestBody ItemRequest item, @RequestAttribute Long userId, @RequestAttribute Long boardId) {
         item.setBoardId(boardId);
         item.setUserId(userId);
         Response response = sharedContentFacade.create(item);
@@ -39,6 +49,13 @@ public class ItemController {
         return ResponseEntity.noContent().build();
     }
 
+    /**
+     * Handles a request to delete one or more items.
+     *
+     * @param itemsIds The IDs of the items to be deleted.
+     * @param boardId  The ID of the board the items belong to.
+     * @return A response indicating the result of the delete operation. The response status will reflect the result of the delete operation.
+     */
     @DeleteMapping
     public ResponseEntity<Response> delete(@RequestBody List<Long> itemsIds, @RequestAttribute Long boardId) {
         Response response = sharedContentFacade.delete(itemsIds, boardId, Item.class);
@@ -46,9 +63,16 @@ public class ItemController {
         return ResponseEntity.noContent().build();
     }
 
+    /**
+     * Handles a request to update an existing item.
+     *
+     * @param updateItemRequest The request body containing the updated information for the item.
+     * @param userId            The ID of the user updating the item.
+     * @param boardId           The ID of the board the item belongs to.
+     * @return A response indicating the result of the update operation. The response status will reflect the result of the update operation.
+     */
     @PatchMapping(value = "update")
-    public ResponseEntity<Response> update(@RequestBody UpdateObjectRequest updateItemRequest, @RequestParam UpdateField field,
-                                           @RequestAttribute Long userId, @RequestAttribute Long boardId) {
+    public ResponseEntity<Response<SectionDTO>> update(@RequestBody UpdateObjectRequest updateItemRequest, @RequestAttribute Long userId, @RequestAttribute Long boardId) {
         updateItemRequest.getObjectsIdsRequest().setUserId(userId);
         updateItemRequest.getObjectsIdsRequest().setBoardId(boardId);
         Response response = sharedContentFacade.update(updateItemRequest, Item.class);
@@ -56,23 +80,38 @@ public class ItemController {
         return ResponseEntity.noContent().build();
     }
 
+    /**
+     * Handles a request to retrieve information for a particular item.
+     *
+     * @param itemId    The ID of the item to be retrieved.
+     * @param boardId   The ID of the board the item belongs to.
+     * @param sectionId The ID of the section the item belongs to.
+     * @param parentId  The ID of the parent the item belongs to.
+     * @return A response containing the requested item's information. The response status will reflect the result of the retrieve operation.
+     */
     @GetMapping(value = "{itemId}")
-    public ResponseEntity<Response> get(@PathVariable Long itemId, @RequestAttribute Long boardId,
-                                        @RequestParam Long sectionId, @RequestParam Long parentId) {
+    public ResponseEntity<Response<ItemDTO>> get(@PathVariable Long itemId, @RequestAttribute Long boardId, @RequestParam Long sectionId, @RequestParam Long parentId) {
         ObjectsIdsRequest objectsIdsRequest = ObjectsIdsRequest.searchBoardSectionParentIds(itemId, boardId, sectionId, parentId);
         Response response = sharedContentFacade.get(objectsIdsRequest, Item.class);
         return new ResponseEntity<>(response, response.getStatus());
     }
 
+    /**
+     * Handles a request to retrieve all items in a particular section.
+     *
+     * @param boardId   The ID of the board the section belongs to.
+     * @param sectionId The ID of the section the items belong to.
+     * @return A response containing the requested items' information. The response status will reflect the result of the retrieve operation.
+     */
     @GetMapping(value = "all-in-section/{sectionId}")
-    public ResponseEntity<Response> getAllItemsInSection(@RequestAttribute Long boardId, @PathVariable Long sectionId) {
+    public ResponseEntity<Response<List<ItemDTO>>> getAllItemsInSection(@RequestAttribute Long boardId, @PathVariable Long sectionId) {
         ObjectsIdsRequest objectsIdsRequest = ObjectsIdsRequest.boardSectionIds(boardId, sectionId);
         Response response = sharedContentFacade.getAllItemsInSection(objectsIdsRequest);
         return new ResponseEntity<>(response, response.getStatus());
     }
 
     @PostMapping(value = "assign-to-user")
-    public ResponseEntity<Response> assignToUser(@RequestBody ObjectsIdsRequest objIds, @RequestAttribute Long boardId) {
+    public ResponseEntity<Response<UserPermissionDTO>> assignToUser(@RequestBody ObjectsIdsRequest objIds, @RequestAttribute Long boardId) {
         objIds.setUserId(boardId);
         Response response = sharedContentFacade.assignToUser(objIds, Item.class);
         messagingTemplate.convertAndSend("/item/" + boardId, response);

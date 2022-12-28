@@ -1,6 +1,8 @@
 package CRM.controller.controllers;
 
 import CRM.controller.facades.AttributeFacade;
+import CRM.entity.DTO.AttributeDTO;
+import CRM.entity.DTO.BoardDTO;
 import CRM.entity.Section;
 import CRM.entity.Status;
 import CRM.entity.requests.AttributeRequest;
@@ -13,6 +15,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @Controller
 @RequestMapping(value = "/status")
@@ -33,7 +37,7 @@ public class StatusController {
      * @return A ResponseEntity containing a Response object with the status of the create operation and the created status object.
      */
     @PostMapping(consumes = "application/json")
-    public ResponseEntity<Response> create(@RequestBody AttributeRequest sectionRequest, @RequestAttribute Long boardId) {
+    public ResponseEntity<Response<List<AttributeDTO>>> create(@RequestBody AttributeRequest sectionRequest, @RequestAttribute Long boardId) {
         sectionRequest.setBoardId(boardId);
         Response response = attributeFacade.create(sectionRequest, Status.class);
         messagingTemplate.convertAndSend("/attribute/" + boardId, response);
@@ -52,17 +56,6 @@ public class StatusController {
         return ResponseEntity.noContent().build();
     }
 
-//    /**
-//     This method is used to handle HTTP GET requests to the specified URL (status/{id}).
-//     The method takes the id of the status as a path variable and uses it to retrieve the status information from the attributeFacade object.
-//     @return A ResponseEntity object containing the Response object with the status information and the HTTP status code.
-//     */
-//    @GetMapping(value = "{boardId}/{sectionId}")
-//    public ResponseEntity<Response> get(@PathVariable Long boardId,@PathVariable Long sectionId) {
-//        Response response = attributeFacade.get(sectionId, boardId, Status.class);
-//        return new ResponseEntity<>(response, response.getStatus());
-//    }
-
     /**
      * This method is used to handle HTTP GET requests to the specified URL (status/getAll/{boardId}).
      * The method takes the id of the board as a path variable and uses it to retrieve all the statuses in that board using the attributeFacade object.
@@ -71,14 +64,14 @@ public class StatusController {
      * @return A ResponseEntity object containing the Response object with the retrieved statuses and the HTTP status code.
      */
     @GetMapping(value = "getAll/{boardId}")
-    public ResponseEntity<Response> getAllInBoard(@PathVariable Long boardId) {
+    public ResponseEntity<Response<List<AttributeDTO>>> getAllInBoard(@PathVariable Long boardId) {
         Response response = attributeFacade.getAllAttributesInBoard(boardId, Status.class);
         return new ResponseEntity<>(response, response.getStatus());
     }
 
     //TODO documentation
     @PatchMapping(value = "/update", consumes = "application/json")
-    public ResponseEntity<Response> update(@RequestBody UpdateObjectRequest updateObjectRequest, @RequestParam UpdateField field) {
+    public ResponseEntity<Response<BoardDTO>> update(@RequestBody UpdateObjectRequest updateObjectRequest, @RequestParam UpdateField field) {
         Response response = attributeFacade.update(updateObjectRequest, Status.class);
         messagingTemplate.convertAndSend("/attribute/" + updateObjectRequest.getObjectsIdsRequest().getBoardId(), response);
         return ResponseEntity.noContent().build();

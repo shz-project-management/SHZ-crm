@@ -13,13 +13,13 @@ import org.springframework.http.HttpStatus;
 @ToString
 @Getter
 @Builder
-public class Response {
+public class Response<T> {
     @JsonProperty("message")
     private String message;
     @JsonProperty("status")
     private HttpStatus status;
     @JsonProperty("data")
-    private Object data;
+    private T data;
     @JsonProperty("statusCode")
     private Integer statusCode;
 }

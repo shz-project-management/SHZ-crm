@@ -49,12 +49,8 @@ public class SharedContentFacade {
      */
     public Response create(ItemRequest item) {
         try {
-            // make sure the params are correct using Validations.validateCreatedItem()
-            // catch exception if relevant
             Validations.validateCreatedItem(item);
 
-            // call itemService with create function to create a new item
-            // return the response with the new item as a data inside response entity.
             return Response.builder()
                     .data(SectionDTO.createSectionDTO(itemService.create(item)))
                     .message(SuccessMessage.CREATE.toString())
@@ -89,12 +85,8 @@ public class SharedContentFacade {
      */
     public Response create(CommentRequest comment, Long userId, Long boardId) {
         try {
-            // make sure the params are correct using Validations.validateCreatedComment()
-            // catch exception if relevant
             Validations.validateCreatedComment(comment, userId, boardId);
 
-            // call commentService with create function to create a new comment
-            // return the response with the new comment as a data inside response entity.
             List<CommentDTO> commentDTOS = CommentDTO.getCommentDTOList(commentService.create(comment, userId, boardId));
             sendCommentCreatedNotification(comment, userId, boardId);
             return Response.builder()
@@ -167,14 +159,8 @@ public class SharedContentFacade {
      * @throws NullPointerException     if the clz parameter is null
      */
     public Response update(UpdateObjectRequest updateObject, Class clz) {
-        // validate params using the Validations.validate function
-        // call the correct service using convertFromClassToService(clz) function
-        // with update function in it.
         try {
-            //updateObject.getObjectsIdsRequest().getUpdateObjId();
-            // validate the id using the Validations.validate function
             Validations.validateSharedContent(updateObject.getObjectsIdsRequest());
-            // call the correct service using convertFromClassToService(clz) function with find function in it
             SectionDTO sectionDTO = SectionDTO.createSectionDTO(convertFromClassToService(clz).update(updateObject));
             if (clz.equals(Item.class)) {
                 sendRelevantNotification(updateObject);
@@ -217,10 +203,8 @@ public class SharedContentFacade {
      */
     public Response get(ObjectsIdsRequest objectsIdsRequest, Class clz) {
         try {
-            // validate the id using the Validations.validate function
             Validations.validateSharedContent(objectsIdsRequest);
 
-            // call the correct service using convertFromClassToService(clz) function with find function in it
             return Response.builder()
                     .data(convertFromServiceOutputToDTOEntity(convertFromClassToService(clz).get(objectsIdsRequest), clz))
                     .message(SuccessMessage.FOUND.toString())
@@ -254,11 +238,8 @@ public class SharedContentFacade {
      */
     public Response getAllItemsInSection(ObjectsIdsRequest objectsIdsRequest) {
         try {
-            // validate the id using the Validations.validate function
             Validations.validateIDs(objectsIdsRequest.getSectionId(), objectsIdsRequest.getBoardId());
 
-            // call the correct service using convertFromClassToService(clz) function
-            // with getAllInItem function in it.
             return Response.builder()
                     .data(ItemDTO.getItemsDTOList(itemService.getAllInSection(objectsIdsRequest)))
                     .message(SuccessMessage.FOUND.toString())

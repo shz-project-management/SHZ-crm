@@ -1,6 +1,7 @@
 package CRM.controller.controllers;
 
 import CRM.controller.facades.NotificationFacade;
+import CRM.entity.DTO.NotificationDTO;
 import CRM.entity.requests.BoardRequest;
 import CRM.entity.requests.NotificationRequest;
 import CRM.entity.requests.ObjectsIdsRequest;
@@ -27,7 +28,7 @@ public class NotificationController {
 
     //TODO:DOCUMENTATION
     @GetMapping(value = "getAll-inBoard")
-    public ResponseEntity<Response> getAllinBoard(@RequestAttribute Long boardId, @RequestAttribute Long userId) {
+    public ResponseEntity<Response<NotificationDTO>> getAllinBoard(@RequestAttribute Long boardId, @RequestAttribute Long userId) {
         ObjectsIdsRequest objectsIdsRequest = ObjectsIdsRequest.boardUserIds(boardId, userId);
         Response response = notificationFacade.getAllinBoard(objectsIdsRequest);
         return new ResponseEntity<>(response, response.getStatus());

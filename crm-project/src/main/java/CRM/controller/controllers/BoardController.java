@@ -1,6 +1,7 @@
 package CRM.controller.controllers;
 
 import CRM.controller.facades.BoardFacade;
+import CRM.entity.DTO.BoardDTO;
 import CRM.entity.requests.BoardRequest;
 import CRM.entity.requests.ObjectsIdsRequest;
 import CRM.entity.requests.UpdateObjectRequest;
@@ -24,24 +25,24 @@ public class BoardController {
     private SimpMessagingTemplate messagingTemplate;
 
     /**
-     * This function maps HTTP POST requests to the /create endpoint to the create function in the BoardFacade class.
-     * It consumes "application/json" and expects a BoardRequest object to be passed as the request body.
+     * Handles a request to create a new board.
      *
-     * @param boardRequest The request body, containing the necessary information to create a new board.
-     * @return A ResponseEntity containing a Response object with the status of the create operation and the created board object.
+     * @param boardRequest The request body containing the board's information.
+     * @param userId       The ID of the user making the request.
+     * @return A response containing the newly created board's information. The response status will reflect the result of the create operation.
      */
     @PostMapping(value = "/create", consumes = "application/json")
-    public ResponseEntity<Response> create(@RequestBody BoardRequest boardRequest, @RequestAttribute Long userId) {
+    public ResponseEntity<Response<BoardDTO>> create(@RequestBody BoardRequest boardRequest, @RequestAttribute Long userId) {
         boardRequest.setCreatorUserId(userId);
         Response response = boardFacade.create(boardRequest);
         return new ResponseEntity<>(response, response.getStatus());
     }
 
     /**
-     * Handle HTTP DELETE requests to delete a board.
+     * Handles a request to delete a board.
      *
-     * @param boardId The ID of the board to delete.
-     * @return A ResponseEntity with the appropriate status and response body.
+     * @param boardId The ID of the board to be deleted.
+     * @return A response indicating the result of the delete operation. The response status will reflect the result of the delete operation.
      */
     @DeleteMapping
     public ResponseEntity<Response> delete(@RequestAttribute Long boardId) {
@@ -50,32 +51,31 @@ public class BoardController {
     }
 
     /**
-     * This method is used to handle HTTP GET requests to the specified URL (board/{id}).
-     * The method takes the id of the board as a path variable and uses it to retrieve the board information from the boardFacade object.
+     * Handles a request to retrieve a board.
      *
-     * @param boardId The id of the board to retrieve.
-     * @return A ResponseEntity object containing the Response object with the board information and the HTTP status code.
+     * @param boardId The ID of the board to be retrieved.
+     * @param userId  The ID of the user making the request.
+     * @return A response containing the requested board's information. The response status will reflect the result of the retrieve operation.
      */
     @GetMapping
-    public ResponseEntity<Response> get(@RequestAttribute Long boardId, @RequestAttribute Long userId) {
+    public ResponseEntity<Response<BoardDTO>> get(@RequestAttribute Long boardId, @RequestAttribute Long userId) {
         Response response = boardFacade.get(boardId, userId);
         return new ResponseEntity<>(response, response.getStatus());
     }
 
     /**
-     * Handles PUT requests to update board.
+     * Handles a request to update a board.
      *
-     * @param boardRequest An object containing the fields to update for the board.
-     * @return A response object indicating the status of the update operation.
+     * @param boardRequest The request body containing the updates to be made to the board.
+     * @param boardId      The ID of the board to be updated.
+     * @return A response indicating the result of the update operation. The response status will reflect the result of the update operation.
      */
     @PatchMapping(value = "update", consumes = "application/json")
-    public ResponseEntity<Response> updateBoard(@RequestBody UpdateObjectRequest boardRequest, @RequestAttribute Long boardId) {
+    public ResponseEntity<Response<BoardDTO>> updateBoard(@RequestBody UpdateObjectRequest boardRequest, @RequestAttribute Long boardId) {
         boardRequest.setObjectsIdsRequest(new ObjectsIdsRequest());
         boardRequest.getObjectsIdsRequest().setBoardId(boardId);
         Response response = boardFacade.updateBoard(boardRequest);
         messagingTemplate.convertAndSend("/board/" + boardId, response);
         return ResponseEntity.noContent().build();
     }
-
-
 }
