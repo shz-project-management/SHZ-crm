@@ -67,7 +67,24 @@ public class ItemDTO extends SharedContentDTO {
         return itemDTO;
     }
 
-    public static ItemDTO getParentItem(Item item, User user){
+    public static ItemDTO getParentItem(Item item){
+        ItemDTO itemDTO = new ItemDTO();
+
+        itemDTO.setUser(UserDTO.createUserDTO(item.getUser()));
+        itemDTO.setTitle(item.getName());
+        itemDTO.setDescription(item.getDescription());
+        itemDTO.setType(item.getType() == null ? null : AttributeDTO.createAttributeDTO(item.getType()));
+        itemDTO.setStatus(item.getStatus() == null ? null : AttributeDTO.createAttributeDTO(item.getStatus()));
+        itemDTO.setSectionId(item.getSection().getId());
+        itemDTO.setCreationDate(item.getCreationDate());
+        itemDTO.setId(item.getId());
+        itemDTO.setImportance(item.getImportance());
+        itemDTO.setDueDate(item.getDueDate());
+
+        return itemDTO;
+    }
+
+    public static ItemDTO getParentItemWithUser(Item item, User user){
         ItemDTO itemDTO = new ItemDTO();
 
         itemDTO.setUser(UserDTO.createUserDTO(item.getUser()));
@@ -86,6 +103,7 @@ public class ItemDTO extends SharedContentDTO {
 
         return itemDTO;
     }
+
 
     public static List<ItemDTO> getItemsDTOList(Set<Item> items) {
         List<ItemDTO> itemDTOList = new ArrayList<>();
