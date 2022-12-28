@@ -1,22 +1,25 @@
 package CRM.service;
 
-import CRM.entity.Board;
-import CRM.entity.User;
-import CRM.entity.UserInBoard;
+import CRM.entity.*;
+import CRM.entity.requests.ObjectsIdsRequest;
 import CRM.repository.BoardRepository;
-import CRM.repository.UserInBoardRepository;
+import CRM.repository.NotificationSettingRepository;
 import CRM.repository.UserRepository;
 import CRM.utils.Validations;
 import CRM.utils.enums.ExceptionMessage;
+import CRM.utils.enums.Permission;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.naming.NoPermissionException;
 import javax.security.auth.login.AccountNotFoundException;
-import java.util.List;
-import java.util.NoSuchElementException;
+import java.util.*;
 import java.util.stream.Collectors;
+
+import static CRM.utils.Util.SharedBoards;
+import static CRM.utils.Util.myBoards;
 
 @Service
 public class UserService {
@@ -26,9 +29,10 @@ public class UserService {
     @Autowired
     private UserRepository userRepository;
     @Autowired
-    private UserInBoardRepository userInBoardRepository;
-    @Autowired
     private BoardRepository boardRepository;
+    @Autowired
+    private NotificationSettingRepository notificationSettingRepository;
+
 
     /**
      * findByEmail search in the database for a user based on the email we have.
@@ -37,13 +41,7 @@ public class UserService {
      * @return entity of user that found in database.
      */
     public User get(String email) throws AccountNotFoundException {
-        // Ask for the repo to find the user, by the given email address input
-        // Since the repo returns an option, check if this option is not empty
-
-        // If it is empty, throw "AccountNotFound" exception
-
-        // Return the user back to the controller
-        return null;
+        return userRepository.findByEmail(email).get();
     }
 
     /**
@@ -54,11 +52,12 @@ public class UserService {
      * @throws AccountNotFoundException if no user with the specified ID exists in the database
      */
     public User get(long userId) throws AccountNotFoundException {
-        // make sure such an id even exists
-        // Ask for the repo to find the user, by the given id input
         try {
+            // make sure such an id even exists
+            // Ask for the repo to find the user, by the given id input
             return Validations.doesIdExists(userId, userRepository);
-        }catch (NoSuchElementException e){
+
+        } catch (NoSuchElementException e) {
             throw new AccountNotFoundException(ExceptionMessage.ACCOUNT_DOES_NOT_EXISTS.toString());
         }
     }
@@ -75,12 +74,41 @@ public class UserService {
         User user;
         try {
             user = Validations.doesIdExists(userId, userRepository);
-        }catch (NoSuchElementException e){
+
+        } catch (NoSuchElementException e) {
             throw new AccountNotFoundException(ExceptionMessage.ACCOUNT_DOES_NOT_EXISTS.toString());
         }
-        // remove all user dependencies from the db
-        removeAllUserDependencies(user);
-        // lastly, remove the user from the database
+        List<Board> boards = boardRepository.findAll();
+
+        for (Board board : boards) {
+            List<UserSetting> userSettingToDelete = board.getUsersSettings().stream()
+                    .filter(userSetting -> userSetting.getUser().getId() == userId)
+                    .collect(Collectors.toList());
+
+            for (UserSetting userSetting : userSettingToDelete) {
+                // Remove the UserSetting object from the set
+                board.getUsersSettings().remove(userSetting);
+            }
+
+            // Save the updated board entity
+            boardRepository.save(board);
+
+            List<UserPermission> userPermissionsToDelete = board.getUsersPermissions().stream()
+                    .filter(userPermission -> userPermission.getUser().getId() == userId)
+                    .collect(Collectors.toList());
+
+            for (UserPermission userPermission : userPermissionsToDelete) {
+                // Remove the UserPermission object from the set
+                board.getUsersPermissions().remove(userPermission);
+            }
+            // Save the updated board entity
+            boardRepository.save(board);
+        }
+
+        List<Board> boardsOfCreator = boardRepository.findByCreatorUser_Id(user.getId());
+        for (Board board : boardsOfCreator) {
+            boardRepository.delete(board);
+        }
         userRepository.delete(user);
         return true;
     }
@@ -104,21 +132,21 @@ public class UserService {
      * @throws NullPointerException     if the specified board id is null.
      */
     public List<User> getAllInBoard(long boardId) throws AccountNotFoundException {
+        // make sure this id even exists
         Board board = Validations.doesIdExists(boardId, boardRepository);
-        List<UserInBoard> usersInBoard = userInBoardRepository.findAllUserByBoard(board);
-        return usersInBoard.stream().map(UserInBoard::getUser).collect(Collectors.toList());
+
+        // get all users from this board: use board.getAllUsersInBoard()
+        return board.getAllUsersInBoard();
     }
 
     /**
-     * Adds a user to a board.
+     * Retrieves all boards belonging to the specified user.
      *
-     * @param userId  the id of the user to add to the board
-     * @param boardId the id of the board to add the user to
-     * @return the UserInBoard object representing the user being added to the board
-     * @throws AccountNotFoundException if the user or board with the given id does not exist in the database
-     * @throws IllegalArgumentException if the combination of the given user and board already exists in the database
+     * @param userId the id of the user
+     * @return a map containing two lists of boards: "myBoards" (boards created by the user) and "SharedBoards" (boards shared with the user)
+     * @throws AccountNotFoundException if the user does not exist
      */
-    public UserInBoard addUserToBoard(long userId, long boardId) throws AccountNotFoundException {
+    public Map<String, List<Board>> getAllBoardsOfUser(long userId) throws AccountNotFoundException, NoPermissionException {
         User user;
         try {
             user = Validations.doesIdExists(userId, userRepository);
@@ -126,59 +154,151 @@ public class UserService {
             throw new AccountNotFoundException(ExceptionMessage.ACCOUNT_DOES_NOT_EXISTS.toString());
         }
 
+        //get all the boards of the creator user
+        Map<String, List<Board>> userBoards = new HashMap<>();
+        userBoards.put(myBoards, boardRepository.findByCreatorUser_Id(user.getId()));
+        userBoards.put(SharedBoards, getSharedBoardsOfUser(user));
+        return userBoards;
+    }
+
+    /**
+     * This method updates a user's permission on a board.
+     *
+     * @param request an {@link ObjectsIdsRequest} object which contains the ID of the user, board, and requested permission
+     * @return a list of {@link User} objects representing all users in the board
+     * @throws AccountNotFoundException if the user or board does not exist
+     * @throws IllegalArgumentException if the requested permission is not allowed or the board's creator is trying to change their own permission
+     */
+    public Set<UserPermission> updateUserToBoard(ObjectsIdsRequest request) throws AccountNotFoundException {
+        User user = getUserFromRequest(request);
+        Board board = getBoardFromRequest(request);
+
+        if (user.equals(board.getCreatorUser())) {
+            throw new IllegalArgumentException(ExceptionMessage.ADMIN_CANT_CHANGE_HIS_PERMISSION.toString());
+        }
+
+        Permission permission = Permission.values()[Math.toIntExact(request.getPermissionId())];
+        Set<UserPermission> userPermissionsSet = updateUserPermission(user, permission, board);
+
+        boardRepository.save(board);
+        return userPermissionsSet;
+    }
+
+    /**
+     * Returns the user from the request. If the request contains an email, the method
+     * attempts to find a user with that email. If the request contains a user ID, the method
+     * uses the ID to find the user. If no user is found, an AccountNotFoundException is thrown.
+     *
+     * @param request the request containing the email or user ID
+     * @return the user found in the request
+     * @throws AccountNotFoundException if no user is found in the request
+     */
+    private User getUserFromRequest(ObjectsIdsRequest request) throws AccountNotFoundException {
+        if (request.getEmail() != null) {
+            Optional<User> optionalUser = userRepository.findByEmail(request.getEmail());
+            if (optionalUser.isPresent()) {
+                return optionalUser.get();
+            }
+        } else {
+            return Validations.doesIdExists(request.getUserId(), userRepository);
+        }
+        throw new AccountNotFoundException(ExceptionMessage.ACCOUNT_DOES_NOT_EXISTS.toString());
+    }
+
+    /**
+     * Returns the board from the request. The method uses the board ID in the request
+     * to find the board. If no board is found, an AccountNotFoundException is thrown.
+     *
+     * @param request the request containing the board ID
+     * @return the board found in the request
+     * @throws AccountNotFoundException if no board is found in the request
+     */
+    private Board getBoardFromRequest(ObjectsIdsRequest request) throws AccountNotFoundException {
+        try {
+            return Validations.doesIdExists(request.getBoardId(), boardRepository);
+        } catch (NoSuchElementException e) {
+            throw new AccountNotFoundException(ExceptionMessage.ACCOUNT_DOES_NOT_EXISTS.toString());
+        }
+    }
+
+    public Set<UserPermission> getAllUserPermissionsInBoard(Long boardId) {
         Board board = Validations.doesIdExists(boardId, boardRepository);
-
-        // make sure this combination of user and board doesn't not exist in the db yet
-        if (userInBoardRepository.findByBoardAndUser(user, board).isPresent())
-            throw new IllegalArgumentException(ExceptionMessage.USER_IN_BOARD_EXISTS.toString());
-
-        // if not, store the new one in the db
-        UserInBoard userInBoard = UserInBoard.userInBoardUser(user, board);
-        return userInBoardRepository.save(userInBoard);
+        Set<UserPermission> userPermissions = board.getUsersPermissions();
+        return userPermissions;
     }
 
     /**
-     * Removes all dependencies related to the given user from the database.
+     * Create default notification settings for a new user in a board.
      *
-     * @param user the user whose dependencies are to be removed
-     *             This method performs the following actions:
-     *             Removes all entries of the given user from the UserInBoard table
-     *             Removes all comments made by the given user from the database
-     *             Removes all attributes of the given user from the database
-     *             Removes all boards created by the given user from the database
+     * @param user  the user to create default settings for
+     * @param board the board to add the default settings to
      */
-    boolean removeAllUserDependencies(User user) {
-        // second, remove all entries of this user from UserInBoard table
-        removeUserDependenciesFromUserInBoardTable(user);
-
-        // remove all user's comments from the db
-
-        // remove all user's attributes from the db
-
-        // third, remove every board created by this user
-        removeUserDependenciesFromBoardTable(user);
-        return true;
+    private void createDefaultSettingForNewUserInBoard(User user, Board board) {
+        List<NotificationSetting> notificationSettingList = notificationSettingRepository.findAll();
+        for (NotificationSetting notificationSetting : notificationSettingList) {
+            UserSetting userSetting = UserSetting.createUserSetting(user, notificationSetting);
+            board.addUserSettingToBoard(userSetting);
+        }
     }
 
     /**
-     * Removes all boards from the database that were created by the given user.
+     * Create a new user permission in a board.
      *
-     * @param user the user whose boards are to be removed from the database
+     * @param user       the user to create the permission for
+     * @param permission the permission to assign to the user
+     * @param board      the board to add the user permission to
      */
-    boolean removeUserDependenciesFromBoardTable(User user) {
-        List<Board> boardList = boardRepository.findAllByUser(user);
-        boardList.forEach(board -> boardRepository.delete(board));
-        return true;
+    private void createNewUserPermission(User user, Permission permission, Board board) {
+        UserPermission userPermission = UserPermission.newUserPermission(user, permission);
+        board.addUserPermissionToBoard(userPermission);
+        createDefaultSettingForNewUserInBoard(user, board);
     }
 
     /**
-     * Removes all entries in the UserInBoard table that are related to the given user or the boards they have created.
+     * Update the user's permission in a board.
      *
-     * @param user the user whose related entries in the UserInBoard table are to be removed
+     * @param user              the user to update the permission for
+     * @param permissionRequest the requested permission
+     * @param board             the board to update the user's permission in
+     * @return the set of user permissions in the board after the update
+     * @throws IllegalArgumentException if the requested permission is not allowed
      */
-    private boolean removeUserDependenciesFromUserInBoardTable(User user) {
-        List<Board> boardList = boardRepository.findAllByUser(user);
-        boardList.forEach(board -> userInBoardRepository.deleteAllByUserOrBoard(board.getCreatorUser(), board));
-        return true;
+    private Set<UserPermission> updateUserPermission(User user, Permission permissionRequest, Board board) {
+        Set<UserPermission> userPermissionsSet = board.getUsersPermissions();
+        UserPermission userPermissionInBoard = board.getUserPermissionById(user.getId(), userPermissionsSet);
+
+        if (permissionRequest.equals(Permission.ADMIN)) {
+            throw new IllegalArgumentException(ExceptionMessage.PERMISSION_NOT_ALLOWED.toString());
+        }
+
+        if (permissionRequest.equals(Permission.UNAUTHORIZED)) {
+            userPermissionsSet.removeIf(userPerm -> userPermissionInBoard.getId().equals(userPerm.getId()));
+            board.removeSettingsByUserPermission(userPermissionInBoard);
+        } else if (userPermissionInBoard == null) {
+            createNewUserPermission(user, permissionRequest, board);
+        } else {
+            userPermissionInBoard.setPermission(permissionRequest);
+        }
+        return userPermissionsSet;
+    }
+
+    /**
+     * Private method to retrieve all boards shared with the specified user.
+     *
+     * @param user the user
+     * @return a list of boards shared with the user
+     */
+    private List<Board> getSharedBoardsOfUser(User user) throws NoPermissionException {
+        //get all the boards of the user he is shared with
+        List<Board> allBoards = boardRepository.findAll();
+        List<Board> sharedBoards = new ArrayList<>();
+        for (Board board : allBoards) {
+            if (board.getAllUsersInBoard().contains(user)) {
+                Permission userPerm = board.getUserPermissionWithAdminByUserId(user.getId());
+                if (!userPerm.equals(Permission.ADMIN))
+                    sharedBoards.add(board);
+            }
+        }
+        return sharedBoards;
     }
 }

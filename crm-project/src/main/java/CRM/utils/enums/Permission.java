@@ -1,6 +1,10 @@
 package CRM.utils.enums;
 
-public enum Permission{
+import javax.persistence.*;
+
+
+public enum Permission {
+    UNAUTHORIZED,
     USER,
     LEADER,
     ADMIN,

@@ -1,12 +1,10 @@
 package CRM.entity.DTO;
 
 import CRM.entity.*;
+import CRM.utils.enums.Permission;
 import lombok.*;
 
-import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -16,47 +14,40 @@ import java.util.Set;
 public class BoardDTO {
 
     private Long id;
-    private User creatorUser;
+    private UserDTO creatorUser;
     private String name;
     private String description;
-    private Set<Item> items;
-    private Set<Type> types;
-    private Set<Status> statuses;
+    private List<SectionDTO> sections;
+    private List<AttributeDTO> types;
+    private List<AttributeDTO> statuses;
+    private Integer userPermission;
 
-    public static BoardDTO createPlainBoard(Board board){
+    public static BoardDTO getBoardFromDB(Board board) {
         BoardDTO boardDTO = new BoardDTO();
         boardDTO.setId(board.getId());
-        boardDTO.setCreatorUser(board.getCreatorUser());
+        boardDTO.setCreatorUser(UserDTO.createUserDTO(board.getCreatorUser()));
         boardDTO.setName(board.getName());
         boardDTO.setDescription(board.getDescription());
+        boardDTO.setSections(SectionDTO.getSectionsDTOList(board.getSections()));
+        boardDTO.setStatuses(AttributeDTO.getListOfAttributesFromDB(board.getStatuses()));
+        boardDTO.setTypes(AttributeDTO.getListOfAttributesFromDB(board.getTypes()));
         return boardDTO;
     }
 
-    public static BoardDTO getBoardFromDB(Board board){
-        BoardDTO boardDTO = new BoardDTO();
-        boardDTO.setId(board.getId());
-        boardDTO.setCreatorUser(board.getCreatorUser());
-        boardDTO.setName(board.getName());
-        boardDTO.setDescription(board.getDescription());
-        board.setItems(board.getItems());
-        board.setStatuses(board.getStatuses());
-        board.setTypes(board.getTypes());
-        return boardDTO;
-    }
-
-    public static List<BoardDTO> getListOfBoardsFromDB(List<Board> boards){
+    public static List<BoardDTO> getListOfBoardsFromDB(List<Board> boards) {
         List<BoardDTO> boardDTOList = new ArrayList<>();
-        for (Board board: boards) {
-            BoardDTO boardDTO = new BoardDTO();
-            boardDTO.setId(board.getId());
-            boardDTO.setCreatorUser(board.getCreatorUser());
-            boardDTO.setName(board.getName());
-            boardDTO.setDescription(board.getDescription());
-            board.setItems(board.getItems());
-            board.setStatuses(board.getStatuses());
-            board.setTypes(board.getTypes());
-            boardDTOList.add(boardDTO);
+        for (Board board : boards) {
+            boardDTOList.add(getBoardFromDB(board));
         }
         return boardDTOList;
+    }
+
+    public static Map<String,List<BoardDTO>> getMapWithAllBoardsForUser(Map<String,List<Board>> boards) {
+        Map<String,List<BoardDTO>> mapBoardListDTO = new HashMap<>();
+        boards.forEach((key, value) -> {
+            List<BoardDTO> boardDTOList = BoardDTO.getListOfBoardsFromDB(value);
+            mapBoardListDTO.put(key, boardDTOList);
+        });
+        return mapBoardListDTO;
     }
 }

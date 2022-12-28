@@ -1,14 +1,139 @@
 package CRM.utils;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import CRM.entity.*;
+import CRM.entity.requests.UpdateObjectRequest;
+import CRM.utils.enums.ExceptionMessage;
+import CRM.utils.enums.UpdateField;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import javax.persistence.EntityManager;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.time.LocalDateTime;
+import java.util.*;
 
 public class Common {
 
-    public static String generateQuery(Map<String, List<String>> filters) {
-        // Use a StringBuilder to build the query more efficiently
-        StringBuilder queryBuilder = new StringBuilder("SELECT item FROM items WHERE ");
+    public static Section getSection(Board board, long sectionId) {
+        return getOptional(board.getSections(), sectionId, Section.class).orElseThrow(() -> new IllegalArgumentException(ExceptionMessage.NO_SUCH_ID.toString()));
+    }
+
+    public static Item getItem(Section section, long searchId) {
+        return getOptional(section.getItems(), searchId, Item.class).orElseThrow(() -> new IllegalArgumentException(ExceptionMessage.NO_SUCH_ID.toString()));
+    }
+
+    public static SharedContent getComment(Item item, long searchId) {
+        return getOptional(item.getComments(), searchId, Comment.class).orElseThrow(() -> new IllegalArgumentException(ExceptionMessage.NO_SUCH_ID.toString()));
+    }
+
+    public static <T> Optional<T> getOptional(Set<T> list, long id, Class<T> cls) {
+        try {
+            Method getIdMethod = cls.getMethod("getId");
+            return list.stream().filter(item -> invokeGetIdMethod(getIdMethod, item).equals(id)).findFirst();
+        } catch (NoSuchMethodException e) {
+            throw new RuntimeException(ExceptionMessage.UNPROCESSABLE_ENTITY.toString());
+        }
+    }
+
+    public static Object invokeGetIdMethod(Method getIdMethod, Object obj) {
+        try {
+            return getIdMethod.invoke(obj);
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            throw new RuntimeException(ExceptionMessage.UNPROCESSABLE_ENTITY.toString());
+        }
+    }
+
+    public static int getDistanceBetweenWords(String firstWord, String secondWord) {
+        // uses levenshtein distance algorithm
+        String word1 = firstWord.toLowerCase();
+        String word2 = secondWord.toLowerCase();
+
+        int len1 = word1.length();
+        int len2 = word2.length();
+
+        // len1+1, len2+1, because finally return dp[len1][len2]
+        int[][] dp = new int[len1 + 1][len2 + 1];
+
+        for (int i = 0; i <= len1; i++) {
+            dp[i][0] = i;
+        }
+
+        for (int j = 0; j <= len2; j++) {
+            dp[0][j] = j;
+        }
+
+        //iterate though, and check last char
+        for (int i = 0; i < len1; i++) {
+            char c1 = word1.charAt(i);
+            for (int j = 0; j < len2; j++) {
+                char c2 = word2.charAt(j);
+
+                //if last two chars equal
+                if (c1 == c2) {
+                    //update dp value for +1 length
+                    dp[i + 1][j + 1] = dp[i][j];
+                } else {
+                    int replace = dp[i][j] + 1;
+                    int insert = dp[i][j + 1] + 1;
+                    int delete = dp[i + 1][j] + 1;
+
+                    int min = replace > insert ? insert : replace;
+                    min = delete > min ? min : delete;
+                    dp[i + 1][j + 1] = min;
+                }
+            }
+        }
+
+        return dp[len1][len2];
+    }
+
+
+    public static void createDefaultSettingForNewUserInBoard(User user, Board board, JpaRepository<NotificationSetting, Long> settingsRepo, EntityManager entityManager) {
+        try {
+            List<NotificationSetting> notificationSettingList = settingsRepo.findAll();
+            for (NotificationSetting notificationSetting : notificationSettingList) {
+                UserSetting userSetting = UserSetting.createUserSetting(user, notificationSetting);
+                userSetting = entityManager.merge(userSetting);
+                board.addUserSettingToBoard(userSetting);
+            }
+        } finally {
+            entityManager.close();
+        }
+    }
+
+    public static Class getObjectOfField(UpdateField fieldName) {
+        switch (fieldName) {
+            case STATUS:
+                return Status.class;
+            case TYPE:
+                return Type.class;
+            case PARENT_ITEM:
+                return Item.class;
+            case SECTION:
+                return Section.class;
+            default:
+                return null;
+        }
+    }
+
+    /**
+     * Helper function for updating a primitive or known object field.
+     *
+     * @param updateObject the request object containing the updates to be made
+     * @param obj         the object being updated
+     * @throws NoSuchFieldException if the field does not exist in the item object
+     */
+    public static void fieldIsPrimitiveOrKnownObjectHelper(UpdateObjectRequest updateObject, Object obj) throws NoSuchFieldException {
+        if (Validations.checkIfFieldIsNonPrimitive(updateObject.getFieldName())) {
+            LocalDateTime dueDate = LocalDateTime.now().plusDays(Long.valueOf((Integer) updateObject.getContent()));
+            Validations.setContentToFieldIfFieldExists(obj, updateObject.getFieldName(), dueDate);
+        } else {
+            Validations.setContentToFieldIfFieldExists(obj, updateObject.getFieldName(), updateObject.getContent());
+        }
+    }
+
+    public static String generateQuery(Map<String,List<String>> filters) {
+        StringBuilder queryBuilder = new StringBuilder("SELECT i FROM Item i WHERE ");
 
         // Use a List to store the different parts of the query
         List<String> conditions = new ArrayList<>();
@@ -23,20 +148,20 @@ public class Common {
             String column = entry.getKey();
             List<String> values = entry.getValue();
 
-            // Check for null or empty values in the filter
             if (column == null || values == null || values.isEmpty()) {
-                throw new IllegalArgumentException("column and values cannot be null or empty");
+//                throw new IllegalArgumentException("column and values cannot be null or empty");
+                continue;
             }
 
             // Use parameterized queries to avoid SQL injection attacks
-            String condition = column + " IN (";
+            StringBuilder condition = new StringBuilder("i." + column + " IN (");
             for (String value : values) {
-                condition += value + ", ";
+                condition.append(value).append(", ");
             }
-            condition = condition.substring(0, condition.length() - 2);
-            condition += ")";
+            condition = new StringBuilder(condition.substring(0, condition.length() - 2));
+            condition.append(")");
 
-            conditions.add(condition);
+            conditions.add(condition.toString());
         }
 
         // Join the different parts of the query using AND

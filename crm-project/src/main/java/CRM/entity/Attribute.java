@@ -3,6 +3,7 @@ package CRM.entity;
 import lombok.*;
 
 import javax.persistence.*;
+import java.util.List;
 import java.util.Objects;
 
 @AllArgsConstructor
@@ -17,18 +18,28 @@ public class Attribute {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "board_id")
-    private Board board;
-
     private String name;
     private String description;
 
-    public static Attribute createAttribute(Board board, String name, String description){
+    public static Attribute createAttribute(String name, String description){
         Attribute attribute = new Attribute();
-        attribute.setBoard(board);
         attribute.setName(name);
         attribute.setDescription(Objects.requireNonNullElse(description, ""));
         return attribute;
+    }
+
+    public static Status createStatusAttribute(String name, String description) {
+        Status status = new Status();
+        status.setName(name);
+        status.setDescription(description);
+        return status;
+    }
+
+
+    public static Type createTypeAttribute(String name, String description) {
+        Type type = new Type();
+        type.setName(name);
+        type.setDescription(description);
+        return type;
     }
 }

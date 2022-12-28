@@ -3,8 +3,7 @@ package CRM.entity.DTO;
 import CRM.entity.*;
 import lombok.*;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 
 @AllArgsConstructor
@@ -22,22 +21,19 @@ public class AttributeDTO {
     public static AttributeDTO createAttributeDTO(Attribute attribute){
         AttributeDTO attributeDTO = new AttributeDTO();
         attributeDTO.setId(attribute.getId());
-        attributeDTO.setBelongsToBoard(attribute.getBoard().getId());
         attributeDTO.setName(attribute.getName());
         attributeDTO.setDescription(attribute.getDescription());
         return attributeDTO;
     }
 
-    public static List<AttributeDTO> createListOfAttributesDTO(List<Attribute> attributes){
-        List<AttributeDTO> attributeDTOS = new ArrayList<>();
-        for (Attribute attribute: attributes) {
-            AttributeDTO attributeDTO = new AttributeDTO();
-            attributeDTO.setId(attribute.getId());
-            attributeDTO.setName(attribute.getName());
-            attributeDTO.setDescription(attribute.getDescription());
-            attributeDTO.setBelongsToBoard(attribute.getBoard().getId());
-            attributeDTOS.add(attributeDTO);
+    public static <T> List<AttributeDTO> getListOfAttributesFromDB(Set<T> attributes){
+        List<AttributeDTO> attributeDTOList = new ArrayList<>();
+        for (T attribute: attributes) {
+            attributeDTOList.add(createAttributeDTO((Attribute) attribute));
         }
-        return attributeDTOS;
+        attributeDTOList.sort(Comparator.comparingLong(AttributeDTO::getId));
+
+        return attributeDTOList;
     }
 }
+

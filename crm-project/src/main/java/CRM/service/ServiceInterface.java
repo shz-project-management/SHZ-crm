@@ -1,20 +1,19 @@
 package CRM.service;
 
-import CRM.entity.Comment;
-import CRM.entity.Item;
+import CRM.entity.Section;
 import CRM.entity.SharedContent;
-import CRM.entity.requests.ItemRequest;
+import CRM.entity.UserPermission;
+import CRM.entity.requests.ObjectsIdsRequest;
+import CRM.entity.requests.UpdateObjectRequest;
 
 import java.util.List;
+import java.util.Set;
 
 public interface ServiceInterface {
-
-    int delete(long id);
-
-    SharedContent update(long id, String field, String content);
-
-    SharedContent get(long id);
-
-    List<SharedContent> getAllInItem(long itemId);
+    int delete(List<Long> ids, long boardId);
+    SharedContent get(ObjectsIdsRequest objectsIdsRequest);
+    Section update(UpdateObjectRequest updateObject) throws NoSuchFieldException;
+    List<SharedContent> getAllInItem(ObjectsIdsRequest objectsIdsRequest);
+    Set<UserPermission> assignToUser(ObjectsIdsRequest objectsIdsRequest);
 
 }

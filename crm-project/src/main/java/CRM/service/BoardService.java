@@ -1,23 +1,27 @@
 package CRM.service;
 
-import CRM.entity.Board;
-import CRM.entity.User;
-import CRM.entity.UserInBoard;
+import CRM.entity.*;
 import CRM.entity.requests.BoardRequest;
+import CRM.entity.requests.UpdateObjectRequest;
 import CRM.repository.BoardRepository;
-import CRM.repository.UserInBoardRepository;
+import CRM.repository.NotificationSettingRepository;
 import CRM.repository.UserRepository;
+import CRM.utils.Common;
 import CRM.utils.Validations;
 import CRM.utils.enums.ExceptionMessage;
+import CRM.utils.enums.Permission;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityManager;
 import javax.security.auth.login.AccountNotFoundException;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.stream.Collectors;
+import java.util.*;
+
+import static CRM.utils.Util.SharedBoards;
+import static CRM.utils.Util.myBoards;
 
 @Service
 public class BoardService {
@@ -29,18 +33,34 @@ public class BoardService {
     @Autowired
     private UserRepository userRepository;
     @Autowired
-    private UserInBoardRepository userInBoardRepository;
+    private NotificationSettingRepository notificationSettingRepository;
+    @Autowired
+    private EntityManager entityManager;
+
 
     /**
-     * This function persists a new board to the database by calling the save function in the BoardRepository class.
+     * Creates a new board with the given request parameters.
      *
-     * @param board The board object to be persisted.
-     * @return The persisted board object.
+     * @param boardRequest a request object containing the creator user id and the name and description of the board
+     * @return the created board
+     * @throws AccountNotFoundException if the creator user id does not correspond to a user in the system
      */
-    public Board create(Board board) {
-        Board dbBoard = boardRepository.save(board);
-        userInBoardRepository.save(UserInBoard.adminUserInBoard(dbBoard.getCreatorUser(), dbBoard));
-        return dbBoard;
+    @Transactional
+    public Board create(BoardRequest boardRequest) throws AccountNotFoundException {
+        User user;
+        try {
+            user = Validations.doesIdExists(boardRequest.getCreatorUserId(), userRepository);
+        } catch (NoSuchElementException e) {
+            throw new AccountNotFoundException(ExceptionMessage.ACCOUNT_DOES_NOT_EXISTS.toString());
+        }
+        if(!user.getId().equals(boardRequest.getCreatorUserId())){
+            throw new IllegalArgumentException(ExceptionMessage.USER_REQUEST_DOSENT_MATCH.toString());
+        }
+        Board board = Board.createBoard(user, boardRequest.getName(), boardRequest.getDescription());
+        Common.createDefaultSettingForNewUserInBoard(user, board, notificationSettingRepository, entityManager);
+        boardRepository.save(board);
+        board.getUsersPermissions().add(UserPermission.newUserPermission(board.getCreatorUser(), Permission.ADMIN));
+        return boardRepository.save(board);
     }
 
     /**
@@ -50,7 +70,6 @@ public class BoardService {
      */
     public boolean delete(long boardId) {
         Board board = Validations.doesIdExists(boardId, boardRepository);
-        userInBoardRepository.deleteAllByBoard(board);
         boardRepository.delete(board);
         return true;
     }
@@ -58,14 +77,14 @@ public class BoardService {
     /**
      * This method is used to retrieve a board with the specified id.
      *
-     * @param id The id of the board to be retrieved.
+     * @param boardId The id of the board to be retrieved.
      * @return The retrieved board.
      * @throws NoSuchElementException   if the board with the specified id is not found.
      * @throws IllegalArgumentException if the specified id is invalid.
      * @throws NullPointerException     if the specified id is null.
      */
-    public Board get(long id) {
-        return Validations.doesIdExists(id, boardRepository);
+    public Board get(long boardId) {
+        return Validations.doesIdExists(boardId, boardRepository);
     }
 
     /**
@@ -78,40 +97,15 @@ public class BoardService {
     }
 
     /**
-     * This method is used to retrieve all the boards created by a user with the specified id.
+     * Updates the specified board with the provided update object request.
      *
-     * @param userId The id of the user whose boards are to be retrieved.
-     * @return A list containing all the boards created by the user with the specified id.
-     * @throws NoSuchElementException   if the user with the specified id is not found.
-     * @throws IllegalArgumentException if the specified user id is invalid.
-     * @throws NullPointerException     if the specified user id is null.
-     */
-    public List<Board> getAllBoardsOfUser(long userId) throws AccountNotFoundException {
-        try {
-            User user = Validations.doesIdExists(userId, userRepository);
-            List<UserInBoard> userInBoard = userInBoardRepository.findAllBoardByUser(user);
-            return userInBoard.stream().map(UserInBoard::getBoard).collect(Collectors.toList());
-        } catch (NoSuchElementException e) {
-            throw new AccountNotFoundException(ExceptionMessage.ACCOUNT_DOES_NOT_EXISTS.toString());
-        }
-    }
-
-    /**
-     * Updates a board with the given information.
-     *
-     * @param boardReq the request object containing the update information for the board
+     * @param updateObjReq the update object request containing the field and value to update
      * @return the updated board
-     * @throws AccountNotFoundException if the board with the given id does not exist
+     * @throws NoSuchFieldException if the field to update does not exist in the board object
      */
-    //FIXME: fieldName and content will replace the actual fields such as: "name" and "description"
-    public Board updateBoard(BoardRequest boardReq) {
-        Board board = Validations.doesIdExists(boardReq.getBoardId(), boardRepository);
-        if (boardReq.getName() != null) {
-            board.setName(boardReq.getName());
-        }
-        if (boardReq.getDescription() != null) {
-            board.setDescription(boardReq.getDescription());
-        }
+    public Board updateBoard(UpdateObjectRequest updateObjReq) throws NoSuchFieldException {
+        Board board = Validations.doesIdExists(updateObjReq.getObjectsIdsRequest().getBoardId(), boardRepository);
+        Common.fieldIsPrimitiveOrKnownObjectHelper(updateObjReq, board);
         return boardRepository.save(board);
     }
 }

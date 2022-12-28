@@ -5,8 +5,10 @@ import CRM.entity.requests.LoginUserRequest;
 import CRM.entity.requests.RegisterUserRequest;
 import CRM.entity.response.Response;
 import CRM.service.AuthService;
+import CRM.utils.GithubCodeDecoder;
 import CRM.utils.Validations;
 import CRM.utils.enums.SuccessMessage;
+import com.google.api.client.http.HttpStatusCodes;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +17,7 @@ import org.springframework.stereotype.Component;
 
 import javax.naming.AuthenticationException;
 import javax.security.auth.login.AccountNotFoundException;
+import java.io.IOException;
 
 @Component
 public class AuthFacade {
@@ -23,12 +26,15 @@ public class AuthFacade {
 
     @Autowired
     private AuthService authService;
+    @Autowired
+    private GithubCodeDecoder githubCodeDecoder;
 
     /**
      * Registers a new user in the system.
+     *
      * @param user The registration information for the user.
      * @return A {@link Response} object containing the saved user, or an error message if the
-     *          registration failed.
+     * registration failed.
      * @throws IllegalArgumentException if any of the provided registration information is invalid.
      * @throws NullPointerException     if any of the required fields in the user request are missing.
      */
@@ -43,23 +49,59 @@ public class AuthFacade {
             // after all validations are made, call the authService to register the user with the relevant information.
             // there's no need to send an activation email at the moment (according to Assaf).
             // If we have time, we'll add it later on.
-            return new Response.Builder()
-                    .data(UserDTO.getUserFromDB(authService.register(user)))
+            return Response.builder()
+                    .data(UserDTO.createUserDTO(authService.register(user)))
                     .message(SuccessMessage.REGISTER.toString())
                     .status(HttpStatus.ACCEPTED)
-                    .statusCode(201)
+                    .statusCode(HttpStatusCodes.STATUS_CODE_OK)
                     .build();
 
         } catch (IllegalArgumentException e) {
-            return new Response.Builder()
+            return Response.builder()
                     .message(e.getMessage())
                     .status(HttpStatus.BAD_REQUEST)
-                    .statusCode(400).build();
+                    .statusCode(HttpStatusCodes.STATUS_CODE_BAD_REQUEST)
+                    .build();
         } catch (NullPointerException e) {
-            return new Response.Builder()
+            return Response.builder()
                     .message(e.getMessage())
                     .status(HttpStatus.BAD_REQUEST)
-                    .statusCode(500).build();
+                    .statusCode(HttpStatusCodes.STATUS_CODE_SERVER_ERROR)
+                    .build();
+        }
+    }
+
+    /**
+     * Attempts to log in a user through a third party provider (e.g. GitHub) using the provided code.
+     *
+     * @param code the authorization code returned by the third party provider after the user grants access
+     * @return a response object with a status code and message indicating the success or failure of the operation, and the user's login information
+     * @throws IOException          if there is an error while communicating with the third party provider
+     * @throws NullPointerException if the code parameter is null
+     */
+    public Response thirdPartyLogin(String code) {
+        try {
+            RegisterUserRequest user = githubCodeDecoder.getUserDataFromCode(code);
+
+            return Response.builder()
+                    .data(authService.thirdPartyLogin(user))
+                    .message(SuccessMessage.REGISTER.toString())
+                    .status(HttpStatus.ACCEPTED)
+                    .statusCode(HttpStatusCodes.STATUS_CODE_OK)
+                    .build();
+
+        } catch (IOException e) {
+            return Response.builder()
+                    .message(e.getMessage())
+                    .status(HttpStatus.BAD_REQUEST)
+                    .statusCode(HttpStatusCodes.STATUS_CODE_BAD_REQUEST)
+                    .build();
+        } catch (NullPointerException e) {
+            return Response.builder()
+                    .message(e.getMessage())
+                    .status(HttpStatus.BAD_REQUEST)
+                    .statusCode(HttpStatusCodes.STATUS_CODE_SERVER_ERROR)
+                    .build();
         }
     }
 
@@ -68,7 +110,7 @@ public class AuthFacade {
      *
      * @param user The login credentials for the user.
      * @return A {@link Response} object containing a JWT token for the user, or an error message if the
-     *          login failed.
+     * login failed.
      * @throws NullPointerException     if any of the required fields in the user request are missing.
      * @throws IllegalArgumentException if any of the provided login credentials are invalid.
      * @throws AuthenticationException  if the provided login credentials are incorrect.
@@ -85,28 +127,31 @@ public class AuthFacade {
 
             // after all validations are made, call the authService to login the user with the relevant information.
             // the return data in Response class has to include a JWT token.
-            return new Response.Builder()
+            return Response.builder()
                     .message(SuccessMessage.LOGIN.toString())
                     .data(authService.login(user))
                     .status(HttpStatus.OK)
-                    .statusCode(200)
+                    .statusCode(HttpStatusCodes.STATUS_CODE_OK)
                     .build();
 
         } catch (IllegalArgumentException | AccountNotFoundException e) {
-            return new Response.Builder()
+            return Response.builder()
                     .message(e.getMessage())
                     .status(HttpStatus.BAD_REQUEST)
-                    .statusCode(400).build();
+                    .statusCode(HttpStatusCodes.STATUS_CODE_BAD_REQUEST)
+                    .build();
         } catch (AuthenticationException e) {
-            return new Response.Builder()
+            return Response.builder()
                     .message(e.getMessage())
                     .status(HttpStatus.BAD_REQUEST)
-                    .statusCode(401).build();
+                    .statusCode(HttpStatusCodes.STATUS_CODE_UNAUTHORIZED)
+                    .build();
         } catch (NullPointerException e) {
-            return new Response.Builder()
+            return Response.builder()
                     .message(e.getMessage())
                     .status(HttpStatus.BAD_REQUEST)
-                    .statusCode(500).build();
+                    .statusCode(HttpStatusCodes.STATUS_CODE_SERVER_ERROR)
+                    .build();
         }
     }
 
