@@ -10,6 +10,7 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,6 +25,9 @@ public class UserController {
 
     @Autowired
     private UserFacade userFacade;
+    @Autowired
+    private SimpMessagingTemplate messagingTemplate;
+
 
     @GetMapping(value = "{id}")
     public ResponseEntity<Response> get(@PathVariable Long id){
@@ -76,6 +80,7 @@ public class UserController {
     public ResponseEntity<Response> updateUserToBoard(@RequestBody ObjectsIdsRequest objectsIdsRequest, @RequestAttribute Long boardId){
         objectsIdsRequest.setBoardId(boardId);
         Response response = userFacade.updateUserToBoard(objectsIdsRequest);
-        return new ResponseEntity<>(response, response.getStatus());
+        messagingTemplate.convertAndSend("/userPermission/" + boardId, response);
+        return ResponseEntity.noContent().build();
     }
 }

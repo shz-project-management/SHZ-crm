@@ -12,6 +12,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,24 +28,30 @@ public class CommentController {
 
     @Autowired
     SharedContentFacade sharedContentFacade;
+    @Autowired
+    private SimpMessagingTemplate messagingTemplate;
 
     @PostMapping(consumes = "application/json")
     public ResponseEntity<Response> create(@RequestBody CommentRequest comment, @RequestAttribute Long userId,
                                            @RequestAttribute Long boardId) {
         Response response = sharedContentFacade.create(comment, userId, boardId);
-        return new ResponseEntity<>(response, response.getStatus());
+        messagingTemplate.convertAndSend("/comment/" + boardId, response);
+        return ResponseEntity.noContent().build();
+
     }
 
     @DeleteMapping
     public ResponseEntity<Response> delete(@RequestBody List<Long> commentsIds, @RequestAttribute Long boardId) {
         Response response = sharedContentFacade.delete(commentsIds, boardId, Comment.class);
-        return new ResponseEntity<>(response, response.getStatus());
+        messagingTemplate.convertAndSend("/comment/" + boardId, response);
+        return ResponseEntity.noContent().build();
     }
 
     @PatchMapping(value = "update")
-    public ResponseEntity<Response> update(@RequestBody UpdateObjectRequest updateObject, @RequestParam UpdateField field) {
+    public ResponseEntity<Response> update(@RequestBody UpdateObjectRequest updateObject, @RequestAttribute Long boardId) {
         Response response = sharedContentFacade.update(updateObject, Comment.class);
-        return new ResponseEntity<>(response, response.getStatus());
+        messagingTemplate.convertAndSend("/comment/" + boardId, response);
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping(value = "{commentId}")

@@ -10,6 +10,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,29 +26,34 @@ public class ItemController {
 
     @Autowired
     private SharedContentFacade sharedContentFacade;
+    @Autowired
+    private SimpMessagingTemplate messagingTemplate;
+
 
     @PostMapping(consumes = "application/json")
-    public ResponseEntity<Response> create(@RequestBody ItemRequest item, @RequestAttribute Long userId,
-                                           @RequestAttribute Long boardId) {
+    public ResponseEntity<Response> create(@RequestBody ItemRequest item, @RequestAttribute Long userId, @RequestAttribute Long boardId) {
         item.setBoardId(boardId);
         item.setUserId(userId);
         Response response = sharedContentFacade.create(item);
-        return new ResponseEntity<>(response, response.getStatus());
+        messagingTemplate.convertAndSend("/item/" + boardId, response);
+        return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping
     public ResponseEntity<Response> delete(@RequestBody List<Long> itemsIds, @RequestAttribute Long boardId) {
         Response response = sharedContentFacade.delete(itemsIds, boardId, Item.class);
-        return new ResponseEntity<>(response, response.getStatus());
+        messagingTemplate.convertAndSend("/item/" + boardId, response);
+        return ResponseEntity.noContent().build();
     }
 
     @PatchMapping(value = "update")
     public ResponseEntity<Response> update(@RequestBody UpdateObjectRequest updateItemRequest, @RequestParam UpdateField field,
-                                           @RequestAttribute Long userId, @RequestAttribute Long boardId){
+                                           @RequestAttribute Long userId, @RequestAttribute Long boardId) {
         updateItemRequest.getObjectsIdsRequest().setUserId(userId);
         updateItemRequest.getObjectsIdsRequest().setBoardId(boardId);
         Response response = sharedContentFacade.update(updateItemRequest, Item.class);
-        return new ResponseEntity<>(response, response.getStatus());
+        messagingTemplate.convertAndSend("/item/" + boardId, response);
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping(value = "{itemId}")
@@ -69,6 +75,9 @@ public class ItemController {
     public ResponseEntity<Response> assignToUser(@RequestBody ObjectsIdsRequest objIds, @RequestAttribute Long boardId) {
         objIds.setUserId(boardId);
         Response response = sharedContentFacade.assignToUser(objIds, Item.class);
-        return new ResponseEntity<>(response, response.getStatus());
+        messagingTemplate.convertAndSend("/item/" + boardId, response);
+        return ResponseEntity.noContent().build();
     }
+
+
 }

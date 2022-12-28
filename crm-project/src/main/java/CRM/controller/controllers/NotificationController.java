@@ -8,6 +8,7 @@ import CRM.entity.response.Response;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,6 +22,8 @@ public class NotificationController {
 
     @Autowired
     private NotificationFacade notificationFacade;
+    @Autowired
+    private SimpMessagingTemplate messagingTemplate;
 
     //TODO:DOCUMENTATION
     @GetMapping(value = "getAll-inBoard")
@@ -31,8 +34,9 @@ public class NotificationController {
     }
 
     @DeleteMapping(value = "delete")
-    public ResponseEntity<Response> delete(@RequestBody List<Long> notificationsIds) {
+    public ResponseEntity<Response> delete(@RequestBody List<Long> notificationsIds, @RequestAttribute Long boardId) {
         Response response = notificationFacade.delete(notificationsIds);
-        return new ResponseEntity<>(response, response.getStatus());
+        messagingTemplate.convertAndSend("/notification/" + boardId, response);
+        return ResponseEntity.noContent().build();
     }
 }

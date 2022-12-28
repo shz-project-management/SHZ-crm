@@ -14,8 +14,8 @@ public class Util {
         return Arrays.asList(SharedContent.class, Attribute.class);
     }
 
-    public static List<String> authPermissionPathsForAll = List.of("auth");
-    public static List<String> permissionPathsForAll = List.of("auth", "board/create", "filter-items", "notification", "settings");
+    public static List<String> authPermissionPathsForAll = List.of("auth","ws");
+    public static List<String> permissionPathsForAll = List.of("auth", "board/create", "filter-items", "notification", "settings", "ws");
     public static List<String> permissionPathsForLeaders = List.of("item", "comment");
     public static List<String> permissionPathsForUsers = List.of("item", "comment");
 
