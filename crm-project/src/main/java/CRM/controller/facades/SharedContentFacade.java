@@ -394,9 +394,10 @@ public class SharedContentFacade {
         try {
             Validations.validateIDs(objIds.getBoardId(), objIds.getSectionId(), objIds.getUpdateObjId());
             Validations.validate(objIds.getEmail(), Regex.EMAIL.getRegex());
-
+            User user = userService.get(objIds.getEmail());
+            
             return Response.builder()
-                    .data(SectionDTO.createSectionWithUserDTO((convertFromClassToService(clz).assignToUser(objIds)), userService.get(objIds.getEmail())))
+                    .data(SectionDTO.createSectionWithUserDTO((convertFromClassToService(clz).assignToUser(objIds)), user))
                     .message(SuccessMessage.FOUND.toString())
                     .status(HttpStatus.OK)
                     .statusCode(HttpStatusCodes.STATUS_CODE_OK)

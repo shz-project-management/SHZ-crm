@@ -18,7 +18,7 @@ public class ItemDTO extends SharedContentDTO {
     private AttributeDTO status;
     private AttributeDTO type;
     private Long sectionId;
-    private User assignedToUser;
+    private UserDTO assignedToUser;
     private LocalDateTime dueDate;
     private Integer importance;
     private Long boardId;
@@ -58,11 +58,11 @@ public class ItemDTO extends SharedContentDTO {
         itemDTO.setImportance(item.getImportance());
         itemDTO.setDueDate(item.getDueDate());
         if(item.getAssignedToUserId() != null){
-            itemDTO.setAssignedToUser(user);
+            itemDTO.setAssignedToUser(UserDTO.createUserDTO(user));
         }
 
         if (item.getItems().size() > 0)
-            itemDTO.setSubItems(ItemDTO.getItemsDTOList(item.getItems()));
+            itemDTO.setSubItems(ItemDTO.getItemsDTOListWithUser(item.getItems(), user));
 
         return itemDTO;
     }
@@ -81,7 +81,7 @@ public class ItemDTO extends SharedContentDTO {
         itemDTO.setImportance(item.getImportance());
         itemDTO.setDueDate(item.getDueDate());
         if(item.getAssignedToUserId() != null){
-            itemDTO.setAssignedToUser(user);
+            itemDTO.setAssignedToUser(UserDTO.createUserDTO(user));
         }
 
         return itemDTO;
