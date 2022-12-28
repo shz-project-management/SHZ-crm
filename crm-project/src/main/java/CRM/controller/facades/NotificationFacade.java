@@ -9,6 +9,8 @@ import CRM.utils.Validations;
 import CRM.utils.enums.Regex;
 import CRM.utils.enums.SuccessMessage;
 import com.google.api.client.http.HttpStatusCodes;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
@@ -19,6 +21,8 @@ import java.util.NoSuchElementException;
 
 @Component
 public class NotificationFacade {
+
+    private static Logger logger = LogManager.getLogger(NotificationFacade.class.getName());
 
     @Autowired
     private NotificationService notificationService;
@@ -33,29 +37,14 @@ public class NotificationFacade {
      * @throws NoSuchElementException   if the specified board does not exist
      * @throws NullPointerException     if the objects IDs request object is null
      */
-    public Response getAllinBoard(ObjectsIdsRequest objectsIdsRequest) {
-        try {
-            Validations.validateIDs(objectsIdsRequest.getUserId(), objectsIdsRequest.getBoardId());
-            List<Notification> notificationList = notificationService.getAllinBoard(objectsIdsRequest);
-            return Response.builder()
-                    .message(SuccessMessage.FOUND.toString())
-                    .status(HttpStatus.FOUND)
-                    .statusCode(HttpStatusCodes.STATUS_CODE_OK)
-                    .data(NotificationDTO.createNotificationsDTOList(notificationList))
-                    .build();
-        } catch (AccountNotFoundException | IllegalArgumentException | NoSuchElementException e) {
-            return Response.builder()
-                    .statusCode(HttpStatusCodes.STATUS_CODE_BAD_REQUEST)
-                    .status(HttpStatus.BAD_REQUEST)
-                    .message(e.getMessage())
-                    .build();
-        } catch (NullPointerException e) {
-            return Response.builder()
-                    .statusCode(HttpStatusCodes.STATUS_CODE_SERVER_ERROR)
-                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .message(e.getMessage())
-                    .build();
-        }
+    public Response getAllinBoard(ObjectsIdsRequest objectsIdsRequest) throws AccountNotFoundException {
+        Validations.validateIDs(objectsIdsRequest.getUserId(), objectsIdsRequest.getBoardId());
+        return Response.builder()
+                .message(SuccessMessage.FOUND.toString())
+                .status(HttpStatus.FOUND)
+                .statusCode(HttpStatusCodes.STATUS_CODE_OK)
+                .data(NotificationDTO.createNotificationsDTOList(notificationService.getAllinBoard(objectsIdsRequest)))
+                .build();
     }
 
     /**
@@ -68,32 +57,19 @@ public class NotificationFacade {
      * @throws NullPointerException     if the notifications IDs list is null
      */
     public Response delete(List<Long> notificationsIds) {
-        try {
-            notificationsIds.forEach(id -> {
-                try {
-                    Validations.validate(id, Regex.ID.getRegex());
-                } catch (IllegalArgumentException | NullPointerException e) {
-                }
-            });
-            List<Notification> remainingNotifications = notificationService.delete(notificationsIds);
-            return Response.builder()
-                    .message(SuccessMessage.DELETED.toString())
-                    .status(HttpStatus.OK)
-                    .statusCode(204)
-                    .data(NotificationDTO.createNotificationsDTOList(remainingNotifications))
-                    .build();
-        } catch (IllegalArgumentException | NoSuchElementException e) {
-            return Response.builder()
-                    .statusCode(HttpStatusCodes.STATUS_CODE_BAD_REQUEST)
-                    .status(HttpStatus.BAD_REQUEST)
-                    .message(e.getMessage())
-                    .build();
-        } catch (NullPointerException e) {
-            return Response.builder()
-                    .statusCode(HttpStatusCodes.STATUS_CODE_SERVER_ERROR)
-                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .message(e.getMessage())
-                    .build();
-        }
+        notificationsIds.forEach(notificationId -> {
+            try {
+                Validations.validate(notificationId, Regex.ID.getRegex());
+            } catch (IllegalArgumentException | NullPointerException e) {
+                logger.warn("Couldn't locate this notification");
+            }
+        });
+        List<Notification> remainingNotifications = notificationService.delete(notificationsIds);
+        return Response.builder()
+                .message(SuccessMessage.DELETED.toString())
+                .status(HttpStatus.OK)
+                .statusCode(HttpStatusCodes.STATUS_CODE_NO_CONTENT)
+                .data(NotificationDTO.createNotificationsDTOList(remainingNotifications))
+                .build();
     }
 }

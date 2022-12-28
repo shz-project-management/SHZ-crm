@@ -8,10 +8,14 @@ import CRM.entity.requests.UpdateObjectRequest;
 import CRM.entity.response.Response;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+
+import javax.naming.NoPermissionException;
+import javax.security.auth.login.AccountNotFoundException;
 
 @Controller
 @RequestMapping(value = "/board")
@@ -32,9 +36,9 @@ public class BoardController {
      * @return A response containing the newly created board's information. The response status will reflect the result of the create operation.
      */
     @PostMapping(value = "/create", consumes = "application/json")
-    public ResponseEntity<Response<BoardDTO>> create(@RequestBody BoardRequest boardRequest, @RequestAttribute Long userId) {
+    public ResponseEntity<Response<BoardDTO>> create(@RequestBody BoardRequest boardRequest, @RequestAttribute Long userId) throws AccountNotFoundException {
         boardRequest.setCreatorUserId(userId);
-        Response response = boardFacade.create(boardRequest);
+        Response<BoardDTO> response = boardFacade.create(boardRequest);
         return new ResponseEntity<>(response, response.getStatus());
     }
 
@@ -45,9 +49,9 @@ public class BoardController {
      * @return A response indicating the result of the delete operation. The response status will reflect the result of the delete operation.
      */
     @DeleteMapping
-    public ResponseEntity<Response> delete(@RequestAttribute Long boardId) {
-        Response response = boardFacade.delete(boardId);
-        return new ResponseEntity<>(response, response.getStatus());
+    public ResponseEntity<Void> delete(@RequestAttribute Long boardId) {
+        boardFacade.delete(boardId);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     /**
@@ -58,8 +62,8 @@ public class BoardController {
      * @return A response containing the requested board's information. The response status will reflect the result of the retrieve operation.
      */
     @GetMapping
-    public ResponseEntity<Response<BoardDTO>> get(@RequestAttribute Long boardId, @RequestAttribute Long userId) {
-        Response response = boardFacade.get(boardId, userId);
+    public ResponseEntity<Response<BoardDTO>> get(@RequestAttribute Long boardId, @RequestAttribute Long userId) throws NoPermissionException {
+        Response<BoardDTO> response = boardFacade.get(boardId, userId);
         return new ResponseEntity<>(response, response.getStatus());
     }
 
@@ -71,10 +75,10 @@ public class BoardController {
      * @return A response indicating the result of the update operation. The response status will reflect the result of the update operation.
      */
     @PatchMapping(value = "update", consumes = "application/json")
-    public ResponseEntity<Response<BoardDTO>> updateBoard(@RequestBody UpdateObjectRequest boardRequest, @RequestAttribute Long boardId) {
+    public ResponseEntity<Response<BoardDTO>> updateBoard(@RequestBody UpdateObjectRequest boardRequest, @RequestAttribute Long boardId) throws NoSuchFieldException {
         boardRequest.setObjectsIdsRequest(new ObjectsIdsRequest());
         boardRequest.getObjectsIdsRequest().setBoardId(boardId);
-        Response response = boardFacade.updateBoard(boardRequest);
+        Response<BoardDTO> response = boardFacade.updateBoard(boardRequest);
         messagingTemplate.convertAndSend("/board/" + boardId, response);
         return ResponseEntity.noContent().build();
     }

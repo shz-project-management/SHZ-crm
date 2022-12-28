@@ -17,6 +17,7 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import javax.security.auth.login.AccountNotFoundException;
 import java.util.List;
 
 @Controller
@@ -41,8 +42,8 @@ public class CommentController {
      * @return A response indicating the result of the create operation. The response status will reflect the result of the create operation.
      */
     @PostMapping(consumes = "application/json")
-    public ResponseEntity<Response<List<CommentDTO>>> create(@RequestBody CommentRequest comment, @RequestAttribute Long userId, @RequestAttribute Long boardId) {
-        Response response = sharedContentFacade.create(comment, userId, boardId);
+    public ResponseEntity<Response<List<CommentDTO>>> create(@RequestBody CommentRequest comment, @RequestAttribute Long userId, @RequestAttribute Long boardId) throws AccountNotFoundException {
+        Response<List<CommentDTO>> response = sharedContentFacade.create(comment, userId, boardId);
         messagingTemplate.convertAndSend("/comment/" + comment.getParentItemId() + "/" + boardId, response);
         return ResponseEntity.noContent().build();
     }
@@ -55,8 +56,8 @@ public class CommentController {
      * @return A response indicating the result of the delete operation. The response status will reflect the result of the delete operation.
      */
     @DeleteMapping
-    public ResponseEntity<Response> delete(@RequestBody List<Long> commentsIds, @RequestAttribute Long boardId) {
-        Response response = sharedContentFacade.delete(commentsIds, boardId, Comment.class);
+    public ResponseEntity<Response<Void>> delete(@RequestBody List<Long> commentsIds, @RequestAttribute Long boardId) throws AccountNotFoundException {
+        Response<Void> response = sharedContentFacade.delete(commentsIds, boardId, Comment.class);
         messagingTemplate.convertAndSend("/comment/" + boardId, response);
         return ResponseEntity.noContent().build();
     }
@@ -69,8 +70,8 @@ public class CommentController {
      * @return A response indicating the result of the update operation. The response status will reflect the result of the update operation.
      */
     @PatchMapping(value = "update")
-    public ResponseEntity<Response<CommentDTO>> update(@RequestBody UpdateObjectRequest updateObject, @RequestAttribute Long boardId) {
-        Response response = sharedContentFacade.update(updateObject, Comment.class);
+    public ResponseEntity<Response<CommentDTO>> update(@RequestBody UpdateObjectRequest updateObject, @RequestAttribute Long boardId) throws NoSuchFieldException, AccountNotFoundException {
+        Response<CommentDTO> response = sharedContentFacade.update(updateObject, Comment.class);
         messagingTemplate.convertAndSend("/comment/" + boardId, response);
         return ResponseEntity.noContent().build();
     }
@@ -87,7 +88,7 @@ public class CommentController {
     @GetMapping(value = "{commentId}")
     public ResponseEntity<Response<CommentDTO>> get(@PathVariable Long commentId, @RequestParam Long boardId, @RequestParam Long sectionId, @RequestParam Long parentId) {
         ObjectsIdsRequest objectsIdsRequest = ObjectsIdsRequest.searchBoardSectionParentIds(commentId, boardId, sectionId, parentId);
-        Response response = sharedContentFacade.get(objectsIdsRequest, Comment.class);
+        Response<CommentDTO> response = sharedContentFacade.get(objectsIdsRequest, Comment.class);
         return new ResponseEntity<>(response, response.getStatus());
     }
 
@@ -102,7 +103,7 @@ public class CommentController {
     @GetMapping(value = "all-in-item/{itemId}")
     public ResponseEntity<Response<List<CommentDTO>>> getAllInItem(@PathVariable Long itemId, @RequestAttribute Long boardId, @RequestParam Long sectionId) {
         ObjectsIdsRequest objectsIdsRequest = ObjectsIdsRequest.boardSectionItemIds(boardId, sectionId, itemId);
-        Response response = sharedContentFacade.getAllInItem(objectsIdsRequest, Comment.class);
+        Response<List<CommentDTO>> response = sharedContentFacade.getAllInItem(objectsIdsRequest, Comment.class);
         return new ResponseEntity<>(response, response.getStatus());
     }
 }

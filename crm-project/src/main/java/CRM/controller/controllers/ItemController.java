@@ -16,6 +16,7 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import javax.security.auth.login.AccountNotFoundException;
 import java.util.List;
 
 @Controller
@@ -40,7 +41,7 @@ public class ItemController {
      * @return A response indicating the result of the create operation. The response status will reflect the result of the create operation.
      */
     @PostMapping(consumes = "application/json")
-    public ResponseEntity<Response<SectionDTO>> create(@RequestBody ItemRequest item, @RequestAttribute Long userId, @RequestAttribute Long boardId) {
+    public ResponseEntity<Response<SectionDTO>> create(@RequestBody ItemRequest item, @RequestAttribute Long userId, @RequestAttribute Long boardId) throws AccountNotFoundException {
         item.setBoardId(boardId);
         item.setUserId(userId);
         Response response = sharedContentFacade.create(item);
@@ -56,8 +57,8 @@ public class ItemController {
      * @return A response indicating the result of the delete operation. The response status will reflect the result of the delete operation.
      */
     @DeleteMapping
-    public ResponseEntity<Response> delete(@RequestBody List<Long> itemsIds, @RequestAttribute Long boardId) {
-        Response response = sharedContentFacade.delete(itemsIds, boardId, Item.class);
+    public ResponseEntity<Response<Void>> delete(@RequestBody List<Long> itemsIds, @RequestAttribute Long boardId) throws AccountNotFoundException {
+        Response<Void> response = sharedContentFacade.delete(itemsIds, boardId, Item.class);
         messagingTemplate.convertAndSend("/item/" + boardId, response);
         return ResponseEntity.noContent().build();
     }
@@ -71,10 +72,10 @@ public class ItemController {
      * @return A response indicating the result of the update operation. The response status will reflect the result of the update operation.
      */
     @PatchMapping(value = "update")
-    public ResponseEntity<Response<SectionDTO>> update(@RequestBody UpdateObjectRequest updateItemRequest, @RequestAttribute Long userId, @RequestAttribute Long boardId) {
+    public ResponseEntity<Response<SectionDTO>> update(@RequestBody UpdateObjectRequest updateItemRequest, @RequestAttribute Long userId, @RequestAttribute Long boardId) throws NoSuchFieldException, AccountNotFoundException {
         updateItemRequest.getObjectsIdsRequest().setUserId(userId);
         updateItemRequest.getObjectsIdsRequest().setBoardId(boardId);
-        Response response = sharedContentFacade.update(updateItemRequest, Item.class);
+        Response<SectionDTO> response = sharedContentFacade.update(updateItemRequest, Item.class);
         messagingTemplate.convertAndSend("/item/" + boardId, response);
         return ResponseEntity.noContent().build();
     }
@@ -91,7 +92,7 @@ public class ItemController {
     @GetMapping(value = "{itemId}")
     public ResponseEntity<Response<ItemDTO>> get(@PathVariable Long itemId, @RequestAttribute Long boardId, @RequestParam Long sectionId, @RequestParam Long parentId) {
         ObjectsIdsRequest objectsIdsRequest = ObjectsIdsRequest.searchBoardSectionParentIds(itemId, boardId, sectionId, parentId);
-        Response response = sharedContentFacade.get(objectsIdsRequest, Item.class);
+        Response<ItemDTO> response = sharedContentFacade.get(objectsIdsRequest, Item.class);
         return new ResponseEntity<>(response, response.getStatus());
     }
 
@@ -105,14 +106,21 @@ public class ItemController {
     @GetMapping(value = "all-in-section/{sectionId}")
     public ResponseEntity<Response<List<ItemDTO>>> getAllItemsInSection(@RequestAttribute Long boardId, @PathVariable Long sectionId) {
         ObjectsIdsRequest objectsIdsRequest = ObjectsIdsRequest.boardSectionIds(boardId, sectionId);
-        Response response = sharedContentFacade.getAllItemsInSection(objectsIdsRequest);
+        Response<List<ItemDTO>> response = sharedContentFacade.getAllItemsInSection(objectsIdsRequest);
         return new ResponseEntity<>(response, response.getStatus());
     }
 
+    /**
+     * Handles a request to assign an item to a particular user.
+     *
+     * @param objIds  An object containing the IDs of the item to be assigned and the user it is being assigned to.
+     * @param boardId The ID of the board the item belongs to.
+     * @return A response indicating the result of the assignment operation. The response status will reflect the result of the operation.
+     */
     @PostMapping(value = "assign-to-user")
-    public ResponseEntity<Response<UserPermissionDTO>> assignToUser(@RequestBody ObjectsIdsRequest objIds, @RequestAttribute Long boardId) {
+    public ResponseEntity<Response<SectionDTO>> assignToUser(@RequestBody ObjectsIdsRequest objIds, @RequestAttribute Long boardId) throws AccountNotFoundException {
         objIds.setUserId(boardId);
-        Response response = sharedContentFacade.assignToUser(objIds, Item.class);
+        Response<SectionDTO> response = sharedContentFacade.assignToUser(objIds, Item.class);
         messagingTemplate.convertAndSend("/item/" + boardId, response);
         return ResponseEntity.noContent().build();
     }

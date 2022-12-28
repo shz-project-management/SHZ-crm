@@ -27,68 +27,80 @@ public class SectionController {
     private SimpMessagingTemplate messagingTemplate;
 
     /**
-     * This function maps HTTP POST requests to the /create endpoint to the create function in the attributeFacade class.
-     * attributeFacade handles Type method and also Status, since they both inherit Attribute
-     * It consumes "application/json" and expects a typeRequest object to be passed as the request body.
+     * Handles a request to create a new section in a particular board.
      *
-     * @param sectionRequest The request body, containing the necessary information to create a new type.
-     * @return A ResponseEntity containing a Response object with the status of the create operation and the created type object.
+     * @param sectionRequest An object containing the necessary information to create a new section.
+     * @param boardId        The ID of the board the new section will belong to.
+     * @return A response indicating the result of the create operation. The response status will reflect the result of the operation.
      */
     @PostMapping(consumes = "application/json")
     public ResponseEntity<Response<List<SectionDTO>>> create(@RequestBody AttributeRequest sectionRequest, @RequestAttribute Long boardId) {
-        Response response = sectionFacade.create(sectionRequest, boardId);
+        Response<SectionDTO> response = sectionFacade.create(sectionRequest, boardId);
         messagingTemplate.convertAndSend("/section/" + boardId, response);
         return ResponseEntity.noContent().build();
     }
 
     /**
-     * Handle HTTP DELETE requests to delete a type.
+     * Handles a request to delete a particular section from a board.
      *
-     * @return A ResponseEntity with the appropriate status and response body.
+     * @param boardId   The ID of the board the section belongs to.
+     * @param sectionId The ID of the section to be deleted.
+     * @return A response indicating the result of the delete operation. The response status will reflect the result of the operation.
      */
-    // FIXME: SKIP
     @DeleteMapping(value = "{sectionId}")
-    public ResponseEntity<Response> delete(@RequestAttribute Long boardId, @PathVariable Long sectionId) {
-        Response response = sectionFacade.delete(boardId, sectionId);
+    public ResponseEntity<Response<Void>> delete(@RequestAttribute Long boardId, @PathVariable Long sectionId) {
+        Response<Void> response = sectionFacade.delete(boardId, sectionId);
         return new ResponseEntity<>(response, response.getStatus());
     }
 
     /**
-     * This method is used to handle HTTP GET requests to the specified URL (type/{id}).
-     * The method takes the id of the type as a path variable and uses it to retrieve the type information from the attributeFacade object.
+     * Handles a request to retrieve a particular section from a board.
      *
-     * @return A ResponseEntity object containing the Response object with the type information and the HTTP status code.
+     * @param sectionId The ID of the section to be retrieved.
+     * @param boardId   The ID of the board the section belongs to.
+     * @return A response containing the retrieved section, or an error message if the section could not be found. The response status will reflect the result of the operation.
      */
     @GetMapping(value = "{sectionId}")
     public ResponseEntity<Response<SectionDTO>> get(@PathVariable Long sectionId, @RequestAttribute Long boardId) {
-        Response response = sectionFacade.get(boardId, sectionId);
+        Response<SectionDTO> response = sectionFacade.get(boardId, sectionId);
         return new ResponseEntity<>(response, response.getStatus());
     }
 
     /**
-     * This method is used to handle HTTP GET requests to the specified URL (type/getAll/{boardId}).
-     * The method takes the id of the board as a path variable and uses it to retrieve all the types in that board using the attributeFacade object.
+     * Handles a request to retrieve all sections in a board.
      *
-     * @param boardId The id of the board whose types are to be retrieved.
-     * @return A ResponseEntity object containing the Response object with the retrieved types and the HTTP status code.
+     * @param boardId The ID of the board to retrieve the sections from.
+     * @return A response containing a list of all the sections in the board, or an error message if the board could not be found. The response status will reflect the result of the operation.
      */
     @GetMapping(value = "getAll")
     public ResponseEntity<Response<List<SectionDTO>>> getAllInBoard(@RequestAttribute Long boardId) {
-        Response response = sectionFacade.getAllSectionsInBoard(boardId);
+        Response<List<SectionDTO>> response = sectionFacade.getAllSectionsInBoard(boardId);
         return new ResponseEntity<>(response, response.getStatus());
     }
 
+    /**
+     * Handles a request to retrieve items from a board that match certain filters.
+     *
+     * @param filters A map of filters to apply to the items, where the keys are the names of the filters and the values are the filter values.
+     * @param boardId The ID of the board to retrieve the items from.
+     * @return A response containing a list of items that match the specified filters, or an error message if the board could not be found or if there was an issue with the filters. The response status will reflect the result of the operation.
+     */
     @PostMapping(value = "filter-items")
     public ResponseEntity<Response<List<SectionDTO>>> getFilteredItems(@RequestBody Map<String, List<String>> filters, @RequestAttribute Long boardId) {
-        Response response = sectionFacade.getFilteredItems(filters, boardId);
+        Response<List<SectionDTO>> response = sectionFacade.getFilteredItems(filters, boardId);
         return new ResponseEntity<>(response, response.getStatus());
     }
 
+    /**
+     * PatchMapping to update a section with a given id.
+     *
+     * @param updateItemRequest The UpdateObjectRequest object containing the updated section details and the list of object ids to be updated.
+     * @param boardId           The id of the board to which the section belongs.
+     * @return A ResponseEntity with no content.
+     */
     @PatchMapping(value = "/update", consumes = "application/json")
     public ResponseEntity<Response<SectionDTO>> update(@RequestBody UpdateObjectRequest updateItemRequest, @RequestAttribute Long boardId) {
         updateItemRequest.getObjectsIdsRequest().setBoardId(boardId);
-        Response response = sectionFacade.update(updateItemRequest);
-        messagingTemplate.convertAndSend("/section/" + boardId, response);
         return ResponseEntity.noContent().build();
     }
 }

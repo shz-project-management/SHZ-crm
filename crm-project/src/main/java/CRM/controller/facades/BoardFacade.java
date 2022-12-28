@@ -7,7 +7,6 @@ import CRM.entity.requests.UpdateObjectRequest;
 import CRM.entity.response.Response;
 import CRM.service.BoardService;
 import CRM.utils.Validations;
-import CRM.utils.enums.ExceptionMessage;
 import CRM.utils.enums.Regex;
 import CRM.utils.enums.SuccessMessage;
 import com.google.api.client.http.HttpStatusCodes;
@@ -35,30 +34,14 @@ public class BoardFacade {
      * @throws IllegalArgumentException if the board name or owner ID is invalid or not provided
      * @throws NullPointerException     if the board request object is null
      */
-    public Response create(BoardRequest boardRequest) {
-        try {
-            Validations.validateNewBoard(boardRequest);
-
-            return Response.builder()
-                    .data(BoardDTO.getBoardFromDB(boardService.create(boardRequest)))
-                    .message(SuccessMessage.CREATE.toString())
-                    .status(HttpStatus.CREATED)
-                    .statusCode(HttpStatusCodes.STATUS_CODE_CREATED)
-                    .build();
-
-        } catch (IllegalArgumentException | AccountNotFoundException | NoSuchElementException e) {
-            return Response.builder()
-                    .message(e.getMessage())
-                    .status(HttpStatus.BAD_REQUEST)
-                    .statusCode(HttpStatusCodes.STATUS_CODE_BAD_REQUEST)
-                    .build();
-        } catch (NullPointerException e) {
-            return Response.builder()
-                    .message(e.getMessage())
-                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .statusCode(HttpStatusCodes.STATUS_CODE_SERVER_ERROR)
-                    .build();
-        }
+    public Response create(BoardRequest boardRequest) throws AccountNotFoundException {
+        Validations.validateNewBoard(boardRequest);
+        return Response.builder()
+                .data(BoardDTO.getBoardFromDB(boardService.create(boardRequest)))
+                .message(SuccessMessage.CREATE.toString())
+                .status(HttpStatus.CREATED)
+                .statusCode(HttpStatusCodes.STATUS_CODE_CREATED)
+                .build();
     }
 
     /**
@@ -68,30 +51,9 @@ public class BoardFacade {
      * @return a response object indicating the status of the deletion operation
      * @throws NoSuchElementException if no board with the given ID exists
      */
-    public Response delete(Long boardId) {
-        try {
-            Validations.validate(boardId, Regex.ID.getRegex());
-            boardService.delete(boardId);
-
-            return Response.builder()
-                    .message(SuccessMessage.DELETED.toString())
-                    .status(HttpStatus.NO_CONTENT)
-                    .statusCode(HttpStatusCodes.STATUS_CODE_NO_CONTENT)
-                    .build();
-
-        } catch (IllegalArgumentException | NoSuchElementException e) {
-            return Response.builder()
-                    .message(e.getMessage())
-                    .status(HttpStatus.BAD_REQUEST)
-                    .statusCode(HttpStatusCodes.STATUS_CODE_BAD_REQUEST)
-                    .build();
-        } catch (NullPointerException e) {
-            return Response.builder()
-                    .message(e.getMessage())
-                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .statusCode(HttpStatusCodes.STATUS_CODE_SERVER_ERROR)
-                    .build();
-        }
+    public void delete(Long boardId) {
+        Validations.validate(boardId, Regex.ID.getRegex());
+        boardService.delete(boardId);
     }
 
     /**
@@ -105,39 +67,17 @@ public class BoardFacade {
      * @throws NoPermissionException    if the user does not have permission to view the board
      * @throws NullPointerException     if any of the parameters are null
      */
-    public Response get(Long boardId, Long userId) {
-        try {
-            Validations.validateIDs(boardId, userId);
-            Board board = boardService.get(boardId);
-            BoardDTO boardDTO = BoardDTO.getBoardFromDB(board);
-            boardDTO.setUserPermission(board.getUserPermissionIntegerByUserId(userId));
-
-            return Response.builder()
-                    .data(boardDTO)
-                    .message(SuccessMessage.FOUND.toString())
-                    .status(HttpStatus.OK)
-                    .statusCode(HttpStatusCodes.STATUS_CODE_OK)
-                    .build();
-
-        } catch (IllegalArgumentException | NoSuchElementException e) {
-            return Response.builder()
-                    .message(e.getMessage())
-                    .status(HttpStatus.BAD_REQUEST)
-                    .statusCode(HttpStatusCodes.STATUS_CODE_BAD_REQUEST)
-                    .build();
-        } catch (NoPermissionException e) {
-            return Response.builder()
-                    .message(e.getMessage())
-                    .status(HttpStatus.FORBIDDEN)
-                    .statusCode(HttpStatusCodes.STATUS_CODE_FORBIDDEN)
-                    .build();
-        } catch (NullPointerException e) {
-            return Response.builder()
-                    .message(e.getMessage())
-                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .statusCode(HttpStatusCodes.STATUS_CODE_SERVER_ERROR)
-                    .build();
-        }
+    public Response get(Long boardId, Long userId) throws NoPermissionException {
+        Validations.validateIDs(boardId, userId);
+        Board board = boardService.get(boardId);
+        BoardDTO boardDTO = BoardDTO.getBoardFromDB(board);
+        boardDTO.setUserPermission(board.getUserPermissionIntegerByUserId(userId));
+        return Response.builder()
+                .data(boardDTO)
+                .message(SuccessMessage.FOUND.toString())
+                .status(HttpStatus.OK)
+                .statusCode(HttpStatusCodes.STATUS_CODE_OK)
+                .build();
     }
 
     /**
@@ -164,29 +104,13 @@ public class BoardFacade {
      * @throws NoSuchElementException   if the specified board does not exist
      * @throws NullPointerException     if the update object request object is null
      */
-    public Response updateBoard(UpdateObjectRequest updateObjReq) {
-        try {
-            Validations.validate(updateObjReq.getObjectsIdsRequest().getBoardId(), Regex.ID.getRegex());
-
-            return Response.builder()
-                    .data(BoardDTO.getBoardFromDB(boardService.updateBoard(updateObjReq)))
-                    .message(SuccessMessage.FOUND.toString())
-                    .status(HttpStatus.OK)
-                    .statusCode(HttpStatusCodes.STATUS_CODE_OK)
-                    .build();
-
-        } catch (NoSuchFieldException | IllegalArgumentException | NoSuchElementException e) {
-            return Response.builder()
-                    .statusCode(HttpStatusCodes.STATUS_CODE_BAD_REQUEST)
-                    .status(HttpStatus.BAD_REQUEST)
-                    .message(ExceptionMessage.NULL_INPUT.toString())
-                    .build();
-        } catch (NullPointerException e) {
-            return Response.builder()
-                    .statusCode(HttpStatusCodes.STATUS_CODE_SERVER_ERROR)
-                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .message(e.getMessage())
-                    .build();
-        }
+    public Response updateBoard(UpdateObjectRequest updateObjReq) throws NoSuchFieldException {
+        Validations.validate(updateObjReq.getObjectsIdsRequest().getBoardId(), Regex.ID.getRegex());
+        return Response.builder()
+                .data(BoardDTO.getBoardFromDB(boardService.updateBoard(updateObjReq)))
+                .message(SuccessMessage.FOUND.toString())
+                .status(HttpStatus.OK)
+                .statusCode(HttpStatusCodes.STATUS_CODE_OK)
+                .build();
     }
 }

@@ -3,12 +3,10 @@ package CRM.controller.controllers;
 import CRM.controller.facades.AttributeFacade;
 import CRM.entity.DTO.AttributeDTO;
 import CRM.entity.DTO.BoardDTO;
-import CRM.entity.Section;
 import CRM.entity.Status;
 import CRM.entity.requests.AttributeRequest;
 import CRM.entity.requests.UpdateObjectRequest;
 import CRM.entity.response.Response;
-import CRM.utils.enums.UpdateField;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -39,19 +37,21 @@ public class StatusController {
     @PostMapping(consumes = "application/json")
     public ResponseEntity<Response<List<AttributeDTO>>> create(@RequestBody AttributeRequest sectionRequest, @RequestAttribute Long boardId) {
         sectionRequest.setBoardId(boardId);
-        Response response = attributeFacade.create(sectionRequest, Status.class);
+        Response<List<AttributeDTO>> response = attributeFacade.create(sectionRequest, Status.class);
         messagingTemplate.convertAndSend("/attribute/" + boardId, response);
         return ResponseEntity.noContent().build();
     }
 
-//    /**
-//     * Handle HTTP DELETE requests to delete a status.
-//     *
-//     * @return A ResponseEntity with the appropriate status and response body.
-//     */
+    /**
+     * DeleteMapping to delete a section with a given id.
+     *
+     * @param boardId   The id of the board to which the section belongs.
+     * @param sectionId The id of the section to be deleted.
+     * @return A ResponseEntity with no content.
+     */
     @DeleteMapping(value = "{sectionId}")
-    public ResponseEntity<Response> delete(@RequestAttribute Long boardId,@PathVariable Long sectionId) {
-        Response response = attributeFacade.delete(boardId, sectionId, Status.class);
+    public ResponseEntity<Response<Void>> delete(@RequestAttribute Long boardId, @PathVariable Long sectionId) {
+        Response<Void> response = attributeFacade.delete(boardId, sectionId, Status.class);
         messagingTemplate.convertAndSend("/attribute/" + boardId, response);
         return ResponseEntity.noContent().build();
     }
@@ -65,14 +65,19 @@ public class StatusController {
      */
     @GetMapping(value = "getAll/{boardId}")
     public ResponseEntity<Response<List<AttributeDTO>>> getAllInBoard(@PathVariable Long boardId) {
-        Response response = attributeFacade.getAllAttributesInBoard(boardId, Status.class);
+        Response<List<AttributeDTO>> response = attributeFacade.getAllAttributesInBoard(boardId, Status.class);
         return new ResponseEntity<>(response, response.getStatus());
     }
 
-    //TODO documentation
+    /**
+     * PatchMapping to update a board with a given id.
+     *
+     * @param updateObjectRequest The UpdateObjectRequest object containing the updated board details and the list of object ids to be updated.
+     * @return A ResponseEntity with no content.
+     */
     @PatchMapping(value = "/update", consumes = "application/json")
-    public ResponseEntity<Response<BoardDTO>> update(@RequestBody UpdateObjectRequest updateObjectRequest) {
-        Response response = attributeFacade.update(updateObjectRequest, Status.class);
+    public ResponseEntity<Response<BoardDTO>> update(@RequestBody UpdateObjectRequest updateObjectRequest) throws NoSuchFieldException {
+        Response<BoardDTO> response = attributeFacade.update(updateObjectRequest, Status.class);
         messagingTemplate.convertAndSend("/attribute/" + updateObjectRequest.getObjectsIdsRequest().getBoardId(), response);
         return ResponseEntity.noContent().build();
     }

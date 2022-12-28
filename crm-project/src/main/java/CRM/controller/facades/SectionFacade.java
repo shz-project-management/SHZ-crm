@@ -195,27 +195,12 @@ public class SectionFacade {
      * @throws NoSuchFieldException     if the field to be updated does not exist
      * @throws NullPointerException     if an unexpected null value is encountered
      */
-    public Response update(UpdateObjectRequest updateItemRequest) {
-        try {
+    public Response update(UpdateObjectRequest updateItemRequest) throws NoSuchFieldException {
             return Response.builder()
                     .data(SectionDTO.createSectionDTO(sectionService.update(updateItemRequest)))
                     .message(SuccessMessage.FOUND.toString())
                     .status(HttpStatus.OK)
                     .statusCode(HttpStatusCodes.STATUS_CODE_OK)
                     .build();
-
-        } catch (IllegalArgumentException | NoSuchElementException | NoSuchFieldException e) {
-            return Response.builder()
-                    .message(e.getMessage())
-                    .status(HttpStatus.BAD_REQUEST)
-                    .statusCode(HttpStatusCodes.STATUS_CODE_BAD_REQUEST)
-                    .build();
-        } catch (NullPointerException e) {
-            return Response.builder()
-                    .message(e.getMessage())
-                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .statusCode(HttpStatusCodes.STATUS_CODE_SERVER_ERROR)
-                    .build();
-        }
     }
 }

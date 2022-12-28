@@ -1,5 +1,6 @@
 package CRM.utils.email;
 
+import CRM.utils.enums.ExceptionMessage;
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.extensions.java6.auth.oauth2.AuthorizationCodeInstalledApp;
 import com.google.api.client.extensions.jetty.auth.oauth2.LocalServerReceiver;
@@ -18,12 +19,14 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Scope;
+import org.springframework.mail.MailSendException;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import javax.mail.MessagingException;
 import javax.mail.Session;
+import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import java.io.ByteArrayOutputStream;
@@ -61,33 +64,26 @@ public class EmailUtil {
         return new AuthorizationCodeInstalledApp(flow, receiver).authorize("user");
     }
 
-    public static void send(String to, String message, String subject) throws MessagingException, IOException {
-        Properties props = new Properties();
-        Session session = Session.getDefaultInstance(props, null);
-        MimeMessage email = new MimeMessage(session);
-        email.setFrom(new InternetAddress(TEST_EMAIL));
-        email.addRecipient(TO, new InternetAddress(to));
-        email.setSubject(subject);
-        email.setContent(message,"text/html; charset=utf-8");
-
-        ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-        email.writeTo(buffer);
-        byte[] rawMessageBytes = buffer.toByteArray();
-        String encodedEmail = Base64.encodeBase64URLSafeString(rawMessageBytes);
-        Message msg = new Message();
-        msg.setRaw(encodedEmail);
-
+    public static void send(String to, String message, String subject) {
         try {
+            Properties props = new Properties();
+            Session session = Session.getDefaultInstance(props, null);
+            MimeMessage email = new MimeMessage(session);
+            email.setFrom(new InternetAddress(TEST_EMAIL));
+            email.addRecipient(TO, new InternetAddress(to));
+            email.setSubject(subject);
+            email.setContent(message, "text/html; charset=utf-8");
+
+            ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+            email.writeTo(buffer);
+            byte[] rawMessageBytes = buffer.toByteArray();
+            String encodedEmail = Base64.encodeBase64URLSafeString(rawMessageBytes);
+            Message msg = new Message();
+            msg.setRaw(encodedEmail);
+
             msg = service.users().messages().send("me", msg).execute();
-            System.out.println("Message id: " + msg.getId());
-            System.out.println(msg.toPrettyString());
-        } catch (GoogleJsonResponseException e) {
-            GoogleJsonError error = e.getDetails();
-            if (error.getCode() == 403) {
-                System.err.println("Unable to send message: " + e.getDetails());
-            } else {
-                throw e;
-            }
+        } catch (MessagingException | IOException e) {
+            throw new MailSendException(ExceptionMessage.EMAIL_SENDING_FAILED.toString());
         }
     }
 }

@@ -15,6 +15,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import javax.naming.AuthenticationException;
+import javax.security.auth.login.AccountNotFoundException;
+import java.io.IOException;
+
 @Controller
 @RequestMapping(value = "/user/auth")
 @AllArgsConstructor
@@ -35,7 +39,7 @@ public class AuthController {
     @RequestMapping(value = "register", method = RequestMethod.POST, consumes = "application/json")
     public ResponseEntity<Response<UserDTO>> register(@RequestBody RegisterUserRequest user) {
         logger.info("in AuthController -> register");
-        Response response = authFacade.register(user);
+        Response<UserDTO> response = authFacade.register(user);
         return new ResponseEntity<>(response, response.getStatus());
     }
 
@@ -46,9 +50,9 @@ public class AuthController {
      * @return A response containing the user's access token. The response status will reflect the result of the login attempt.
      */
     @RequestMapping(value = "login", method = RequestMethod.POST, consumes = "application/json")
-    public ResponseEntity<Response<String>> login(@RequestBody LoginUserRequest user) {
+    public ResponseEntity<Response<String>> login(@RequestBody LoginUserRequest user) throws AuthenticationException, AccountNotFoundException {
         logger.info("in AuthController -> login");
-        Response response = authFacade.login(user);
+        Response<String> response = authFacade.login(user);
         return new ResponseEntity<>(response, response.getStatus());
     }
 
@@ -59,8 +63,8 @@ public class AuthController {
      * @return A response containing the user's access token. The response status will reflect the result of the login attempt.
      */
     @PostMapping("/third-party-login")
-    public ResponseEntity<Response<String>> callback(@RequestParam String code) {
-        Response response = authFacade.thirdPartyLogin(code);
+    public ResponseEntity<Response<String>> callback(@RequestParam String code) throws IOException {
+        Response<String> response = authFacade.thirdPartyLogin(code);
         return new ResponseEntity<>(response, response.getStatus());
     }
 }

@@ -172,9 +172,8 @@ public class Board {
         // update the attribute (casted) field to the relevant Set (status, section, type)
     }
 
-    public List<Attribute> getAllAttributeInBoard(Class clz) {
-        return (List<Attribute>) getAttributeSet(clz)
-                .stream().collect(Collectors.toList());
+    public List<? extends Attribute> getAllAttributeInBoard(Class<? extends Attribute> clz) {
+        return new ArrayList<>(getAttributeSet(clz));
     }
 
     //--------------------------------------User--------------------------------------//
@@ -206,9 +205,9 @@ public class Board {
     // -------- Helpers: --------- //
 
 
-    public <T extends Attribute> Set<T> getAttributeSet(Class<T> clz) {
-        if (clz == Type.class) return (Set<T>) types;
-        if (clz == Status.class) return (Set<T>) statuses;
+    public Set<? extends Attribute> getAttributeSet(Class<? extends Attribute> clz) {
+        if (clz == Type.class) return types;
+        if (clz == Status.class) return statuses;
 
         throw new IllegalArgumentException("Invalid Attribute class: " + clz); // FIXME: return null
     }
