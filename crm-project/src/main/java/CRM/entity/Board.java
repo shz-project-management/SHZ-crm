@@ -117,9 +117,18 @@ public class Board {
     }
 
     public Set<Comment> getAllCommentsInItem(long sectionId, long itemId) {
-        return new HashSet<>(getSectionFromBoard(sectionId)
+        Set<Comment> commentsSet = new HashSet<>(getSectionFromBoard(sectionId)
                 .getItemById(itemId)
                 .getComments());
+
+        return commentsSet.stream()
+                .sorted((o1, o2) -> {
+                    // Assuming that the objects have a getId() method that returns their ID as a Long
+                    Long id1 = o1.getId();
+                    Long id2 = o2.getId();
+                    return id1.compareTo(id2);
+                })
+                .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
 
@@ -181,7 +190,7 @@ public class Board {
         return false;
     }
 
-    public Set<User> getBoardUsersSet(){
+    public Set<User> getBoardUsersSet() {
         Set<User> userSet = new HashSet<>();
         for (UserSetting userSetting : usersSettings) {
             userSet.add(userSetting.getUser());
@@ -278,7 +287,7 @@ public class Board {
         throw new NoPermissionException(ExceptionMessage.PERMISSION_FAILED.toString());
     }
 
-    public Permission getUserPermissionWithoutAdminByUserId(Long userId) throws NoPermissionException {
+    public Permission getUserPermissionWithAdminByUserId(Long userId) throws NoPermissionException {
         if (creatorUser.getId().equals(userId)) {
             return Permission.ADMIN;
         }

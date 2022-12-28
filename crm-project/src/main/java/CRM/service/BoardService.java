@@ -9,6 +9,7 @@ import CRM.repository.UserRepository;
 import CRM.utils.Common;
 import CRM.utils.Validations;
 import CRM.utils.enums.ExceptionMessage;
+import CRM.utils.enums.Permission;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,6 +58,8 @@ public class BoardService {
         }
         Board board = Board.createBoard(user, boardRequest.getName(), boardRequest.getDescription());
         Common.createDefaultSettingForNewUserInBoard(user, board, notificationSettingRepository, entityManager);
+        boardRepository.save(board);
+        board.getUsersPermissions().add(UserPermission.newUserPermission(board.getCreatorUser(), Permission.ADMIN));
         return boardRepository.save(board);
     }
 
