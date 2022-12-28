@@ -29,10 +29,10 @@ public class UserController {
     private SimpMessagingTemplate messagingTemplate;
 
 
-    @GetMapping(value = "{id}")
-    public ResponseEntity<Response> get(@PathVariable Long id){
+    @GetMapping
+    public ResponseEntity<Response> get(@RequestAttribute Long userId){
 
-        Response response = userFacade.get(id);
+        Response response = userFacade.get(userId);
         return new ResponseEntity<>(response, response.getStatus());
     }
 

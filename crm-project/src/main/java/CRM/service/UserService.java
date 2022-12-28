@@ -1,24 +1,19 @@
 package CRM.service;
 
 import CRM.entity.*;
-import CRM.entity.requests.NotificationRequest;
 import CRM.entity.requests.ObjectsIdsRequest;
 import CRM.repository.BoardRepository;
 import CRM.repository.NotificationSettingRepository;
 import CRM.repository.UserRepository;
-import CRM.repository.UserSettingRepository;
-import CRM.utils.Common;
-import CRM.utils.NotificationSender;
 import CRM.utils.Validations;
 import CRM.utils.enums.ExceptionMessage;
-import CRM.utils.enums.Notifications;
 import CRM.utils.enums.Permission;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.persistence.EntityManager;
+import javax.naming.NoPermissionException;
 import javax.security.auth.login.AccountNotFoundException;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -151,7 +146,7 @@ public class UserService {
      * @return a map containing two lists of boards: "myBoards" (boards created by the user) and "SharedBoards" (boards shared with the user)
      * @throws AccountNotFoundException if the user does not exist
      */
-    public Map<String, List<Board>> getAllBoardsOfUser(long userId) throws AccountNotFoundException {
+    public Map<String, List<Board>> getAllBoardsOfUser(long userId) throws AccountNotFoundException, NoPermissionException {
         User user;
         try {
             user = Validations.doesIdExists(userId, userRepository);
@@ -184,8 +179,6 @@ public class UserService {
 
         Permission permission = Permission.values()[Math.toIntExact(request.getPermissionId())];
         Set<UserPermission> userPermissionsSet = updateUserPermission(user, permission, board);
-        User admin = board.getCreatorUser();
-        addAdminToUsersPermissionIfNotExists(userPermissionsSet, admin);
 
         boardRepository.save(board);
         return userPermissionsSet;
@@ -231,9 +224,6 @@ public class UserService {
     public Set<UserPermission> getAllUserPermissionsInBoard(Long boardId) {
         Board board = Validations.doesIdExists(boardId, boardRepository);
         Set<UserPermission> userPermissions = board.getUsersPermissions();
-        User admin = board.getCreatorUser();
-        addAdminToUsersPermissionIfNotExists(userPermissions, admin);
-
         return userPermissions;
     }
 
@@ -298,20 +288,17 @@ public class UserService {
      * @param user the user
      * @return a list of boards shared with the user
      */
-    private List<Board> getSharedBoardsOfUser(User user) {
+    private List<Board> getSharedBoardsOfUser(User user) throws NoPermissionException {
         //get all the boards of the user he is shared with
         List<Board> allBoards = boardRepository.findAll();
         List<Board> sharedBoards = new ArrayList<>();
         for (Board board : allBoards) {
             if (board.getAllUsersInBoard().contains(user)) {
-                sharedBoards.add(board);
+                Permission userPerm = board.getUserPermissionWithAdminByUserId(user.getId());
+                if (!userPerm.equals(Permission.ADMIN))
+                    sharedBoards.add(board);
             }
         }
         return sharedBoards;
-    }
-
-    private void addAdminToUsersPermissionIfNotExists(Set<UserPermission> userPermissions, User admin){
-        if (userPermissions.stream().noneMatch(userPerm -> userPerm.getUser().getId().equals(admin.getId())))
-            userPermissions.add(UserPermission.newUserPermission(admin, Permission.ADMIN));
     }
 }

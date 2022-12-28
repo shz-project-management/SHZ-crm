@@ -22,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
+import javax.naming.NoPermissionException;
 import javax.security.auth.login.AccountNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
@@ -205,7 +206,7 @@ public class UserFacade {
                     .statusCode(HttpStatusCodes.STATUS_CODE_OK)
                     .build();
 
-        } catch (AccountNotFoundException | IllegalArgumentException | NoSuchElementException e) {
+        } catch (AccountNotFoundException | NoPermissionException | IllegalArgumentException | NoSuchElementException e) {
             return Response.builder()
                     .statusCode(HttpStatusCodes.STATUS_CODE_BAD_REQUEST)
                     .status(HttpStatus.BAD_REQUEST)
