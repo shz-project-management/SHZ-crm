@@ -74,12 +74,12 @@ public class NotificationSender {
                 return "Item id: " + notificationRequest.getItemId() + " has been assigned to you in board " +
                         notificationRequest.getBoard().getName();
             case 2:
-                return "Item id: " + notificationRequest.getItemId() + " Status has been changed to " +
-                        notificationRequest.getBoard().getAllAttributeInBoard(Status.class).get((Integer) notificationRequest.getPresentContent())
+                List<Attribute> statuses = notificationRequest.getBoard().getAllAttributeInBoard(Status.class);
+                return " Status has been changed to " + statuses.get((Integer) notificationRequest.getPresentContent()).getName()
                         + " in item: " + notificationRequest.getItemId();
             case 3:
-                return "Item id: " + notificationRequest.getItemId() + " Type has been changed to " +
-                        notificationRequest.getBoard().getAllAttributeInBoard(Type.class).get((Integer) notificationRequest.getPresentContent())
+                List<Attribute> types = notificationRequest.getBoard().getAllAttributeInBoard(Type.class);
+                return " Type has been changed to " + types.get((Integer) notificationRequest.getPresentContent()).getName()
                         + " in item: " + notificationRequest.getItemId();
             case 4:
                 return "New comment added on item id: " + notificationRequest.getItemId() + ":\n " +
