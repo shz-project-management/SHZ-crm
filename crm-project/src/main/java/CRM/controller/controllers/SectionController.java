@@ -50,6 +50,7 @@ public class SectionController {
     @DeleteMapping(value = "{sectionId}")
     public ResponseEntity<Response<Void>> delete(@RequestAttribute Long boardId, @PathVariable Long sectionId) {
         Response<Void> response = sectionFacade.delete(boardId, sectionId);
+        messagingTemplate.convertAndSend("/section/" + boardId, response);
         return new ResponseEntity<>(response, response.getStatus());
     }
 
@@ -101,6 +102,7 @@ public class SectionController {
     @PatchMapping(value = "/update", consumes = "application/json")
     public ResponseEntity<Response<SectionDTO>> update(@RequestBody UpdateObjectRequest updateItemRequest, @RequestAttribute Long boardId) {
         updateItemRequest.getObjectsIdsRequest().setBoardId(boardId);
+        messagingTemplate.convertAndSend("/section/" + boardId, response);
         return ResponseEntity.noContent().build();
     }
 }
