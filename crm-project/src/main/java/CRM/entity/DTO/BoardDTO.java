@@ -20,6 +20,7 @@ public class BoardDTO {
     private List<SectionDTO> sections;
     private List<AttributeDTO> types;
     private List<AttributeDTO> statuses;
+    private List<UserDTO> members;
     private Integer userPermission;
 
     public static BoardDTO getBoardFromDB(Board board) {
@@ -31,6 +32,7 @@ public class BoardDTO {
         boardDTO.setSections(SectionDTO.getSectionsDTOList(board.getSections()));
         boardDTO.setStatuses(AttributeDTO.getListOfAttributesFromDB(board.getStatuses()));
         boardDTO.setTypes(AttributeDTO.getListOfAttributesFromDB(board.getTypes()));
+        boardDTO.setMembers(UserDTO.getListOfUsersDTO(board.getAllUsersInBoard()));
         return boardDTO;
     }
 
