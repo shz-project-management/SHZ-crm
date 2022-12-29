@@ -50,8 +50,8 @@ public class StatusController {
      * @return A ResponseEntity with no content.
      */
     @DeleteMapping(value = "{sectionId}")
-    public ResponseEntity<Response<Void>> delete(@RequestAttribute Long boardId, @PathVariable Long sectionId) {
-        Response<Void> response = attributeFacade.delete(boardId, sectionId, Status.class);
+    public ResponseEntity<Response<BoardDTO>> delete(@RequestAttribute Long boardId, @PathVariable Long sectionId) {
+        Response<BoardDTO> response = attributeFacade.delete(boardId, sectionId, Status.class);
         messagingTemplate.convertAndSend("/attribute/" + boardId, response);
         return ResponseEntity.noContent().build();
     }

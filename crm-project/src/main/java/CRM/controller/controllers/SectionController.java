@@ -35,7 +35,7 @@ public class SectionController {
      */
     @PostMapping(consumes = "application/json")
     public ResponseEntity<Response<List<SectionDTO>>> create(@RequestBody AttributeRequest sectionRequest, @RequestAttribute Long boardId) {
-        Response<SectionDTO> response = sectionFacade.create(sectionRequest, boardId);
+        Response<List<SectionDTO>> response = sectionFacade.create(sectionRequest, boardId);
         messagingTemplate.convertAndSend("/section/" + boardId, response);
         return ResponseEntity.noContent().build();
     }
@@ -100,8 +100,9 @@ public class SectionController {
      * @return A ResponseEntity with no content.
      */
     @PatchMapping(value = "/update", consumes = "application/json")
-    public ResponseEntity<Response<SectionDTO>> update(@RequestBody UpdateObjectRequest updateItemRequest, @RequestAttribute Long boardId) {
+    public ResponseEntity<Response<SectionDTO>> update(@RequestBody UpdateObjectRequest updateItemRequest, @RequestAttribute Long boardId) throws NoSuchFieldException {
         updateItemRequest.getObjectsIdsRequest().setBoardId(boardId);
+        Response response = sectionFacade.update(updateItemRequest);
         messagingTemplate.convertAndSend("/section/" + boardId, response);
         return ResponseEntity.noContent().build();
     }

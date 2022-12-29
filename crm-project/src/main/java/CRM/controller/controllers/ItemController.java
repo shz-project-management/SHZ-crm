@@ -3,9 +3,10 @@ package CRM.controller.controllers;
 import CRM.controller.facades.SharedContentFacade;
 import CRM.entity.DTO.ItemDTO;
 import CRM.entity.DTO.SectionDTO;
-import CRM.entity.DTO.UserPermissionDTO;
 import CRM.entity.Item;
-import CRM.entity.requests.*;
+import CRM.entity.requests.ItemRequest;
+import CRM.entity.requests.ObjectsIdsRequest;
+import CRM.entity.requests.UpdateObjectRequest;
 import CRM.entity.response.Response;
 import lombok.AllArgsConstructor;
 import org.apache.logging.log4j.LogManager;
@@ -119,7 +120,7 @@ public class ItemController {
      */
     @PostMapping(value = "assign-to-user")
     public ResponseEntity<Response<SectionDTO>> assignToUser(@RequestBody ObjectsIdsRequest objIds, @RequestAttribute Long boardId) throws AccountNotFoundException {
-        objIds.setUserId(boardId);
+        objIds.setBoardId(boardId);
         Response<SectionDTO> response = sharedContentFacade.assignToUser(objIds, Item.class);
         messagingTemplate.convertAndSend("/item/" + boardId, response);
         return ResponseEntity.noContent().build();

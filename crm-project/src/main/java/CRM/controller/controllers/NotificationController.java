@@ -49,8 +49,8 @@ public class NotificationController {
      * @return A response indicating the result of the delete operation. The response status will reflect the result of the operation.
      */
     @DeleteMapping(value = "delete")
-    public ResponseEntity<Response<Void>> delete(@RequestBody List<Long> notificationsIds, @RequestAttribute Long boardId) {
-        Response<Void> response = notificationFacade.delete(notificationsIds);
+    public ResponseEntity<Response<NotificationDTO>> delete(@RequestBody List<Long> notificationsIds, @RequestAttribute Long boardId) {
+        Response<List<NotificationDTO>> response = notificationFacade.delete(notificationsIds);
         messagingTemplate.convertAndSend("/notification/" + boardId, response);
         return ResponseEntity.noContent().build();
     }

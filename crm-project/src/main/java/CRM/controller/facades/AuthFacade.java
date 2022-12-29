@@ -38,10 +38,10 @@ public class AuthFacade {
      * @throws IllegalArgumentException if any of the provided registration information is invalid.
      * @throws NullPointerException     if any of the required fields in the user request are missing.
      */
-    public Response register(RegisterUserRequest user) {
+    public Response<UserDTO> register(RegisterUserRequest user) {
         logger.info("in FacadeAuthController -> register");
         Validations.validateRegisteredUser(user);
-        return Response.builder()
+        return Response.<UserDTO>builder()
                 .data(UserDTO.createUserDTO(authService.register(user)))
                 .message(SuccessMessage.REGISTER.toString())
                 .status(HttpStatus.ACCEPTED)
@@ -57,9 +57,9 @@ public class AuthFacade {
      * @throws IOException          if there is an error while communicating with the third party provider
      * @throws NullPointerException if the code parameter is null
      */
-    public Response thirdPartyLogin(String code) throws IOException {
+    public Response<String> thirdPartyLogin(String code) throws IOException {
         RegisterUserRequest user = githubCodeDecoder.getUserDataFromCode(code);
-        return Response.builder()
+        return Response.<String>builder()
                 .data(authService.thirdPartyLogin(user))
                 .message(SuccessMessage.REGISTER.toString())
                 .status(HttpStatus.ACCEPTED)
@@ -77,10 +77,10 @@ public class AuthFacade {
      * @throws AccountNotFoundException if the user with the given login credentials does not exist.
      */
     // FIXME: Make Response<String> somehow...
-    public Response login(LoginUserRequest user) throws AuthenticationException, AccountNotFoundException {
+    public Response<String> login(LoginUserRequest user) throws AuthenticationException, AccountNotFoundException {
         logger.info("in FacadeAuthController -> login");
         Validations.validateLoginUser(user);
-        return Response.builder()
+        return Response.<String>builder()
                 .data(authService.login(user))
                 .message(SuccessMessage.LOGIN.toString())
                 .status(HttpStatus.OK)

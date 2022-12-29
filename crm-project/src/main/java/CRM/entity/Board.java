@@ -150,29 +150,24 @@ public class Board {
     }
 
     //--------------------------------------Attributes--------------------------------------//
-    public Attribute getAttributeById(long id, Class clz) {
-        Set<Attribute> attributes = getAttributeSet(clz);
-        for (Attribute attribute : attributes) {
+    public <T extends Attribute> T getAttributeById(long id, Class<T> clz) {
+        Set<T> attributes = getAttributeSet(clz);
+        for (T attribute : attributes) {
             if (attribute.getId() == id) return attribute;
         }
         throw new NoSuchElementException("Could not find this attribute in the db"); // FIXME: return null
     }
 
-    public void addAttributeToBoard(Attribute attribute, Class clz) {
+    public <T extends Attribute> void addAttributeToBoard(T attribute, Class<T> clz) {
         checkIfAttributeNameAlreadyExists(attribute.getName(), clz);
         getAttributeSet(clz).add(attribute);
     }
 
-    public void removeAttribute(long attributeId, Class clz) {
+    public void removeAttribute(long attributeId, Class<? extends Attribute> clz) {
         getAttributeSet(clz).remove(getAttributeById(attributeId, clz));
     }
 
-    public void updateAttribute(UpdateObjectRequest attributeRequest, long attributeId, Class clz) {
-        // check which class this is
-        // update the attribute (casted) field to the relevant Set (status, section, type)
-    }
-
-    public List<? extends Attribute> getAllAttributeInBoard(Class<? extends Attribute> clz) {
+    public <T extends Attribute> List<T> getAllAttributeInBoard(Class<T> clz) {
         return new ArrayList<>(getAttributeSet(clz));
     }
 
@@ -203,18 +198,15 @@ public class Board {
     }
 
     // -------- Helpers: --------- //
-
-
-    public Set<? extends Attribute> getAttributeSet(Class<? extends Attribute> clz) {
-        if (clz == Type.class) return types;
-        if (clz == Status.class) return statuses;
+    public <T extends Attribute> Set<T> getAttributeSet(Class<T> clz) {
+        if (clz == Type.class) return (Set<T>) types;
+        if (clz == Status.class) return (Set<T>) statuses;
 
         throw new IllegalArgumentException("Invalid Attribute class: " + clz); // FIXME: return null
     }
 
-
-    private void checkIfAttributeNameAlreadyExists(String name, Class clz) {
-        List<Attribute> list = (List<Attribute>) getAttributeSet(clz).stream().collect(Collectors.toList());
+    private void checkIfAttributeNameAlreadyExists(String name, Class<? extends Attribute> clz) {
+        List<Attribute> list = new ArrayList<>(getAttributeSet(clz));
         for (Attribute attribute : list) {
             if (attribute.getName().equals(name))
                 throw new IllegalArgumentException("This name already exists"); // FIXME: return null
@@ -225,7 +217,7 @@ public class Board {
         usersSettings.add(userSetting);
     }
 
-    public void removeAttributeFromItems(long attributeId, Class clz) {
+    public void removeAttributeFromItems(long attributeId, Class<? extends Attribute> clz) {
         getSections().forEach(section ->
                 section.getItems().forEach(item -> {
                     if (clz == Status.class) {

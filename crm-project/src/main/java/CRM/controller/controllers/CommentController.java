@@ -3,7 +3,7 @@ package CRM.controller.controllers;
 import CRM.controller.facades.SharedContentFacade;
 import CRM.entity.Comment;
 import CRM.entity.DTO.CommentDTO;
-import CRM.entity.SharedContent;
+import CRM.entity.DTO.SectionDTO;
 import CRM.entity.requests.CommentRequest;
 import CRM.entity.requests.ObjectsIdsRequest;
 import CRM.entity.requests.UpdateObjectRequest;
@@ -26,7 +26,7 @@ import java.util.List;
 @CrossOrigin
 public class CommentController {
 
-    private static Logger logger = LogManager.getLogger(CommentController.class.getName());
+    private static final Logger logger = LogManager.getLogger(CommentController.class.getName());
 
     @Autowired
     SharedContentFacade sharedContentFacade;
@@ -70,8 +70,8 @@ public class CommentController {
      * @return A response indicating the result of the update operation. The response status will reflect the result of the update operation.
      */
     @PatchMapping(value = "update")
-    public ResponseEntity<Response<CommentDTO>> update(@RequestBody UpdateObjectRequest updateObject, @RequestAttribute Long boardId) throws NoSuchFieldException, AccountNotFoundException {
-        Response<CommentDTO> response = sharedContentFacade.update(updateObject, Comment.class);
+    public ResponseEntity<Response<SectionDTO>> update(@RequestBody UpdateObjectRequest updateObject, @RequestAttribute Long boardId) throws NoSuchFieldException, AccountNotFoundException {
+        Response<SectionDTO> response = sharedContentFacade.update(updateObject, Comment.class);
         messagingTemplate.convertAndSend("/comment/" + boardId, response);
         return ResponseEntity.noContent().build();
     }

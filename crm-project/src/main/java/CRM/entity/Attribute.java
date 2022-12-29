@@ -21,11 +21,11 @@ public class Attribute {
     private String name;
     private String description;
 
-    public static Attribute createAttribute(String name, String description){
+    public static <T extends Attribute> T createAttribute(String name, String description){
         Attribute attribute = new Attribute();
         attribute.setName(name);
         attribute.setDescription(Objects.requireNonNullElse(description, ""));
-        return attribute;
+        return (T) attribute;
     }
 
     public static Status createStatusAttribute(String name, String description) {

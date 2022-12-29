@@ -7,7 +7,6 @@ import CRM.entity.response.Response;
 import CRM.service.*;
 import CRM.utils.NotificationSender;
 import CRM.utils.Validations;
-import CRM.utils.email.Share;
 import CRM.utils.enums.*;
 import com.google.api.client.http.HttpStatusCodes;
 import org.apache.logging.log4j.LogManager;
@@ -47,9 +46,9 @@ public class SharedContentFacade {
      * @throws NoSuchElementException   if the board ID, type ID, or status ID specified in the request object do not correspond to existing entities.
      * @throws NullPointerException     if the parent item ID is null.
      */
-    public Response create(ItemRequest item) throws AccountNotFoundException {
+    public Response<SectionDTO> create(ItemRequest item) throws AccountNotFoundException {
         Validations.validateCreatedItem(item);
-        return Response.builder()
+        return Response.<SectionDTO>builder()
                 .data(SectionDTO.createSectionDTO(itemService.create(item)))
                 .message(SuccessMessage.CREATE.toString())
                 .status(HttpStatus.ACCEPTED)
@@ -67,11 +66,11 @@ public class SharedContentFacade {
      * @throws NoSuchElementException   if the parent item ID specified in the request object does not correspond to an existing item.
      * @throws NullPointerException     if the title is null.
      */
-    public Response create(CommentRequest comment, Long userId, Long boardId) throws AccountNotFoundException {
+    public Response<List<CommentDTO>> create(CommentRequest comment, Long userId, Long boardId) throws AccountNotFoundException {
         Validations.validateCreatedComment(comment, userId, boardId);
         List<CommentDTO> commentDTOS = CommentDTO.getCommentDTOList(commentService.create(comment, userId, boardId));
         sendCommentCreatedNotification(comment, userId, boardId);
-        return Response.builder()
+        return Response.<List<CommentDTO>>builder()
                 .data(commentDTOS)
                 .message(SuccessMessage.CREATE.toString())
                 .status(HttpStatus.ACCEPTED)
@@ -90,7 +89,7 @@ public class SharedContentFacade {
      * @throws IllegalArgumentException if the ids or boardId are invalid
      * @throws NullPointerException     if the clz parameter is null
      */
-    public Response delete(List<Long> ids, long boardId, Class<? extends SharedContent> clz) throws AccountNotFoundException {
+    public Response<Void> delete(List<Long> ids, long boardId, Class<? extends SharedContent> clz) throws AccountNotFoundException {
         List<Long> correctIds = new ArrayList<>();
         Validations.validate(boardId, Regex.ID.getRegex());
         ids.forEach(id -> {
@@ -100,10 +99,9 @@ public class SharedContentFacade {
             } catch (IllegalArgumentException | NullPointerException e) {
             }
         });
-        int deleteData = convertFromClassToService(clz).delete(correctIds, boardId);
+        convertFromClassToService(clz).delete(correctIds, boardId);
         sendItemDeleteNotification(correctIds, boardId);
-        return Response.builder()
-                .data(deleteData)
+        return Response.<Void>builder()
                 .message(SuccessMessage.DELETED.toString())
                 .status(HttpStatus.NO_CONTENT)
                 .statusCode(HttpStatusCodes.STATUS_CODE_NO_CONTENT)
@@ -124,13 +122,13 @@ public class SharedContentFacade {
      * @throws AccountNotFoundException if the user associated with the update request cannot be found
      * @throws NullPointerException     if the clz parameter is null
      */
-    public Response update(UpdateObjectRequest updateObject, Class<? extends SharedContent> clz) throws NoSuchFieldException, AccountNotFoundException {
+    public Response<SectionDTO> update(UpdateObjectRequest updateObject, Class<? extends SharedContent> clz) throws NoSuchFieldException, AccountNotFoundException {
         Validations.validateSharedContent(updateObject.getObjectsIdsRequest());
         SectionDTO sectionDTO = SectionDTO.createSectionDTO(convertFromClassToService(clz).update(updateObject));
         if (clz.equals(Item.class)) {
             sendRelevantNotification(updateObject);
         }
-        return Response.builder()
+        return Response.<SectionDTO>builder()
                 .data(sectionDTO)
                 .message(SuccessMessage.FOUND.toString())
                 .status(HttpStatus.OK)
@@ -150,10 +148,10 @@ public class SharedContentFacade {
      * @throws AccountNotFoundException if the user associated with the request cannot be found
      * @throws NullPointerException     if the clz parameter is null
      */
-    public Response get(ObjectsIdsRequest objectsIdsRequest, Class<? extends SharedContent> clz) {
+    public <T extends SharedContentDTO, E extends SharedContent> Response<T> get(ObjectsIdsRequest objectsIdsRequest, Class<E> clz) {
         Validations.validateSharedContent(objectsIdsRequest);
-        return Response.builder()
-                .data(convertFromServiceOutputToDTOEntity(convertFromClassToService(clz).get(objectsIdsRequest), clz))
+        return Response.<T>builder()
+                .data(convertFromServiceOutputToDTOEntity(convertFromClassToService(clz).get(objectsIdsRequest)))
                 .message(SuccessMessage.FOUND.toString())
                 .status(HttpStatus.OK)
                 .statusCode(HttpStatusCodes.STATUS_CODE_OK)
@@ -169,9 +167,9 @@ public class SharedContentFacade {
      * @throws NoSuchElementException   if the section or board associated with the request cannot be found
      * @throws NullPointerException     if the objectsIdsRequest parameter is null
      */
-    public Response getAllItemsInSection(ObjectsIdsRequest objectsIdsRequest) {
+    public Response<List<ItemDTO>> getAllItemsInSection(ObjectsIdsRequest objectsIdsRequest) {
         Validations.validateIDs(objectsIdsRequest.getSectionId(), objectsIdsRequest.getBoardId());
-        return Response.builder()
+        return Response.<List<ItemDTO>>builder()
                 .data(ItemDTO.getItemsDTOList(itemService.getAllInSection(objectsIdsRequest)))
                 .message(SuccessMessage.FOUND.toString())
                 .status(HttpStatus.OK)
@@ -189,14 +187,32 @@ public class SharedContentFacade {
      * @throws NoSuchElementException   if any of the IDs does not correspond to an existing element
      * @throws NullPointerException     if an error occurs while processing the request
      */
-    public Response getAllInItem(ObjectsIdsRequest objectsIdsRequest, Class<? extends SharedContent> clz) {
+    public <T extends SharedContentDTO, E extends SharedContent> Response<List<T>> getAllInItem(ObjectsIdsRequest objectsIdsRequest, Class<E> clz) {
         Validations.validateIDs(objectsIdsRequest.getItemId(), objectsIdsRequest.getSectionId(), objectsIdsRequest.getBoardId());
-        return Response.builder()
-                .data(convertFromClassToService(clz).getAllInItem(objectsIdsRequest).stream().map(entity -> convertFromServiceOutputToDTOEntity(entity, clz)).collect(Collectors.toList()))
+        List<E> eList = convertFromClassToService(clz).getAllInItem(objectsIdsRequest);
+        List<T> tList = convertFromSharedContentToDTOList(eList);
+        return Response.<List<T>>builder()
+                .data(tList)
                 .message(SuccessMessage.FOUND.toString())
                 .status(HttpStatus.OK)
                 .statusCode(HttpStatusCodes.STATUS_CODE_OK)
                 .build();
+    }
+
+    /**
+     * Converts a list of SharedContent entities to a list of SharedContentDTOs.
+     *
+     * @param eList a list of SharedContent entities
+     * @param <T> the type of SharedContentDTO to return
+     * @param <E> the type of SharedContent entity being converted
+     * @return a list of SharedContentDTOs
+     */
+    private <T extends SharedContentDTO, E extends SharedContent> List<T> convertFromSharedContentToDTOList(List<E> eList){
+        List<T> tList = new ArrayList<>();
+        for (E element: eList) {
+            tList.add(convertFromServiceOutputToDTOEntity(element));
+        }
+        return tList;
     }
 
     /**
@@ -209,12 +225,11 @@ public class SharedContentFacade {
      * @throws NoSuchElementException   if any of the provided IDs do not correspond to an existing object
      * @throws NullPointerException     if any of the provided IDs are null
      */
-    public Response assignToUser(ObjectsIdsRequest objIds, Class<? extends SharedContent> clz) throws AccountNotFoundException {
+    public Response<SectionDTO> assignToUser(ObjectsIdsRequest objIds, Class<? extends SharedContent> clz) throws AccountNotFoundException {
         Validations.validateIDs(objIds.getBoardId(), objIds.getSectionId(), objIds.getUpdateObjId());
         Validations.validate(objIds.getEmail(), Regex.EMAIL.getRegex());
         User user = userService.get(objIds.getEmail());
-
-        return Response.builder()
+        return Response.<SectionDTO>builder()
                 .data(SectionDTO.createSectionWithUserDTO((convertFromClassToService(clz).assignToUser(objIds)), user))
                 .message(SuccessMessage.FOUND.toString())
                 .status(HttpStatus.OK)
@@ -228,8 +243,8 @@ public class SharedContentFacade {
      * @param clz the Class object to be converted
      * @return the corresponding AttributeService object, or null if no corresponding AttributeService object is found
      */
-    private ServiceInterface convertFromClassToService(Class<? extends SharedContent> clz) {
-        logger.info("in FacadeFileController -> convertFromClassToService ,item of Class: " + clz);
+    private <E extends SharedContent> ServiceInterface convertFromClassToService(Class<E> clz) {
+        logger.info("in SharedContentController -> convertFromClassToService ,item of Class: " + clz);
 
         if (clz.equals(Item.class)) return itemService;
         if (clz.equals(Comment.class)) return commentService;
@@ -244,18 +259,24 @@ public class SharedContentFacade {
      * If the class is not recognized, an IllegalArgumentException is thrown.
      *
      * @param content - the shared content object to convert
-     * @param clz     - the class of the shared content object
+     *                //     * @param clz     - the class of the shared content object
      * @return a DTO entity representing the shared content object
      */
-    private SharedContentDTO convertFromServiceOutputToDTOEntity(SharedContent content, Class<? extends SharedContent> clz) {
-        if (clz.getSimpleName().equals(Item.class.getSimpleName()))
-            return ItemDTO.getSharedContentFromDB((Item) content);
-        if (clz.getSimpleName().equals(Comment.class.getSimpleName()))
-            return CommentDTO.getSharedContentFromDB((Comment) content);
+    private <T extends SharedContentDTO, E extends SharedContent> T convertFromServiceOutputToDTOEntity(E content) {
+        if (content instanceof Item)
+            return (T) ItemDTO.getSharedContentFromDB((Item) content);
+        if (content instanceof Comment)
+            return (T) CommentDTO.getSharedContentFromDB((Comment) content);
 
         throw new IllegalArgumentException(ExceptionMessage.NO_SUCH_CLASS.toString());
     }
 
+    /**
+     * Sends a notification to relevant users based on an update to an object.
+     *
+     * @param updateObject the update object request
+     * @throws AccountNotFoundException if a user specified in the update object request cannot be found
+     */
     private void sendRelevantNotification(UpdateObjectRequest updateObject) throws AccountNotFoundException {
         NotificationRequest request;
         if (updateObject.getFieldName().equals(UpdateField.STATUS))
@@ -279,6 +300,14 @@ public class SharedContentFacade {
                 boardService.get(updateObject.getObjectsIdsRequest().getBoardId()).getBoardUsersSet());
     }
 
+    /**
+     * Sends a notification when a new comment is created.
+     *
+     * @param comment the comment request
+     * @param userId the ID of the user who created the comment
+     * @param boardId the ID of the board on which the comment was created
+     * @throws AccountNotFoundException if the user specified by the user ID cannot be found
+     */
     private void sendCommentCreatedNotification(CommentRequest comment, long userId, long boardId) throws AccountNotFoundException {
         notificationSender.sendNotificationToManyUsers(
                 NotificationRequest.createCommentAddedRequest(userService.get(userId),
@@ -288,6 +317,13 @@ public class SharedContentFacade {
                 boardService.get(boardId).getBoardUsersSet());
     }
 
+    /**
+     * Sends a notification when an item is deleted.
+     *
+     * @param correctIds the IDs of the deleted items
+     * @param boardId the ID of the board on which the items were deleted
+     * @throws AccountNotFoundException if the board specified by the board ID cannot be found
+     */
     private void sendItemDeleteNotification(List<Long> correctIds, Long boardId) throws AccountNotFoundException {
         Board board = boardService.get(boardId);
         for (Long id : correctIds) {

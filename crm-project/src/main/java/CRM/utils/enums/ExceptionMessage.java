@@ -48,6 +48,7 @@ public enum ExceptionMessage {
     UNAUTHORIZED_USER("You don't have the permission to do that action: "),
     WRONG_SEARCH("Something in the request wasn't properly written, try again"),
     EMAIL_IN_USE("This email address is already in use"),
+    EMPTY_LIST("A list must not be empty"),
     UNPROCESSABLE_ENTITY("Server Couldn't process entity"),
     CANT_ASSIGN_PERMISSION("Cant assign this permission to the given user"),
     USER_NOT_ACTIVATED("The user is not activated"),

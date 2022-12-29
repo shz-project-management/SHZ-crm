@@ -48,8 +48,8 @@ public class TypeController {
      * @return A ResponseEntity with the appropriate status and response body.
      */
     @DeleteMapping(value = "{sectionId}")
-    public ResponseEntity<Response<Void>> delete(@RequestAttribute Long boardId, @PathVariable Long sectionId) {
-        Response<Void> response = attributeFacade.delete(boardId, sectionId, Type.class);
+    public ResponseEntity<Response<BoardDTO>> delete(@RequestAttribute Long boardId, @PathVariable Long sectionId) {
+        Response<BoardDTO> response = attributeFacade.delete(boardId, sectionId, Type.class);
         messagingTemplate.convertAndSend("/attribute/" + boardId, response);
         return ResponseEntity.noContent().build();
     }

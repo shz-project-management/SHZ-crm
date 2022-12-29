@@ -13,6 +13,7 @@ import CRM.service.SettingsService;
 import CRM.service.UserService;
 import CRM.utils.NotificationSender;
 import CRM.utils.Validations;
+import CRM.utils.enums.ExceptionMessage;
 import CRM.utils.enums.Notifications;
 import CRM.utils.enums.Regex;
 import CRM.utils.enums.SuccessMessage;
@@ -181,9 +182,9 @@ public class UserFacade {
         User user = null;
         if (objectsIdsRequest.getEmail() != null)
             user = userService.get(objectsIdsRequest.getEmail());
-        else
+        else if(objectsIdsRequest.getUserId() != null)
             user = userService.get(objectsIdsRequest.getUserId());
-
+        else throw new NullPointerException(ExceptionMessage.ACCOUNT_DOES_NOT_EXISTS.toString());
         notificationSender.sendNotificationToManyUsers(
                 NotificationRequest.createUserAddedRequest(boardService.get(objectsIdsRequest.getBoardId()), user,
                         settingsService.getNotificationSettingFromDB(Notifications.USER_ADDED.name)), users);

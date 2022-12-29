@@ -18,6 +18,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Component
@@ -34,9 +35,9 @@ public class AttributeFacade {
      * @param clz              The class type of the attribute.
      * @return A Response object with the created attribute as a list of AttributeDTO objects and the corresponding HTTP status.
      */
-    public Response create(AttributeRequest attributeRequest, Class<? extends Attribute> clz) {
+    public Response<List<AttributeDTO>> create(AttributeRequest attributeRequest, Class<? extends Attribute> clz) {
         Validations.validate(attributeRequest.getName(), Regex.NAME.getRegex());
-        return Response.builder()
+        return Response.<List<AttributeDTO>>builder()
                 .status(HttpStatus.CREATED)
                 .statusCode(HttpStatusCodes.STATUS_CODE_CREATED)
                 .data(AttributeDTO.getListOfAttributesFromDB(new HashSet<>(attributeService.create(attributeRequest, clz))))
@@ -51,9 +52,9 @@ public class AttributeFacade {
      * @param clz         The class type of the attribute.
      * @return A Response object with the updated board as a BoardDTO object and the corresponding HTTP status.
      */
-    public Response delete(Long boardId, Long attributeId, Class<? extends Attribute> clz) {
+    public Response<BoardDTO> delete(Long boardId, Long attributeId, Class<? extends Attribute> clz) {
         Validations.validateIDs(attributeId, boardId);
-        return Response.builder()
+        return Response.<BoardDTO>builder()
                 .data(BoardDTO.getBoardFromDB(attributeService.delete(boardId, attributeId, clz)))
                 .status(HttpStatus.OK)
                 .statusCode(HttpStatusCodes.STATUS_CODE_NO_CONTENT)
@@ -69,9 +70,9 @@ public class AttributeFacade {
      * @param clz         The class type of the attribute.
      * @return A Response object with the attribute as an AttributeDTO object and the corresponding HTTP status.
      */
-    public Response get(Long attributeId, Long boardId, Class<? extends Attribute> clz) {
+    public Response<AttributeDTO> get(Long attributeId, Long boardId, Class<? extends Attribute> clz) {
         Validations.validateIDs(attributeId, boardId);
-        return Response.builder()
+        return Response.<AttributeDTO>builder()
                 .data(AttributeDTO.createAttributeDTO(attributeService.get(attributeId, boardId, clz)))
                 .message(SuccessMessage.FOUND.toString())
                 .status(HttpStatus.OK)
@@ -86,10 +87,10 @@ public class AttributeFacade {
      * @param clz     The class type of the attribute.
      * @return A Response object with the list of attributes as a list of AttributeDTO objects and the corresponding HTTP status.
      */
-    public Response getAllAttributesInBoard(Long boardId, Class<? extends Attribute> clz) {
+    public Response<List<AttributeDTO>> getAllAttributesInBoard(Long boardId, Class<? extends Attribute> clz) {
         Validations.validate(boardId, Regex.ID.getRegex());
         Set<Attribute> targetSet = new HashSet<>(attributeService.getAllAttributesInBoard(boardId, clz));
-        return Response.builder()
+        return Response.<List<AttributeDTO>>builder()
                 .data(AttributeDTO.getListOfAttributesFromDB(targetSet))
                 .message(SuccessMessage.FOUND.toString())
                 .status(HttpStatus.OK)
@@ -104,10 +105,10 @@ public class AttributeFacade {
      * @param clz                 The class type of the attribute.
      * @return A Response object with the updated attribute as an AttributeDTO object and the corresponding HTTP status.
      */
-    public Response update(UpdateObjectRequest updateObjectRequest, Class<? extends Attribute> clz) throws NoSuchFieldException {
+    public Response<BoardDTO> update(UpdateObjectRequest updateObjectRequest, Class<? extends Attribute> clz) throws NoSuchFieldException {
         Validations.validateIDs(updateObjectRequest.getObjectsIdsRequest().getUpdateObjId(),
                 updateObjectRequest.getObjectsIdsRequest().getBoardId());
-        return Response.builder()
+        return Response.<BoardDTO>builder()
                 .data(BoardDTO.getBoardFromDB(attributeService.update(updateObjectRequest, clz)))
                 .message(SuccessMessage.FOUND.toString())
                 .status(HttpStatus.OK)

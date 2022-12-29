@@ -6,6 +6,7 @@ import CRM.entity.requests.ObjectsIdsRequest;
 import CRM.entity.response.Response;
 import CRM.service.NotificationService;
 import CRM.utils.Validations;
+import CRM.utils.enums.ExceptionMessage;
 import CRM.utils.enums.Regex;
 import CRM.utils.enums.SuccessMessage;
 import com.google.api.client.http.HttpStatusCodes;
@@ -37,9 +38,9 @@ public class NotificationFacade {
      * @throws NoSuchElementException   if the specified board does not exist
      * @throws NullPointerException     if the objects IDs request object is null
      */
-    public Response getAllinBoard(ObjectsIdsRequest objectsIdsRequest) throws AccountNotFoundException {
+    public Response<List<NotificationDTO>> getAllinBoard(ObjectsIdsRequest objectsIdsRequest) throws AccountNotFoundException {
         Validations.validateIDs(objectsIdsRequest.getUserId(), objectsIdsRequest.getBoardId());
-        return Response.builder()
+        return Response.<List<NotificationDTO>>builder()
                 .message(SuccessMessage.FOUND.toString())
                 .status(HttpStatus.FOUND)
                 .statusCode(HttpStatusCodes.STATUS_CODE_OK)
@@ -56,7 +57,8 @@ public class NotificationFacade {
      * @throws NoSuchElementException   if any of the specified notifications do not exist
      * @throws NullPointerException     if the notifications IDs list is null
      */
-    public Response delete(List<Long> notificationsIds) {
+    public Response<List<NotificationDTO>> delete(List<Long> notificationsIds) {
+        if (notificationsIds.size() == 0) throw new IllegalArgumentException(ExceptionMessage.EMPTY_LIST.toString());
         notificationsIds.forEach(notificationId -> {
             try {
                 Validations.validate(notificationId, Regex.ID.getRegex());
@@ -65,7 +67,7 @@ public class NotificationFacade {
             }
         });
         List<Notification> remainingNotifications = notificationService.delete(notificationsIds);
-        return Response.builder()
+        return Response.<List<NotificationDTO>>builder()
                 .message(SuccessMessage.DELETED.toString())
                 .status(HttpStatus.OK)
                 .statusCode(HttpStatusCodes.STATUS_CODE_NO_CONTENT)

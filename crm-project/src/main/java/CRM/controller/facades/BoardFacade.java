@@ -16,6 +16,7 @@ import org.springframework.stereotype.Component;
 
 import javax.naming.NoPermissionException;
 import javax.security.auth.login.AccountNotFoundException;
+import java.util.List;
 import java.util.NoSuchElementException;
 
 @Component
@@ -34,9 +35,9 @@ public class BoardFacade {
      * @throws IllegalArgumentException if the board name or owner ID is invalid or not provided
      * @throws NullPointerException     if the board request object is null
      */
-    public Response create(BoardRequest boardRequest) throws AccountNotFoundException {
+    public Response<BoardDTO> create(BoardRequest boardRequest) throws AccountNotFoundException {
         Validations.validateNewBoard(boardRequest);
-        return Response.builder()
+        return Response.<BoardDTO>builder()
                 .data(BoardDTO.getBoardFromDB(boardService.create(boardRequest)))
                 .message(SuccessMessage.CREATE.toString())
                 .status(HttpStatus.CREATED)
@@ -67,12 +68,12 @@ public class BoardFacade {
      * @throws NoPermissionException    if the user does not have permission to view the board
      * @throws NullPointerException     if any of the parameters are null
      */
-    public Response get(Long boardId, Long userId) throws NoPermissionException {
+    public Response<BoardDTO> get(Long boardId, Long userId) throws NoPermissionException {
         Validations.validateIDs(boardId, userId);
         Board board = boardService.get(boardId);
         BoardDTO boardDTO = BoardDTO.getBoardFromDB(board);
         boardDTO.setUserPermission(board.getUserPermissionIntegerByUserId(userId));
-        return Response.builder()
+        return Response.<BoardDTO>builder()
                 .data(boardDTO)
                 .message(SuccessMessage.FOUND.toString())
                 .status(HttpStatus.OK)
@@ -85,8 +86,8 @@ public class BoardFacade {
      *
      * @return A Response object containing all the retrieved boards.
      */
-    public Response getAll() {
-        return Response.builder()
+    public Response<List<BoardDTO>> getAll() {
+        return Response.<List<BoardDTO>>builder()
                 .data(BoardDTO.getListOfBoardsFromDB(boardService.getAll()))
                 .message(SuccessMessage.FOUND.toString())
                 .status(HttpStatus.OK)
@@ -104,9 +105,9 @@ public class BoardFacade {
      * @throws NoSuchElementException   if the specified board does not exist
      * @throws NullPointerException     if the update object request object is null
      */
-    public Response updateBoard(UpdateObjectRequest updateObjReq) throws NoSuchFieldException {
+    public Response<BoardDTO> updateBoard(UpdateObjectRequest updateObjReq) throws NoSuchFieldException {
         Validations.validate(updateObjReq.getObjectsIdsRequest().getBoardId(), Regex.ID.getRegex());
-        return Response.builder()
+        return Response.<BoardDTO>builder()
                 .data(BoardDTO.getBoardFromDB(boardService.updateBoard(updateObjReq)))
                 .message(SuccessMessage.FOUND.toString())
                 .status(HttpStatus.OK)
