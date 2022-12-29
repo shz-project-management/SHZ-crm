@@ -113,8 +113,9 @@ public class SectionFacade {
      * @return a response with a list of sections that match the given filters
      */
 
-    public Response<List<SectionDTO>> getFilteredItems(Map<String, List<String>> filters, Long boardId) {
-        return Response.<List<SectionDTO>>builder()
+    public Response getFilteredItems(Map<String, List<String>> filters, Long boardId) {
+        Validations.validate(boardId, Regex.ID.getRegex());
+        return Response.builder()
                 .data(SectionDTO.getSectionsDTOList(sectionService.getQuery(filters, boardId)))
                 .message(SuccessMessage.FOUND.toString())
                 .status(HttpStatus.OK)
@@ -134,6 +135,8 @@ public class SectionFacade {
      * @throws NullPointerException     if an unexpected null value is encountered
      */
     public Response<SectionDTO> update(UpdateObjectRequest updateItemRequest) throws NoSuchFieldException {
+        Validations.validateIDs(updateItemRequest.getObjectsIdsRequest().getBoardId(),
+                updateItemRequest.getObjectsIdsRequest().getSectionId());
         return Response.<SectionDTO>builder()
                 .data(SectionDTO.createSectionDTO(sectionService.update(updateItemRequest)))
                 .message(SuccessMessage.FOUND.toString())

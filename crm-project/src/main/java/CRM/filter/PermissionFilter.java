@@ -1,5 +1,6 @@
 package CRM.filter;
 
+import CRM.config.PermissionPathsConfig;
 import CRM.entity.Board;
 import CRM.entity.User;
 import CRM.repository.BoardRepository;
@@ -33,6 +34,8 @@ public class PermissionFilter extends GenericFilterBean {
     AuthService authService;
     @Autowired
     BoardService boardService;
+    @Autowired
+    PermissionPathsConfig permissionPathsConfig;
 
     /**
      * this doFilter function is set to check if the user has the permission to do the action he
@@ -70,7 +73,6 @@ public class PermissionFilter extends GenericFilterBean {
 
             try {
                 Long userId = authService.checkTokenToUserInDB(token);
-//                board = boardService.get(Long.parseLong(boardId));
                 user = authService.findById(userId);
                 permission = board.getUserPermissionWithAdminByUserId(user.getId());
             } catch (AccountNotFoundException | NoPermissionException e) {
@@ -89,7 +91,7 @@ public class PermissionFilter extends GenericFilterBean {
     }
 
     private boolean isPermittedPath(String path) {
-        return permissionPathsForAll.stream().noneMatch(path::contains);
+        return permissionPathsConfig.getPermissionPathsForAll().stream().noneMatch(path::contains);
     }
 
     private boolean isValidRequest(HttpServletRequest httpRequest, String path, Permission permission) throws IOException {
@@ -112,11 +114,11 @@ public class PermissionFilter extends GenericFilterBean {
     }
 
     private boolean isPermittedForUsers(String path) {
-        return permissionPathsForUsers.stream().anyMatch(path::contains);
+        return permissionPathsConfig.getPermissionPathsForUsers().stream().anyMatch(path::contains);
     }
 
     private boolean isPermittedForLeaders(String path) {
-        return permissionPathsForLeaders.stream().anyMatch(path::contains);
+        return permissionPathsConfig.getPermissionPathsForLeaders().stream().anyMatch(path::contains);
     }
 
     private boolean isValidUpdateForUsers(HttpServletRequest httpRequest, String path) {
