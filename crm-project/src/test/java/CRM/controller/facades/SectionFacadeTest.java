@@ -287,7 +287,7 @@ class SectionFacadeTest {
 
     @Test
     @DisplayName("update section with invalid boardId retrieved bad request response ")
-    public void update_InvalidBoardId_BadRequestResponse() {
+    public void update_InvalidBoardId_BadRequestResponse() throws NoSuchFieldException {
         long boardId = -1L;
         long sectionId = 2L;
         UpdateObjectRequest updateItemRequest = new UpdateObjectRequest();
@@ -301,7 +301,7 @@ class SectionFacadeTest {
 
     @Test
     @DisplayName("update section with null boardId retrieved bad request response ")
-    public void update_NullBoardId_ServerErrorResponse() {
+    public void update_NullBoardId_ServerErrorResponse() throws NoSuchFieldException {
         Long boardId = null;
         long sectionId = 2L;
         UpdateObjectRequest updateItemRequest = new UpdateObjectRequest();

@@ -52,9 +52,14 @@ public class BoardFacade {
      * @return a response object indicating the status of the deletion operation
      * @throws NoSuchElementException if no board with the given ID exists
      */
-    public void delete(Long boardId) {
+    public Response<Void> delete(Long boardId) {
         Validations.validate(boardId, Regex.ID.getRegex());
         boardService.delete(boardId);
+        return Response.<Void>builder()
+                .message(SuccessMessage.DELETED.toString())
+                .status(HttpStatus.NO_CONTENT)
+                .statusCode(HttpStatusCodes.STATUS_CODE_OK)
+                .build();
     }
 
     /**

@@ -49,9 +49,10 @@ public class BoardController {
      * @return A response indicating the result of the delete operation. The response status will reflect the result of the delete operation.
      */
     @DeleteMapping
-    public ResponseEntity<Void> delete(@RequestAttribute Long boardId) {
+    public ResponseEntity<Response<Void>> delete(@RequestAttribute Long boardId) {
         boardFacade.delete(boardId);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        Response<Void> response = boardFacade.delete(boardId);
+        return new ResponseEntity<>(response, response.getStatus());
     }
 
     /**

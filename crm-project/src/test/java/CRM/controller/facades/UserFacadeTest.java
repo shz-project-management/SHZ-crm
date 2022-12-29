@@ -127,7 +127,7 @@ public class UserFacadeTest {
 
     @Test
     @DisplayName("Test getAllInBoard method when null pointer exception is thrown")
-    void getAllInBoard_NullBoarId_ServerErrorResponse() {
+    void getAllInBoard_NullBoarId_ServerErrorResponse() throws AccountNotFoundException {
         Long boardId = null;
 
         assertEquals(HttpStatusCodes.STATUS_CODE_SERVER_ERROR, userFacade.getAllInBoard(boardId).getStatusCode());
@@ -217,7 +217,7 @@ public class UserFacadeTest {
 
     @Test
     @DisplayName("Get all boards of user - invalid input")
-    public void getAllBoardsOfUser_InvalidInput_BadRequestResponse() {
+    public void getAllBoardsOfUser_InvalidInput_BadRequestResponse() throws NoPermissionException, AccountNotFoundException {
         long userId = -1L;
 
         assertEquals(HttpStatusCodes.STATUS_CODE_BAD_REQUEST, userFacade.getAllBoardsOfUser(userId).getStatusCode());
@@ -225,7 +225,7 @@ public class UserFacadeTest {
 
     @Test
     @DisplayName("Get all boards of user - null pointer exception")
-    public void getAllBoardsOfUser_NullUserId_ServerErrorResponse() {
+    public void getAllBoardsOfUser_NullUserId_ServerErrorResponse() throws NoPermissionException, AccountNotFoundException {
         Long userId = null;
 
         assertEquals(HttpStatusCodes.STATUS_CODE_SERVER_ERROR, userFacade.getAllBoardsOfUser(userId).getStatusCode());
@@ -291,7 +291,7 @@ public class UserFacadeTest {
 
     @Test
     @DisplayName("update user to board failed using invalid board id")
-    public void updateUserToBoard_InvalidBoardIdInput_BadRequestResponse() {
+    public void updateUserToBoard_InvalidBoardIdInput_BadRequestResponse() throws AccountNotFoundException {
         ObjectsIdsRequest objectsIdsRequest = mock(ObjectsIdsRequest.class);
         given(objectsIdsRequest.getBoardId()).willReturn(-1L);
         given(objectsIdsRequest.getUserId()).willReturn(2L);
@@ -302,7 +302,7 @@ public class UserFacadeTest {
 
     @Test
     @DisplayName("update user to board failed using null board id")
-    public void updateUserToBoard_NullBoardIdInput_ServerErrorResponse() {
+    public void updateUserToBoard_NullBoardIdInput_ServerErrorResponse() throws AccountNotFoundException {
         ObjectsIdsRequest objectsIdsRequest = mock(ObjectsIdsRequest.class);
         given(objectsIdsRequest.getBoardId()).willReturn(null);
         given(objectsIdsRequest.getUserId()).willReturn(2L);
