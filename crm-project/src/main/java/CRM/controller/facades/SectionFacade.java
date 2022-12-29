@@ -176,12 +176,28 @@ public class SectionFacade {
      */
 
     public Response getFilteredItems(Map<String, List<String>> filters, Long boardId) {
-        return Response.builder()
-                .data(SectionDTO.getSectionsDTOList(sectionService.getQuery(filters, boardId)))
-                .message(SuccessMessage.FOUND.toString())
-                .status(HttpStatus.OK)
-                .statusCode(HttpStatusCodes.STATUS_CODE_OK)
-                .build();
+        try {
+            Validations.validate(boardId, Regex.ID.getRegex());
+
+            return Response.builder()
+                    .data(SectionDTO.getSectionsDTOList(sectionService.getQuery(filters, boardId)))
+                    .message(SuccessMessage.FOUND.toString())
+                    .status(HttpStatus.OK)
+                    .statusCode(HttpStatusCodes.STATUS_CODE_OK)
+                    .build();
+        } catch (IllegalArgumentException | NoSuchElementException e) {
+            return Response.builder()
+                    .message(e.getMessage())
+                    .status(HttpStatus.BAD_REQUEST)
+                    .statusCode(HttpStatusCodes.STATUS_CODE_BAD_REQUEST)
+                    .build();
+        } catch (NullPointerException e) {
+            return Response.builder()
+                    .message(e.getMessage())
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .statusCode(HttpStatusCodes.STATUS_CODE_SERVER_ERROR)
+                    .build();
+        }
     }
 
 
@@ -197,6 +213,9 @@ public class SectionFacade {
      */
     public Response update(UpdateObjectRequest updateItemRequest) {
         try {
+            Validations.validateIDs(updateItemRequest.getObjectsIdsRequest().getBoardId(),
+                    updateItemRequest.getObjectsIdsRequest().getSectionId());
+
             return Response.builder()
                     .data(SectionDTO.createSectionDTO(sectionService.update(updateItemRequest)))
                     .message(SuccessMessage.FOUND.toString())

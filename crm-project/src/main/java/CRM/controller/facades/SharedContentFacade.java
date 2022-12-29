@@ -484,7 +484,7 @@ public class SharedContentFacade {
                 boardService.get(boardId).getBoardUsersSet());
     }
 
-    private void sendItemDeleteNotification(List<Long> correctIds, Long boardId){
+    private void  sendItemDeleteNotification(List<Long> correctIds, Long boardId){
         Board board = boardService.get(boardId);
         for (Long id : correctIds) {
             notificationSender.sendNotificationToManyUsers(NotificationRequest.createDeletedItemRequest(board,
