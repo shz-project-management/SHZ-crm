@@ -30,6 +30,7 @@ public class Attribute {
 
     public static Status createStatusAttribute(String name, String description) {
         Status status = new Status();
+        status.setId(0L);
         status.setName(name);
         status.setDescription(description);
         return status;
@@ -38,6 +39,7 @@ public class Attribute {
 
     public static Type createTypeAttribute(String name, String description) {
         Type type = new Type();
+        type.setId(0L);
         type.setName(name);
         type.setDescription(description);
         return type;

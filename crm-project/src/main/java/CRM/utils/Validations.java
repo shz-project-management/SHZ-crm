@@ -101,7 +101,7 @@ public class Validations {
             logger.warn("Parent item ID is null");
         }
 
-        Validations.validateIDs(item.getUserId(), item.getSectionId());
+        Validations.validateIDs(item.getUserId(), item.getSectionId(), item.getBoardId());
 
         // We don't have to add a status and a type to an item
 //        validate(item.getStatusId(), Regex.ID.getRegex());

@@ -31,7 +31,8 @@ public class AttributeDTO {
         for (T attribute: attributes) {
             attributeDTOList.add(createAttributeDTO((Attribute) attribute));
         }
-        attributeDTOList.sort(Comparator.comparingLong(AttributeDTO::getId));
+        if(!attributeDTOList.isEmpty())
+            attributeDTOList.sort(Comparator.comparingLong(AttributeDTO::getId));
 
         return attributeDTOList;
     }

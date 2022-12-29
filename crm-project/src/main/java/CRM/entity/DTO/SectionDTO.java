@@ -53,7 +53,8 @@ public class SectionDTO {
         for (Section section : sections) {
             sectionDTOList.add(createSectionDTO(section));
         }
-        sectionDTOList.sort(Comparator.comparingLong(SectionDTO::getId));
+        if (!sectionDTOList.isEmpty())
+            sectionDTOList.sort(Comparator.comparingLong(SectionDTO::getId));
 
         return sectionDTOList;
     }
