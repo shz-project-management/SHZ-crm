@@ -1,6 +1,7 @@
 package CRM.controller.controllers;
 
 import CRM.controller.facades.SettingsFacade;
+import CRM.entity.DTO.SettingsDTO;
 import CRM.entity.requests.ObjectsIdsRequest;
 import CRM.entity.requests.SettingUpdateRequest;
 import CRM.entity.response.Response;
@@ -9,6 +10,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+
+import javax.security.auth.login.AccountNotFoundException;
+import java.util.List;
 
 @Controller
 @RequestMapping(value = "/settings")
@@ -20,30 +24,30 @@ public class SettingController {
     private SettingsFacade settingsFacade;
 
     /**
-     * This endpoint is used to retrieve all user settings in a specific board.
+     * GetMapping to retrieve all user settings in a given board.
      *
-     * @param userId  The ID of the user for which the settings will be retrieved.
-     * @param boardId The ID of the board for which the settings will be retrieved.
-     * @return A ResponseEntity object containing the response with the retrieved user settings.
+     * @param userId  The id of the user.
+     * @param boardId The id of the board.
+     * @return A ResponseEntity with a list of SettingsDTO objects and the corresponding HTTP status.
      */
     @GetMapping(value = "get-user-settings-in-board")
-    public ResponseEntity<Response> getAllUserSettingsInBoard(@RequestAttribute Long userId, @RequestAttribute Long boardId) {
+    public ResponseEntity<Response<List<SettingsDTO>>> getAllUserSettingsInBoard(@RequestAttribute Long userId, @RequestAttribute Long boardId) throws AccountNotFoundException {
         ObjectsIdsRequest objectsIdsRequest = ObjectsIdsRequest.boardUserIds(boardId, userId);
-        Response response = settingsFacade.getAllUserSettingsInBoard(objectsIdsRequest);
+        Response<List<SettingsDTO>> response = settingsFacade.getAllUserSettingsInBoard(objectsIdsRequest);
         return new ResponseEntity<>(response, response.getStatus());
     }
 
     /**
-     * This endpoint is used to update a specific user settings in a specific board.
+     * PatchMapping to change user settings in a given board.
      *
-     * @param settingUpdateRequest Includes userSettingId which is the id of the setting to update and the setting new data.
-     * @return A ResponseEntity object containing the response with the all the user's settings in that board.
+     * @param settingUpdateRequest The SettingUpdateRequest object containing the updated settings and the board id.
+     * @param boardId              The id of the board.
+     * @return A ResponseEntity with a list of SettingsDTO objects and the corresponding HTTP status.
      */
     @PatchMapping(consumes = "application/json")
-    public ResponseEntity<Response> changeUserSettingsInBoard(@RequestBody SettingUpdateRequest settingUpdateRequest,
-                                                              @RequestAttribute Long boardId) {
+    public ResponseEntity<Response<List<SettingsDTO>>> changeUserSettingsInBoard(@RequestBody SettingUpdateRequest settingUpdateRequest, @RequestAttribute Long boardId) {
         settingUpdateRequest.setBoardId(boardId);
-        Response response = settingsFacade.changeUserSettingsInBoard(settingUpdateRequest);
+        Response<List<SettingsDTO>> response = settingsFacade.changeUserSettingsInBoard(settingUpdateRequest);
         return new ResponseEntity<>(response, response.getStatus());
     }
 }

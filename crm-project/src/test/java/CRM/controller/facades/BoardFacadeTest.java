@@ -13,6 +13,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import javax.naming.NoPermissionException;
 import javax.security.auth.login.AccountNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
@@ -49,7 +50,7 @@ class BoardFacadeTest {
 
     @Test
     @DisplayName("Test the case where the boardRequest has a null name")
-    public void create_NullName_ServerErrorResponse() {
+    public void create_NullName_ServerErrorResponse() throws AccountNotFoundException {
         BoardRequest incorrectBoardRequest = new BoardRequest(1L, null, "nice");
 
         assertEquals(HttpStatusCodes.STATUS_CODE_SERVER_ERROR, boardFacade.create(incorrectBoardRequest).getStatusCode());
@@ -57,7 +58,7 @@ class BoardFacadeTest {
 
     @Test
     @DisplayName("Test the case where the boardRequest has a null creator user ID")
-    public void create_NullCreatorUser_ServerErrorResponse() {
+    public void create_NullCreatorUser_ServerErrorResponse() throws AccountNotFoundException {
         BoardRequest incorrectBoardRequest = new BoardRequest(null, "board", "nice");
 
         assertEquals(HttpStatusCodes.STATUS_CODE_SERVER_ERROR, boardFacade.create(incorrectBoardRequest).getStatusCode());
@@ -73,7 +74,6 @@ class BoardFacadeTest {
 
         assertEquals(HttpStatusCodes.STATUS_CODE_BAD_REQUEST, boardFacade.create(incorrectBoardRequest).getStatusCode());
     }
-
 
     @Test
     @DisplayName("Test delete with valid id")
@@ -103,7 +103,7 @@ class BoardFacadeTest {
 
     @Test
     @DisplayName("Test get with valid id")
-    public void get_ValidInput_Success() {
+    public void get_ValidInput_Success() throws NoPermissionException {
         RegisterUserRequest correctRegisterUserRequest = new RegisterUserRequest("Ziv Hausler", "ziv123456", "test@gmail.com");
         User user = User.newUser(correctRegisterUserRequest);
         user.setId(1L);
@@ -124,7 +124,7 @@ class BoardFacadeTest {
 
     @Test
     @DisplayName("Test get with non-existent id")
-    public void get_ServiceThrowsNoSuchElement_BadRequestResponse() {
+    public void get_ServiceThrowsNoSuchElement_BadRequestResponse() throws NoPermissionException {
         given(boardService.get(1L)).willThrow(NoSuchElementException.class);
 
         assertEquals(HttpStatusCodes.STATUS_CODE_BAD_REQUEST, boardFacade.get(1L, 1L).getStatusCode());
@@ -132,13 +132,13 @@ class BoardFacadeTest {
 
     @Test
     @DisplayName("Test get with null user id")
-    public void get_NullUserId_ServerErrorResponse() {
+    public void get_NullUserId_ServerErrorResponse() throws NoPermissionException {
         assertEquals(HttpStatusCodes.STATUS_CODE_SERVER_ERROR, boardFacade.get(null, 1L).getStatusCode());
     }
 
     @Test
     @DisplayName("Test get with invalid id")
-    public void get_InvalidUserId_BadRequestResponse() {
+    public void get_InvalidUserId_BadRequestResponse() throws NoPermissionException {
         assertEquals(HttpStatusCodes.STATUS_CODE_BAD_REQUEST, boardFacade.get(Long.valueOf("-2"), 1L).getStatusCode());
     }
 
@@ -173,7 +173,7 @@ class BoardFacadeTest {
 
     @Test
     @DisplayName("Test update board with invalid board ID")
-    public void update_InvalidBoardId_BadRequestResponse() {
+    public void update_InvalidBoardId_BadRequestResponse() throws NoSuchFieldException {
         UpdateObjectRequest boardRequest = new UpdateObjectRequest();
         boardRequest.setFieldName(UpdateField.NAME);
         boardRequest.setContent("Test new board name");
@@ -199,7 +199,7 @@ class BoardFacadeTest {
 
     @Test
     @DisplayName("Test update board with null input")
-    public void update_NullInput_ServerErrorResponse() {
+    public void update_NullInput_ServerErrorResponse() throws NoSuchFieldException {
         assertEquals(HttpStatusCodes.STATUS_CODE_SERVER_ERROR, boardFacade.updateBoard(null).getStatusCode());
     }
 }

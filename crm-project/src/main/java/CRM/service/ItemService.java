@@ -131,7 +131,7 @@ public class ItemService implements ServiceInterface {
      * @return the list of shared content objects within the specified object
      */
     @Override
-    public List<SharedContent> getAllInItem(ObjectsIdsRequest objectsIdsRequest) {
+    public List<Item> getAllInItem(ObjectsIdsRequest objectsIdsRequest) {
         Board board = Validations.doesIdExists(objectsIdsRequest.getBoardId(), boardRepository);
         return new ArrayList<>(board.getSectionFromBoard(objectsIdsRequest.getSectionId()).getItems());
     }

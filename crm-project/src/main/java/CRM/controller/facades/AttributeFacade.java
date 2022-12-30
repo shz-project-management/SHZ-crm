@@ -13,13 +13,12 @@ import CRM.utils.enums.SuccessMessage;
 import com.google.api.client.http.HttpStatusCodes;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.hibernate.NonUniqueObjectException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
 import java.util.HashSet;
-import java.util.NoSuchElementException;
+import java.util.List;
 import java.util.Set;
 
 @Component
@@ -30,181 +29,90 @@ public class AttributeFacade {
     private AttributeService attributeService;
 
     /**
-     * Creates a new attribute for a board object.
+     * Method to create a new attribute.
      *
-     * @param attributeRequest the request object containing the attribute name and board ID
-     * @param clz              the class of the attribute to create (either {@link Status} or {@link Type})
-     * @return a response object with a status code and message indicating the success or failure of the operation
-     * @throws NonUniqueObjectException if an attribute with the same name already exists for the specified board
-     * @throws NoSuchElementException   if the specified board does not exist
-     * @throws IllegalArgumentException if the attribute name is invalid or the board ID is not provided
-     * @throws NullPointerException     if the attribute request object is null
+     * @param attributeRequest The AttributeRequest object containing the attribute details.
+     * @param clz              The class type of the attribute.
+     * @return A Response object with the created attribute as a list of AttributeDTO objects and the corresponding HTTP status.
      */
-    public Response create(AttributeRequest attributeRequest, Class clz) {
-        try {
-            Validations.validate(attributeRequest.getName(), Regex.NAME.getRegex());
-
-            return Response.builder()
-                    .status(HttpStatus.CREATED)
-                    .statusCode(HttpStatusCodes.STATUS_CODE_CREATED)
-                    .data(AttributeDTO.getListOfAttributesFromDB(new HashSet<>(attributeService.create(attributeRequest, clz))))
-                    .build();
-        } catch (IllegalArgumentException | NonUniqueObjectException | NoSuchElementException e) {
-            return Response.builder()
-                    .message(e.getMessage())
-                    .status(HttpStatus.BAD_REQUEST)
-                    .statusCode(HttpStatusCodes.STATUS_CODE_BAD_REQUEST)
-                    .build();
-        } catch (NullPointerException e) {
-            return Response.builder()
-                    .message(e.getMessage())
-                    .status(HttpStatus.BAD_REQUEST)
-                    .statusCode(HttpStatusCodes.STATUS_CODE_SERVER_ERROR)
-                    .build();
-        }
+    public Response<List<AttributeDTO>> create(AttributeRequest attributeRequest, Class<? extends Attribute> clz) {
+        Validations.validate(attributeRequest.getName(), Regex.NAME.getRegex());
+        return Response.<List<AttributeDTO>>builder()
+                .status(HttpStatus.CREATED)
+                .statusCode(HttpStatusCodes.STATUS_CODE_CREATED)
+                .data(AttributeDTO.getListOfAttributesFromDB(new HashSet<>(attributeService.create(attributeRequest, clz))))
+                .build();
     }
 
     /**
-     * Deletes an attribute from a board object.
+     * Method to delete an attribute with a given id.
      *
-     * @param boardId     the ID of the board containing the attribute
-     * @param attributeId the ID of the attribute to delete
-     * @param clz         the class of the attribute to delete (either {@link Status} or {@link Type})
-     * @return a response object with a status code and message indicating the success or failure of the operation
-     * @throws NoSuchElementException   if the specified attribute or board does not exist
-     * @throws IllegalArgumentException if the attribute or board ID is invalid
-     * @throws NullPointerException     if one of the ID parameters is null
+     * @param boardId     The id of the board to which the attribute belongs.
+     * @param attributeId The id of the attribute to be deleted.
+     * @param clz         The class type of the attribute.
+     * @return A Response object with the updated board as a BoardDTO object and the corresponding HTTP status.
      */
-    public Response delete(Long boardId, Long attributeId, Class clz) {
-        try {
-            Validations.validateIDs(attributeId, boardId);
-
-            return Response.builder()
-                    .data(BoardDTO.getBoardFromDB(attributeService.delete(boardId, attributeId, clz)))
-                    .status(HttpStatus.OK)
-                    .statusCode(HttpStatusCodes.STATUS_CODE_NO_CONTENT)
-                    .message(SuccessMessage.DELETED.toString())
-                    .build();
-        } catch (NoSuchElementException | IllegalArgumentException e) {
-            return Response.builder()
-                    .message(e.getMessage())
-                    .status(HttpStatus.BAD_REQUEST)
-                    .statusCode(HttpStatusCodes.STATUS_CODE_BAD_REQUEST)
-                    .build();
-        } catch (NullPointerException e) {
-            return Response.builder()
-                    .message(e.getMessage())
-                    .status(HttpStatus.BAD_REQUEST)
-                    .statusCode(HttpStatusCodes.STATUS_CODE_SERVER_ERROR)
-                    .build();
-        }
+    public Response<BoardDTO> delete(Long boardId, Long attributeId, Class<? extends Attribute> clz) {
+        Validations.validateIDs(attributeId, boardId);
+        return Response.<BoardDTO>builder()
+                .data(BoardDTO.getBoardFromDB(attributeService.delete(boardId, attributeId, clz)))
+                .status(HttpStatus.OK)
+                .statusCode(HttpStatusCodes.STATUS_CODE_NO_CONTENT)
+                .message(SuccessMessage.DELETED.toString())
+                .build();
     }
 
     /**
-     * Retrieves an attribute from a board object.
+     * Method to retrieve an attribute with a given id.
      *
-     * @param attributeId the ID of the attribute to retrieve
-     * @param boardId     the ID of the board containing the attribute
-     * @param clz         the class of the attribute to retrieve (either {@link Status} or {@link Type})
-     * @return a response object with a status code and message indicating the success or failure of the operation, and the retrieved attribute
-     * @throws NoSuchElementException   if the specified attribute or board does not exist
-     * @throws IllegalArgumentException if the attribute or board ID is invalid
-     * @throws NullPointerException     if one of the ID parameters is null
+     * @param attributeId The id of the attribute.
+     * @param boardId     The id of the board to which the attribute belongs.
+     * @param clz         The class type of the attribute.
+     * @return A Response object with the attribute as an AttributeDTO object and the corresponding HTTP status.
      */
-    public Response get(Long attributeId, Long boardId, Class clz) {
-        try {
-            Validations.validateIDs(attributeId, boardId);
-
-            return Response.builder()
-                    .data(AttributeDTO.createAttributeDTO(attributeService.get(attributeId, boardId, clz)))
-                    .message(SuccessMessage.FOUND.toString())
-                    .status(HttpStatus.OK)
-                    .statusCode(HttpStatusCodes.STATUS_CODE_OK)
-                    .build();
-        } catch (NoSuchElementException | IllegalArgumentException e) {
-            return Response.builder()
-                    .message(e.getMessage())
-                    .status(HttpStatus.BAD_REQUEST)
-                    .statusCode(HttpStatusCodes.STATUS_CODE_BAD_REQUEST)
-                    .build();
-        } catch (NullPointerException e) {
-            return Response.builder()
-                    .message(e.getMessage())
-                    .status(HttpStatus.BAD_REQUEST)
-                    .statusCode(HttpStatusCodes.STATUS_CODE_SERVER_ERROR)
-                    .build();
-        }
+    public Response<AttributeDTO> get(Long attributeId, Long boardId, Class<? extends Attribute> clz) {
+        Validations.validateIDs(attributeId, boardId);
+        return Response.<AttributeDTO>builder()
+                .data(AttributeDTO.createAttributeDTO(attributeService.get(attributeId, boardId, clz)))
+                .message(SuccessMessage.FOUND.toString())
+                .status(HttpStatus.OK)
+                .statusCode(HttpStatusCodes.STATUS_CODE_OK)
+                .build();
     }
 
     /**
-     * Retrieves all attributes of a given class (either {@link Status} or {@link Type}) from a board object.
+     * Method to retrieve all attributes belonging to a given board.
      *
-     * @param boardId the ID of the board to retrieve attributes from
-     * @param clz     the class of the attributes to retrieve (either {@link Status} or {@link Type})
-     * @return a response object with a status code and message indicating the success or failure of the operation, and a list of retrieved attributes
-     * @throws NoSuchElementException   if the specified board does not exist
-     * @throws IllegalArgumentException if the board ID is invalid
-     * @throws NullPointerException     if the board ID is null
+     * @param boardId The id of the board.
+     * @param clz     The class type of the attribute.
+     * @return A Response object with the list of attributes as a list of AttributeDTO objects and the corresponding HTTP status.
      */
-    public Response getAllAttributesInBoard(Long boardId, Class clz) {
-        try {
-            Validations.validate(boardId, Regex.ID.getRegex());
-            Set<Attribute> targetSet = new HashSet<>(attributeService.getAllAttributesInBoard(boardId, clz));
-            return Response.builder()
-                    .data(AttributeDTO.getListOfAttributesFromDB(targetSet))
-                    .message(SuccessMessage.FOUND.toString())
-                    .status(HttpStatus.OK)
-                    .statusCode(HttpStatusCodes.STATUS_CODE_OK)
-                    .build();
-        } catch (IllegalArgumentException | NoSuchElementException e) {
-            return Response.builder()
-                    .message(e.getMessage())
-                    .status(HttpStatus.BAD_REQUEST)
-                    .statusCode(HttpStatusCodes.STATUS_CODE_BAD_REQUEST)
-                    .build();
-        } catch (NullPointerException e) {
-            return Response.builder()
-                    .message(e.getMessage())
-                    .status(HttpStatus.BAD_REQUEST)
-                    .statusCode(HttpStatusCodes.STATUS_CODE_SERVER_ERROR)
-                    .build();
-        }
+    public Response<List<AttributeDTO>> getAllAttributesInBoard(Long boardId, Class<? extends Attribute> clz) {
+        Validations.validate(boardId, Regex.ID.getRegex());
+        Set<Attribute> targetSet = new HashSet<>(attributeService.getAllAttributesInBoard(boardId, clz));
+        return Response.<List<AttributeDTO>>builder()
+                .data(AttributeDTO.getListOfAttributesFromDB(targetSet))
+                .message(SuccessMessage.FOUND.toString())
+                .status(HttpStatus.OK)
+                .statusCode(HttpStatusCodes.STATUS_CODE_OK)
+                .build();
     }
 
     /**
-     * Updates an attribute of a board object with the provided update object request.
+     * Method to update an attribute with a given id.
      *
-     * @param updateObjectRequest the update object request containing the required id's
-     * @param clz                 the class of the attribute to update (either {@link Status} or {@link Type})
-     * @return a response object with a status code and message indicating the success or failure of the operation, and the updated board object
-     * @throws NoSuchElementException   if the specified attribute or board does not exist
-     * @throws IllegalArgumentException if the attribute ID or board ID is invalid
-     * @throws NoSuchFieldException     if the specified attribute does not exist on the board object
-     * @throws NullPointerException     if the update object request object is null
+     * @param updateObjectRequest The request object containing the updated attribute object and the id of the attribute to be updated.
+     * @param clz                 The class type of the attribute.
+     * @return A Response object with the updated attribute as an AttributeDTO object and the corresponding HTTP status.
      */
-    public Response update(UpdateObjectRequest updateObjectRequest, Class clz) {
-        try {
-            Validations.validateIDs(updateObjectRequest.getObjectsIdsRequest().getUpdateObjId(),
-                    updateObjectRequest.getObjectsIdsRequest().getBoardId());
-
-            return Response.builder()
-                    .data(BoardDTO.getBoardFromDB(attributeService.update(updateObjectRequest, clz)))
-                    .message(SuccessMessage.FOUND.toString())
-                    .status(HttpStatus.OK)
-                    .statusCode(HttpStatusCodes.STATUS_CODE_OK)
-                    .build();
-        } catch (IllegalArgumentException | NoSuchElementException | NoSuchFieldException e) {
-            return Response.builder()
-                    .message(e.getMessage())
-                    .status(HttpStatus.BAD_REQUEST)
-                    .statusCode(HttpStatusCodes.STATUS_CODE_BAD_REQUEST)
-                    .build();
-        } catch (NullPointerException e) {
-            return Response.builder()
-                    .message(e.getMessage())
-                    .status(HttpStatus.BAD_REQUEST)
-                    .statusCode(HttpStatusCodes.STATUS_CODE_SERVER_ERROR)
-                    .build();
-        }
+    public Response<BoardDTO> update(UpdateObjectRequest updateObjectRequest, Class<? extends Attribute> clz) throws NoSuchFieldException {
+        Validations.validateIDs(updateObjectRequest.getObjectsIdsRequest().getUpdateObjId(),
+                updateObjectRequest.getObjectsIdsRequest().getBoardId());
+        return Response.<BoardDTO>builder()
+                .data(BoardDTO.getBoardFromDB(attributeService.update(updateObjectRequest, clz)))
+                .message(SuccessMessage.FOUND.toString())
+                .status(HttpStatus.OK)
+                .statusCode(HttpStatusCodes.STATUS_CODE_OK)
+                .build();
     }
 }

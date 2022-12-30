@@ -11,9 +11,13 @@ import java.util.Set;
 
 public interface ServiceInterface {
     int delete(List<Long> ids, long boardId);
+
     SharedContent get(ObjectsIdsRequest objectsIdsRequest);
+
     Section update(UpdateObjectRequest updateObject) throws NoSuchFieldException;
-    List<SharedContent> getAllInItem(ObjectsIdsRequest objectsIdsRequest);
+
+    <T extends SharedContent> List<T> getAllInItem(ObjectsIdsRequest objectsIdsRequest);
+
     Section assignToUser(ObjectsIdsRequest objectsIdsRequest);
 
 }

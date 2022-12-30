@@ -92,7 +92,7 @@ public class AuthFacadeTest {
 
     @Test
     @DisplayName("Test that a 500 status code is returned when authService.login throws a NullPointerException")
-    public void login_NullPassword_ServerErrorResponse() {
+    public void login_NullPassword_ServerErrorResponse() throws AuthenticationException, AccountNotFoundException {
         LoginUserRequest correctLoginUserRequest = new LoginUserRequest("test@gmail.com", null);
         assertEquals(HttpStatusCodes.STATUS_CODE_SERVER_ERROR, authFacade.login(correctLoginUserRequest).getStatusCode());
     }
