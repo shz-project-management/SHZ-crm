@@ -24,9 +24,7 @@ import org.springframework.stereotype.Component;
 
 import javax.naming.NoPermissionException;
 import javax.security.auth.login.AccountNotFoundException;
-import java.util.ArrayList;
-import java.util.NoSuchElementException;
-import java.util.Set;
+import java.util.*;
 
 @Component
 public class UserFacade {
@@ -48,9 +46,9 @@ public class UserFacade {
      * could not be found.
      * @throws AccountNotFoundException if the user with the given ID does not exist.
      */
-    public Response get(Long id) throws AccountNotFoundException {
+    public Response<UserDTO> get(Long id) throws AccountNotFoundException {
         Validations.validate(id, Regex.ID.getRegex());
-        return Response.builder()
+        return Response.<UserDTO>builder()
                 .data(UserDTO.createUserDTO(userService.get(id)))
                 .message(SuccessMessage.FOUND.toString())
                 .status(HttpStatus.OK)
@@ -69,9 +67,9 @@ public class UserFacade {
      * @throws IllegalArgumentException if the id is invalid
      * @throws NullPointerException     if the id parameter is null
      */
-    public Response delete(Long id) throws AccountNotFoundException {
+    public Response<Boolean> delete(Long id) throws AccountNotFoundException {
         Validations.validate(id, Regex.ID.getRegex());
-        return Response.builder()
+        return Response.<Boolean>builder()
                 .data(userService.delete(id))
                 .message(SuccessMessage.DELETED.toString())
                 .status(HttpStatus.NO_CONTENT)
@@ -84,8 +82,8 @@ public class UserFacade {
      *
      * @return A {@link Response} object containing a list of all users.
      */
-    public Response getAll() {
-        return Response.builder()
+    public Response<List<UserDTO>> getAll() {
+        return Response.<List<UserDTO>>builder()
                 .data(UserDTO.getListOfUsersDTO(userService.getAll()))
                 .message(SuccessMessage.FOUND.toString())
                 .status(HttpStatus.OK)
@@ -99,9 +97,9 @@ public class UserFacade {
      * @param boardId the ID of the board to retrieve users from
      * @return a {@link Response} object containing the list of users or an error message
      */
-    public Response getAllInBoard(Long boardId) throws AccountNotFoundException {
+    public Response<List<UserDTO>> getAllInBoard(Long boardId) throws AccountNotFoundException {
         Validations.validate(boardId, Regex.ID.getRegex());
-        return Response.builder()
+        return Response.<List<UserDTO>>builder()
                 .data(UserDTO.getListOfUsersDTO(userService.getAllInBoard(boardId)))
                 .message(SuccessMessage.FOUND.toString())
                 .status(HttpStatus.OK)
@@ -116,9 +114,9 @@ public class UserFacade {
      * @return a response object containing the user permissions for the board
      * @throws IllegalArgumentException if the board ID is invalid
      */
-    public Response getAllUserPermissionsInBoard(Long boardId) {
+    public Response<List<UserPermissionDTO>> getAllUserPermissionsInBoard(Long boardId) {
         Validations.validate(boardId, Regex.ID.getRegex());
-        return Response.builder()
+        return Response.<List<UserPermissionDTO>>builder()
                 .data(UserPermissionDTO.getListOfUserPermissionFromDB(new ArrayList<>(userService.getAllUserPermissionsInBoard(boardId))))
                 .message(SuccessMessage.FOUND.toString())
                 .status(HttpStatus.OK)
@@ -135,9 +133,9 @@ public class UserFacade {
      * @throws NullPointerException     if the specified user id is null.
      * @throws NoSuchElementException   if the user with the specified id is not found.
      */
-    public Response getAllBoardsOfUser(Long userId) throws NoPermissionException, AccountNotFoundException {
+    public Response<Map<String,List<BoardDTO>>> getAllBoardsOfUser(Long userId) throws NoPermissionException, AccountNotFoundException {
         Validations.validate(userId, Regex.ID.getRegex());
-        return Response.builder()
+        return Response.<Map<String,List<BoardDTO>>>builder()
                 .data(BoardDTO.getMapWithAllBoardsForUser(userService.getAllBoardsOfUser(userId)))
                 .message(SuccessMessage.FOUND.toString())
                 .status(HttpStatus.OK)
@@ -156,12 +154,12 @@ public class UserFacade {
      * @throws NoSuchElementException   if the board or permission level associated with the request cannot be found
      * @throws NullPointerException     if the objectsIdsRequest parameter is null
      */
-    public Response updateUserToBoard(ObjectsIdsRequest objectsIdsRequest) throws AccountNotFoundException {
+    public Response<List<UserPermissionDTO>> updateUserToBoard(ObjectsIdsRequest objectsIdsRequest) throws AccountNotFoundException {
         Validations.validateUpdateUserToBoard(objectsIdsRequest.getBoardId(), objectsIdsRequest.getUserId(),
                 objectsIdsRequest.getPermissionId());
         Set<UserPermission> usersPermissions = userService.updateUserToBoard(objectsIdsRequest);
         sendUserAddedNotification(objectsIdsRequest, boardService.get(objectsIdsRequest.getBoardId()).getBoardUsersSet());
-        return Response.builder()
+        return Response.<List<UserPermissionDTO>>builder()
                 .message(SuccessMessage.FOUND.toString())
                 .data(UserPermissionDTO.getListOfUserPermissionFromDB(new ArrayList<>(usersPermissions)))
                 .status(HttpStatus.OK)
