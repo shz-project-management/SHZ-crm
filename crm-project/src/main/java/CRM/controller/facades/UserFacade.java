@@ -69,30 +69,14 @@ public class UserFacade {
      * @throws IllegalArgumentException if the id is invalid
      * @throws NullPointerException     if the id parameter is null
      */
-    public Response delete(Long id) {
-        try {
-            Validations.validate(id, Regex.ID.getRegex());
-
-            return Response.builder()
-                    .data(userService.delete(id))
-                    .message(SuccessMessage.DELETED.toString())
-                    .status(HttpStatus.NO_CONTENT)
-                    .statusCode(HttpStatusCodes.STATUS_CODE_NO_CONTENT)
-                    .build();
-
-        } catch (AccountNotFoundException | NoSuchElementException | IllegalArgumentException e) {
-            return Response.builder()
-                    .message(e.getMessage())
-                    .status(HttpStatus.BAD_REQUEST)
-                    .statusCode(HttpStatusCodes.STATUS_CODE_BAD_REQUEST)
-                    .build();
-        } catch (NullPointerException e) {
-            return Response.builder()
-                    .message(e.getMessage())
-                    .status(HttpStatus.BAD_REQUEST)
-                    .statusCode(HttpStatusCodes.STATUS_CODE_SERVER_ERROR)
-                    .build();
-        }
+    public Response delete(Long id) throws AccountNotFoundException {
+        Validations.validate(id, Regex.ID.getRegex());
+        return Response.builder()
+                .data(userService.delete(id))
+                .message(SuccessMessage.DELETED.toString())
+                .status(HttpStatus.NO_CONTENT)
+                .statusCode(HttpStatusCodes.STATUS_CODE_NO_CONTENT)
+                .build();
     }
 
     /**
@@ -125,6 +109,13 @@ public class UserFacade {
                 .build();
     }
 
+    /**
+     * Retrieves all the user permissions for the board with the given ID.
+     *
+     * @param boardId the ID of the board to retrieve the user permissions for
+     * @return a response object containing the user permissions for the board
+     * @throws IllegalArgumentException if the board ID is invalid
+     */
     public Response getAllUserPermissionsInBoard(Long boardId) {
         Validations.validate(boardId, Regex.ID.getRegex());
         return Response.builder()
@@ -178,11 +169,18 @@ public class UserFacade {
                 .build();
     }
 
+    /**
+     * Sends a notification to a set of users that a user has been added to a board.
+     *
+     * @param objectsIdsRequest an object containing the board and user IDs, and the user's email
+     * @param users             a set of users to send the notification to
+     * @throws AccountNotFoundException if the user specified in the request could not be found
+     */
     private void sendUserAddedNotification(ObjectsIdsRequest objectsIdsRequest, Set<User> users) throws AccountNotFoundException {
         User user = null;
         if (objectsIdsRequest.getEmail() != null)
             user = userService.get(objectsIdsRequest.getEmail());
-        else if(objectsIdsRequest.getUserId() != null)
+        else if (objectsIdsRequest.getUserId() != null)
             user = userService.get(objectsIdsRequest.getUserId());
         else throw new NullPointerException(ExceptionMessage.ACCOUNT_DOES_NOT_EXISTS.toString());
         notificationSender.sendNotificationToManyUsers(

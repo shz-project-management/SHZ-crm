@@ -45,13 +45,13 @@ public class StatusController {
     /**
      * DeleteMapping to delete a section with a given id.
      *
-     * @param boardId   The id of the board to which the section belongs.
-     * @param sectionId The id of the section to be deleted.
+     * @param boardId  The id of the board to which the section belongs.
+     * @param statusId The id of the section to be deleted.
      * @return A ResponseEntity with no content.
      */
-    @DeleteMapping(value = "{sectionId}")
-    public ResponseEntity<Response<BoardDTO>> delete(@RequestAttribute Long boardId, @PathVariable Long sectionId) {
-        Response<BoardDTO> response = attributeFacade.delete(boardId, sectionId, Status.class);
+    @DeleteMapping(value = "{statusId}")
+    public ResponseEntity<Response<BoardDTO>> delete(@RequestAttribute Long boardId, @PathVariable Long statusId) {
+        Response<BoardDTO> response = attributeFacade.delete(boardId, statusId, Status.class);
         messagingTemplate.convertAndSend("/attribute/" + boardId, response);
         return ResponseEntity.noContent().build();
     }
