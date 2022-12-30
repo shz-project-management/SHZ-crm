@@ -58,7 +58,7 @@ public class BoardFacade {
         return Response.<Void>builder()
                 .message(SuccessMessage.DELETED.toString())
                 .status(HttpStatus.NO_CONTENT)
-                .statusCode(HttpStatusCodes.STATUS_CODE_OK)
+                .statusCode(HttpStatusCodes.STATUS_CODE_NO_CONTENT)
                 .build();
     }
 
