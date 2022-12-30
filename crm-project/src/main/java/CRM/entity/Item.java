@@ -52,10 +52,10 @@ public class Item extends SharedContent {
 
     public static Item createNewItem(ItemRequest itemRequest, Board board, User user) {
         Section section = board.getSectionFromBoard(itemRequest.getSectionId());
-        Status status = board.getStatusByName("Open");
+        Status status = board.getStatus("Open");
         Type type = itemRequest.getParentItemId() != null ?
-                board.getTypeByName("Sub-Item") :
-                board.getTypeByName("Item") ;
+                board.getType("Sub-Item") :
+                board.getType("Item") ;
 
         Item parentItem = null;
         if (itemRequest.getParentItemId() != null) {
