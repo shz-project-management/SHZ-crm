@@ -59,8 +59,6 @@ public class Board {
         board.setCreatorUser(user);
         board.setName(name);
         board.setDescription(description);
-        board.setStatuses(Status.defaultStatuses());
-        board.setTypes(Type.defaultTypes());
         return board;
     }
 
