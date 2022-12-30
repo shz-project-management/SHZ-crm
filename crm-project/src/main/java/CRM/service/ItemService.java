@@ -156,7 +156,8 @@ public class ItemService implements ServiceInterface {
     @Override
     public Section assignToUser(ObjectsIdsRequest objectsIdsRequest) {
         Board board = Validations.doesIdExists(objectsIdsRequest.getBoardId(), boardRepository);
-        board.assignUserToItem(objectsIdsRequest.getUpdateObjId(), objectsIdsRequest.getSectionId(), objectsIdsRequest.getEmail());
+        User user = Validations.doesIdExists(objectsIdsRequest.getAssignedUserId(), userRepository);
+        board.assignUserToItem(objectsIdsRequest.getUpdateObjId(), objectsIdsRequest.getSectionId(), user);
         boardRepository.save(board);
         return board.getSectionFromBoard(objectsIdsRequest.getSectionId());
     }

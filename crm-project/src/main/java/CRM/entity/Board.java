@@ -3,7 +3,10 @@ package CRM.entity;
 import CRM.entity.requests.UpdateObjectRequest;
 import CRM.utils.enums.ExceptionMessage;
 import CRM.utils.enums.Permission;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.naming.NoPermissionException;
 import javax.persistence.*;
@@ -228,6 +231,25 @@ public class Board {
     public Item updateItem(UpdateObjectRequest objectRequest, long itemId, long sectionId) {
         return getItemFromSectionById(itemId, sectionId)
                 .updateItem(objectRequest);
+    }
+
+    public void removeAssignedUserFromItems(long userId) {
+        sections.forEach(section -> section.getItems()
+                .forEach(item -> {
+                    if(item.getAssignedToUser() != null) {
+                        if (Objects.equals(item.getAssignedToUser().getId(), userId)) {
+                            item.setAssignedToUser(null);
+                        }
+                    }
+                }));
+    }
+
+    public void removeAssignedUsersFromBoard() {
+        sections.forEach(section -> section.getItems()
+                .forEach(item -> {
+                            item.setAssignedToUser(null);
+                        }
+                ));
     }
 
     //--------------------------------------Attributes--------------------------------------//
@@ -556,10 +578,15 @@ public class Board {
      *
      * @param updateObjId the ID of the item to assign the user to
      * @param sectionId   the ID of the section containing the item
-     * @param userEmail   the email address of the user to assign to the item
+     * @param user        the user to assign to the item
      */
-    public void assignUserToItem(Long updateObjId, Long sectionId, String userEmail) {
-        getItemFromSectionById(updateObjId, sectionId).setAssignedToUserId(userEmail);
+    public void assignUserToItem(Long updateObjId, Long sectionId, User user) {
+        getItemFromSectionById(updateObjId, sectionId).setAssignedToUser(user);
+    }
+
+    public void removeAttributesFromBoard() {
+        getTypes().clear();
+        getStatuses().clear();
     }
 }
 
