@@ -59,6 +59,8 @@ public class BoardService {
         Board board = Board.createBoard(user, boardRequest.getName(), boardRequest.getDescription());
         Common.createDefaultSettingForNewUserInBoard(user, board, notificationSettingRepository, entityManager);
         boardRepository.save(board);
+        board.setStatuses(Status.defaultStatuses());
+        board.setTypes(Type.defaultTypes());
         board.getUsersPermissions().add(UserPermission.newUserPermission(board.getCreatorUser(), Permission.ADMIN));
         return boardRepository.save(board);
     }
