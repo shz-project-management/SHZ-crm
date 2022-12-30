@@ -55,7 +55,7 @@ public class UserController {
      * @return A ResponseEntity with the corresponding HTTP status.
      */
     @DeleteMapping(value = "{id}")
-    public ResponseEntity<Response<Void>> delete(@PathVariable Long id) {
+    public ResponseEntity<Response<Void>> delete(@PathVariable Long id) throws AccountNotFoundException {
         Response<Void> response = userFacade.delete(id);
         return new ResponseEntity<>(response, response.getStatus());
     }

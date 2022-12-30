@@ -35,7 +35,7 @@ public class AttributeFacade {
      * @param clz              The class type of the attribute.
      * @return A Response object with the created attribute as a list of AttributeDTO objects and the corresponding HTTP status.
      */
-    public Response<List<AttributeDTO>> create(AttributeRequest attributeRequest, Class<? extends Attribute> clz) {
+    public <T extends Attribute> Response<List<AttributeDTO>> create(AttributeRequest attributeRequest, Class<T> clz) {
         Validations.validate(attributeRequest.getName(), Regex.NAME.getRegex());
         return Response.<List<AttributeDTO>>builder()
                 .status(HttpStatus.CREATED)
@@ -52,7 +52,7 @@ public class AttributeFacade {
      * @param clz         The class type of the attribute.
      * @return A Response object with the updated board as a BoardDTO object and the corresponding HTTP status.
      */
-    public Response<BoardDTO> delete(Long boardId, Long attributeId, Class<? extends Attribute> clz) {
+    public <T extends Attribute> Response<BoardDTO> delete(Long boardId, Long attributeId, Class<T> clz) {
         Validations.validateIDs(attributeId, boardId);
         return Response.<BoardDTO>builder()
                 .data(BoardDTO.getBoardFromDB(attributeService.delete(boardId, attributeId, clz)))
@@ -70,7 +70,7 @@ public class AttributeFacade {
      * @param clz         The class type of the attribute.
      * @return A Response object with the attribute as an AttributeDTO object and the corresponding HTTP status.
      */
-    public Response<AttributeDTO> get(Long attributeId, Long boardId, Class<? extends Attribute> clz) {
+    public <T extends Attribute> Response<AttributeDTO> get(Long attributeId, Long boardId, Class<T> clz) {
         Validations.validateIDs(attributeId, boardId);
         return Response.<AttributeDTO>builder()
                 .data(AttributeDTO.createAttributeDTO(attributeService.get(attributeId, boardId, clz)))
@@ -87,7 +87,7 @@ public class AttributeFacade {
      * @param clz     The class type of the attribute.
      * @return A Response object with the list of attributes as a list of AttributeDTO objects and the corresponding HTTP status.
      */
-    public Response<List<AttributeDTO>> getAllAttributesInBoard(Long boardId, Class<? extends Attribute> clz) {
+    public <T extends Attribute> Response<List<AttributeDTO>> getAllAttributesInBoard(Long boardId, Class<T> clz) {
         Validations.validate(boardId, Regex.ID.getRegex());
         Set<Attribute> targetSet = new HashSet<>(attributeService.getAllAttributesInBoard(boardId, clz));
         return Response.<List<AttributeDTO>>builder()
@@ -105,9 +105,8 @@ public class AttributeFacade {
      * @param clz                 The class type of the attribute.
      * @return A Response object with the updated attribute as an AttributeDTO object and the corresponding HTTP status.
      */
-    public Response<BoardDTO> update(UpdateObjectRequest updateObjectRequest, Class<? extends Attribute> clz) throws NoSuchFieldException {
-        Validations.validateIDs(updateObjectRequest.getObjectsIdsRequest().getUpdateObjId(),
-                updateObjectRequest.getObjectsIdsRequest().getBoardId());
+    public <T extends Attribute> Response<BoardDTO> update(UpdateObjectRequest updateObjectRequest, Class<T> clz) throws NoSuchFieldException {
+        Validations.validateIDs(updateObjectRequest.getObjectsIdsRequest().getUpdateObjId(), updateObjectRequest.getObjectsIdsRequest().getBoardId());
         return Response.<BoardDTO>builder()
                 .data(BoardDTO.getBoardFromDB(attributeService.update(updateObjectRequest, clz)))
                 .message(SuccessMessage.FOUND.toString())
