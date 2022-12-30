@@ -12,7 +12,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.HttpStatus;
 
 import javax.security.auth.login.AccountNotFoundException;
 import java.time.LocalDateTime;
@@ -218,7 +217,7 @@ public class SharedContentFacadeTest {
 
     @Test
     @DisplayName("bad request, field not found to update")
-    void updateComment_FieldInputNotExists_ThrowsNullPointerException() throws NoSuchFieldException {
+    void updateComment_FieldInputNotExists_ThrowsNoSuchField() throws NoSuchFieldException {
         UpdateObjectRequest updateObject = new UpdateObjectRequest();
         ObjectsIdsRequest objectRequest = ObjectsIdsRequest.boardSectionItemIds(1L, 1L, 1L);
         objectRequest.setUpdateObjId(1L);
@@ -226,7 +225,7 @@ public class SharedContentFacadeTest {
 
         given(itemService.update(updateObject)).willThrow(NoSuchFieldException.class);
 
-        assertThrows(NullPointerException.class, () -> sharedContentFacade.update(updateObject, Item.class));
+        assertThrows(NoSuchFieldException.class, () -> sharedContentFacade.update(updateObject, Item.class));
     }
 
     @Test
@@ -408,46 +407,46 @@ public class SharedContentFacadeTest {
     }
 
     @Test
-    @DisplayName("get all item in section - null board input")
-    void getAllItemInSection_NullBoardInput_ServerErrorResponse() {
+    @DisplayName("get all item in section - null board input throws null pointer")
+    void getAllItemInSection_NullBoardInput_ThrowsNullPointerException() {
         ObjectsIdsRequest objectRequest = ObjectsIdsRequest.boardSectionItemIds(null, 1L, 1L);
         objectRequest.setUpdateObjId(1L);
 
-        assertEquals(HttpStatusCodes.STATUS_CODE_SERVER_ERROR, sharedContentFacade.getAllItemsInSection(objectRequest).getStatusCode());
+        assertThrows(NullPointerException.class, () ->  sharedContentFacade.getAllItemsInSection(objectRequest));
     }
 
 
     @Test
-    @DisplayName("Test get all in item method with invalid item ID")
-    public void getAllInItem_InvalidItemId_BadRequestResponse() throws NoSuchElementException {
+    @DisplayName("Test get all in item method with invalid item ID throws illegal argument")
+    public void getAllInItem_InvalidItemId_ThrowsIllegalArgumentException() throws NoSuchElementException {
         long itemId = -1;
         long sectionId = 2;
         long boardId = 3;
         ObjectsIdsRequest objectsIdsRequest = ObjectsIdsRequest.boardSectionItemIds(boardId, sectionId, itemId);
 
-        assertEquals(HttpStatus.BAD_REQUEST, sharedContentFacade.getAllInItem(objectsIdsRequest, Comment.class).getStatus());
+        assertThrows(IllegalArgumentException.class, () -> sharedContentFacade.getAllInItem(objectsIdsRequest, Comment.class));
     }
 
     @Test
-    @DisplayName("Test get all in item method with invalid section ID")
+    @DisplayName("Test get all in item method with invalid section ID throws illegal argument")
     public void getAllInItem_InvalidSectionId_BadRequestResponse() throws NoSuchElementException {
         long itemId = 1;
         long sectionId = -1;
         long boardId = 3;
         ObjectsIdsRequest objectsIdsRequest = ObjectsIdsRequest.boardSectionItemIds(boardId, sectionId, itemId);
 
-        assertEquals(HttpStatus.BAD_REQUEST, sharedContentFacade.getAllInItem(objectsIdsRequest, Comment.class).getStatus());
+        assertThrows(IllegalArgumentException.class, () -> sharedContentFacade.getAllInItem(objectsIdsRequest, Comment.class));
     }
 
     @Test
-    @DisplayName("Test get all in item method with null board ID")
-    public void getAllInItem_NullBoardId_ServerErrorResponse() throws NoSuchElementException {
+    @DisplayName("Test get all in item method with null board ID throws null pointer")
+    public void getAllInItem_NullBoardId_ThrowsNullPointerException() throws NoSuchElementException {
         long itemId = 1;
         long sectionId = 1;
         Long boardId = null;
         ObjectsIdsRequest objectsIdsRequest = ObjectsIdsRequest.boardSectionItemIds(boardId, sectionId, itemId);
 
-        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, sharedContentFacade.getAllInItem(objectsIdsRequest, Comment.class).getStatus());
+        assertThrows(NullPointerException.class, () -> sharedContentFacade.getAllInItem(objectsIdsRequest, Comment.class));
     }
 
     @Test
@@ -483,8 +482,8 @@ public class SharedContentFacadeTest {
     }
 
     @Test
-    @DisplayName("Test assignToUser method with invalid email input")
-    public void assignToUser_InvalidInput_BadRequestResponse() throws AccountNotFoundException {
+    @DisplayName("Test assignToUser method with invalid email input throws illegal argument")
+    public void assignToUser_InvalidEmailInput_ThrowsIllegalArgument() {
         long boardId = 1;
         long sectionId = 2;
         long updateObjId = 3;
@@ -496,18 +495,18 @@ public class SharedContentFacadeTest {
         given(objIds.getUpdateObjId()).willReturn(updateObjId);
         given(objIds.getEmail()).willReturn(email);
 
-        assertEquals(HttpStatusCodes.STATUS_CODE_BAD_REQUEST, sharedContentFacade.assignToUser(objIds, Item.class).getStatusCode());
+        assertThrows(IllegalArgumentException.class, () -> sharedContentFacade.assignToUser(objIds, Item.class));
     }
 
     @Test
-    @DisplayName("Test assignToUser method with null input")
-    public void assignToUser_InvalidInput_ServerErrorResponse() throws AccountNotFoundException {
+    @DisplayName("Test assignToUser method with null input throws null pointer exception")
+    public void assignToUser_NullUpdateObjIdInput_ThrowsNullPointerException() {
         long boardId = 1;
         long sectionId = 2;
         Long updateObjId = null;
         ObjectsIdsRequest objectsIdsRequest = ObjectsIdsRequest.boardSectionIds(boardId, sectionId);
         objectsIdsRequest.setUpdateObjId(updateObjId);
 
-        assertEquals(HttpStatusCodes.STATUS_CODE_SERVER_ERROR, sharedContentFacade.assignToUser(objectsIdsRequest, Item.class).getStatusCode());
+        assertThrows(NullPointerException.class, () -> sharedContentFacade.assignToUser(objectsIdsRequest, Item.class));
     }
 }
