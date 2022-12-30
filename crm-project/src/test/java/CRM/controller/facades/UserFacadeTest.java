@@ -140,13 +140,13 @@ public class UserFacadeTest {
 
     @Test
     @DisplayName("Test invalid ID value returns BAD REQUEST status")
-    public void delete_InvalidInput_BadRequestResponse() {
+    public void delete_InvalidInput_BadRequestResponse() throws AccountNotFoundException {
         assertEquals(HttpStatusCodes.STATUS_CODE_BAD_REQUEST, userFacade.delete(-1L).getStatusCode());
     }
 
     @Test
     @DisplayName("Test null ID value returns BAD REQUEST status")
-    public void delete_NullInput_ServerErrorResponse() {
+    public void delete_NullInput_ServerErrorResponse() throws AccountNotFoundException {
         assertEquals(HttpStatusCodes.STATUS_CODE_SERVER_ERROR, userFacade.delete(null).getStatusCode());
     }
 
