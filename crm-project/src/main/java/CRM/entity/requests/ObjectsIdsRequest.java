@@ -20,6 +20,7 @@ public class ObjectsIdsRequest {
     private Long permissionId;
     private Long searchId;
     private Long updateObjId;
+    private Long assignedUserId;
     private String email;
 
     public static ObjectsIdsRequest searchBoardSectionParentIds(Long searchItemId, Long boardId, Long sectionId, Long parentId){

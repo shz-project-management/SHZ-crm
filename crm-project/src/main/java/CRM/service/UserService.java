@@ -3,6 +3,7 @@ package CRM.service;
 import CRM.entity.*;
 import CRM.entity.requests.ObjectsIdsRequest;
 import CRM.repository.BoardRepository;
+import CRM.repository.NotificationRepository;
 import CRM.repository.NotificationSettingRepository;
 import CRM.repository.UserRepository;
 import CRM.utils.Validations;
@@ -32,6 +33,8 @@ public class UserService {
     private BoardRepository boardRepository;
     @Autowired
     private NotificationSettingRepository notificationSettingRepository;
+    @Autowired
+    private NotificationRepository notificationRepository;
 
 
     /**
@@ -78,37 +81,7 @@ public class UserService {
         } catch (NoSuchElementException e) {
             throw new AccountNotFoundException(ExceptionMessage.ACCOUNT_DOES_NOT_EXISTS.toString());
         }
-        List<Board> boards = boardRepository.findAll();
-
-        for (Board board : boards) {
-            List<UserSetting> userSettingToDelete = board.getUsersSettings().stream()
-                    .filter(userSetting -> userSetting.getUser().getId() == userId)
-                    .collect(Collectors.toList());
-
-            for (UserSetting userSetting : userSettingToDelete) {
-                // Remove the UserSetting object from the set
-                board.getUsersSettings().remove(userSetting);
-            }
-
-            // Save the updated board entity
-            boardRepository.save(board);
-
-            List<UserPermission> userPermissionsToDelete = board.getUsersPermissions().stream()
-                    .filter(userPermission -> userPermission.getUser().getId() == userId)
-                    .collect(Collectors.toList());
-
-            for (UserPermission userPermission : userPermissionsToDelete) {
-                // Remove the UserPermission object from the set
-                board.getUsersPermissions().remove(userPermission);
-            }
-            // Save the updated board entity
-            boardRepository.save(board);
-        }
-
-        List<Board> boardsOfCreator = boardRepository.findByCreatorUser_Id(user.getId());
-        for (Board board : boardsOfCreator) {
-            boardRepository.delete(board);
-        }
+        removeDependenciesFromBoard(user);
         userRepository.delete(user);
         return true;
     }
@@ -306,5 +279,54 @@ public class UserService {
             }
         }
         return sharedBoards;
+    }
+
+    private void removeDependenciesFromBoard(User user){
+
+        List<Board> boardWhereUserAssigned = boardRepository.findBySections_Items_AssignedToUser(user);
+        for (Board board : boardWhereUserAssigned) {
+            board.removeAssignedUserFromItems(user.getId());
+            boardRepository.save(board);
+        }
+
+        notificationRepository.deleteByUser(user);
+
+
+        List<Board> boards = boardRepository.findAll();
+
+        for (Board board : boards) {
+            List<UserSetting> userSettingToDelete = board.getUsersSettings().stream()
+                    .filter(userSetting -> Objects.equals(userSetting.getUser().getId(), user.getId()))
+                    .collect(Collectors.toList());
+
+            for (UserSetting userSetting : userSettingToDelete) {
+                // Remove the UserSetting object from the set
+                board.getUsersSettings().remove(userSetting);
+            }
+
+            // Save the updated board entity
+            boardRepository.save(board);
+
+            List<UserPermission> userPermissionsToDelete = board.getUsersPermissions().stream()
+                    .filter(userPermission -> Objects.equals(userPermission.getUser().getId(), user.getId()))
+                    .collect(Collectors.toList());
+
+            for (UserPermission userPermission : userPermissionsToDelete) {
+                // Remove the UserPermission object from the set
+                board.getUsersPermissions().remove(userPermission);
+            }
+            // Save the updated board entity
+            boardRepository.save(board);
+        }
+
+        List<Board> boardsOfCreator = boardRepository.findByCreatorUser_Id(user.getId());
+        for (Board board : boardsOfCreator) {
+            board.removeAttributesFromBoard();
+            boardRepository.save(board);
+            board.removeAssignedUsersFromBoard();
+            boardRepository.save(board);
+            boardRepository.delete(board);
+        }
+
     }
 }
