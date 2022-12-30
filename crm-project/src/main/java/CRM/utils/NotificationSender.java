@@ -75,7 +75,7 @@ public class NotificationSender {
         Long kind = notificationRequest.getNotificationType().getId();
         Board board = notificationRequest.getBoard();
         Item item = null;
-        if (kind != 5)
+        if (kind != 5 && kind != 7)
             item = notificationRequest.getBoard().getItemById(notificationRequest.getItemId(), notificationRequest.getSectionId());
         Long attributeId = notificationRequest.getPresentContent() != null ? Long.valueOf((Integer) notificationRequest.getPresentContent()) : null;
         switch (kind.intValue()) {

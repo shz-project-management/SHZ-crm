@@ -86,6 +86,10 @@ public class ItemDTO extends SharedContentDTO {
         itemDTO.setImportance(item.getImportance());
         itemDTO.setDueDate(item.getDueDate());
 
+        if(item.getAssignedToUserId() != null){
+            itemDTO.setAssignedToUser(UserDTO.createUserDTO(item.getUser())); // FIXME: don't return the creator user -> return the assigned user
+        }
+
         return itemDTO;
     }
 
@@ -102,6 +106,7 @@ public class ItemDTO extends SharedContentDTO {
         itemDTO.setId(item.getId());
         itemDTO.setImportance(item.getImportance());
         itemDTO.setDueDate(item.getDueDate());
+
         if(item.getAssignedToUserId() != null){
             itemDTO.setAssignedToUser(UserDTO.createUserDTO(user));
         }
