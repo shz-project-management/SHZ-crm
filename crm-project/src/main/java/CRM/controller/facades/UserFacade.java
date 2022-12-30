@@ -25,10 +25,8 @@ import org.springframework.stereotype.Component;
 import javax.naming.NoPermissionException;
 import javax.security.auth.login.AccountNotFoundException;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @Component
 public class UserFacade {
@@ -50,30 +48,14 @@ public class UserFacade {
      * could not be found.
      * @throws AccountNotFoundException if the user with the given ID does not exist.
      */
-    public Response get(Long id) {
-        try {
-            Validations.validate(id, Regex.ID.getRegex());
-
-            return Response.builder()
-                    .data(UserDTO.createUserDTO(userService.get(id)))
-                    .message(SuccessMessage.FOUND.toString())
-                    .status(HttpStatus.OK)
-                    .statusCode(HttpStatusCodes.STATUS_CODE_OK)
-                    .build();
-
-        } catch (AccountNotFoundException | IllegalArgumentException e) {
-            return Response.builder()
-                    .message(e.getMessage())
-                    .status(HttpStatus.BAD_REQUEST)
-                    .statusCode(HttpStatusCodes.STATUS_CODE_BAD_REQUEST)
-                    .build();
-        } catch (NullPointerException e) {
-            return Response.builder()
-                    .message(e.getMessage())
-                    .status(HttpStatus.BAD_REQUEST)
-                    .statusCode(HttpStatusCodes.STATUS_CODE_SERVER_ERROR)
-                    .build();
-        }
+    public Response get(Long id) throws AccountNotFoundException {
+        Validations.validate(id, Regex.ID.getRegex());
+        return Response.builder()
+                .data(UserDTO.createUserDTO(userService.get(id)))
+                .message(SuccessMessage.FOUND.toString())
+                .status(HttpStatus.OK)
+                .statusCode(HttpStatusCodes.STATUS_CODE_OK)
+                .build();
     }
 
     /**
@@ -133,58 +115,25 @@ public class UserFacade {
      * @param boardId the ID of the board to retrieve users from
      * @return a {@link Response} object containing the list of users or an error message
      */
-    public Response getAllInBoard(Long boardId) {
-        try {
-            Validations.validate(boardId, Regex.ID.getRegex());
-
-            return Response.builder()
-                    .data(UserDTO.getListOfUsersDTO(userService.getAllInBoard(boardId)))
-                    .message(SuccessMessage.FOUND.toString())
-                    .status(HttpStatus.OK)
-                    .statusCode(HttpStatusCodes.STATUS_CODE_OK)
-                    .build();
-
-        } catch (AccountNotFoundException | IllegalArgumentException | NoSuchElementException e) {
-            return Response.builder()
-                    .message(e.getMessage())
-                    .status(HttpStatus.BAD_REQUEST)
-                    .statusCode(HttpStatusCodes.STATUS_CODE_BAD_REQUEST)
-                    .build();
-        } catch (NullPointerException e) {
-            return Response.builder()
-                    .message(e.getMessage())
-                    .status(HttpStatus.BAD_REQUEST)
-                    .statusCode(HttpStatusCodes.STATUS_CODE_SERVER_ERROR)
-                    .build();
-        }
+    public Response getAllInBoard(Long boardId) throws AccountNotFoundException {
+        Validations.validate(boardId, Regex.ID.getRegex());
+        return Response.builder()
+                .data(UserDTO.getListOfUsersDTO(userService.getAllInBoard(boardId)))
+                .message(SuccessMessage.FOUND.toString())
+                .status(HttpStatus.OK)
+                .statusCode(HttpStatusCodes.STATUS_CODE_OK)
+                .build();
     }
 
     public Response getAllUserPermissionsInBoard(Long boardId) {
-        try {
-            Validations.validate(boardId, Regex.ID.getRegex());
-
-            return Response.builder()
-                    .data(UserPermissionDTO.getListOfUserPermissionFromDB(new ArrayList<>(userService.getAllUserPermissionsInBoard(boardId))))
-                    .message(SuccessMessage.FOUND.toString())
-                    .status(HttpStatus.OK)
-                    .statusCode(HttpStatusCodes.STATUS_CODE_OK)
-                    .build();
-
-        } catch (IllegalArgumentException | NoSuchElementException e) {
-            return Response.builder()
-                    .message(e.getMessage())
-                    .status(HttpStatus.BAD_REQUEST)
-                    .statusCode(HttpStatusCodes.STATUS_CODE_BAD_REQUEST)
-                    .build();
-        } catch (NullPointerException e) {
-            return Response.builder()
-                    .message(e.getMessage())
-                    .status(HttpStatus.BAD_REQUEST)
-                    .statusCode(HttpStatusCodes.STATUS_CODE_SERVER_ERROR)
-                    .build();
-        }
+        Validations.validate(boardId, Regex.ID.getRegex());
+        return Response.builder()
+                .data(UserPermissionDTO.getListOfUserPermissionFromDB(new ArrayList<>(userService.getAllUserPermissionsInBoard(boardId))))
+                .message(SuccessMessage.FOUND.toString())
+                .status(HttpStatus.OK)
+                .statusCode(HttpStatusCodes.STATUS_CODE_OK)
+                .build();
     }
-
 
     /**
      * This method is used to retrieve all the boards created by a user with the specified id.
@@ -195,32 +144,15 @@ public class UserFacade {
      * @throws NullPointerException     if the specified user id is null.
      * @throws NoSuchElementException   if the user with the specified id is not found.
      */
-    public Response getAllBoardsOfUser(Long userId) {
-        try {
-            Validations.validate(userId, Regex.ID.getRegex());
-
-            return Response.builder()
-                    .data(BoardDTO.getMapWithAllBoardsForUser(userService.getAllBoardsOfUser(userId)))
-                    .message(SuccessMessage.FOUND.toString())
-                    .status(HttpStatus.OK)
-                    .statusCode(HttpStatusCodes.STATUS_CODE_OK)
-                    .build();
-
-        } catch (AccountNotFoundException | NoPermissionException | IllegalArgumentException | NoSuchElementException e) {
-            return Response.builder()
-                    .statusCode(HttpStatusCodes.STATUS_CODE_BAD_REQUEST)
-                    .status(HttpStatus.BAD_REQUEST)
-                    .message(ExceptionMessage.NULL_INPUT.toString())
-                    .build();
-        } catch (NullPointerException e) {
-            return Response.builder()
-                    .statusCode(HttpStatusCodes.STATUS_CODE_SERVER_ERROR)
-                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .message(e.getMessage())
-                    .build();
-        }
+    public Response getAllBoardsOfUser(Long userId) throws NoPermissionException, AccountNotFoundException {
+        Validations.validate(userId, Regex.ID.getRegex());
+        return Response.builder()
+                .data(BoardDTO.getMapWithAllBoardsForUser(userService.getAllBoardsOfUser(userId)))
+                .message(SuccessMessage.FOUND.toString())
+                .status(HttpStatus.OK)
+                .statusCode(HttpStatusCodes.STATUS_CODE_OK)
+                .build();
     }
-
 
     /**
      * Method to update a user's membership in a board.
@@ -233,41 +165,26 @@ public class UserFacade {
      * @throws NoSuchElementException   if the board or permission level associated with the request cannot be found
      * @throws NullPointerException     if the objectsIdsRequest parameter is null
      */
-    public Response updateUserToBoard(ObjectsIdsRequest objectsIdsRequest) {
-        try {
-            Validations.validateUpdateUserToBoard(objectsIdsRequest.getBoardId(), objectsIdsRequest.getUserId(),
-                    objectsIdsRequest.getPermissionId());
-            Set<UserPermission> usersPermissions = userService.updateUserToBoard(objectsIdsRequest);
-            sendUserAddedNotification(objectsIdsRequest, boardService.get(objectsIdsRequest.getBoardId()).getBoardUsersSet());
-            return Response.builder()
-                    .message(SuccessMessage.FOUND.toString())
-                    .data(UserPermissionDTO.getListOfUserPermissionFromDB(new ArrayList<>(usersPermissions)))
-                    .status(HttpStatus.OK)
-                    .statusCode(HttpStatusCodes.STATUS_CODE_OK)
-                    .build();
-
-        } catch (AccountNotFoundException | IllegalArgumentException | NoSuchElementException e) {
-            return Response.builder()
-                    .message(e.getMessage())
-                    .status(HttpStatus.BAD_REQUEST)
-                    .statusCode(HttpStatusCodes.STATUS_CODE_BAD_REQUEST)
-                    .build();
-        } catch (NullPointerException e) {
-            return Response.builder()
-                    .message(e.getMessage())
-                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .statusCode(HttpStatusCodes.STATUS_CODE_SERVER_ERROR)
-                    .build();
-        }
+    public Response updateUserToBoard(ObjectsIdsRequest objectsIdsRequest) throws AccountNotFoundException {
+        Validations.validateUpdateUserToBoard(objectsIdsRequest.getBoardId(), objectsIdsRequest.getUserId(),
+                objectsIdsRequest.getPermissionId());
+        Set<UserPermission> usersPermissions = userService.updateUserToBoard(objectsIdsRequest);
+        sendUserAddedNotification(objectsIdsRequest, boardService.get(objectsIdsRequest.getBoardId()).getBoardUsersSet());
+        return Response.builder()
+                .message(SuccessMessage.FOUND.toString())
+                .data(UserPermissionDTO.getListOfUserPermissionFromDB(new ArrayList<>(usersPermissions)))
+                .status(HttpStatus.OK)
+                .statusCode(HttpStatusCodes.STATUS_CODE_OK)
+                .build();
     }
 
     private void sendUserAddedNotification(ObjectsIdsRequest objectsIdsRequest, Set<User> users) throws AccountNotFoundException {
         User user = null;
-        if(objectsIdsRequest.getEmail() != null){
+        if (objectsIdsRequest.getEmail() != null)
             user = userService.get(objectsIdsRequest.getEmail());
-        } else{
-          user = userService.get(objectsIdsRequest.getUserId());
-        }
+        else if(objectsIdsRequest.getUserId() != null)
+            user = userService.get(objectsIdsRequest.getUserId());
+        else throw new NullPointerException(ExceptionMessage.ACCOUNT_DOES_NOT_EXISTS.toString());
         notificationSender.sendNotificationToManyUsers(
                 NotificationRequest.createUserAddedRequest(boardService.get(objectsIdsRequest.getBoardId()), user,
                         settingsService.getNotificationSettingFromDB(Notifications.USER_ADDED.name)), users);

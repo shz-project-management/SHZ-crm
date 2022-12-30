@@ -221,10 +221,16 @@ public class UserService {
         }
     }
 
+    /**
+     * Retrieves the set of user permissions for a board.
+     *
+     * @param boardId The ID of the board for which to retrieve user permissions.
+     * @return A set of user permissions for the specified board.
+     * @throws IllegalArgumentException If the provided board ID is invalid or the board does not exist.
+     */
     public Set<UserPermission> getAllUserPermissionsInBoard(Long boardId) {
         Board board = Validations.doesIdExists(boardId, boardRepository);
-        Set<UserPermission> userPermissions = board.getUsersPermissions();
-        return userPermissions;
+        return board.getUsersPermissions();
     }
 
     /**

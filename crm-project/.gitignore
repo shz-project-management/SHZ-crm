@@ -1,6 +1,7 @@
 *.class
 .idea/
-resources/
+resources/application.properties
+resources/credentials.json
 resources/log4j2.xml
 target/
 log/

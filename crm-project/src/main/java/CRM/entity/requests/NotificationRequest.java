@@ -1,7 +1,6 @@
 package CRM.entity.requests;
 
 import CRM.entity.*;
-import CRM.utils.enums.Notifications;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -20,6 +19,7 @@ public class NotificationRequest {
     private String comment;
     private Object presentContent;
     private String changedFieldName;
+    private Long sectionId;
 
     public static NotificationRequest createAssignRequest(User forUser, Board inBoard, Long itemId, NotificationSetting notificationType){
         NotificationRequest notificationRequest = new NotificationRequest();
@@ -30,27 +30,29 @@ public class NotificationRequest {
         return notificationRequest;
     }
 
-    public static NotificationRequest createStatusChangeRequest(User forUser, Board inBoard, Long itemId, Object presentStatus, NotificationSetting notificationType){
+    public static NotificationRequest createStatusChangeRequest(User forUser, Board inBoard, Long itemId, Object presentStatus, NotificationSetting notificationType, Long sectionId){
         NotificationRequest notificationRequest = new NotificationRequest();
         notificationRequest.user = forUser;
         notificationRequest.board = inBoard;
         notificationRequest.itemId = itemId;
         notificationRequest.presentContent = presentStatus;
         notificationRequest.notificationType = notificationType;
+        notificationRequest.sectionId = sectionId;
         return notificationRequest;
     }
 
-    public static NotificationRequest createTypeChangeRequest(User forUser, Board inBoard, Long itemId, Object presentStatus, NotificationSetting notificationType){
+    public static NotificationRequest createTypeChangeRequest(User forUser, Board inBoard, Long itemId, Object presentStatus, NotificationSetting notificationType, Long sectionId){
         NotificationRequest notificationRequest = new NotificationRequest();
         notificationRequest.user = forUser;
         notificationRequest.board = inBoard;
         notificationRequest.itemId = itemId;
         notificationRequest.presentContent = presentStatus;
         notificationRequest.notificationType = notificationType;
+        notificationRequest.sectionId = sectionId;
         return notificationRequest;
     }
 
-    public static NotificationRequest createCommentAddedRequest(User forUser, Board inBoard, Long itemId, String addedComment, User commenter, NotificationSetting notificationType){
+    public static NotificationRequest createCommentAddedRequest(User forUser, Board inBoard, Long itemId, String addedComment, User commenter, NotificationSetting notificationType, Long sectionId){
         NotificationRequest notificationRequest = new NotificationRequest();
         notificationRequest.user = forUser;
         notificationRequest.board = inBoard;
@@ -58,6 +60,7 @@ public class NotificationRequest {
         notificationRequest.comment = addedComment;
         notificationRequest.fromUser = commenter;
         notificationRequest.notificationType = notificationType;
+        notificationRequest.sectionId = sectionId;
         return notificationRequest;
     }
 
@@ -70,7 +73,7 @@ public class NotificationRequest {
         return notificationRequest;
     }
 
-    public static NotificationRequest createItemChangeRequest(User forUser, Board inBoard, Long itemId, String fieldName, Object present, NotificationSetting notificationType){
+    public static NotificationRequest createItemChangeRequest(User forUser, Board inBoard, Long itemId, String fieldName, Object present, NotificationSetting notificationType, Long sectionId){
         NotificationRequest notificationRequest = new NotificationRequest();
         notificationRequest.user = forUser;
         notificationRequest.board = inBoard;
@@ -78,6 +81,7 @@ public class NotificationRequest {
         notificationRequest.presentContent = present;
         notificationRequest.changedFieldName = fieldName;
         notificationRequest.notificationType = notificationType;
+        notificationRequest.sectionId = sectionId;
         return notificationRequest;
     }
 

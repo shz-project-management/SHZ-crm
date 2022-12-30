@@ -54,7 +54,6 @@ public class AuthService {
      */
     public String thirdPartyLogin(RegisterUserRequest user) {
         logger.info("in AuthService -> thirdPartyLogin");
-
         User storedUser = findByEmail(user.getEmail());
         if (storedUser == null)
             storedUser = userRepository.save(User.newUser(user));

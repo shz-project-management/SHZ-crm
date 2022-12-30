@@ -26,7 +26,7 @@ public class AttributeService {
      * @param clz              the class of the attribute to be created, either Type or Status
      * @return a list of all attributes of the given class in the board
      */
-    public List<Attribute> create(AttributeRequest attributeRequest, Class clz) {
+    public <T extends Attribute> List<T> create(AttributeRequest attributeRequest, Class<T> clz) {
         Board board = Validations.doesIdExists(attributeRequest.getBoardId(), boardRepository);
 
         board.addAttributeToBoard(Attribute.createAttribute(attributeRequest.getName(), attributeRequest.getDescription()), clz);

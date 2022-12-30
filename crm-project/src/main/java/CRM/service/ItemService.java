@@ -131,7 +131,7 @@ public class ItemService implements ServiceInterface {
      * @return the list of shared content objects within the specified object
      */
     @Override
-    public List<SharedContent> getAllInItem(ObjectsIdsRequest objectsIdsRequest) {
+    public List<Item> getAllInItem(ObjectsIdsRequest objectsIdsRequest) {
         Board board = Validations.doesIdExists(objectsIdsRequest.getBoardId(), boardRepository);
         return new ArrayList<>(board.getSectionFromBoard(objectsIdsRequest.getSectionId()).getItems());
     }
@@ -154,11 +154,11 @@ public class ItemService implements ServiceInterface {
      * @return the updated set of user permissions for the board
      */
     @Override
-    public Set<UserPermission> assignToUser(ObjectsIdsRequest objectsIdsRequest) {
+    public Section assignToUser(ObjectsIdsRequest objectsIdsRequest) {
         Board board = Validations.doesIdExists(objectsIdsRequest.getBoardId(), boardRepository);
         board.assignUserToItem(objectsIdsRequest.getUpdateObjId(), objectsIdsRequest.getSectionId(), objectsIdsRequest.getEmail());
         boardRepository.save(board);
-        return board.getUsersPermissions();
+        return board.getSectionFromBoard(objectsIdsRequest.getSectionId());
     }
 
     /**

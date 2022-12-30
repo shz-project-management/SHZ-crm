@@ -139,7 +139,7 @@ public class CommentService implements ServiceInterface {
      * @return a List of all Comments in the Item
      */
     @Override
-    public List<SharedContent> getAllInItem(ObjectsIdsRequest objectsIdsRequest) {
+    public List<Comment> getAllInItem(ObjectsIdsRequest objectsIdsRequest) {
         Board board = Validations.doesIdExists(objectsIdsRequest.getBoardId(), boardRepository);
         return new ArrayList<>(board.getAllCommentsInItem(objectsIdsRequest.getSectionId(), objectsIdsRequest.getItemId()));
     }
@@ -151,7 +151,7 @@ public class CommentService implements ServiceInterface {
      * @return a List of all Comments in the Item
      */
     @Override
-    public Set<UserPermission> assignToUser(ObjectsIdsRequest objectsIdsRequest) {
+    public Section assignToUser(ObjectsIdsRequest objectsIdsRequest) {
         return null;
     }
 
