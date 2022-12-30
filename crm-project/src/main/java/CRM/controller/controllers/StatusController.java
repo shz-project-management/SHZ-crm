@@ -7,6 +7,7 @@ import CRM.entity.Status;
 import CRM.entity.requests.AttributeRequest;
 import CRM.entity.requests.UpdateObjectRequest;
 import CRM.entity.response.Response;
+import com.google.api.client.http.HttpStatusCodes;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -35,9 +36,13 @@ public class StatusController {
      * @return A ResponseEntity containing a Response object with the status of the create operation and the created status object.
      */
     @PostMapping(consumes = "application/json")
-    public ResponseEntity<Response<List<AttributeDTO>>> create(@RequestBody AttributeRequest sectionRequest, @RequestAttribute Long boardId) {
+    public ResponseEntity<Response<List<AttributeDTO>>> create(@RequestBody AttributeRequest sectionRequest, @RequestAttribute Long boardId, @RequestParam Boolean force) {
         sectionRequest.setBoardId(boardId);
-        Response<List<AttributeDTO>> response = attributeFacade.create(sectionRequest, Status.class);
+        Response<List<AttributeDTO>> response = attributeFacade.create(sectionRequest, Status.class, force);
+
+        if (response.getStatusCode().equals(HttpStatusCodes.STATUS_CODE_CONFLICT))
+            return new ResponseEntity<>(response, response.getStatus());
+
         messagingTemplate.convertAndSend("/attribute/" + boardId, response);
         return ResponseEntity.noContent().build();
     }
