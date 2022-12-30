@@ -26,6 +26,7 @@ import javax.security.auth.login.AccountNotFoundException;
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 
@@ -57,31 +58,29 @@ public class UserFacadeTest {
     }
 
     @Test
-    @DisplayName("Test get method with invalid id")
-    void get_UserWithInvalidId_BadRequestResponse() throws AccountNotFoundException {
+    @DisplayName("Test get method with invalid id throws illegal argument")
+    void get_UserWithInvalidId_ThrowsIllegalArgumentException() throws AccountNotFoundException {
         given(userService.get(1L)).willThrow(IllegalArgumentException.class);
 
-        assertEquals(HttpStatusCodes.STATUS_CODE_BAD_REQUEST, userFacade.get(1L).getStatusCode());
+        assertThrows(IllegalArgumentException.class, () -> userFacade.get(1L));
     }
 
     @Test
-    @DisplayName("Test get method when user is not found")
-    void get_ServiceThrowsAccountNotFound_BadRequestResponse() throws AccountNotFoundException {
+    @DisplayName("Test get method when user is not found throws account not found exception")
+    void get_UserAccountNotFoundInDB_ThrowsAccountNotFoundException() throws AccountNotFoundException {
         long id = 1L;
 
         given(userService.get(id)).willThrow(new AccountNotFoundException(ExceptionMessage.ACCOUNT_DOES_NOT_EXISTS.toString()));
 
-        assertEquals(HttpStatusCodes.STATUS_CODE_BAD_REQUEST, userFacade.get(id).getStatusCode());
+        assertThrows(AccountNotFoundException.class, () -> userFacade.get(id));
     }
 
     @Test
-    @DisplayName("Test get method when null pointer exception is thrown")
-    void get_ServiceThrowsNullPointerException_ServerErrorResponse() throws AccountNotFoundException {
-        long id = 1L;
+    @DisplayName("Test get method when null pointer exception is thrown throws null pointer exception")
+    void get_UserIdNullInput_ThrowsNullPointerException() {
+        Long id = null;
 
-        given(userService.get(id)).willThrow(new NullPointerException());
-
-        assertEquals(HttpStatusCodes.STATUS_CODE_SERVER_ERROR, userFacade.get(id).getStatusCode());
+        assertThrows(NullPointerException.class, () -> userFacade.get(id));
     }
 
     @Test
@@ -108,29 +107,27 @@ public class UserFacadeTest {
     }
 
     @Test
-    @DisplayName("Test getAllInBoard method with invalid id")
-    void getAllInBoard_InvalidId_BadRequestResponse() throws AccountNotFoundException {
-        given(userService.getAllInBoard(1L)).willThrow(IllegalArgumentException.class);
-
-        assertEquals(HttpStatusCodes.STATUS_CODE_BAD_REQUEST, userFacade.getAllInBoard(1L).getStatusCode());
+    @DisplayName("Test getAllInBoard method with invalid id throws illegal argument")
+    void getAllInBoard_InvalidUserId_ThrowsIllegalArgumentException() {
+        assertThrows(IllegalArgumentException.class, () -> userFacade.getAllInBoard(-1L));
     }
 
     @Test
     @DisplayName("Test getAllInBoard method when board is not found")
-    void getAllInBoard_ServiceThrowsNoSuchElement_BadRequestResponse() throws AccountNotFoundException {
+    void getAllInBoard_BoardNotFoundInDB_ThrowsNoSuchElementException() throws AccountNotFoundException {
         long boardId = 1L;
 
         given(userService.getAllInBoard(boardId)).willThrow(new NoSuchElementException(ExceptionMessage.BOARD_DOES_NOT_EXISTS.toString()));
 
-        assertEquals(HttpStatusCodes.STATUS_CODE_BAD_REQUEST, userFacade.getAllInBoard(boardId).getStatusCode());
+        assertThrows(NoSuchElementException.class, () -> userFacade.getAllInBoard(boardId));
     }
 
     @Test
     @DisplayName("Test getAllInBoard method when null pointer exception is thrown")
-    void getAllInBoard_NullBoarId_ServerErrorResponse() throws AccountNotFoundException {
+    void getAllInBoard_NullBoarId_ThrowsNullPointerExcption() {
         Long boardId = null;
 
-        assertEquals(HttpStatusCodes.STATUS_CODE_SERVER_ERROR, userFacade.getAllInBoard(boardId).getStatusCode());
+        assertThrows(NullPointerException.class, () -> userFacade.getAllInBoard(boardId));
     }
 
     @Test
@@ -153,13 +150,13 @@ public class UserFacadeTest {
         assertEquals(HttpStatusCodes.STATUS_CODE_SERVER_ERROR, userFacade.delete(null).getStatusCode());
     }
 
-    @Test
-    @DisplayName("Test non-existent ID value returns BAD REQUEST status")
-    public void delete_ServiceThrowsAccountNotFound_BadRequestResponse() throws AccountNotFoundException {
-        given(userService.delete(100L)).willThrow(new AccountNotFoundException());
-
-        assertEquals(HttpStatusCodes.STATUS_CODE_BAD_REQUEST, userFacade.delete(100L).getStatusCode());
-    }
+//    @Test
+//    @DisplayName("Test non-existent ID value returns BAD REQUEST status")
+//    public void delete_ServiceThrowsAccountNotFound_BadRequestResponse() throws AccountNotFoundException {
+//        given(userService.delete(100L)).willThrow(new AccountNotFoundException());
+//
+//        assertEquals(HttpStatusCodes.STATUS_CODE_BAD_REQUEST, userFacade.delete(100L).getStatusCode());
+//    }
 
     @Test
     @DisplayName("get all user permissions in board - success")
@@ -175,29 +172,29 @@ public class UserFacadeTest {
     }
 
     @Test
-    @DisplayName("get all user permissions in board - invalid board id")
-    public void getAllUserPermissionsInBoard_InvalidBoardId_BadRequestResponse() {
+    @DisplayName("get all user permissions in board - invalid board id throws illeagl argument")
+    public void getAllUserPermissionsInBoard_InvalidBoardId_ThrowsIllegalArgumentException() {
         long boardId = -1L;
 
-        assertEquals(HttpStatusCodes.STATUS_CODE_BAD_REQUEST, userFacade.getAllUserPermissionsInBoard(boardId).getStatusCode());
+        assertThrows(IllegalArgumentException.class, () -> userFacade.getAllUserPermissionsInBoard(boardId));
     }
 
     @Test
-    @DisplayName("get all user permissions in board with valid board that not found in db, retrieved bad request response")
-    public void getAllUserPermissionsInBoard_BoardNotFound_BadRequestResponse() {
+    @DisplayName("get all user permissions in board with valid board that not found in db, throws no such element")
+    public void getAllUserPermissionsInBoard_BoardNotFound_ThrowsNoSuchElementException() {
         long boardId = 1L;
 
         given(userService.getAllUserPermissionsInBoard(boardId)).willThrow(new NoSuchElementException());
 
-        assertEquals(HttpStatusCodes.STATUS_CODE_BAD_REQUEST, userFacade.getAllUserPermissionsInBoard(boardId).getStatusCode());
+        assertThrows(NoSuchElementException.class, () -> userFacade.getAllUserPermissionsInBoard(boardId));
     }
 
     @Test
-    @DisplayName("get all user permissions in board with null id - null pointer exception sends server error")
-    public void getAllUserPermissionsInBoard_NullBoardId_ServerErrorResponse() {
+    @DisplayName("get all user permissions in board with null id - null pointer exception")
+    public void getAllUserPermissionsInBoard_NullBoardId_ThrowsNullPointerException() {
         Long boardId = null;
 
-        assertEquals(HttpStatusCodes.STATUS_CODE_SERVER_ERROR, userFacade.getAllUserPermissionsInBoard(boardId).getStatusCode());
+        assertThrows(NullPointerException.class, () -> userFacade.getAllUserPermissionsInBoard(boardId));
     }
 
     @Test
@@ -216,19 +213,19 @@ public class UserFacadeTest {
     }
 
     @Test
-    @DisplayName("Get all boards of user - invalid input")
-    public void getAllBoardsOfUser_InvalidInput_BadRequestResponse() throws NoPermissionException, AccountNotFoundException {
+    @DisplayName("Get all boards of user - invalid input throws illegal argument")
+    public void getAllBoardsOfUser_InvalidUserIDInput_ThrowsIllegalArgumentException() {
         long userId = -1L;
 
-        assertEquals(HttpStatusCodes.STATUS_CODE_BAD_REQUEST, userFacade.getAllBoardsOfUser(userId).getStatusCode());
+        assertThrows(IllegalArgumentException.class, () -> userFacade.getAllBoardsOfUser(userId));
     }
 
     @Test
     @DisplayName("Get all boards of user - null pointer exception")
-    public void getAllBoardsOfUser_NullUserId_ServerErrorResponse() throws NoPermissionException, AccountNotFoundException {
+    public void getAllBoardsOfUser_NullUserId_ThrowsNullPointerException() {
         Long userId = null;
 
-        assertEquals(HttpStatusCodes.STATUS_CODE_SERVER_ERROR, userFacade.getAllBoardsOfUser(userId).getStatusCode());
+        assertThrows(NullPointerException.class, () -> userFacade.getAllBoardsOfUser(userId));
     }
 
     @Test
@@ -286,28 +283,29 @@ public class UserFacadeTest {
 
         given(userService.get(objectsIdsRequest.getEmail())).willReturn(user);
         given(board.getBoardUsersSet()).willReturn(users);
+
         assertEquals(HttpStatusCodes.STATUS_CODE_OK, userFacade.updateUserToBoard(objectsIdsRequest).getStatusCode());
     }
 
     @Test
-    @DisplayName("update user to board failed using invalid board id")
-    public void updateUserToBoard_InvalidBoardIdInput_BadRequestResponse() throws AccountNotFoundException {
+    @DisplayName("update user to board failed using invalid board id throws illegal argument")
+    public void updateUserToBoard_InvalidBoardIdInput_ThrowsIllegalArgumentException() {
         ObjectsIdsRequest objectsIdsRequest = mock(ObjectsIdsRequest.class);
         given(objectsIdsRequest.getBoardId()).willReturn(-1L);
         given(objectsIdsRequest.getUserId()).willReturn(2L);
         given(objectsIdsRequest.getPermissionId()).willReturn(3L);
 
-        assertEquals(HttpStatusCodes.STATUS_CODE_BAD_REQUEST, userFacade.updateUserToBoard(objectsIdsRequest).getStatusCode());
+        assertThrows(IllegalArgumentException.class, () -> userFacade.updateUserToBoard(objectsIdsRequest));
     }
 
     @Test
-    @DisplayName("update user to board failed using null board id")
-    public void updateUserToBoard_NullBoardIdInput_ServerErrorResponse() throws AccountNotFoundException {
+    @DisplayName("update user to board failed using null board id throws null pointer")
+    public void updateUserToBoard_NullBoardIdInput_ThrowsNullPointerException() {
         ObjectsIdsRequest objectsIdsRequest = mock(ObjectsIdsRequest.class);
         given(objectsIdsRequest.getBoardId()).willReturn(null);
         given(objectsIdsRequest.getUserId()).willReturn(2L);
         given(objectsIdsRequest.getPermissionId()).willReturn(3L);
 
-        assertEquals(HttpStatusCodes.STATUS_CODE_SERVER_ERROR, userFacade.updateUserToBoard(objectsIdsRequest).getStatusCode());
+        assertThrows(NullPointerException.class, () -> userFacade.updateUserToBoard(objectsIdsRequest));
     }
 }

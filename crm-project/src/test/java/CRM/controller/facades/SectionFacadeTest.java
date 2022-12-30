@@ -18,6 +18,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 
@@ -56,25 +57,25 @@ class SectionFacadeTest {
 
     @Test
     @DisplayName("Test create section with invalid name")
-    public void create_InvalidName_BadRequestResponse() {
+    public void create_InvalidName_ThrowsIllegalArgumentException() {
         AttributeRequest sectionRequest = new AttributeRequest();
         sectionRequest.setBoardId(1L);
         sectionRequest.setName("Invalid name @!@#123");
 
-        assertEquals(HttpStatusCodes.STATUS_CODE_BAD_REQUEST, sectionFacade.create(sectionRequest, 1L).getStatusCode());
+        assertThrows(IllegalArgumentException.class, () -> sectionFacade.create(sectionRequest, 1L));
     }
 
     @Test
     @DisplayName("Test create section with null board id")
-    public void create_NullBoardId_ServerErrorResponse() {
+    public void create_NullBoardId_ThrowsNullPointerException() {
         AttributeRequest sectionRequest = new AttributeRequest();
 
-        assertEquals(HttpStatusCodes.STATUS_CODE_SERVER_ERROR, sectionFacade.create(sectionRequest, null).getStatusCode());
+        assertThrows(NullPointerException.class, () -> sectionFacade.create(sectionRequest, null));
     }
 
     @Test
     @DisplayName("Test create section with board not found")
-    public void create_ServiceThrowsNoSuchElement_BadRequestResponse() {
+    public void create_SectionNotFoundInDB_ThrowsNoSuchElementException() {
         AttributeRequest sectionRequest = new AttributeRequest();
         sectionRequest.setBoardId(1L);
         sectionRequest.setName("name");
@@ -82,7 +83,7 @@ class SectionFacadeTest {
 
         given(sectionService.create(sectionRequest, 1L)).willThrow(NoSuchElementException.class);
 
-        assertEquals(HttpStatusCodes.STATUS_CODE_BAD_REQUEST, sectionFacade.create(sectionRequest, 1L).getStatusCode());
+        assertThrows(NoSuchElementException.class, () -> sectionFacade.create(sectionRequest, 1L));
     }
 
     @Test
@@ -102,27 +103,27 @@ class SectionFacadeTest {
         long boardId = -1L;
         long sectionId = 2L;
 
-        assertEquals(HttpStatusCodes.STATUS_CODE_BAD_REQUEST, sectionFacade.delete(boardId, sectionId).getStatusCode());
+        assertThrows(IllegalArgumentException.class, () -> sectionFacade.delete(boardId, sectionId));
     }
 
     @Test
     @DisplayName("delete section with non-existent board id")
-    public void delete_ServiceThrowsNoSuchElement_NonExistentBoardId() {
+    public void delete_SectionNotFoundInDB_ThrowsNoSuchElementException() {
         long boardId = 3L;
         long sectionId = 2L;
 
         doThrow(new NoSuchElementException()).when(sectionService).delete(boardId, sectionId);
 
-        assertEquals(HttpStatusCodes.STATUS_CODE_BAD_REQUEST, sectionFacade.delete(boardId, sectionId).getStatusCode());
+        assertThrows(NoSuchElementException.class, () -> sectionFacade.delete(boardId, sectionId));
     }
 
     @Test
     @DisplayName("delete section with null input board id")
-    public void delete_NullInput_BoardId() {
+    public void delete_NullInput_ThrowsNullPointerException() {
         Long boardId = null;
         long sectionId = 2L;
 
-        assertEquals(HttpStatusCodes.STATUS_CODE_SERVER_ERROR, sectionFacade.delete(boardId, sectionId).getStatusCode());
+        assertThrows(NullPointerException.class, () -> sectionFacade.delete(boardId, sectionId));
     }
 
     @Test
@@ -146,31 +147,31 @@ class SectionFacadeTest {
 
     @Test
     @DisplayName("get section invalid input")
-    public void get_InvalidInput_BadRequestResponse() {
+    public void get_InvalidInput_ThrowsIllegalArgumentException() {
         long boardId = 1L;
         long sectionId = -2L;
 
-        assertEquals(HttpStatusCodes.STATUS_CODE_BAD_REQUEST, sectionFacade.get(sectionId, boardId).getStatusCode());
+        assertThrows(IllegalArgumentException.class, () -> sectionFacade.get(sectionId, boardId));
     }
 
     @Test
     @DisplayName("get section not found")
-    public void get_ServiceThrowsNoSuchElement_BadRequestResponse() {
+    public void get_SectionNotFoundInDB_ThrowsNoSuchElementException() {
         long boardId = 1L;
         long sectionId = 2L;
 
         given(sectionService.get(sectionId, boardId)).willThrow(new NoSuchElementException());
 
-        assertEquals(HttpStatusCodes.STATUS_CODE_BAD_REQUEST, sectionFacade.get(sectionId, boardId).getStatusCode());
+        assertThrows(NoSuchElementException.class, () -> sectionFacade.get(sectionId, boardId));
     }
 
     @Test
-    @DisplayName("get section internal server error")
-    public void get_SectionNullBoardId_ServerErrorResponse() {
+    @DisplayName("get section with null board id throws null pointer")
+    public void get_SectionNullBoardId_ThrowsNullPointerException() {
         Long boardId = null;
         long sectionId = 2L;
 
-        assertEquals(HttpStatusCodes.STATUS_CODE_SERVER_ERROR, sectionFacade.get(sectionId, boardId).getStatusCode());
+        assertThrows(NullPointerException.class, () -> sectionFacade.get(sectionId, boardId));
     }
 
     @Test
@@ -195,28 +196,28 @@ class SectionFacadeTest {
 
     @Test
     @DisplayName("get all sections in board invalid input")
-    public void getAllSectionsInBoard_InvalidInput_BadRequestResponse() {
+    public void getAllSectionsInBoard_InvalidInput_ThrowsIllegalArgumentException() {
         long boardId = -1L;
 
-        assertEquals(HttpStatusCodes.STATUS_CODE_BAD_REQUEST, sectionFacade.getAllSectionsInBoard(boardId).getStatusCode());
+        assertThrows(IllegalArgumentException.class, () -> sectionFacade.getAllSectionsInBoard(boardId));
     }
 
     @Test
     @DisplayName("get all sections in board where no section found")
-    public void getAllSectionsInBoard_ServiceThrowsNoSuchElement_BadRequestResponse() {
+    public void getAllSectionsInBoard_BoardNotFoundInDB_ThrowsNoSuchElementException() {
         long boardId = 1L;
 
         given(sectionService.getAllSectionsInBoard(boardId)).willThrow(new NoSuchElementException());
 
-        assertEquals(HttpStatusCodes.STATUS_CODE_BAD_REQUEST, sectionFacade.getAllSectionsInBoard(boardId).getStatusCode());
+        assertThrows(NoSuchElementException.class, () -> sectionFacade.getAllSectionsInBoard(boardId));
     }
 
     @Test
     @DisplayName("get all sections in board null pointer")
-    public void getAllSectionsInBoard_NullBoardId_ServerErrorResponse() {
+    public void getAllSectionsInBoard_NullBoardId_ThrowsNullPointerException() {
         Long boardId = null;
 
-        assertEquals(HttpStatusCodes.STATUS_CODE_SERVER_ERROR, sectionFacade.getAllSectionsInBoard(boardId).getStatusCode());
+        assertThrows(NullPointerException.class, () -> sectionFacade.getAllSectionsInBoard(boardId));
     }
 
     @Test
@@ -244,20 +245,21 @@ class SectionFacadeTest {
     }
 
     @Test
-    @DisplayName("get filtered sections invalid filter")
-    public void getFilteredItems_InvalidBoardId_BadRequestResponse() {
+    @DisplayName("get filtered sections with invalid board id")
+    public void getFilteredItems_InvalidBoardId_ThrowsIllegalArgumentException() {
         Map<String, List<String>> filters = new HashMap<>();
         filters.put("invalid", List.of("Section 3"));
         long boardId = -1L;
 
-        assertEquals(HttpStatusCodes.STATUS_CODE_BAD_REQUEST, sectionFacade.getFilteredItems(filters, boardId).getStatusCode());
+        assertThrows(IllegalArgumentException.class, () -> sectionFacade.getFilteredItems(filters, boardId));
     }
 
     @Test
-    @DisplayName("get filtered sections with null board id retrieved null pointer exception which resulted in server error response")
-    public void getFilteredItems_NullBoardId_ServerErrorResponse() {
+    @DisplayName("get filtered sections with null board id retrieved null pointer exception")
+    public void getFilteredItems_NullBoardId_ThrowsNullPointerException() {
         Long boardId = null;
-        assertEquals(HttpStatusCodes.STATUS_CODE_SERVER_ERROR, sectionFacade.getFilteredItems(null, boardId).getStatusCode());
+
+        assertThrows(NullPointerException.class, () -> sectionFacade.getFilteredItems(null, boardId));
     }
 
     @Test
@@ -286,8 +288,8 @@ class SectionFacadeTest {
     }
 
     @Test
-    @DisplayName("update section with invalid boardId retrieved bad request response ")
-    public void update_InvalidBoardId_BadRequestResponse() throws NoSuchFieldException {
+    @DisplayName("update section with invalid boardId throws illegal argument")
+    public void update_InvalidBoardId_ThrowsIllegalArgumentException() {
         long boardId = -1L;
         long sectionId = 2L;
         UpdateObjectRequest updateItemRequest = new UpdateObjectRequest();
@@ -296,12 +298,12 @@ class SectionFacadeTest {
         ObjectsIdsRequest objIds = ObjectsIdsRequest.boardSectionIds(boardId, sectionId);
         updateItemRequest.setObjectsIdsRequest(objIds);
 
-        assertEquals(HttpStatusCodes.STATUS_CODE_BAD_REQUEST, sectionFacade.update(updateItemRequest).getStatusCode());
+        assertThrows(IllegalArgumentException.class, () -> sectionFacade.update(updateItemRequest));
     }
 
     @Test
-    @DisplayName("update section with null boardId retrieved bad request response ")
-    public void update_NullBoardId_ServerErrorResponse() throws NoSuchFieldException {
+    @DisplayName("update section with null boardId throws null pointer exception")
+    public void update_NullBoardId_ThrowsNullPointerException() {
         Long boardId = null;
         long sectionId = 2L;
         UpdateObjectRequest updateItemRequest = new UpdateObjectRequest();
@@ -310,6 +312,6 @@ class SectionFacadeTest {
         ObjectsIdsRequest objIds = ObjectsIdsRequest.boardSectionIds(boardId, sectionId);
         updateItemRequest.setObjectsIdsRequest(objIds);
 
-        assertEquals(HttpStatusCodes.STATUS_CODE_SERVER_ERROR, sectionFacade.update(updateItemRequest).getStatusCode());
+        assertThrows(NullPointerException.class, () -> sectionFacade.update(updateItemRequest));
     }
 }

@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.BDDMockito.given;
 
 
@@ -50,29 +51,29 @@ class BoardFacadeTest {
 
     @Test
     @DisplayName("Test the case where the boardRequest has a null name")
-    public void create_NullName_ServerErrorResponse() throws AccountNotFoundException {
+    public void create_NullName_ThrowsNullPointerException() {
         BoardRequest incorrectBoardRequest = new BoardRequest(1L, null, "nice");
 
-        assertEquals(HttpStatusCodes.STATUS_CODE_SERVER_ERROR, boardFacade.create(incorrectBoardRequest).getStatusCode());
+        assertThrows(NullPointerException.class, () -> boardFacade.create(incorrectBoardRequest));
     }
 
     @Test
     @DisplayName("Test the case where the boardRequest has a null creator user ID")
-    public void create_NullCreatorUser_ServerErrorResponse() throws AccountNotFoundException {
+    public void create_NullCreatorUser_ThrowsNullPointerException() {
         BoardRequest incorrectBoardRequest = new BoardRequest(null, "board", "nice");
 
-        assertEquals(HttpStatusCodes.STATUS_CODE_SERVER_ERROR, boardFacade.create(incorrectBoardRequest).getStatusCode());
+        assertThrows(NullPointerException.class, () -> boardFacade.create(incorrectBoardRequest));
     }
 
     @Test
     @DisplayName("Test the case where the creator user ID in the boardRequest does not exist")
-    public void create_ServiceThrowsAccountNotFound_BadRequestResponse() throws AccountNotFoundException {
+    public void create_UserNotFoundInDB_ThrowsAccountNotFoundException() throws AccountNotFoundException {
         BoardRequest incorrectBoardRequest = new BoardRequest(100L, "board", "nice");
         incorrectBoardRequest.setCreatorUserId(1L);
 
         given(boardService.create(incorrectBoardRequest)).willThrow(AccountNotFoundException.class);
 
-        assertEquals(HttpStatusCodes.STATUS_CODE_BAD_REQUEST, boardFacade.create(incorrectBoardRequest).getStatusCode());
+        assertThrows(AccountNotFoundException.class, () -> boardFacade.create(incorrectBoardRequest));
     }
 
     @Test
@@ -83,22 +84,22 @@ class BoardFacadeTest {
 
     @Test
     @DisplayName("Test delete with invalid id")
-    public void delete_BoardId_BadRequestResponse() {
-        assertEquals(HttpStatusCodes.STATUS_CODE_BAD_REQUEST, boardFacade.delete(Long.valueOf("-2")).getStatusCode());
+    public void delete_InvalidBoardId_ThrowsIllegalArgumentException() {
+        assertThrows(IllegalArgumentException.class, () -> boardFacade.delete(-2L));
     }
 
     @Test
     @DisplayName("Test delete with null id")
-    public void delete_NullId_ServerErrorResponse() {
-        assertEquals(HttpStatusCodes.STATUS_CODE_SERVER_ERROR, boardFacade.delete(null).getStatusCode());
+    public void delete_NullBoardId_ThrowsNullPointerException() {
+        assertThrows(NullPointerException.class, () -> boardFacade.delete(null));
     }
 
     @Test
     @DisplayName("Test delete with non existent board id in database")
-    public void delete_ServiceThrowsNoSuchElement_BadRequestResponse() {
+    public void delete_BoardIdNotExistsInDB_NoSuchElementException() {
         given(boardService.delete(1L)).willThrow(NoSuchElementException.class);
 
-        assertEquals(HttpStatusCodes.STATUS_CODE_BAD_REQUEST, boardFacade.delete(1L).getStatusCode());
+        assertThrows(NoSuchElementException.class, () -> boardFacade.delete(1L));
     }
 
     @Test
@@ -124,22 +125,22 @@ class BoardFacadeTest {
 
     @Test
     @DisplayName("Test get with non-existent id")
-    public void get_ServiceThrowsNoSuchElement_BadRequestResponse() throws NoPermissionException {
+    public void get_BoardIdNotExistsInDB_ThrowsNoSuchElementException() {
         given(boardService.get(1L)).willThrow(NoSuchElementException.class);
 
-        assertEquals(HttpStatusCodes.STATUS_CODE_BAD_REQUEST, boardFacade.get(1L, 1L).getStatusCode());
+        assertThrows(NoSuchElementException.class, () -> boardFacade.get(1L, 1L));
     }
 
     @Test
     @DisplayName("Test get with null user id")
-    public void get_NullUserId_ServerErrorResponse() throws NoPermissionException {
-        assertEquals(HttpStatusCodes.STATUS_CODE_SERVER_ERROR, boardFacade.get(null, 1L).getStatusCode());
+    public void get_NullUserId_ThrowsNullPointerException() {
+        assertThrows(NullPointerException.class, () -> boardFacade.get(1L, null));
     }
 
     @Test
     @DisplayName("Test get with invalid id")
-    public void get_InvalidUserId_BadRequestResponse() throws NoPermissionException {
-        assertEquals(HttpStatusCodes.STATUS_CODE_BAD_REQUEST, boardFacade.get(Long.valueOf("-2"), 1L).getStatusCode());
+    public void get_InvalidUserId_ThrowsIllegalArgumentException() {
+        assertThrows(IllegalArgumentException.class, () -> boardFacade.get(-2L, 1L));
     }
 
     @Test
@@ -173,19 +174,19 @@ class BoardFacadeTest {
 
     @Test
     @DisplayName("Test update board with invalid board ID")
-    public void update_InvalidBoardId_BadRequestResponse() throws NoSuchFieldException {
+    public void update_InvalidBoardId_ThrowsIllegalArgumentException() {
         UpdateObjectRequest boardRequest = new UpdateObjectRequest();
         boardRequest.setFieldName(UpdateField.NAME);
         boardRequest.setContent("Test new board name");
         ObjectsIdsRequest objIds = ObjectsIdsRequest.boardUserIds(-2L, 1L);
         boardRequest.setObjectsIdsRequest(objIds);
 
-        assertEquals(HttpStatusCodes.STATUS_CODE_BAD_REQUEST, boardFacade.updateBoard(boardRequest).getStatusCode());
+        assertThrows(IllegalArgumentException.class, () -> boardFacade.updateBoard(boardRequest));
     }
 
     @Test
     @DisplayName("Test update board with non-existent board")
-    public void update_ServiceThrowsNoSuchElement_BadRequestResponse() throws NoSuchFieldException {
+    public void update_BoardIdNotFoundInDB_ThrowsNoSuchElementException() throws NoSuchFieldException {
         UpdateObjectRequest boardRequest = new UpdateObjectRequest();
         boardRequest.setFieldName(UpdateField.NAME);
         boardRequest.setContent("Test new board name");
@@ -194,12 +195,27 @@ class BoardFacadeTest {
 
         given(boardService.updateBoard(boardRequest)).willThrow(NoSuchElementException.class);
 
-        assertEquals(HttpStatusCodes.STATUS_CODE_BAD_REQUEST, boardFacade.updateBoard(boardRequest).getStatusCode());
+        assertThrows(NoSuchElementException.class, () -> boardFacade.updateBoard(boardRequest));
     }
 
     @Test
+    @DisplayName("Test update board with non-existent field to update")
+    public void update_InvalidFieldUpdateInput_ThrowsNoSuchFieldException() throws NoSuchFieldException {
+        UpdateObjectRequest boardRequest = new UpdateObjectRequest();
+        boardRequest.setFieldName(UpdateField.NAME);
+        boardRequest.setContent("Teste");
+        ObjectsIdsRequest objIds = ObjectsIdsRequest.boardUserIds(123L, 1L);
+        boardRequest.setObjectsIdsRequest(objIds);
+
+        given(boardService.updateBoard(boardRequest)).willThrow(NoSuchFieldException.class);
+
+        assertThrows(NoSuchFieldException.class, () -> boardFacade.updateBoard(boardRequest));
+    }
+
+
+    @Test
     @DisplayName("Test update board with null input")
-    public void update_NullInput_ServerErrorResponse() throws NoSuchFieldException {
-        assertEquals(HttpStatusCodes.STATUS_CODE_SERVER_ERROR, boardFacade.updateBoard(null).getStatusCode());
+    public void update_NullInput_ThrowsNullPointerException() {
+        assertThrows(NullPointerException.class, () -> boardFacade.updateBoard(null));
     }
 }
