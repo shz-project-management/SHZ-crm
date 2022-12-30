@@ -83,16 +83,16 @@ public class NotificationSender {
                 return "Item id: " + notificationRequest.getItemId() + " has been assigned to you in board " + board.getName();
             case 2:
                 Status status = board.getAttributeById(attributeId, Status.class);
-                return "The item's: " + item.getName() + " status has been changed to " + status.getName();
+                return "The item's '" + item.getName() + "' status has been changed to '" + status.getName() + "'";
             case 3:
                 Type type = board.getAttributeById(attributeId, Type.class);
-                return "The item's: " + item.getName() + " type has been changed to " + type.getName();
+                return "The item's '" + item.getName() + "' type has been changed to " + type.getName();
             case 4:
-                return "New comment added on item: " + item.getName() + ":\n " + notificationRequest.getComment() + "\n By: " + notificationRequest.getFromUser().getFullName();
+                return "New comment added on item '" + item.getName() + "':\n " + notificationRequest.getComment() + "\n By " + notificationRequest.getFromUser().getFullName();
             case 5:
                 return "Item: " + notificationRequest.getItemId() + " has been deleted";
             case 6:
-                return "The item's '" + item.getName() + "' Field " + notificationRequest.getChangedFieldName() + " has been changed " + " to " + notificationRequest.getPresentContent();
+                return "The item's '" + item.getName() + "' Field " + notificationRequest.getChangedFieldName() + " has been changed " + " to '" + notificationRequest.getPresentContent() + "'";
             case 7:
                 return getAddUserNotificationDescription(notificationRequest, kind);
 
@@ -107,17 +107,18 @@ public class NotificationSender {
         if (notificationRequest.getFromUser() == notificationRequest.getUser())
             switch (userPermission.getPermission()) {
                 case USER:
-                    notificationRequest.setNotificationType(new NotificationSetting(type, "You have been added to a board"));
-                    return "You have been added to board: " + notificationRequest.getBoard().getName() + " Welcome!";
+                    notificationRequest.setNotificationType(new NotificationSetting(type, "You are invited to a board"));
+                    return "You are invited to the board '" + notificationRequest.getBoard().getName() + "'. Welcome!";
                 case LEADER:
                     notificationRequest.setNotificationType(new NotificationSetting(type, "You have been promoted to leader"));
-                    return "You have been promoted to leader in board: " + notificationRequest.getBoard().getName() + " Good luck!";
+                    return "You have been promoted to leader in board '" + notificationRequest.getBoard().getName() + "'. Good luck!";
                 case UNAUTHORIZED:
                     notificationRequest.setNotificationType(new NotificationSetting(type, "You have been removed from board"));
-                    return "You have been removed from board: " + notificationRequest.getBoard().getName();
+                    return "You have been removed from board '" + notificationRequest.getBoard().getName() + "'";
             }
         else if (userPermission.getPermission() == Permission.USER)
-            return notificationRequest.getFromUser().getFullName() + " has been added to the board, Welcome!";
-        return "User: " + notificationRequest.getFromUser().getFullName() + " permissions has been changed";
+            return notificationRequest.getFromUser().getFullName() + " has been added to the board. Welcome!";
+
+        return notificationRequest.getFromUser().getFullName() + "'s permissions has been changed in this board";
     }
 }
