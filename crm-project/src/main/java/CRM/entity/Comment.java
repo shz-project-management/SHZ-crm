@@ -9,6 +9,7 @@ import javax.persistence.*;
 @Setter
 @ToString
 @Entity
+@EqualsAndHashCode
 @Table(name = "comments")
 public class Comment extends SharedContent {
     private Long assignedToUserId;
