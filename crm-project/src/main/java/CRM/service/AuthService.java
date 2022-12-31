@@ -138,7 +138,6 @@ public class AuthService {
         }
     }
 
-
     /**
      * Find a user by their email.
      *

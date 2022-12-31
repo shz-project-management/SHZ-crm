@@ -112,4 +112,25 @@ public class AuthServiceTest {
         assertThrows(AccountNotFoundException.class, () -> authService.findById(creatorUserId));
         verify(userRepository).findById(creatorUserId);
     }
+
+    @Test
+    public void testLoginThirdParty_Success(){
+        RegisterUserRequest user = new RegisterUserRequest("test", "test123456", "test@gmail.com");
+        User realUser = User.newUser(user);
+
+        given(userRepository.findByEmail(user.getEmail())).willReturn(Optional.of(realUser));
+        realUser.setId(1L);
+
+        assertEquals(String.class, authService.thirdPartyLogin(user).getClass());
+    }
+
+    @Test
+    public void testLoginThirdParty_NoAccountFound(){
+        RegisterUserRequest user = new RegisterUserRequest("test", "test123456", "test@gmail.com");
+        User realUser = User.newUser(user);
+
+        given(userRepository.findByEmail(user.getEmail())).willReturn(Optional.empty());
+        given(userRepository.save(realUser)).willReturn(realUser);
+        assertEquals(String.class, authService.thirdPartyLogin(user).getClass());
+    }
 }

@@ -461,7 +461,6 @@ public class SharedContentFacadeTest {
         given(objIds.getBoardId()).willReturn(boardId);
         given(objIds.getSectionId()).willReturn(sectionId);
         given(objIds.getUpdateObjId()).willReturn(updateObjId);
-        given(objIds.getEmail()).willReturn(email);
 
 
         Item item = (Item) Item.createSharedContentItemForTests();
@@ -476,7 +475,7 @@ public class SharedContentFacadeTest {
         given(itemService.assignToUser(objIds)).willReturn(section);
 
         User user = mock(User.class);
-        given(userService.get(email)).willReturn(user);
+//        given(userService.get(email)).willReturn(user);
 
         assertEquals(HttpStatusCodes.STATUS_CODE_OK, sharedContentFacade.assignToUser(objIds, Item.class).getStatusCode());
     }

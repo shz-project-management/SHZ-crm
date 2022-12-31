@@ -1,8 +1,10 @@
 package CRM.service;
 
 import CRM.entity.*;
+import CRM.entity.requests.ObjectsIdsRequest;
 import CRM.repository.BoardRepository;
 //import CRM.repository.UserInBoardRepository;
+import CRM.repository.NotificationSettingRepository;
 import CRM.repository.UserRepository;
 import CRM.utils.enums.Permission;
 import org.junit.jupiter.api.DisplayName;
@@ -28,19 +30,19 @@ public class UserServiceTest {
     private UserRepository userRepository;
     @Mock
     private BoardRepository boardRepository;
-//    @Mock
-//    private UserInBoardRepository userInBoardRepository;
+    @Mock
+    private NotificationSettingRepository notificationSettingRepository;
 
     @InjectMocks
     private UserService userService;
 
-//    @Test
-//    @DisplayName("Test get method when user exists")
-//    public void testGetMethodWhenUserExists() throws AccountNotFoundException {
-//        User storedUser = new User(1L, "Ziv", "Hausler", "not-the-same-password-for-sure", "ziv@gmail.com", null, null);
-//        given(userRepository.findById(1L)).willReturn(Optional.of(storedUser));
-//        assertEquals(1L, userService.get(storedUser.getId()).getId());
-//    }
+    @Test
+    @DisplayName("Test get method when user exists")
+    public void testGetMethodWhenUserExists() throws AccountNotFoundException {
+        User storedUser = new User(1L, "Ziv", "not-the-same-password-for-sure", "ziv@gmail.com", null);
+        given(userRepository.findById(1L)).willReturn(Optional.of(storedUser));
+        assertEquals(1L, userService.get(storedUser.getId()).getId());
+    }
 
     @Test
     @DisplayName("Test get method when user does not exist")
@@ -56,13 +58,13 @@ public class UserServiceTest {
         assertThrows(AccountNotFoundException.class, () -> userService.get(1L));
     }
 
-//    @Test
-//    @DisplayName("Test get method when Validations.doesIdExists returns a user with a different id")
-//    public void testGetMethodWhenValidationsReturnsUserWithDifferentId() throws AccountNotFoundException {
-//        User differentUser = new User(2L, "Ziv", "Hausler", "not-the-same-password-for-sure", "ziv@gmail.com", null, null);
-//        when(userRepository.findById(1L)).thenReturn(Optional.of(differentUser));
-//        assertNotEquals(1L, userService.get(1L).getId());
-//    }
+    @Test
+    @DisplayName("Test get method when Validations.doesIdExists returns a user with a different id")
+    public void testGetMethodWhenValidationsReturnsUserWithDifferentId() throws AccountNotFoundException {
+        User differentUser = new User(2L, "Ziv", "not-the-same-password-for-sure", "ziv@gmail.com", null);
+        when(userRepository.findById(1L)).thenReturn(Optional.of(differentUser));
+        assertNotEquals(1L, userService.get(1L).getId());
+    }
 
     @Test
     @DisplayName("Test get method when Validations.doesIdExists returns null")
@@ -91,57 +93,55 @@ public class UserServiceTest {
         assertTrue(users.isEmpty());
     }
 
-//    @Test
-//    @DisplayName("Test getAll method when there are multiple users in the repository")
-//    public void testGetAllMethodWhenMultipleUsers() {
-//        // Set up the mock userRepository to return a list of users when findAll is called
-//        when(userRepository.findAll()).thenReturn(Arrays.asList(
-//                new User(1L, "Ziv1", "Hausler", "ziv123456", "ziv1@gmail.com", null, null),
-//                new User(2L, "Ziv2", "Hausler", "ziv123456", "ziv2@gmail.com", null, null),
-//                new User(3L, "Ziv3", "Hausler", "ziv123456", "ziv3@gmail.com", null, null)
-//        ));
-//
-//        // Call the getAll method
-//        List<User> users = userService.getAll();
-//
-//        // Assert that the returned list has the correct size and contains the correct users
-//        assertEquals(3, users.size());
-//        assertEquals(1L, users.get(0).getId());
-//        assertEquals("Ziv1", users.get(0).getFirstName());
-//        assertEquals("Hausler", users.get(0).getLastName());
-//        assertEquals(2L, users.get(1).getId());
-//        assertEquals("Ziv2", users.get(1).getFirstName());
-//        assertEquals("Hausler", users.get(1).getLastName());
-//        assertEquals(3L, users.get(2).getId());
-//        assertEquals("Ziv3", users.get(2).getFirstName());
-//        assertEquals("Hausler", users.get(2).getLastName());
-//    }
+    @Test
+    @DisplayName("Test getAll method when there are multiple users in the repository")
+    public void testGetAllMethodWhenMultipleUsers() {
+        // Set up the mock userRepository to return a list of users when findAll is called
+        when(userRepository.findAll()).thenReturn(Arrays.asList(
+                new User(1L, "Ziv1", "ziv123456", "ziv1@gmail.com", null),
+                new User(2L, "Ziv2", "ziv123456", "ziv2@gmail.com", null),
+                new User(3L, "Ziv3", "ziv123456", "ziv3@gmail.com", null)
+        ));
 
-//    @Test
-//    @DisplayName("Test getAllInBoard method when board exists and there are multiple users in the board")
-//    public void testGetAllInBoardMethodWhenBoardExistsAndMultipleUsers() throws AccountNotFoundException {
-//        User user1 = new User(1L, "Ziv1", "Hausler", "ziv123456", "ziv1@gmail.com", null, null);
-//        Board board1 = Board.createBoard(user1, "hello1", "world1");
-//        when(boardRepository.findById(1L)).thenReturn(Optional.of(board1));
-//        when(userInBoardRepository.findAllUserByBoard(board1))
-//                .thenReturn(Arrays.asList(
-//                        UserInBoard.userInBoardUserChoosePermission(new User(1L, "Ziv1", "Hausler", "ziv123456", "ziv1@gmail.com", null, null), Board.createBoard(user1, "hello", "world"), Permission.ADMIN),
-//                        UserInBoard.userInBoardUserChoosePermission(new User(2L, "Ziv2", "Hausler", "ziv123456", "ziv2@gmail.com", null, null), Board.createBoard(user1, "hello", "world"), Permission.USER),
-//                        UserInBoard.userInBoardUserChoosePermission(new User(3L, "Ziv3", "Hausler", "ziv123456", "ziv3@gmail.com", null, null), Board.createBoard(user1, "hello", "world"), Permission.USER)
-//                ));
-//        List<User> users = userService.getAllInBoard(1L);
-//
+        // Call the getAll method
+        List<User> users = userService.getAll();
+
+        // Assert that the returned list has the correct size and contains the correct users
+        assertEquals(3, users.size());
+        assertEquals(1L, users.get(0).getId());
+        assertEquals("Ziv1", users.get(0).getFullName());
+        assertEquals(2L, users.get(1).getId());
+        assertEquals("Ziv2", users.get(1).getFullName());
+        assertEquals(3L, users.get(2).getId());
+        assertEquals("Ziv3", users.get(2).getFullName());
+    }
+
+    @Test
+    @DisplayName("Test getAllInBoard method when board exists and there are multiple users in the board")
+    public void testGetAllInBoardMethodWhenBoardExistsAndMultipleUsers() throws AccountNotFoundException {
+        User user1 = new User(1L, "Ziv1", "ziv123456", "ziv1@gmail.com", null);
+        User user2 = new User(2L, "Ziv2", "ziv123456", "ziv2@gmail.com", null);
+        User user3 = new User(3L, "Ziv3", "ziv123456", "ziv3@gmail.com", null);
+        Board board1 = Board.createBoard(user1, "hello1", "world1");
+        when(boardRepository.findById(1L)).thenReturn(Optional.of(board1));
+
+        UserPermission userPermission1 = new UserPermission(1L, user1, Permission.USER);
+        UserPermission userPermission2 = new UserPermission(2L, user2, Permission.USER);
+        UserPermission userPermission3 = new UserPermission(3L, user3, Permission.USER);
+        board1.addUserPermissionToBoard(userPermission1);
+        board1.addUserPermissionToBoard(userPermission2);
+        board1.addUserPermissionToBoard(userPermission3);
+
+        List<User> users = userService.getAllInBoard(1L);
+
 //        assertEquals(3, users.size());
-//        assertEquals(1L, users.get(0).getId());
-//        assertEquals("Ziv1", users.get(0).getFirstName());
-//        assertEquals("Hausler", users.get(0).getLastName());
-//        assertEquals(2L, users.get(1).getId());
-//        assertEquals("Ziv2", users.get(1).getFirstName());
-//        assertEquals("Hausler", users.get(1).getLastName());
-//        assertEquals(3L, users.get(2).getId());
-//        assertEquals("Ziv3", users.get(2).getFirstName());
-//        assertEquals("Hausler", users.get(2).getLastName());
-//    }
+        assertEquals(3L, users.get(0).getId());
+        assertEquals("Ziv3", users.get(0).getFullName());
+        assertEquals(1L, users.get(1).getId());
+        assertEquals("Ziv1", users.get(1).getFullName());
+        assertEquals(2L, users.get(2).getId());
+        assertEquals("Ziv2", users.get(2).getFullName());
+    }
 
     @Test
     @DisplayName("Test getAllInBoard method when board does not exist")
@@ -150,6 +150,7 @@ public class UserServiceTest {
         assertThrows(NoSuchElementException.class, () -> userService.getAllInBoard(1L));
     }
 
+    //
 //    @Test
 //    @DisplayName("Test valid user ID and board ID values add a new user to an existing board")
 //    public void testAddUserToBoard() throws AccountNotFoundException {
@@ -167,35 +168,52 @@ public class UserServiceTest {
 //        UserInBoard userInBoard = userService.addUserToBoard(1L, 1L);
 //        assertNotNull(userInBoard);
 //    }
-
-//    @Test
-//    @DisplayName("Test non-existent user ID value throws AccountNotFoundException with USER_NOT_FOUND message")
-//    public void testNonExistentUserId() {
-//        given(userRepository.findById(100L)).willReturn(Optional.empty());
-//        assertThrows(AccountNotFoundException.class, () -> userService.updateUserToBoard(100L, 1L));
-//    }
 //
-//    @Test
-//    @DisplayName("Test non-existent board ID value throws AccountNotFoundException with BOARD_NOT_FOUND message")
-//    public void testNonExistentBoardId() {
-//        assertThrows(AccountNotFoundException.class, () -> userService.updateUserToBoard(1L, 100L));
-//    }
+    @Test
+    @DisplayName("Test non-existent user ID value throws AccountNotFoundException with USER_NOT_FOUND message")
+    public void testNonExistentUserId() {
+        ObjectsIdsRequest objectsIdsRequest = new ObjectsIdsRequest();
+        objectsIdsRequest.setUserId(100L);
+        objectsIdsRequest.setEmail("test@gmail.com");
+        assertThrows(AccountNotFoundException.class, () -> userService.updateUserToBoard(objectsIdsRequest));
+    }
+
+    @Test
+    @DisplayName("Test non-existent board ID value throws AccountNotFoundException with BOARD_NOT_FOUND message")
+    public void testNonExistentBoardId() {
+        User user1 = new User(1L, "test", "test123456", "test@gmail.com", null);
+        given(userRepository.findByEmail(user1.getEmail())).willReturn(Optional.of(user1));
+        ObjectsIdsRequest objectsIdsRequest = new ObjectsIdsRequest();
+        objectsIdsRequest.setUserId(1L);
+        objectsIdsRequest.setEmail("test@gmail.com");
+        assertThrows(NoSuchElementException.class, () -> userService.updateUserToBoard(objectsIdsRequest));
+    }
+
 
 //    @Test
 //    @DisplayName("Test combination of user and board that already exists in the database throws IllegalArgumentException with USER_IN_BOARD_EXISTS message")
-//    public void testUserInBoardAlreadyExists() {
+//    public void testUserInBoardAlreadyExists() throws AccountNotFoundException {
 //        User user = new User();
 //        user.setId(1L);
-//        given(userRepository.findById(1L)).willReturn(Optional.of(user));
+//
+//        ObjectsIdsRequest objectsIdsRequest = new ObjectsIdsRequest();
+//        objectsIdsRequest.setUserId(1L);
+//        objectsIdsRequest.setBoardId(1L);
+//        objectsIdsRequest.setPermissionId(1L);
+//        objectsIdsRequest.setEmail("test@gmail.com");
+//
+//        given(userRepository.findByEmail("test@gmail.com")).willReturn(Optional.of(user));
 //
 //        Board board = new Board();
 //        board.setId(1L);
 //        given(boardRepository.findById(1L)).willReturn(Optional.of(board));
 //
-//        given(userInBoardRepository.findByBoardAndUser(user, board)).willReturn(Optional.of(new UserInBoard()));
-//        assertThrows(IllegalArgumentException.class, () -> userService.addUserToBoard(1L, 1L));
+//        UserPermission userPermission1 = new UserPermission(1L, user, Permission.USER);
+//        List<UserPermission> upList = Collections.singletonList(userPermission1);
+//        given(notificationSettingRepository.findAll()).willReturn(new ArrayList<>());
+//        assertEquals(userPermission1, userService.updateUserToBoard(objectsIdsRequest));
 //    }
-
+//
 //    @Test
 //    @DisplayName("Test removal of all user dependencies")
 //    public void testRemoveAllUserDependencies() {
@@ -203,7 +221,7 @@ public class UserServiceTest {
 //        user.setId(1L);
 //        assertTrue(userService.removeAllUserDependencies(user));
 //    }
-
+//
 //    @Test
 //    @DisplayName("Test removal of boards associated with user")
 //    public void testRemoveBoardsByUser() {
@@ -213,7 +231,7 @@ public class UserServiceTest {
 //        when(boardRepository.findAllByUser(user)).thenReturn(boardList);
 //        assertTrue(userService.removeUserDependenciesFromBoardTable(user));
 //    }
-
+//
 //    @Test
 //    @DisplayName("Test handling of empty list of boards")
 //    public void testHandleEmptyBoardList() {
@@ -223,17 +241,20 @@ public class UserServiceTest {
 //        when(boardRepository.findAllByUser(user)).thenReturn(boardList);
 //        assertTrue(userService.removeUserDependenciesFromBoardTable(user));
 //    }
-
-    @Test
-    @DisplayName("Test deletion of user and dependencies")
-    public void testDeleteUserAndDependencies() throws AccountNotFoundException {
-        long userId = 1L;
-        User user = new User();
-        user.setId(userId);
-        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
-        assertTrue(userService.delete(userId));
-    }
-
+//
+//    @Test
+//    @DisplayName("Test deletion of user and dependencies")
+//    public void testDeleteUserAndDependencies() throws AccountNotFoundException {
+//        long userId = 1L;
+//        User user = new User();
+//        user.setId(userId);
+//        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+//        given(userService.removeDependenciesFromBoard(user)).willReturn(true);
+////        given(userRepository.delete(user)).
+//        doNothing().when(userRepository).delete(user);
+//        assertTrue(userService.delete(userId));
+//    }
+//
     @Test
     @DisplayName("Test handling of non-existent user")
     public void testHandleNonExistentUser() {
@@ -243,15 +264,15 @@ public class UserServiceTest {
     }
 
 
-    @Test
-    @DisplayName("Test deletion of user with no dependencies")
-    public void testDeleteUserWithNoDependencies() throws AccountNotFoundException {
-        long userId = 1L;
-        User user = new User();
-        user.setId(userId);
-        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
-        assertTrue(userService.delete(userId));
-    }
+//    @Test
+//    @DisplayName("Test deletion of user with no dependencies")
+//    public void testDeleteUserWithNoDependencies() throws AccountNotFoundException {
+//        long userId = 1L;
+//        User user = new User();
+//        user.setId(userId);
+//        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+//        assertTrue(userService.delete(userId));
+//    }
 
 //    @Test
 //    @DisplayName("Test deletion of user with multiple dependencies")
