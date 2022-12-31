@@ -594,7 +594,7 @@ public class Board {
      * @param sectionId the ID of the section containing the item (if objClass is Item.class)
      * @return the object with the given ID, or null if no such object exists
      */
-    public Object getObjectByItsClass(Integer content, Class objClass, Long sectionId) {
+    public Object getObjectByItsClass(Integer content, Object objClass, Long sectionId) {
         if (objClass == Status.class) {
             return getStatus(content);
         } else if (objClass == Type.class) {

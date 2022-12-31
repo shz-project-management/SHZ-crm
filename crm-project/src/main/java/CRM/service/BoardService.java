@@ -19,10 +19,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import javax.security.auth.login.AccountNotFoundException;
-import java.util.*;
-
-import static CRM.utils.Util.SharedBoards;
-import static CRM.utils.Util.myBoards;
+import java.util.List;
+import java.util.NoSuchElementException;
 
 @Service
 public class BoardService {
