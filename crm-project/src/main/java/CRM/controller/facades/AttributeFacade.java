@@ -35,12 +35,28 @@ public class AttributeFacade {
      * @param clz              The class type of the attribute.
      * @return A Response object with the created attribute as a list of AttributeDTO objects and the corresponding HTTP status.
      */
-    public <T extends Attribute> Response<List<AttributeDTO>> create(AttributeRequest attributeRequest, Class<T> clz) {
+    public <T extends Attribute> Response<List<AttributeDTO>> create(AttributeRequest attributeRequest, Class<T> clz, Boolean force) {
         Validations.validate(attributeRequest.getName(), Regex.NAME.getRegex());
-        return Response.<List<AttributeDTO>>builder()
+
+        if (force) return Response.<List<AttributeDTO>>builder()
                 .status(HttpStatus.CREATED)
                 .statusCode(HttpStatusCodes.STATUS_CODE_CREATED)
                 .data(AttributeDTO.getListOfAttributesFromDB(new HashSet<>(attributeService.create(attributeRequest, clz))))
+                .build();
+
+        List<T> similarAttributes = attributeService.checkSimilarityWithDatabase(attributeRequest, clz);
+        if (similarAttributes.isEmpty()) {
+            return Response.<List<AttributeDTO>>builder()
+                    .status(HttpStatus.CREATED)
+                    .statusCode(HttpStatusCodes.STATUS_CODE_CREATED)
+                    .data(AttributeDTO.getListOfAttributesFromDB(new HashSet<>(attributeService.create(attributeRequest, clz))))
+                    .build();
+        }
+
+        return Response.<List<AttributeDTO>>builder()
+                .status(HttpStatus.CONFLICT)
+                .statusCode(HttpStatusCodes.STATUS_CODE_CONFLICT)
+                .data(AttributeDTO.getListOfAttributesFromDB(new HashSet<>(similarAttributes)))
                 .build();
     }
 

@@ -226,11 +226,10 @@ public class SharedContentFacade {
      * @throws NullPointerException     if any of the provided IDs are null
      */
     public Response<SectionDTO> assignToUser(ObjectsIdsRequest objIds, Class<? extends SharedContent> clz) throws AccountNotFoundException {
-        Validations.validateIDs(objIds.getBoardId(), objIds.getSectionId(), objIds.getUpdateObjId());
-        Validations.validate(objIds.getEmail(), Regex.EMAIL.getRegex());
-        User user = userService.get(objIds.getEmail());
+        Validations.validateIDs(objIds.getBoardId(), objIds.getSectionId(),
+                objIds.getUpdateObjId(), objIds.getAssignedUserId());
         return Response.<SectionDTO>builder()
-                .data(SectionDTO.createSectionWithUserDTO((convertFromClassToService(clz).assignToUser(objIds)), user))
+                .data(SectionDTO.createSectionDTO((convertFromClassToService(clz).assignToUser(objIds))))
                 .message(SuccessMessage.FOUND.toString())
                 .status(HttpStatus.OK)
                 .statusCode(HttpStatusCodes.STATUS_CODE_OK)

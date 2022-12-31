@@ -156,7 +156,8 @@ public class ItemService implements ServiceInterface {
     @Override
     public Section assignToUser(ObjectsIdsRequest objectsIdsRequest) {
         Board board = Validations.doesIdExists(objectsIdsRequest.getBoardId(), boardRepository);
-        board.assignUserToItem(objectsIdsRequest.getUpdateObjId(), objectsIdsRequest.getSectionId(), objectsIdsRequest.getEmail());
+        User user = Validations.doesIdExists(objectsIdsRequest.getAssignedUserId(), userRepository);
+        board.assignUserToItem(objectsIdsRequest.getUpdateObjId(), objectsIdsRequest.getSectionId(), user);
         boardRepository.save(board);
         return board.getSectionFromBoard(objectsIdsRequest.getSectionId());
     }
@@ -170,7 +171,7 @@ public class ItemService implements ServiceInterface {
      * @throws NoSuchFieldException if the field does not exist in the item object
      */
     private void fieldIsCustomObjectHelper(UpdateObjectRequest updateObject, Item item, Board board, long itemId) throws NoSuchFieldException {
-        Class objClass = Common.getObjectOfField(updateObject.getFieldName());
+        Object objClass = Common.getObjectOfField(updateObject.getFieldName());
         if (objClass == null) {
             throw new NoSuchFieldException(ExceptionMessage.FIELD_OBJECT_NOT_EXISTS.toString());
         }

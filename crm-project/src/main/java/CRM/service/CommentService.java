@@ -77,8 +77,8 @@ public class CommentService implements ServiceInterface {
         int counter = 0;
         for (Section section : board.getSections()) {
             for (Item item : section.getItems()) {
-                item.getComments().removeIf(comment -> ids.contains(comment.getId()));
                 counter += item.getComments().size();
+                item.getComments().removeIf(comment -> ids.contains(comment.getId()));
             }
         }
 
@@ -154,38 +154,4 @@ public class CommentService implements ServiceInterface {
     public Section assignToUser(ObjectsIdsRequest objectsIdsRequest) {
         return null;
     }
-
-    /**
-     * Retrieves all comments in a board.
-     *
-     * @param boardId the ID of the board to retrieve comments from
-     * @return a set of all comments in the board
-     * @throws NoSuchElementException if the board does not exist
-     */
-    public Set<Comment> getAllCommentsInBoard(long boardId) {
-        Board board = Validations.doesIdExists(boardId, boardRepository);
-
-        List<Item> items = new ArrayList<>();
-        Set<Section> sectionsInBoard = board.getSections();
-        sectionsInBoard.forEach(section -> items.addAll(section.getItems()));
-
-        Set<Comment> commentList = new HashSet<>();
-
-        for (Item item : items) {
-            commentList.addAll(item.getComments());
-        }
-        return commentList;
-    }
-
-
-//    //TODO + documentation
-//    public Set<Comment> getAllCommentsInSection(ObjectsIdsRequest objectsIdsRequest) {
-////        Status status = Validations.doesIdExists(statusId, statusRepository);
-////        Set<Item> itemsInStatus = itemRepository.findAllByStatus(status);
-//        Set<Comment> commentList = new HashSet<>();
-////        for (Item item : itemsInStatus) {
-////            commentList.addAll(commentRepository.findAllByParentItem(item));
-////        }
-//        return commentList;
-//    }
 }

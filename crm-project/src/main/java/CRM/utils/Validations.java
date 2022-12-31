@@ -140,7 +140,7 @@ public class Validations {
     }
 
     public static void validateUpdateUserToBoard(Long boardId, Long userId, Long permissionId) {
-        if(userId != null) validate(userId, Regex.ID.getRegex());
+        if (userId != null) validate(userId, Regex.ID.getRegex());
         validate(boardId, Regex.ID.getRegex());
         validate(permissionId, Regex.ID.getRegex());
         if (permissionId < 0 || permissionId > 3) {
@@ -185,9 +185,8 @@ public class Validations {
             throw new IllegalArgumentException(ExceptionMessage.ILLEGAL_AUTH_HEADER.toString());
         }
 
-        token = token.substring(7, token.length());
-        Claims claims = ConfirmationToken.decodeJWT(token);
-        return Long.valueOf(claims.getId());
+        token = token.substring(7);
+        return ConfirmationToken.decodeJWT(token);
     }
 
     /**
@@ -199,7 +198,7 @@ public class Validations {
      * @throws NoSuchFieldException if the field does not exist in the object
      */
     public static <T> void setContentToFieldIfFieldExists(T object, UpdateField fieldName, Object content) throws NoSuchFieldException {
-        if(object == null){
+        if (object == null) {
             throw new IllegalArgumentException(ExceptionMessage.FIELD_OBJECT_NOT_EXISTS.toString());
         }
 

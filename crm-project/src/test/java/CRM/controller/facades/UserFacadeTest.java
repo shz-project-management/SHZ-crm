@@ -139,15 +139,17 @@ public class UserFacadeTest {
     }
 
     @Test
-    @DisplayName("Test invalid ID value returns BAD REQUEST status")
-    public void delete_InvalidInput_BadRequestResponse() throws AccountNotFoundException {
-        assertEquals(HttpStatusCodes.STATUS_CODE_BAD_REQUEST, userFacade.delete(-1L).getStatusCode());
+    @DisplayName("Test invalid ID value throws illegal argument")
+    public void delete_InvalidInput_ThrowsIllegalArgumentException() {
+        assertThrows(IllegalArgumentException.class, () -> userFacade.delete(-1L));
+
     }
 
     @Test
-    @DisplayName("Test null ID value returns BAD REQUEST status")
-    public void delete_NullInput_ServerErrorResponse() throws AccountNotFoundException {
-        assertEquals(HttpStatusCodes.STATUS_CODE_SERVER_ERROR, userFacade.delete(null).getStatusCode());
+    @DisplayName("Test null ID value throws null pointer")
+    public void delete_NullInput_ThrowsNullPointerException() {
+        assertThrows(NullPointerException.class, () -> userFacade.delete(null));
+
     }
 
 //    @Test

@@ -4,6 +4,7 @@ import CRM.entity.*;
 import CRM.entity.requests.BoardRequest;
 import CRM.entity.requests.UpdateObjectRequest;
 import CRM.repository.BoardRepository;
+import CRM.repository.NotificationRepository;
 import CRM.repository.NotificationSettingRepository;
 import CRM.repository.UserRepository;
 import CRM.utils.Common;
@@ -18,10 +19,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import javax.security.auth.login.AccountNotFoundException;
-import java.util.*;
-
-import static CRM.utils.Util.SharedBoards;
-import static CRM.utils.Util.myBoards;
+import java.util.List;
+import java.util.NoSuchElementException;
 
 @Service
 public class BoardService {
@@ -36,6 +35,8 @@ public class BoardService {
     private NotificationSettingRepository notificationSettingRepository;
     @Autowired
     private EntityManager entityManager;
+    @Autowired
+    private NotificationRepository notificationRepository;
 
 
     /**
@@ -72,6 +73,7 @@ public class BoardService {
      */
     public boolean delete(long boardId) {
         Board board = Validations.doesIdExists(boardId, boardRepository);
+        notificationRepository.deleteByBoard(board);
         boardRepository.delete(board);
         return true;
     }

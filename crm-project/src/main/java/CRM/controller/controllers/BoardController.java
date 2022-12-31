@@ -49,7 +49,6 @@ public class BoardController {
      */
     @DeleteMapping
     public ResponseEntity<Response<Void>> delete(@RequestAttribute Long boardId) {
-        boardFacade.delete(boardId);
         Response<Void> response = boardFacade.delete(boardId);
         return new ResponseEntity<>(response, response.getStatus());
     }

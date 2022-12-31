@@ -1,9 +1,14 @@
 package CRM.entity;
 
 import CRM.entity.requests.UpdateObjectRequest;
+import CRM.utils.Common;
 import CRM.utils.enums.ExceptionMessage;
 import CRM.utils.enums.Permission;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import org.w3c.dom.Attr;
 
 import javax.naming.NoPermissionException;
 import javax.persistence.*;
@@ -230,6 +235,35 @@ public class Board {
                 .updateItem(objectRequest);
     }
 
+    /**
+     * Removes the assigned user from all items in the sections of this instance.
+     * An item's assigned user is set to null if its ID matches the given user ID.
+     *
+     * @param userId the ID of the user to remove from the items
+     */
+    public void removeAssignedUserFromItems(long userId) {
+        sections.forEach(section -> section.getItems()
+                .forEach(item -> {
+                    if (item.getAssignedToUser() != null) {
+                        if (Objects.equals(item.getAssignedToUser().getId(), userId)) {
+                            item.setAssignedToUser(null);
+                        }
+                    }
+                }));
+    }
+
+    /**
+     * Removes the assigned user from all items in the sections of this instance.
+     * An item's assigned user is set to null.
+     */
+    public void removeAssignedUsersFromBoard() {
+        sections.forEach(section -> section.getItems()
+                .forEach(item -> {
+                            item.setAssignedToUser(null);
+                        }
+                ));
+    }
+
     //--------------------------------------Attributes--------------------------------------//
 
     /**
@@ -258,7 +292,8 @@ public class Board {
      * @throws IllegalArgumentException if an attribute with the same name and class type already exists on the board
      */
     public <T extends Attribute> void addAttributeToBoard(T attribute, Class<T> clz) {
-        checkIfAttributeNameAlreadyExists(attribute.getName(), clz);
+
+        List<T> similarList = checkSimilarityInDatabase(attribute.getName(), clz);
         getAttributeSet(clz).add(attribute);
     }
 
@@ -269,7 +304,7 @@ public class Board {
      * @param clz         the class type of the attribute to remove, which must extend Attribute
      * @throws NoSuchElementException if the attribute with the given ID and class type could not be found in the database
      */
-    public void removeAttribute(long attributeId, Class<? extends Attribute> clz) {
+    public <T extends Attribute> void removeAttribute(long attributeId, Class<T> clz) {
         getAttributeSet(clz).remove(getAttributeById(attributeId, clz));
     }
 
@@ -357,12 +392,34 @@ public class Board {
      * @param clz  the class type of the attribute to check, which must extend Attribute
      * @throws IllegalArgumentException if an attribute with the given name and class type already exists on the board
      */
-    private void checkIfAttributeNameAlreadyExists(String name, Class<? extends Attribute> clz) {
-        List<Attribute> list = new ArrayList<>(getAttributeSet(clz));
-        for (Attribute attribute : list) {
-            if (attribute.getName().equals(name))
-                throw new IllegalArgumentException("This name already exists"); // FIXME: return null
+    public <T extends Attribute> List<T> checkSimilarityInDatabase(String name, Class<T> clz) {
+        List<T> list = new ArrayList<>(getAttributeSet(clz));
+        Map<Integer, List<T>> wordsDistanceFromOrigin = new HashMap<>();
+        for (T attribute : list) {
+            int distance = Common.getDistanceBetweenWords(name, attribute.getName());
+            if (distance == 0)
+                return Collections.singletonList(attribute);
+
+            wordsDistanceFromOrigin.computeIfAbsent(distance, k -> new ArrayList<>()).add(attribute);
         }
+        int minListOfWords = getMinimumDistance(wordsDistanceFromOrigin, name.length() / 3);
+        return wordsDistanceFromOrigin.getOrDefault(minListOfWords, Collections.emptyList());
+    }
+
+    /**
+     * Returns the minimum key in the given map that is less than or equal to the given threshold.
+     * If there is no such key, the threshold is returned as a default value.
+     *
+     * @param map        a map of integer keys and lists of attributes
+     * @param threshHold the maximum key value to consider
+     * @param <T>        the type of attributes in the lists
+     * @return the minimum key that meets the condition, or the threshold if no such key exists
+     */
+    private <T extends Attribute> int getMinimumDistance(Map<Integer, List<T>> map, int threshHold) {
+        return map.keySet().stream()
+                .filter(key -> key <= threshHold) // filter out the irrelevant attributes
+                .min(Integer::compareTo) // find the min index of the array of the closest words by similarity
+                .orElse(threshHold); // if not found, return the index of the default thresh hold
     }
 
     /**
@@ -537,7 +594,7 @@ public class Board {
      * @param sectionId the ID of the section containing the item (if objClass is Item.class)
      * @return the object with the given ID, or null if no such object exists
      */
-    public Object getObjectByItsClass(Integer content, Class objClass, Long sectionId) {
+    public Object getObjectByItsClass(Integer content, Object objClass, Long sectionId) {
         if (objClass == Status.class) {
             return getStatus(content);
         } else if (objClass == Type.class) {
@@ -556,10 +613,15 @@ public class Board {
      *
      * @param updateObjId the ID of the item to assign the user to
      * @param sectionId   the ID of the section containing the item
-     * @param userEmail   the email address of the user to assign to the item
+     * @param user        the user to assign to the item
      */
-    public void assignUserToItem(Long updateObjId, Long sectionId, String userEmail) {
-        getItemFromSectionById(updateObjId, sectionId).setAssignedToUserId(userEmail);
+    public void assignUserToItem(Long updateObjId, Long sectionId, User user) {
+        getItemFromSectionById(updateObjId, sectionId).setAssignedToUser(user);
+    }
+
+    public void removeAttributesFromBoard() {
+        getTypes().clear();
+        getStatuses().clear();
     }
 }
 
