@@ -388,21 +388,13 @@ public class Board {
         Map<Integer, List<T>> wordsDistanceFromOrigin = new HashMap<>();
         for (T attribute : list) {
             int distance = Common.getDistanceBetweenWords(name, attribute.getName());
-            if (distance == 0) {
-                List<T> sameAttribute = new ArrayList<>();
-                sameAttribute.add(attribute);
-                return sameAttribute;
-            }
-            if (wordsDistanceFromOrigin.containsKey(distance)) {
-                wordsDistanceFromOrigin.get(distance).add(attribute);
-            } else {
-                List<T> attributesList = new ArrayList<>();
-                attributesList.add(attribute);
-                wordsDistanceFromOrigin.put(distance, attributesList);
-            }
+            if (distance == 0)
+                return Collections.singletonList(attribute);
+
+            wordsDistanceFromOrigin.computeIfAbsent(distance, k -> new ArrayList<>()).add(attribute);
         }
         int minListOfWords = getMinimumDistance(wordsDistanceFromOrigin, name.length() / 3);
-        return wordsDistanceFromOrigin.getOrDefault(minListOfWords, new ArrayList<>());
+        return wordsDistanceFromOrigin.getOrDefault(minListOfWords, Collections.emptyList());
     }
 
     private <T extends Attribute> int getMinimumDistance(Map<Integer, List<T>> map, int threshHold) {
