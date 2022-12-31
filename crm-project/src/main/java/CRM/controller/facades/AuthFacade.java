@@ -7,6 +7,7 @@ import CRM.entity.response.Response;
 import CRM.service.AuthService;
 import CRM.utils.GithubCodeDecoder;
 import CRM.utils.Validations;
+import CRM.utils.enums.ExceptionMessage;
 import CRM.utils.enums.SuccessMessage;
 import com.google.api.client.http.HttpStatusCodes;
 import org.apache.logging.log4j.LogManager;
@@ -40,6 +41,7 @@ public class AuthFacade {
      */
     public Response<UserDTO> register(RegisterUserRequest user) {
         logger.info("in FacadeAuthController -> register");
+//        throw new IllegalArgumentException(ExceptionMessage.NO_DOCUMENT_IN_DATABASE.toString());
         Validations.validateRegisteredUser(user);
         return Response.<UserDTO>builder()
                 .data(UserDTO.createUserDTO(authService.register(user)))
