@@ -294,7 +294,6 @@ public class Board {
     public <T extends Attribute> void addAttributeToBoard(T attribute, Class<T> clz) {
 
         List<T> similarList = checkSimilarityInDatabase(attribute.getName(), clz);
-        System.out.println(similarList);
         getAttributeSet(clz).add(attribute);
     }
 
