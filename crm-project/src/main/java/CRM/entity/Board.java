@@ -235,6 +235,12 @@ public class Board {
                 .updateItem(objectRequest);
     }
 
+    /**
+     * Removes the assigned user from all items in the sections of this instance.
+     * An item's assigned user is set to null if its ID matches the given user ID.
+     *
+     * @param userId the ID of the user to remove from the items
+     */
     public void removeAssignedUserFromItems(long userId) {
         sections.forEach(section -> section.getItems()
                 .forEach(item -> {
@@ -246,6 +252,10 @@ public class Board {
                 }));
     }
 
+    /**
+     * Removes the assigned user from all items in the sections of this instance.
+     * An item's assigned user is set to null.
+     */
     public void removeAssignedUsersFromBoard() {
         sections.forEach(section -> section.getItems()
                 .forEach(item -> {
@@ -397,11 +407,20 @@ public class Board {
         return wordsDistanceFromOrigin.getOrDefault(minListOfWords, Collections.emptyList());
     }
 
+    /**
+     * Returns the minimum key in the given map that is less than or equal to the given threshold.
+     * If there is no such key, the threshold is returned as a default value.
+     *
+     * @param map        a map of integer keys and lists of attributes
+     * @param threshHold the maximum key value to consider
+     * @param <T>        the type of attributes in the lists
+     * @return the minimum key that meets the condition, or the threshold if no such key exists
+     */
     private <T extends Attribute> int getMinimumDistance(Map<Integer, List<T>> map, int threshHold) {
-        for (Map.Entry<Integer, ?> entry : map.entrySet()) {
-            if (entry.getKey() <= threshHold) threshHold = entry.getKey();
-        }
-        return threshHold;
+        return map.keySet().stream()
+                .filter(key -> key <= threshHold) // filter out the irrelevant attributes
+                .min(Integer::compareTo) // find the min index of the array of the closest words by similarity
+                .orElse(threshHold); // if not found, return the index of the default thresh hold
     }
 
     /**
