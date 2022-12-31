@@ -27,11 +27,15 @@ public class AttributeService {
      */
     public <T extends Attribute> List<T> create(AttributeRequest attributeRequest, Class<T> clz) {
         Board board = Validations.doesIdExists(attributeRequest.getBoardId(), boardRepository);
-
+        // check if is a force add to the db. if so, push the new attribute request to the db.
         board.addAttributeToBoard(Attribute.createAttribute(attributeRequest.getName(), attributeRequest.getDescription()), clz);
         boardRepository.save(board);
-
         return board.getAllAttributeInBoard(clz);
+    }
+
+    public <T extends Attribute> List<T> checkSimilarityWithDatabase(AttributeRequest attributeRequest, Class<T> clz) {
+        Board board = Validations.doesIdExists(attributeRequest.getBoardId(), boardRepository);
+        return board.checkSimilarityInDatabase(attributeRequest.getName(), clz);
     }
 
     /**

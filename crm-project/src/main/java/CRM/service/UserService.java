@@ -186,11 +186,11 @@ public class UserService {
      * @return the board found in the request
      * @throws AccountNotFoundException if no board is found in the request
      */
-    private Board getBoardFromRequest(ObjectsIdsRequest request) throws AccountNotFoundException {
+    private Board getBoardFromRequest(ObjectsIdsRequest request) {
         try {
             return Validations.doesIdExists(request.getBoardId(), boardRepository);
         } catch (NoSuchElementException e) {
-            throw new AccountNotFoundException(ExceptionMessage.ACCOUNT_DOES_NOT_EXISTS.toString());
+            throw new NoSuchElementException(ExceptionMessage.ACCOUNT_DOES_NOT_EXISTS.toString());
         }
     }
 
@@ -281,7 +281,7 @@ public class UserService {
         return sharedBoards;
     }
 
-    private void removeDependenciesFromBoard(User user){
+    boolean removeDependenciesFromBoard(User user) {
 
         List<Board> boardWhereUserAssigned = boardRepository.findBySections_Items_AssignedToUser(user);
         for (Board board : boardWhereUserAssigned) {
@@ -327,6 +327,6 @@ public class UserService {
             boardRepository.save(board);
             boardRepository.delete(board);
         }
-
+        return true;
     }
 }

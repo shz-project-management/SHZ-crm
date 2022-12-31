@@ -62,13 +62,13 @@ public class ConfirmationToken {
         return builder.compact();
     }
 
-    public static Claims decodeJWT(String jwt) {
+    public static Long decodeJWT(String jwt) {
         logger.info("in ConfirmationToken -> decodeJWT");
 
         Claims claims = Jwts.parser()
                 .setSigningKey(DatatypeConverter.parseBase64Binary(SECRET_KEY))
                 .parseClaimsJws(jwt).getBody();
 
-        return claims;
+        return Long.valueOf(claims.getId());
     }
 }
