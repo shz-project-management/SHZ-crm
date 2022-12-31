@@ -1,12 +1,14 @@
 package CRM.entity;
 
 import CRM.entity.requests.UpdateObjectRequest;
+import CRM.utils.Common;
 import CRM.utils.enums.ExceptionMessage;
 import CRM.utils.enums.Permission;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.w3c.dom.Attr;
 
 import javax.naming.NoPermissionException;
 import javax.persistence.*;
@@ -236,7 +238,7 @@ public class Board {
     public void removeAssignedUserFromItems(long userId) {
         sections.forEach(section -> section.getItems()
                 .forEach(item -> {
-                    if(item.getAssignedToUser() != null) {
+                    if (item.getAssignedToUser() != null) {
                         if (Objects.equals(item.getAssignedToUser().getId(), userId)) {
                             item.setAssignedToUser(null);
                         }
@@ -280,7 +282,8 @@ public class Board {
      * @throws IllegalArgumentException if an attribute with the same name and class type already exists on the board
      */
     public <T extends Attribute> void addAttributeToBoard(T attribute, Class<T> clz) {
-        checkIfAttributeNameAlreadyExists(attribute.getName(), clz);
+
+        List<T> similarList = checkSimilarityInDatabase(attribute.getName(), clz);
         getAttributeSet(clz).add(attribute);
     }
 
@@ -291,7 +294,7 @@ public class Board {
      * @param clz         the class type of the attribute to remove, which must extend Attribute
      * @throws NoSuchElementException if the attribute with the given ID and class type could not be found in the database
      */
-    public void removeAttribute(long attributeId, Class<? extends Attribute> clz) {
+    public <T extends Attribute> void removeAttribute(long attributeId, Class<T> clz) {
         getAttributeSet(clz).remove(getAttributeById(attributeId, clz));
     }
 
@@ -379,12 +382,33 @@ public class Board {
      * @param clz  the class type of the attribute to check, which must extend Attribute
      * @throws IllegalArgumentException if an attribute with the given name and class type already exists on the board
      */
-    private void checkIfAttributeNameAlreadyExists(String name, Class<? extends Attribute> clz) {
-        List<Attribute> list = new ArrayList<>(getAttributeSet(clz));
-        for (Attribute attribute : list) {
-            if (attribute.getName().equals(name))
-                throw new IllegalArgumentException("This name already exists"); // FIXME: return null
+    public <T extends Attribute> List<T> checkSimilarityInDatabase(String name, Class<T> clz) {
+        List<T> list = new ArrayList<>(getAttributeSet(clz));
+        Map<Integer, List<T>> wordsDistanceFromOrigin = new HashMap<>();
+        for (T attribute : list) {
+            int distance = Common.getDistanceBetweenWords(name, attribute.getName());
+            if (distance == 0) {
+                List<T> sameAttribute = new ArrayList<>();
+                sameAttribute.add(attribute);
+                return sameAttribute;
+            }
+            if (wordsDistanceFromOrigin.containsKey(distance)) {
+                wordsDistanceFromOrigin.get(distance).add(attribute);
+            } else {
+                List<T> attributesList = new ArrayList<>();
+                attributesList.add(attribute);
+                wordsDistanceFromOrigin.put(distance, attributesList);
+            }
         }
+        int minListOfWords = getMinimumDistance(wordsDistanceFromOrigin, name.length() / 3);
+        return wordsDistanceFromOrigin.getOrDefault(minListOfWords, new ArrayList<>());
+    }
+
+    private <T extends Attribute> int getMinimumDistance(Map<Integer, List<T>> map, int threshHold) {
+        for (Map.Entry<Integer, ?> entry : map.entrySet()) {
+            if (entry.getKey() <= threshHold) threshHold = entry.getKey();
+        }
+        return threshHold;
     }
 
     /**
