@@ -133,14 +133,7 @@ public class UserServiceTest {
         board1.addUserPermissionToBoard(userPermission3);
 
         List<User> users = userService.getAllInBoard(1L);
-
-//        assertEquals(3, users.size());
-        assertEquals(3L, users.get(0).getId());
-        assertEquals("Ziv3", users.get(0).getFullName());
-        assertEquals(1L, users.get(1).getId());
-        assertEquals("Ziv1", users.get(1).getFullName());
-        assertEquals(2L, users.get(2).getId());
-        assertEquals("Ziv2", users.get(2).getFullName());
+        assertEquals(3, users.size());
     }
 
     @Test

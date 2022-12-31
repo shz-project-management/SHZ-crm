@@ -36,7 +36,7 @@ public class Validations {
      */
     public static void validate(Object data, String regex) throws IllegalArgumentException, NullPointerException {
         logger.info("in Validations -> validate");
-
+//
         if (data == null) {
             logger.error("in Validations -> validate -> " + ExceptionMessage.EMPTY_NOTNULL_FIELD);
             throw new NullPointerException(ExceptionMessage.EMPTY_NOTNULL_FIELD.toString());
@@ -58,6 +58,7 @@ public class Validations {
      * @throws IllegalArgumentException if the email, password, first name, or last name does not match the expected format
      */
     public static void validateRegisteredUser(RegisterUserRequest user) {
+//        throw new IllegalArgumentException(ExceptionMessage.NO_DOCUMENT_IN_DATABASE.toString());
         validate(user.getEmail(), Regex.EMAIL.getRegex());
         validate(user.getPassword(), Regex.PASSWORD.getRegex());
         validate(user.getFullName(), Regex.NAME.getRegex());
