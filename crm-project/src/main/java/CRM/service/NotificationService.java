@@ -45,9 +45,10 @@ public class NotificationService {
      * @param notificationRequest the request object containing the notification information to create
      * @param userSetting         the user's notification settings
      */
-    public void createInAppNotification(NotificationRequest notificationRequest, UserSetting userSetting) {
+    public Notification createInAppNotification(NotificationRequest notificationRequest, UserSetting userSetting) {
         Notification notification = Notification.createNewNotification(notificationRequest, userSetting);
         notificationRepository.save(notification);
+        return notification;
     }
 
     /**
