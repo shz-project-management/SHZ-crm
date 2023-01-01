@@ -11,7 +11,6 @@ import CRM.utils.enums.SuccessMessage;
 import com.google.api.client.http.HttpStatusCodes;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.hibernate.NonUniqueObjectException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
@@ -116,7 +115,7 @@ public class SectionFacade {
     public Response getFilteredItems(Map<String, List<String>> filters, Long boardId) {
         Validations.validate(boardId, Regex.ID.getRegex());
         return Response.builder()
-                .data(SectionDTO.getSectionsDTOList(sectionService.getQuery(filters, boardId)))
+                .data(SectionDTO.getSectionsDTOList(sectionService.getFilteredItems(filters, boardId)))
                 .message(SuccessMessage.FOUND.toString())
                 .status(HttpStatus.OK)
                 .statusCode(HttpStatusCodes.STATUS_CODE_OK)

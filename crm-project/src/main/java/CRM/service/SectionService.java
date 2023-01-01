@@ -99,7 +99,7 @@ public class SectionService {
      * @param boardId the ID of the board to retrieve the sections from
      * @return the set of sections in the board that match the filters
      */
-    public Set<Section> getQuery(Map<String, List<String>> filters, long boardId) {
+    public Set<Section> getFilteredItems(Map<String, List<String>> filters, long boardId) {
         Board board = Validations.doesIdExists(boardId, boardRepository);
         EntityManager em = entityManagerFactory.createEntityManager();
         Set<Section> sections = board.getSections();
