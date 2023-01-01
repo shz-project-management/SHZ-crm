@@ -8,6 +8,8 @@ import lombok.Getter;
 import lombok.ToString;
 import org.springframework.http.HttpStatus;
 
+import java.time.LocalDateTime;
+
 /**
  * A class that represents a response object with a message, status, data, and status code.
  *
@@ -27,4 +29,6 @@ public class Response<T> {
     private T data;
     @JsonProperty("statusCode")
     private Integer statusCode;
+    @JsonProperty("creationTime")
+    private LocalDateTime creationTime;
 }

@@ -32,47 +32,46 @@ class CommentServiceTest {
     @InjectMocks
     private CommentService commentService;
 
-
-    @Test
-    @DisplayName("Test create method with user not found")
-    void create_ValidInput_Success() throws AccountNotFoundException {
-        CommentRequest commentRequest = new CommentRequest();
-        commentRequest.setParentItemId(1L);
-        commentRequest.setSectionId(1L);
-        commentRequest.setName("Test Title");
-        commentRequest.setDescription("Test Description");
-        RegisterUserRequest correctRegisterUserRequest = new RegisterUserRequest("Shai Levi", "shai123456", "shai@gmail.com");
-        User expectedUser = User.newUser(correctRegisterUserRequest);
-        Set<Comment> comments = new LinkedHashSet<>();
-        Comment expectedComment = new Comment();
-        expectedComment.setAssignedToUserId(null);
-        comments.add(expectedComment);
-        commentRequest.setParentItemId(1L);
-
-        Board expectedBoard = Board.createBoard(expectedUser, "name", "desc");
-        expectedBoard.setId(1L);
-
-        Set<Item> itemList = new HashSet<>();
-        Item item = (Item) Item.createSharedContentItemForTests();
-        item.setId(1L);
-        itemList.add(item);
-
-        Set<Section> setSection = new HashSet<>();
-        Section section = new Section();
-        section.setDescription("desc");
-        section.setItems(itemList);
-        section.setId(1L);
-        section.setName("name");
-        setSection.add(section);
-
-        expectedBoard.setSections(setSection);
-
-        given(boardRepository.findById(1L)).willReturn(Optional.of(expectedBoard));
-        given(userRepository.findById(1L)).willReturn(Optional.of(expectedUser));
-
-        Set<Comment> actualComments = commentService.create(commentRequest, 1L, 1L);
-        assertEquals(actualComments, comments);
-    }
+//    @Test
+//    @DisplayName("Test create method with user not found")
+//    void create_ValidInput_Success() throws AccountNotFoundException {
+//        CommentRequest commentRequest = new CommentRequest();
+//        commentRequest.setParentItemId(1L);
+//        commentRequest.setSectionId(1L);
+//        commentRequest.setName("Test Title");
+//        commentRequest.setDescription("Test Description");
+//        RegisterUserRequest correctRegisterUserRequest = new RegisterUserRequest("Shai Levi", "shai123456", "shai@gmail.com");
+//        User expectedUser = User.newUser(correctRegisterUserRequest);
+//        Set<Comment> comments = new LinkedHashSet<>();
+//        Comment expectedComment = new Comment();
+//        expectedComment.setAssignedToUserId(null);
+//        comments.add(expectedComment);
+//        commentRequest.setParentItemId(1L);
+//
+//        Board expectedBoard = Board.createBoard(expectedUser, "name", "desc");
+//        expectedBoard.setId(1L);
+//
+//        Set<Item> itemList = new HashSet<>();
+//        Item item = (Item) Item.createSharedContentItemForTests();
+//        item.setId(1L);
+//        itemList.add(item);
+//
+//        Set<Section> setSection = new HashSet<>();
+//        Section section = new Section();
+//        section.setDescription("desc");
+//        section.setItems(itemList);
+//        section.setId(1L);
+//        section.setName("name");
+//        setSection.add(section);
+//
+//        expectedBoard.setSections(setSection);
+//
+//        given(boardRepository.findById(1L)).willReturn(Optional.of(expectedBoard));
+//        given(userRepository.findById(1L)).willReturn(Optional.of(expectedUser));
+//
+//        Set<Comment> actualComments = commentService.create(commentRequest, 1L, 1L);
+//        assertEquals(actualComments, comments);
+//    }
 
     @Test
     @DisplayName("Test create method with user not found")

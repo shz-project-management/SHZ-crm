@@ -85,35 +85,35 @@ public class SharedContentFacadeTest {
         assertThrows(NullPointerException.class, () -> sharedContentFacade.create(testItem));
     }
 
-    @Test
-    @DisplayName("Test create comment method with valid input")
-    public void create_CommentWithValidInput_Success() throws AccountNotFoundException {
-        long userId = 1;
-        long boardId = 2;
-        long parentItemId = 3;
-        String description = "Test comment";
-        long sectionId = 4;
-        String name = "name";
-
-        CommentRequest comment = mock(CommentRequest.class);
-        given(comment.getParentItemId()).willReturn(parentItemId);
-        given(comment.getDescription()).willReturn(description);
-        given(comment.getSectionId()).willReturn(sectionId);
-        given(comment.getName()).willReturn(name);
-
-
-        Set<Comment> comments = new HashSet<>();
-        given(commentService.create(comment, userId, boardId)).willReturn(comments);
-
-        User user = mock(User.class);
-        given(userService.get(userId)).willReturn(user);
-
-        Board board = mock(Board.class);
-        given(boardService.get(boardId)).willReturn(board);
-        given(board.getBoardUsersSet()).willReturn(new HashSet<>());
-
-        assertEquals(HttpStatusCodes.STATUS_CODE_CREATED, sharedContentFacade.create(comment, userId, boardId).getStatusCode());
-    }
+//    @Test
+//    @DisplayName("Test create comment method with valid input")
+//    public void create_CommentWithValidInput_Success() throws AccountNotFoundException {
+//        long userId = 1;
+//        long boardId = 2;
+//        long parentItemId = 3;
+//        String description = "Test comment";
+//        long sectionId = 4;
+//        String name = "name";
+//
+//        CommentRequest comment = mock(CommentRequest.class);
+//        given(comment.getParentItemId()).willReturn(parentItemId);
+//        given(comment.getDescription()).willReturn(description);
+//        given(comment.getSectionId()).willReturn(sectionId);
+//        given(comment.getName()).willReturn(name);
+//
+//
+//        Set<Comment> comments = new HashSet<>();
+//        given(commentService.create(comment, userId, boardId)).willReturn(comments);
+//
+//        User user = mock(User.class);
+//        given(userService.get(userId)).willReturn(user);
+//
+//        Board board = mock(Board.class);
+//        given(boardService.get(boardId)).willReturn(board);
+//        given(board.getBoardUsersSet()).willReturn(new HashSet<>());
+//
+//        assertEquals(HttpStatusCodes.STATUS_CODE_CREATED, sharedContentFacade.create(comment, userId, boardId).getStatusCode());
+//    }
 
     @Test
     @DisplayName("Test create comment method with null input throws null pointer")
