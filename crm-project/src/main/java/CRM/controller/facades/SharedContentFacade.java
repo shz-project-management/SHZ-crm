@@ -122,7 +122,7 @@ public class SharedContentFacade {
      * @throws AccountNotFoundException if the user associated with the update request cannot be found
      * @throws NullPointerException     if the clz parameter is null
      */
-    public Response<SectionDTO> update(UpdateObjectRequest updateObject, Class<? extends SharedContent> clz) throws NoSuchFieldException, AccountNotFoundException {
+    public <T extends SharedContent> Response<SectionDTO> update(UpdateObjectRequest updateObject, Class<T> clz) throws NoSuchFieldException, AccountNotFoundException {
         Validations.validateSharedContent(updateObject.getObjectsIdsRequest());
         SectionDTO sectionDTO = SectionDTO.createSectionDTO(convertFromClassToService(clz).update(updateObject));
         if (clz.equals(Item.class)) {

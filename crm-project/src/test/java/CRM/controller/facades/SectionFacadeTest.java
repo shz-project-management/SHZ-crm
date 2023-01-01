@@ -239,7 +239,7 @@ class SectionFacadeTest {
 
         sections.add(section);
 
-        given(sectionService.getQuery(filters, boardId)).willReturn(sections);
+        given(sectionService.getFilteredItems(filters, boardId)).willReturn(sections);
 
         assertEquals(HttpStatusCodes.STATUS_CODE_OK, sectionFacade.getFilteredItems(filters, boardId).getStatusCode());
     }

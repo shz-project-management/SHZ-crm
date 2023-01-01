@@ -21,8 +21,8 @@ public class ExceptionHandlerControllerAdvice {
     @ExceptionHandler({IllegalArgumentException.class, NoSuchElementException.class,
             NoSuchFieldException.class, NonUniqueObjectException.class, AccountNotFoundException.class
             , IOException.class, AuthenticationException.class, MailSendException.class})
-    public ResponseEntity<Response> handleIllegalArgumentException(IllegalArgumentException ex) {
-        return ResponseEntity.badRequest().body(Response.builder()
+    public ResponseEntity<Response<Void>> handleIllegalArgumentException(IllegalArgumentException ex) {
+        return ResponseEntity.badRequest().body(Response.<Void>builder()
                 .message(ex.getMessage())
                 .status(HttpStatus.BAD_REQUEST)
                 .statusCode(HttpStatusCodes.STATUS_CODE_BAD_REQUEST)
@@ -30,8 +30,8 @@ public class ExceptionHandlerControllerAdvice {
     }
 
     @ExceptionHandler(NoPermissionException.class)
-    public ResponseEntity<Response> handleNoPermissionException(NoPermissionException ex) {
-        return ResponseEntity.badRequest().body(Response.builder()
+    public ResponseEntity<Response<Void>> handleNoPermissionException(NoPermissionException ex) {
+        return ResponseEntity.badRequest().body(Response.<Void>builder()
                 .message(ex.getMessage())
                 .status(HttpStatus.FORBIDDEN)
                 .statusCode(HttpStatusCodes.STATUS_CODE_FORBIDDEN)
@@ -39,8 +39,8 @@ public class ExceptionHandlerControllerAdvice {
     }
 
     @ExceptionHandler(NullPointerException.class)
-    public ResponseEntity<Response> handleNullPointerException(NullPointerException ex) {
-        return ResponseEntity.badRequest().body(Response.builder()
+    public ResponseEntity<Response<Void>> handleNullPointerException(NullPointerException ex) {
+        return ResponseEntity.badRequest().body(Response.<Void>builder()
                 .message(ex.getMessage())
                 .status(HttpStatus.BAD_REQUEST)
                 .statusCode(HttpStatusCodes.STATUS_CODE_SERVER_ERROR)

@@ -67,7 +67,7 @@ public class AuthServiceTest {
 
     @Test
     @DisplayName("Test login method when email is not found")
-    void testLoginWithEmailNotFound() {
+    void testLogin_WithEmail_NotFound() {
         LoginUserRequest loginUser = new LoginUserRequest("ziv@gmail.com", "ziv123456");
         when(userRepository.findByEmail(loginUser.getEmail())).thenReturn(Optional.empty());
 
@@ -79,7 +79,7 @@ public class AuthServiceTest {
 
     @Test
     @DisplayName("Test login method when password does not match")
-    void testLoginWithIncorrectPassword() {
+    void testLogin_WithIncorrectPassword() {
         LoginUserRequest loginUser = new LoginUserRequest("ziv@gmail.com", "ziv123456");
         User storedUser = new User(1L, "Ziv", "not-the-same-password-for-sure", "ziv@gmail.com", null);
         when(userRepository.findByEmail(loginUser.getEmail())).thenReturn(Optional.of(storedUser));

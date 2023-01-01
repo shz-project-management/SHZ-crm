@@ -35,7 +35,6 @@ public class AuthorizationFilter extends GenericFilterBean {
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
         logger.info("in AuthorizationFilter -> doFilter");
-//        String url = ((HttpServletRequest) request).getRequestURL().toString();
         HttpServletRequest httpRequest = (HttpServletRequest) request;
         HttpServletResponse httpResponse = (HttpServletResponse) response;
 

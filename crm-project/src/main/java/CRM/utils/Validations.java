@@ -272,7 +272,6 @@ public class Validations {
             User user = doesIdExists(userId, userRepo);
             Board board = doesIdExists(boardId, boardRepo);
             return board.doesBoardIncludeUser(userId);
-//            return board.getAllUsersInBoard().contains(user) || board.getCreatorUser().equals(user);
 
         } catch (NoSuchElementException e) {
             throw new AccountNotFoundException(ExceptionMessage.ACCOUNT_DOES_NOT_EXISTS.toString());
@@ -324,12 +323,13 @@ public class Validations {
     private static <T> boolean checkIfFieldExistsInEntityHelper(Field field, T object, String fieldName, Object content) throws IllegalAccessException {
         field.setAccessible(true);
         Object value = field.get(object);
-        if (!field.getName().equalsIgnoreCase(fieldName)) {
+
+        if (!field.getName().equalsIgnoreCase(fieldName))
             return false;
-        }
-        if (value != null && !(value.getClass().equals(content.getClass()))) {
+
+        if (value != null && !(value.getClass().equals(content.getClass())))
             value.getClass().cast(content);
-        }
+
         field.set(object, content);
         return true;
     }

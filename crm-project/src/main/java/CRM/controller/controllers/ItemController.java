@@ -45,7 +45,7 @@ public class ItemController {
     public ResponseEntity<Response<SectionDTO>> create(@RequestBody ItemRequest item, @RequestAttribute Long userId, @RequestAttribute Long boardId) throws AccountNotFoundException {
         item.setBoardId(boardId);
         item.setUserId(userId);
-        Response response = sharedContentFacade.create(item);
+        Response<SectionDTO> response = sharedContentFacade.create(item);
         messagingTemplate.convertAndSend("/item/" + boardId, response);
         return ResponseEntity.noContent().build();
     }
