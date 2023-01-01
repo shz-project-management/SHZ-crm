@@ -14,18 +14,51 @@ import java.util.*;
 
 public class Common {
 
+    /**
+     * Returns the section with the specified search ID, if it exists in the list of sections for the given board.
+     *
+     * @param board     the board whose sections should be searched
+     * @param sectionId the sectionId of the desired section
+     * @return the section with the specified search ID
+     * @throws IllegalArgumentException if no such section exists in the list of sections for the given board
+     */
     public static Section getSection(Board board, long sectionId) {
         return getOptional(board.getSections(), sectionId, Section.class).orElseThrow(() -> new IllegalArgumentException(ExceptionMessage.NO_SUCH_ID.toString()));
     }
 
+    /**
+     * Returns the item with the specified search ID, if it exists in the list of items for the given section.
+     *
+     * @param section  the section whose items should be searched
+     * @param searchId the search ID of the desired item
+     * @return the item with the specified search ID
+     * @throws IllegalArgumentException if no such item exists in the list of items for the given section
+     */
     public static Item getItem(Section section, long searchId) {
         return getOptional(section.getItems(), searchId, Item.class).orElseThrow(() -> new IllegalArgumentException(ExceptionMessage.NO_SUCH_ID.toString()));
     }
 
+    /**
+     * Returns the comment with the specified search ID, if it exists in the list of comments for the given item.
+     *
+     * @param item     the item whose comments should be searched
+     * @param searchId the search ID of the desired comment
+     * @return the comment with the specified search ID
+     * @throws IllegalArgumentException if no such comment exists in the list of comments for the given item
+     */
     public static SharedContent getComment(Item item, long searchId) {
         return getOptional(item.getComments(), searchId, Comment.class).orElseThrow(() -> new IllegalArgumentException(ExceptionMessage.NO_SUCH_ID.toString()));
     }
 
+    /**
+     * Gets an object from a set by ID.
+     *
+     * @param list the set of objects to search
+     * @param id   the ID of the object to search for
+     * @param cls  the class of the objects in the set
+     * @return an Optional containing the object if it is found, or an empty Optional if it is not found
+     * @throws RuntimeException if the getId method of the class is not found
+     */
     public static <T> Optional<T> getOptional(Set<T> list, long id, Class<T> cls) {
         try {
             Method getIdMethod = cls.getMethod("getId");
@@ -35,6 +68,14 @@ public class Common {
         }
     }
 
+    /**
+     * Invokes a getId method on an object.
+     *
+     * @param getIdMethod the getId method to invoke
+     * @param obj         the object to invoke the method on
+     * @return the result of invoking the method
+     * @throws RuntimeException if the method cannot be accessed or an exception is thrown during the invocation
+     */
     public static Object invokeGetIdMethod(Method getIdMethod, Object obj) {
         try {
             return getIdMethod.invoke(obj);
@@ -43,10 +84,17 @@ public class Common {
         }
     }
 
-    public static int getDistanceBetweenWords(String firstWord, String secondWord) {
+    /**
+     * Calculates the distance between two words using the Levenshtein distance algorithm.
+     *
+     * @param givenWord      the first word
+     * @param wordInDatabase the second word
+     * @return the distance between the two words
+     */
+    public static int getDistanceBetweenWords(String givenWord, String wordInDatabase) {
         // uses levenshtein distance algorithm
-        String word1 = firstWord.toLowerCase();
-        String word2 = secondWord.toLowerCase();
+        String word1 = givenWord.toLowerCase();
+        String word2 = wordInDatabase.toLowerCase();
 
         int len1 = word1.length();
         int len2 = word2.length();
@@ -77,8 +125,8 @@ public class Common {
                     int insert = dp[i][j + 1] + 1;
                     int delete = dp[i + 1][j] + 1;
 
-                    int min = replace > insert ? insert : replace;
-                    min = delete > min ? min : delete;
+                    int min = Math.min(replace, insert);
+                    min = Math.min(delete, min);
                     dp[i + 1][j + 1] = min;
                 }
             }
@@ -87,7 +135,14 @@ public class Common {
         return dp[len1][len2];
     }
 
-
+    /**
+     * Creates default notification settings for a new user in a board.
+     *
+     * @param user          the user to create the settings for
+     * @param board         the board the user is being added to
+     * @param settingsRepo  the repository for accessing NotificationSetting objects
+     * @param entityManager the entity manager for managing the UserSetting objects
+     */
     public static void createDefaultSettingForNewUserInBoard(User user, Board board, JpaRepository<NotificationSetting, Long> settingsRepo, EntityManager entityManager) {
         try {
             List<NotificationSetting> notificationSettingList = settingsRepo.findAll();
@@ -101,6 +156,12 @@ public class Common {
         }
     }
 
+    /**
+     * Returns the Class object of the specified field.
+     *
+     * @param fieldName the field to get the Class object for
+     * @return the Class object for the field
+     */
     public static Class getObjectOfField(UpdateField fieldName) {
         switch (fieldName) {
             case STATUS:
@@ -120,7 +181,7 @@ public class Common {
      * Helper function for updating a primitive or known object field.
      *
      * @param updateObject the request object containing the updates to be made
-     * @param obj         the object being updated
+     * @param obj          the object being updated
      * @throws NoSuchFieldException if the field does not exist in the item object
      */
     public static void fieldIsPrimitiveOrKnownObjectHelper(UpdateObjectRequest updateObject, Object obj) throws NoSuchFieldException {
@@ -132,7 +193,15 @@ public class Common {
         }
     }
 
-    public static String generateQuery(Map<String,List<String>> filters) {
+    /**
+     * Generates a query for retrieving items from a database.
+     *
+     * @param filters a map where the keys are the names of the columns to filter on and the values
+     *                are lists of the values to filter for
+     * @return a string representation of the generated query
+     * @throws IllegalArgumentException if the filters map is null
+     */
+    public static String generateQuery(Map<String, List<String>> filters) {
         StringBuilder queryBuilder = new StringBuilder("SELECT i FROM Item i WHERE ");
 
         // Use a List to store the different parts of the query

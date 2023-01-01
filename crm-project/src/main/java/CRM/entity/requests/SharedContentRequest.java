@@ -7,6 +7,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
+@Setter
 public class SharedContentRequest {
     private Long parentItemId;
     private Long sectionId;

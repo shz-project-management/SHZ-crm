@@ -4,6 +4,7 @@ package CRM.entity.DTO;
 import CRM.entity.Board;
 import CRM.entity.Item;
 import CRM.entity.Section;
+import CRM.entity.User;
 import lombok.*;
 
 import java.util.*;
@@ -39,7 +40,8 @@ public class SectionDTO {
         for (Section section : sections) {
             sectionDTOList.add(createSectionDTO(section));
         }
-        sectionDTOList.sort(Comparator.comparingLong(SectionDTO::getId));
+        if (!sectionDTOList.isEmpty())
+            sectionDTOList.sort(Comparator.comparingLong(SectionDTO::getId));
 
         return sectionDTOList;
     }

@@ -2,30 +2,25 @@ package CRM.utils;
 
 import CRM.entity.*;
 import CRM.entity.requests.NotificationRequest;
-import CRM.entity.response.Response;
 import CRM.repository.*;
-import CRM.service.AttributeService;
 import CRM.service.NotificationService;
 import CRM.service.SettingsService;
 import CRM.utils.email.EmailUtil;
-import CRM.utils.enums.ExceptionMessage;
 import CRM.utils.enums.Permission;
-import com.google.api.client.http.HttpStatusCodes;
-import org.hibernate.tool.schema.internal.StandardTableExporter;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.mail.MailSendException;
+import org.springframework.messaging.MessagingException;
 import org.springframework.stereotype.Component;
 
-import javax.mail.MessagingException;
 import javax.security.auth.login.AccountNotFoundException;
-import java.io.IOException;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
 @Component
 public class NotificationSender {
+    private static Logger logger = LogManager.getLogger(NotificationSender.class.getName());
 
     @Autowired
     private UserRepository userRepository;
@@ -36,85 +31,96 @@ public class NotificationSender {
     @Autowired
     private SettingsService settingsService;
 
-    //TODO: DOCUMENTATION
+    /**
+     * Sends a notification to the user specified in the notification request.
+     * The notification can be either in-app or email, depending on the user's settings.
+     *
+     * @param notificationRequest the notification request object containing the details of the notification
+     * @return true if the notification was sent successfully, false if the user does not exist in the specified board
+     * @throws MailSendException if there was an error sending the email notification
+     */
+    public void sendNotification(NotificationRequest notificationRequest) throws AccountNotFoundException {
+        User user = notificationRequest.getUser();
+        Board board = notificationRequest.getBoard();
+        Validations.checkIfUserExistsInBoard(user.getId(), board.getId(), userRepository, boardRepository);
 
-    public boolean sendNotification(NotificationRequest notificationRequest) {
-        try{
-            Validations.checkIfUserExistsInBoard(notificationRequest.getUser().getId(), notificationRequest.getBoard().getId(), userRepository, boardRepository);
-        }catch (AccountNotFoundException e){
-            return false;
-        }
-        UserSetting userSettingsInBoard = UserSetting.getRelevantUserSetting(notificationRequest.getBoard(), notificationRequest.getUser().getId(),
-                settingsService.getNotificationSettingFromDB(notificationRequest.getNotificationType().getName()).getName());
+        NotificationSetting notificationSetting = settingsService.getNotificationSettingFromDB(notificationRequest.getNotificationType().getName());
+        if (notificationSetting == null) return;
+
+        String notificationSettingName = notificationSetting.getName();
+        UserSetting userSettingsInBoard = UserSetting.getRelevantUserSetting(board, user.getId(), notificationSettingName);
+
         if (userSettingsInBoard.isInApp()) {
             notificationService.createInAppNotification(notificationRequest, userSettingsInBoard);
         }
         if (userSettingsInBoard.isInEmail()) {
-            try{
-                System.out.println("Sending an email notification");
-                EmailUtil.send(notificationRequest.getUser().getEmail(), createNotificationDescription(notificationRequest), notificationRequest.getNotificationType().getName());
-            }catch (MessagingException | IOException exception){
-                throw new MailSendException(ExceptionMessage.EMAIL_SENDING_FAILED.toString());
-            }
+            EmailUtil.send(notificationRequest.getUser().getEmail(), createNotificationDescription(notificationRequest), notificationRequest.getNotificationType().getName());
         }
-        return true;
     }
 
-    public void sendNotificationToManyUsers(NotificationRequest notificationRequest, Set<User> usersInBoard) {
-        for (User userInBoard: usersInBoard) {
+    /**
+     * Sends a notification to a set of users.
+     *
+     * @param notificationRequest the notification request object containing the details of the notification
+     * @param usersInBoard        the set of users to whom the notification should be sent
+     */
+    public void sendNotificationToManyUsers(NotificationRequest notificationRequest, Set<User> usersInBoard) throws AccountNotFoundException {
+        for (User userInBoard : usersInBoard) {
             notificationRequest.setUser(userInBoard);
             sendNotification(notificationRequest);
         }
     }
 
-    public static String createNotificationDescription(NotificationRequest notificationRequest){
-        Long type = notificationRequest.getNotificationType().getId();
-        switch (type.intValue()){
+    public static String createNotificationDescription(NotificationRequest notificationRequest) {
+        Long kind = notificationRequest.getNotificationType().getId();
+        Board board = notificationRequest.getBoard();
+        Item item = null;
+        Long attributeId = null;
+        if (kind != 5 && kind != 7)
+            item = notificationRequest.getBoard().getItemById(notificationRequest.getItemId(), notificationRequest.getSectionId());
+        switch (kind.intValue()) {
             case 1:
-                return "Item id: " + notificationRequest.getItemId() + " has been assigned to you in board " +
-                        notificationRequest.getBoard().getName();
+                return "Item id: " + notificationRequest.getItemId() + " has been assigned to you in board " + board.getName();
             case 2:
-                List<Attribute> statuses = notificationRequest.getBoard().getAllAttributeInBoard(Status.class);
-                Item statusItem = notificationRequest.getBoard().getItemById(notificationRequest.getItemId(), notificationRequest.getSectionId());
-                return "The item's: " + statusItem.getName() + " status has been changed to " + statuses.get((Integer) notificationRequest.getPresentContent()).getName();
+                attributeId = notificationRequest.getPresentContent() != null ? Long.valueOf((Integer) notificationRequest.getPresentContent()) : null;
+                Status status = board.getAttributeById(attributeId, Status.class);
+                return "The item's '" + item.getName() + "' status has been changed to '" + status.getName() + "'";
             case 3:
-                List<Attribute> types = notificationRequest.getBoard().getAllAttributeInBoard(Type.class);
-                Item typeItem = notificationRequest.getBoard().getItemById(notificationRequest.getItemId(), notificationRequest.getSectionId());
-                return "The item's: " + typeItem.getName() + " type has been changed to " + types.get((Integer) notificationRequest.getPresentContent()).getName();
+                attributeId = notificationRequest.getPresentContent() != null ? Long.valueOf((Integer) notificationRequest.getPresentContent()) : null;
+                Type type = board.getAttributeById(attributeId, Type.class);
+                return "The item's '" + item.getName() + "' type has been changed to " + type.getName();
             case 4:
-                Item commentItem = notificationRequest.getBoard().getItemById(notificationRequest.getItemId(), notificationRequest.getSectionId());
-                return "New comment added on item: " + commentItem.getName() + ":\n " +
-                        notificationRequest.getComment() + "\n By: " + notificationRequest.getFromUser().getFullName();
+                return "New comment added on item '" + item.getName() + "':\n " + notificationRequest.getComment() + "\n By " + notificationRequest.getFromUser().getFullName();
             case 5:
                 return "Item: " + notificationRequest.getItemId() + " has been deleted";
             case 6:
-                Item item = notificationRequest.getBoard().getItemById(notificationRequest.getItemId(), notificationRequest.getSectionId());
-                return "The item's" + item.getName() + "Field " + notificationRequest.getChangedFieldName() + " has been changed " +
-                        " to " + notificationRequest.getPresentContent();
+                return "The item's '" + item.getName() + "' Field " + notificationRequest.getChangedFieldName() + " has been changed " + " to '" + notificationRequest.getPresentContent() + "'";
             case 7:
-                getAddUserNotificationDescription(notificationRequest, type);
+                return getAddUserNotificationDescription(notificationRequest, kind);
+
             default:
                 return null;
         }
     }
 
-    private static String getAddUserNotificationDescription(NotificationRequest notificationRequest, Long type){
+    private static String getAddUserNotificationDescription(NotificationRequest notificationRequest, Long type) {
         Board board = notificationRequest.getBoard();
         UserPermission userPermission = board.getUserPermissionById(notificationRequest.getFromUser().getId(), board.getUsersPermissions());
-        if(notificationRequest.getFromUser() == notificationRequest.getUser())
-            switch (userPermission.getPermission()){
+        if (notificationRequest.getFromUser() == notificationRequest.getUser())
+            switch (userPermission.getPermission()) {
                 case USER:
-                    notificationRequest.setNotificationType(new NotificationSetting(type, "You have been added to a board"));
-                    return "You have been added to board: " + notificationRequest.getBoard().getName() + " Welcome!";
+                    notificationRequest.setNotificationType(new NotificationSetting(type, "You are invited to a board"));
+                    return "You are invited to the board '" + notificationRequest.getBoard().getName() + "'. Welcome!";
                 case LEADER:
                     notificationRequest.setNotificationType(new NotificationSetting(type, "You have been promoted to leader"));
-                    return "You have been promoted to leader in board: " + notificationRequest.getBoard().getName() + " Good luck!";
+                    return "You have been promoted to leader in board '" + notificationRequest.getBoard().getName() + "'. Good luck!";
                 case UNAUTHORIZED:
                     notificationRequest.setNotificationType(new NotificationSetting(type, "You have been removed from board"));
-                    return "You have been removed from board: " + notificationRequest.getBoard().getName();
+                    return "You have been removed from board '" + notificationRequest.getBoard().getName() + "'";
             }
-        else if(userPermission.getPermission() == Permission.USER)
-            return notificationRequest.getFromUser().getFullName() + " has been added to the board, Welcome!";
-        return "User: " + notificationRequest.getFromUser().getFullName() + " permissions has been changed";
+        else if (userPermission.getPermission() == Permission.USER)
+            return notificationRequest.getFromUser().getFullName() + " has been added to the board. Welcome!";
+
+        return notificationRequest.getFromUser().getFullName() + "'s permissions has been changed in this board";
     }
 }

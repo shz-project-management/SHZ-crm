@@ -54,7 +54,6 @@ public class AuthService {
      */
     public String thirdPartyLogin(RegisterUserRequest user) {
         logger.info("in AuthService -> thirdPartyLogin");
-
         User storedUser = findByEmail(user.getEmail());
         if (storedUser == null)
             storedUser = userRepository.save(User.newUser(user));
@@ -138,7 +137,6 @@ public class AuthService {
             throw new AccountNotFoundException(ExceptionMessage.NO_USER_IN_DATABASE.toString());
         }
     }
-
 
     /**
      * Find a user by their email.

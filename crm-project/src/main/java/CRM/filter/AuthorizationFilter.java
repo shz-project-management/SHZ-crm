@@ -1,10 +1,9 @@
 package CRM.filter;
 
+import CRM.config.PermissionPathsConfig;
 import CRM.service.AuthService;
-import CRM.utils.enums.ExceptionMessage;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.GenericFilterBean;
 
@@ -17,13 +16,13 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-import static CRM.utils.Util.authPermissionPathsForAll;
-
 @Component
 public class AuthorizationFilter extends GenericFilterBean {
 
     @Autowired
     AuthService authService;
+    @Autowired
+    PermissionPathsConfig permissionPathsConfig;
 
     /**
      * this doFilter function is set to check if the user has the permission to enter the app controllers.
@@ -36,13 +35,15 @@ public class AuthorizationFilter extends GenericFilterBean {
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
         logger.info("in AuthorizationFilter -> doFilter");
-//        String url = ((HttpServletRequest) request).getRequestURL().toString();
         HttpServletRequest httpRequest = (HttpServletRequest) request;
         HttpServletResponse httpResponse = (HttpServletResponse) response;
 
         String token = httpRequest.getHeader("authorization");
         String path = httpRequest.getRequestURI();
-        if (authPermissionPathsForAll.stream().noneMatch(path::contains)) {
+        logger.info("in AuthorizationFilter -> doFilter - > beforeConfig");
+        if (permissionPathsConfig.getAuthPermissionPathsForAll().stream().noneMatch(path::contains)) {
+            logger.info("in AuthorizationFilter -> doFilter - > afterConfig");
+
             try {
                 Long userId = authService.checkTokenToUserInDB(token);
                 httpRequest.setAttribute("userId", userId);

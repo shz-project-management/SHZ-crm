@@ -37,9 +37,10 @@ public class Notification {
 
     private LocalDateTime notificationDateTime;
 
-    public static Notification createNewNotification(NotificationRequest notificationRequest, UserSetting userSetting){
+    public static Notification createNewNotification(NotificationRequest notificationRequest, UserSetting userSetting) {
         Notification notification = new Notification();
-        notification.setUser(notificationRequest.getUser());
+        if (notificationRequest.getUser() != null)
+            notification.setUser(notificationRequest.getUser());
         notification.setBoard(notificationRequest.getBoard());
         notification.setFromUser(notificationRequest.getFromUser());
         notification.setDescription(NotificationSender.createNotificationDescription(notificationRequest));

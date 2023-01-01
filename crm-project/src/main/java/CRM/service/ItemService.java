@@ -131,7 +131,7 @@ public class ItemService implements ServiceInterface {
      * @return the list of shared content objects within the specified object
      */
     @Override
-    public List<SharedContent> getAllInItem(ObjectsIdsRequest objectsIdsRequest) {
+    public List<Item> getAllInItem(ObjectsIdsRequest objectsIdsRequest) {
         Board board = Validations.doesIdExists(objectsIdsRequest.getBoardId(), boardRepository);
         return new ArrayList<>(board.getSectionFromBoard(objectsIdsRequest.getSectionId()).getItems());
     }
@@ -154,11 +154,12 @@ public class ItemService implements ServiceInterface {
      * @return the updated set of user permissions for the board
      */
     @Override
-    public Set<UserPermission> assignToUser(ObjectsIdsRequest objectsIdsRequest) {
+    public Section assignToUser(ObjectsIdsRequest objectsIdsRequest) {
         Board board = Validations.doesIdExists(objectsIdsRequest.getBoardId(), boardRepository);
-        board.assignUserToItem(objectsIdsRequest.getUpdateObjId(), objectsIdsRequest.getSectionId(), objectsIdsRequest.getEmail());
+        User user = Validations.doesIdExists(objectsIdsRequest.getAssignedUserId(), userRepository);
+        board.assignUserToItem(objectsIdsRequest.getUpdateObjId(), objectsIdsRequest.getSectionId(), user);
         boardRepository.save(board);
-        return board.getUsersPermissions();
+        return board.getSectionFromBoard(objectsIdsRequest.getSectionId());
     }
 
     /**
@@ -170,7 +171,7 @@ public class ItemService implements ServiceInterface {
      * @throws NoSuchFieldException if the field does not exist in the item object
      */
     private void fieldIsCustomObjectHelper(UpdateObjectRequest updateObject, Item item, Board board, long itemId) throws NoSuchFieldException {
-        Class objClass = Common.getObjectOfField(updateObject.getFieldName());
+        Object objClass = Common.getObjectOfField(updateObject.getFieldName());
         if (objClass == null) {
             throw new NoSuchFieldException(ExceptionMessage.FIELD_OBJECT_NOT_EXISTS.toString());
         }

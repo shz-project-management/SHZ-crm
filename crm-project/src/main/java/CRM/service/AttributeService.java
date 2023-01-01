@@ -10,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Set;
 
 @Service
 public class AttributeService {
@@ -26,13 +25,17 @@ public class AttributeService {
      * @param clz              the class of the attribute to be created, either Type or Status
      * @return a list of all attributes of the given class in the board
      */
-    public List<Attribute> create(AttributeRequest attributeRequest, Class clz) {
+    public <T extends Attribute> List<T> create(AttributeRequest attributeRequest, Class<T> clz) {
         Board board = Validations.doesIdExists(attributeRequest.getBoardId(), boardRepository);
-
+        // check if is a force add to the db. if so, push the new attribute request to the db.
         board.addAttributeToBoard(Attribute.createAttribute(attributeRequest.getName(), attributeRequest.getDescription()), clz);
         boardRepository.save(board);
-
         return board.getAllAttributeInBoard(clz);
+    }
+
+    public <T extends Attribute> List<T> checkSimilarityWithDatabase(AttributeRequest attributeRequest, Class<T> clz) {
+        Board board = Validations.doesIdExists(attributeRequest.getBoardId(), boardRepository);
+        return board.checkSimilarityInDatabase(attributeRequest.getName(), clz);
     }
 
     /**
@@ -42,10 +45,8 @@ public class AttributeService {
      * @param attributeId the id of the attribute to be deleted
      * @param clz         the class of the attribute to be deleted, either Type or Status
      */
-    public Board delete(long boardId, long attributeId, Class clz) {
-        // get the board Id and make sure it exsits
+    public <T extends Attribute> Board delete(long boardId, long attributeId, Class<T> clz) {
         Board board = Validations.doesIdExists(boardId, boardRepository);
-
         board.removeAttributeFromItems(attributeId, clz);
         board.removeAttribute(attributeId, clz);
         return boardRepository.save(board);
@@ -59,9 +60,8 @@ public class AttributeService {
      * @param clz         the class of the attribute to retrieve, either Type or Status
      * @return the attribute with the given attributeId
      */
-    public Attribute get(long attributeId, long boardId, Class clz) {
+    public <T extends Attribute> T get(long attributeId, long boardId, Class<T> clz) {
         Board board = Validations.doesIdExists(boardId, boardRepository);
-        // create method in the entity and get the attribute from
         return board.getAttributeById(attributeId, clz);
     }
 
@@ -73,7 +73,7 @@ public class AttributeService {
      * @return the updated board
      * @throws NoSuchFieldException if the field to be updated does not exist in the attribute
      */
-    public Board update(UpdateObjectRequest updateObjReq, Class clz) throws NoSuchFieldException {
+    public <T extends Attribute> Board update(UpdateObjectRequest updateObjReq, Class<T> clz) throws NoSuchFieldException {
         Board board = Validations.doesIdExists(updateObjReq.getObjectsIdsRequest().getBoardId(), boardRepository);
         updateBoard(board, updateObjReq, clz);
         return boardRepository.save(board);
@@ -86,7 +86,7 @@ public class AttributeService {
      * @param clz     the class of the attributes to retrieve, either Type or Status
      * @return a list of all attributes of the given class in the board
      */
-    public List<Attribute> getAllAttributesInBoard(long boardId, Class clz) {
+    public <T extends Attribute> List<T> getAllAttributesInBoard(long boardId, Class<T> clz) {
         Board board = Validations.doesIdExists(boardId, boardRepository);
         return board.getAllAttributeInBoard(clz);
     }
@@ -99,10 +99,10 @@ public class AttributeService {
      * @param clz          the class of the attribute to update (either {@link Status} or {@link Type})
      * @throws NoSuchFieldException if the specified attribute does not exist on the board object
      */
-    private void updateBoard(Board board, UpdateObjectRequest updateObjReq, Class clz) throws NoSuchFieldException {
+    private <T extends Attribute> void updateBoard(Board board, UpdateObjectRequest updateObjReq, Class<T> clz) throws NoSuchFieldException {
         Attribute attribute;
-        if (clz == Status.class) attribute = board.getStatusById(updateObjReq.getObjectsIdsRequest().getUpdateObjId());
-        else attribute = board.getTypeById(updateObjReq.getObjectsIdsRequest().getUpdateObjId());
+        if (clz == Status.class) attribute = board.getStatus(updateObjReq.getObjectsIdsRequest().getUpdateObjId());
+        else attribute = board.getType(updateObjReq.getObjectsIdsRequest().getUpdateObjId());
         Common.fieldIsPrimitiveOrKnownObjectHelper(updateObjReq, attribute);
     }
 }

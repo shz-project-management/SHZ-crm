@@ -15,6 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
 import javax.security.auth.login.AccountNotFoundException;
+import java.util.List;
 import java.util.NoSuchElementException;
 
 @Component
@@ -34,30 +35,14 @@ public class SettingsFacade {
      * @throws NullPointerException     if the specified user/board id is null.
      * @throws NoSuchElementException   if the user with the specified id is not found/user does not belong to that board.
      */
-    public Response getAllUserSettingsInBoard(ObjectsIdsRequest objectsIdsRequest) {
-        try {
-            Validations.validateIDs(objectsIdsRequest.getUserId(), objectsIdsRequest.getBoardId());
-
-            return Response.builder()
-                    .data(SettingsDTO.createUserSettingsList(settingsService.getAllUserSettingsInBoard(objectsIdsRequest)))
-                    .message(SuccessMessage.FOUND.toString())
-                    .status(HttpStatus.OK)
-                    .statusCode(HttpStatusCodes.STATUS_CODE_OK)
-                    .build();
-
-        } catch (IllegalArgumentException | NoSuchElementException | AccountNotFoundException e) {
-            return Response.builder()
-                    .statusCode(HttpStatusCodes.STATUS_CODE_BAD_REQUEST)
-                    .status(HttpStatus.BAD_REQUEST)
-                    .message(e.getMessage())
-                    .build();
-        } catch (NullPointerException e) {
-            return Response.builder()
-                    .message(e.getMessage())
-                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .statusCode(HttpStatusCodes.STATUS_CODE_SERVER_ERROR)
-                    .build();
-        }
+    public Response<List<SettingsDTO>> getAllUserSettingsInBoard(ObjectsIdsRequest objectsIdsRequest) throws AccountNotFoundException {
+        Validations.validateIDs(objectsIdsRequest.getUserId(), objectsIdsRequest.getBoardId());
+        return Response.<List<SettingsDTO>>builder()
+                .data(SettingsDTO.createUserSettingsList(settingsService.getAllUserSettingsInBoard(objectsIdsRequest)))
+                .message(SuccessMessage.FOUND.toString())
+                .status(HttpStatus.OK)
+                .statusCode(HttpStatusCodes.STATUS_CODE_OK)
+                .build();
     }
 
     /**
@@ -69,28 +54,13 @@ public class SettingsFacade {
      * @throws NoSuchElementException   if the setting does not exist the DB
      * @throws NullPointerException     if an error occurs while processing the request
      */
-    public Response changeUserSettingsInBoard(SettingUpdateRequest settingUpdateRequest) {
-        try {
-            Validations.validateIDs(settingUpdateRequest.getUserSettingId(), settingUpdateRequest.getBoardId());
-            return Response.builder()
-                    .data(SettingsDTO.createUserSettingsList(settingsService.changeUserSettingsInBoard(settingUpdateRequest)))
-                    .message(SuccessMessage.FOUND.toString())
-                    .status(HttpStatus.OK)
-                    .statusCode(HttpStatusCodes.STATUS_CODE_OK)
-                    .build();
-
-        } catch (IllegalArgumentException | NoSuchElementException e) {
-            return Response.builder()
-                    .statusCode(HttpStatusCodes.STATUS_CODE_BAD_REQUEST)
-                    .status(HttpStatus.BAD_REQUEST)
-                    .message(e.getMessage())
-                    .build();
-        } catch (NullPointerException e) {
-            return Response.builder()
-                    .message(e.getMessage())
-                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .statusCode(HttpStatusCodes.STATUS_CODE_SERVER_ERROR)
-                    .build();
-        }
+    public Response<List<SettingsDTO>> changeUserSettingsInBoard(SettingUpdateRequest settingUpdateRequest) {
+        Validations.validateIDs(settingUpdateRequest.getUserSettingId(), settingUpdateRequest.getBoardId());
+        return Response.<List<SettingsDTO>>builder()
+                .data(SettingsDTO.createUserSettingsList(settingsService.changeUserSettingsInBoard(settingUpdateRequest)))
+                .message(SuccessMessage.FOUND.toString())
+                .status(HttpStatus.OK)
+                .statusCode(HttpStatusCodes.STATUS_CODE_OK)
+                .build();
     }
 }

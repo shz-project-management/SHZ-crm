@@ -45,9 +45,10 @@ public class NotificationService {
      * @param notificationRequest the request object containing the notification information to create
      * @param userSetting         the user's notification settings
      */
-    public void createInAppNotification(NotificationRequest notificationRequest, UserSetting userSetting) {
+    public Notification createInAppNotification(NotificationRequest notificationRequest, UserSetting userSetting) {
         Notification notification = Notification.createNewNotification(notificationRequest, userSetting);
         notificationRepository.save(notification);
+        return notification;
     }
 
     /**
@@ -56,11 +57,11 @@ public class NotificationService {
      * @param notificationsIds the IDs of the notifications to delete
      */
     public List<Notification> delete(List<Long> notificationsIds) {
-        Optional<Notification> notificationOptional = notificationRepository.findById(notificationsIds.stream().findFirst().get());
-        Notification notification = null;
-        if (notificationOptional.isPresent()){
-             notification = notificationOptional.get();
+        Optional<Notification> notificationOptional = notificationRepository.findById(notificationsIds.get(0));
+        if (!notificationOptional.isPresent()) {
+            throw new NoSuchElementException(ExceptionMessage.NO_SUCH_ID.toString());
         }
+        Notification notification = notificationOptional.get();
         notificationRepository.deleteAllById(notificationsIds);
         return notificationRepository.findByUser_IdAndBoard_Id(notification.getUser().getId(), notification.getBoard().getId());
     }

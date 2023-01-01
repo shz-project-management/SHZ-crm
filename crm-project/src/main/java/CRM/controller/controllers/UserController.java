@@ -1,6 +1,9 @@
 package CRM.controller.controllers;
 
 import CRM.controller.facades.UserFacade;
+import CRM.entity.DTO.BoardDTO;
+import CRM.entity.DTO.UserDTO;
+import CRM.entity.DTO.UserPermissionDTO;
 import CRM.entity.requests.ObjectsIdsRequest;
 import CRM.entity.requests.UpdateObjectRequest;
 import CRM.entity.response.Response;
@@ -13,6 +16,11 @@ import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+
+import javax.naming.NoPermissionException;
+import javax.security.auth.login.AccountNotFoundException;
+import java.util.List;
+import java.util.Map;
 
 @Controller
 @RequestMapping(value = "/user")
@@ -28,58 +36,88 @@ public class UserController {
     @Autowired
     private SimpMessagingTemplate messagingTemplate;
 
-
+    /**
+     * GetMapping to retrieve a user with a given id.
+     *
+     * @param userId The id of the user.
+     * @return A ResponseEntity with a UserDTO object and the corresponding HTTP status.
+     */
     @GetMapping
-    public ResponseEntity<Response> get(@RequestAttribute Long userId){
-
-        Response response = userFacade.get(userId);
-        return new ResponseEntity<>(response, response.getStatus());
-    }
-
-    @DeleteMapping(value = "{id}")
-    public ResponseEntity<Response> delete(@PathVariable Long id){
-
-        Response response = userFacade.delete(id);
+    public ResponseEntity<Response<UserDTO>> get(@RequestAttribute Long userId) throws AccountNotFoundException {
+        Response<UserDTO> response = userFacade.get(userId);
         return new ResponseEntity<>(response, response.getStatus());
     }
 
     /**
-     * This method is used to handle HTTP GET requests to the specified URL (board/getAll/{userId}).
-     * The method takes the id of the user as a path variable and uses it to retrieve all the boards created by the user using the boardFacade object.
+     * DeleteMapping to delete a user with a given id.
      *
-     * @param userId The id of the user whose boards are to be retrieved.
-     * @return A ResponseEntity object containing the Response object with the retrieved boards and the HTTP status code.
+     * @param userId The id of the user to be deleted.
+     * @return A ResponseEntity with the corresponding HTTP status.
+     */
+    @DeleteMapping(value = "delete")
+    public ResponseEntity<Response<Boolean>> delete(@RequestAttribute Long userId) throws AccountNotFoundException {
+        Response<Boolean> response = userFacade.delete(userId);
+        return new ResponseEntity<>(response, response.getStatus());
+    }
+
+    /**
+     * GetMapping to retrieve all boards of a user with a given id.
+     *
+     * @param userId The id of the user.
+     * @return A ResponseEntity with a map of board names and lists of BoardDTO objects and the corresponding HTTP status.
      */
     @GetMapping(value = "getAll")
-    public ResponseEntity<Response> getAllBoardsOfUser(@RequestAttribute Long userId) {
-        Response response = userFacade.getAllBoardsOfUser(userId);
+    public ResponseEntity<Response<Map<String, List<BoardDTO>>>> getAllBoardsOfUser(@RequestAttribute Long userId) throws NoPermissionException, AccountNotFoundException {
+        Response<Map<String, List<BoardDTO>>> response = userFacade.getAllBoardsOfUser(userId);
         return new ResponseEntity<>(response, response.getStatus());
     }
 
+    /**
+     * GetMapping to retrieve all users.
+     *
+     * @return A ResponseEntity with a list of UserDTO objects and the corresponding HTTP status.
+     */
     @GetMapping(value = "get-all-users")
-    public ResponseEntity<Response> getAll(){
-
-        Response response = userFacade.getAll();
+    public ResponseEntity<Response<List<UserDTO>>> getAll() {
+        Response<List<UserDTO>> response = userFacade.getAll();
         return new ResponseEntity<>(response, response.getStatus());
     }
 
+    /**
+     * GetMapping to retrieve all users in a given board.
+     *
+     * @param boardId The id of the board.
+     * @return A ResponseEntity with a list of UserDTO objects and the corresponding HTTP status.
+     */
     @GetMapping(value = "getAll-users-in-board")
-    public ResponseEntity<Response> getAllInBoard(@RequestAttribute Long boardId){
-
-        Response response = userFacade.getAllInBoard(boardId);
+    public ResponseEntity<Response<List<UserDTO>>> getAllInBoard(@RequestAttribute Long boardId) throws AccountNotFoundException {
+        Response<List<UserDTO>> response = userFacade.getAllInBoard(boardId);
         return new ResponseEntity<>(response, response.getStatus());
     }
 
+    /**
+     * GetMapping to retrieve all user permissions in a given board.
+     *
+     * @param boardId The id of the board.
+     * @return A ResponseEntity with a list of UserPermissionDTO objects and the corresponding HTTP status.
+     */
     @GetMapping(value = "getAll-users-permissions")
-    public ResponseEntity<Response> getAllUserPermissionsInBoard(@RequestAttribute Long boardId){
-        Response response = userFacade.getAllUserPermissionsInBoard(boardId);
+    public ResponseEntity<Response<List<UserPermissionDTO>>> getAllUserPermissionsInBoard(@RequestAttribute Long boardId) {
+        Response<List<UserPermissionDTO>> response = userFacade.getAllUserPermissionsInBoard(boardId);
         return new ResponseEntity<>(response, response.getStatus());
     }
 
+    /**
+     * PostMapping to add a user to a given board.
+     *
+     * @param objectsIdsRequest The ObjectsIdsRequest object containing the user id and the board id.
+     * @param boardId           The id of the board.
+     * @return A ResponseEntity with no content.
+     */
     @PostMapping(value = "update-user-to-board")
-    public ResponseEntity<Response> updateUserToBoard(@RequestBody ObjectsIdsRequest objectsIdsRequest, @RequestAttribute Long boardId){
+    public ResponseEntity<Response<List<UserPermissionDTO>>> updateUserToBoard(@RequestBody ObjectsIdsRequest objectsIdsRequest, @RequestAttribute Long boardId) throws AccountNotFoundException {
         objectsIdsRequest.setBoardId(boardId);
-        Response response = userFacade.updateUserToBoard(objectsIdsRequest);
+        Response<List<UserPermissionDTO>> response = userFacade.updateUserToBoard(objectsIdsRequest);
         messagingTemplate.convertAndSend("/userPermission/" + boardId, response);
         return ResponseEntity.noContent().build();
     }

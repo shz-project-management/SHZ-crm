@@ -1,6 +1,7 @@
 package CRM.controller.controllers;
 
 import CRM.controller.facades.AuthFacade;
+import CRM.entity.DTO.UserDTO;
 import CRM.entity.requests.LoginUserRequest;
 import CRM.entity.requests.RegisterUserRequest;
 import CRM.entity.response.Response;
@@ -14,6 +15,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import javax.naming.AuthenticationException;
+import javax.security.auth.login.AccountNotFoundException;
+import java.io.IOException;
+
 @Controller
 @RequestMapping(value = "/user/auth")
 @AllArgsConstructor
@@ -26,55 +31,40 @@ public class AuthController {
     AuthFacade authFacade;
 
     /**
-     * Register function is responsible for creating new users and adding them to the database.
-     * Users will use their personal information to create a new account: email, password, name.
+     * Handles a request to register a new user.
      *
-     * @param user - User with email, name and password
-     * @return ResponseEntity with our Response with data and status 201 if good or 400 if something went wrong.
+     * @param user The request body containing the user's registration information.
+     * @return A response containing the newly registered user's information. The response status will reflect the result of the registration attempt.
      */
     @RequestMapping(value = "register", method = RequestMethod.POST, consumes = "application/json")
-    public ResponseEntity<Response> register(@RequestBody RegisterUserRequest user) {
+    public ResponseEntity<Response<UserDTO>> register(@RequestBody RegisterUserRequest user) {
         logger.info("in AuthController -> register");
-
-        Response response = authFacade.register(user);
+        Response<UserDTO> response = authFacade.register(user);
         return new ResponseEntity<>(response, response.getStatus());
     }
 
     /**
-     * Login function is responsible for logging user into the system.
-     * This function accepts only 2 parameters: email, password.
-     * If the credentials match to the database's information, it will allow the user to use its functionalities.
-     * A token will be returned in a successful request.
+     * Handles a request to login a user.
      *
-     * @param user - user's details with email and password to check if correct
-     * @return ResponseEntity with our Response with user's token and status 200 if good or 400 if something went wrong.
+     * @param user The request body containing the user's login credentials.
+     * @return A response containing the user's access token. The response status will reflect the result of the login attempt.
      */
     @RequestMapping(value = "login", method = RequestMethod.POST, consumes = "application/json")
-    public ResponseEntity<Response> login(@RequestBody LoginUserRequest user) {
+    public ResponseEntity<Response<String>> login(@RequestBody LoginUserRequest user) throws AuthenticationException, AccountNotFoundException {
         logger.info("in AuthController -> login");
-
-        Response response = authFacade.login(user);
+        Response<String> response = authFacade.login(user);
         return new ResponseEntity<>(response, response.getStatus());
     }
 
+    /**
+     * Handles a callback from a third-party login provider.
+     *
+     * @param code The authorization code provided by the login provider.
+     * @return A response containing the user's access token. The response status will reflect the result of the login attempt.
+     */
     @PostMapping("/third-party-login")
-    public ResponseEntity<Response> callback(@RequestParam String code) {
-            Response response = authFacade.thirdPartyLogin(code);
-            return new ResponseEntity<>(response, response.getStatus());
+    public ResponseEntity<Response<String>> callback(@RequestParam String code) throws IOException {
+        Response<String> response = authFacade.thirdPartyLogin(code);
+        return new ResponseEntity<>(response, response.getStatus());
     }
 }
-
-//    /**
-//     * Activate function is responsible for activating email links.
-//     * If the link is not expired, make the user activated in the database.
-//     * If the link is expired, resend a new link to the user with a new token.
-//     *
-//     * @param token - A link with activation token
-//     * @return ResponseEntity<Response>  with data and status 200 if good or 400 if something went wrong.
-//     */
-//    @RequestMapping(value = "activate", method = RequestMethod.POST)
-//    public ResponseEntity<Response> activate(@RequestParam String token) {
-//        logger.info("in AuthController -> activate");
-//        Response response = facadeAuth.activate(token);
-//        return new ResponseEntity<>(response, response.getStatus());
-//    }

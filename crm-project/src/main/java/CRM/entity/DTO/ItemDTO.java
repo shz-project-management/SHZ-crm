@@ -1,6 +1,7 @@
 package CRM.entity.DTO;
 
 import CRM.entity.Item;
+import CRM.entity.User;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -17,7 +18,7 @@ public class ItemDTO extends SharedContentDTO {
     private AttributeDTO status;
     private AttributeDTO type;
     private Long sectionId;
-    private Long assignedToUserId;
+    private UserDTO assignedToUser;
     private LocalDateTime dueDate;
     private Integer importance;
     private Long boardId;
@@ -36,6 +37,10 @@ public class ItemDTO extends SharedContentDTO {
         itemDTO.setId(item.getId());
         itemDTO.setImportance(item.getImportance());
         itemDTO.setDueDate(item.getDueDate());
+
+        if(item.getAssignedToUser() != null){
+            itemDTO.setAssignedToUser(UserDTO.createUserDTO(item.getAssignedToUser())); // FIXME: don't return the creator user -> return the assigned user
+        }
 
         if (item.getItems().size() > 0)
             itemDTO.setSubItems(ItemDTO.getItemsDTOList(item.getItems()));
@@ -57,6 +62,9 @@ public class ItemDTO extends SharedContentDTO {
         itemDTO.setImportance(item.getImportance());
         itemDTO.setDueDate(item.getDueDate());
 
+        if(item.getAssignedToUser() != null){
+            itemDTO.setAssignedToUser(UserDTO.createUserDTO(item.getAssignedToUser())); // FIXME: don't return the creator user -> return the assigned user
+        }
 
         return itemDTO;
     }

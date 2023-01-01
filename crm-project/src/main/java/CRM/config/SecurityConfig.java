@@ -21,6 +21,5 @@ public class SecurityConfig {
 
         http.authorizeRequests().antMatchers("/**").permitAll().anyRequest()
                 .authenticated().and().csrf().disable().cors().configurationSource(request -> corsConfiguration);
-
     }
 }

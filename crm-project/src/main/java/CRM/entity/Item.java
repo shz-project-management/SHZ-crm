@@ -33,14 +33,15 @@ public class Item extends SharedContent {
     @JoinColumn(name = "section_id")
     private Section section;
 
-    @Column(name = "assigned_to_user")
-    private String assignedToUserId;
-
     @Column(name = "due_date")
     private LocalDateTime dueDate;
 
     @Column(name = "importance")
     private int importance;
+
+    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
+    @JoinColumn(name = "assigned_user_id")
+    private User assignedToUser;
 
     @JsonIgnore
     @OneToMany(mappedBy = "parentItem", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -52,10 +53,10 @@ public class Item extends SharedContent {
 
     public static Item createNewItem(ItemRequest itemRequest, Board board, User user) {
         Section section = board.getSectionFromBoard(itemRequest.getSectionId());
-        Status status = board.getStatusByName("Open");
+        Status status = board.getStatus("Open");
         Type type = itemRequest.getParentItemId() != null ?
-                board.getTypeByName("Sub-Item") :
-                board.getTypeByName("Item") ;
+                board.getType("Sub-Item") :
+                board.getType("Item") ;
 
         Item parentItem = null;
         if (itemRequest.getParentItemId() != null) {

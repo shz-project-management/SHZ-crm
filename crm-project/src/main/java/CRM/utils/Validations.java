@@ -3,16 +3,13 @@ package CRM.utils;
 import CRM.entity.Board;
 import CRM.entity.User;
 import CRM.entity.requests.*;
-import CRM.entity.Attribute;
 import CRM.entity.requests.LoginUserRequest;
 import CRM.entity.requests.RegisterUserRequest;
 import CRM.utils.enums.ExceptionMessage;
 import CRM.utils.enums.Regex;
 import CRM.utils.enums.UpdateField;
-import io.jsonwebtoken.Claims;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.hibernate.NonUniqueObjectException;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import javax.security.auth.login.AccountNotFoundException;
@@ -36,7 +33,7 @@ public class Validations {
      */
     public static void validate(Object data, String regex) throws IllegalArgumentException, NullPointerException {
         logger.info("in Validations -> validate");
-
+//
         if (data == null) {
             logger.error("in Validations -> validate -> " + ExceptionMessage.EMPTY_NOTNULL_FIELD);
             throw new NullPointerException(ExceptionMessage.EMPTY_NOTNULL_FIELD.toString());
@@ -58,6 +55,7 @@ public class Validations {
      * @throws IllegalArgumentException if the email, password, first name, or last name does not match the expected format
      */
     public static void validateRegisteredUser(RegisterUserRequest user) {
+//        throw new IllegalArgumentException(ExceptionMessage.NO_DOCUMENT_IN_DATABASE.toString());
         validate(user.getEmail(), Regex.EMAIL.getRegex());
         validate(user.getPassword(), Regex.PASSWORD.getRegex());
         validate(user.getFullName(), Regex.NAME.getRegex());
@@ -94,18 +92,13 @@ public class Validations {
      * @throws IllegalArgumentException if the importance value is not within the range 0-5, or if any other field fails validation.
      */
     public static void validateCreatedItem(ItemRequest item) {
-        // validate each field of the item using validate(regex, field)
         try {
             validate(item.getParentItemId(), Regex.ID.getRegex());
         } catch (NullPointerException e) {
             logger.warn("Parent item ID is null");
         }
 
-        Validations.validateIDs(item.getUserId(), item.getSectionId());
-
-        // We don't have to add a status and a type to an item
-//        validate(item.getStatusId(), Regex.ID.getRegex());
-//        validate(item.getTypeId(), Regex.ID.getRegex());
+        Validations.validateIDs(item.getUserId(), item.getSectionId(), item.getBoardId());
 
         if (item.getName() == null)
             throw new NullPointerException(ExceptionMessage.VALIDATION_FAILED.toString());
@@ -119,28 +112,43 @@ public class Validations {
      * @throws NullPointerException     if the title is null.
      */
     public static void validateCreatedComment(CommentRequest comment, Long userId, Long boardId) {
-        // validate each field of the item using validate(regex, field)
         Validations.validateIDs(comment.getParentItemId(), userId, boardId);
 
-        if (comment.getName() == null)
+        if (comment.getDescription() == null)
             throw new NullPointerException(ExceptionMessage.VALIDATION_FAILED.toString());
     }
 
+    /**
+     * Validates the shared content of a Trello object.
+     *
+     * @param obj the Trello object containing the shared content to validate
+     */
     public static void validateSharedContent(ObjectsIdsRequest obj) {
         Validations.validateIDs(obj.getBoardId(), obj.getSectionId(), obj.getUpdateObjId());
         if (obj.getParentId() != null)
             Validations.validate(obj.getParentId(), Regex.ID.getRegex());
     }
 
-    //TODO documentation
+    /**
+     * Validates a list of Trello object IDs.
+     *
+     * @param ids the Trello object IDs to validate
+     */
     public static void validateIDs(Long... ids) {
         for (Long id : ids) {
             validate(id, Regex.ID.getRegex());
         }
     }
 
+    /**
+     * Validates an update to a user's permissions on a Trello board.
+     *
+     * @param boardId the ID of the Trello board
+     * @param userId the ID of the user being updated
+     * @param permissionId the ID of the user's new permissions
+     */
     public static void validateUpdateUserToBoard(Long boardId, Long userId, Long permissionId) {
-        if(userId != null) validate(userId, Regex.ID.getRegex());
+        if (userId != null) validate(userId, Regex.ID.getRegex());
         validate(boardId, Regex.ID.getRegex());
         validate(permissionId, Regex.ID.getRegex());
         if (permissionId < 0 || permissionId > 3) {
@@ -185,9 +193,8 @@ public class Validations {
             throw new IllegalArgumentException(ExceptionMessage.ILLEGAL_AUTH_HEADER.toString());
         }
 
-        token = token.substring(7, token.length());
-        Claims claims = ConfirmationToken.decodeJWT(token);
-        return Long.valueOf(claims.getId());
+        token = token.substring(7);
+        return ConfirmationToken.decodeJWT(token);
     }
 
     /**
@@ -199,7 +206,7 @@ public class Validations {
      * @throws NoSuchFieldException if the field does not exist in the object
      */
     public static <T> void setContentToFieldIfFieldExists(T object, UpdateField fieldName, Object content) throws NoSuchFieldException {
-        if(object == null){
+        if (object == null) {
             throw new IllegalArgumentException(ExceptionMessage.FIELD_OBJECT_NOT_EXISTS.toString());
         }
 
@@ -265,7 +272,6 @@ public class Validations {
             User user = doesIdExists(userId, userRepo);
             Board board = doesIdExists(boardId, boardRepo);
             return board.doesBoardIncludeUser(userId);
-//            return board.getAllUsersInBoard().contains(user) || board.getCreatorUser().equals(user);
 
         } catch (NoSuchElementException e) {
             throw new AccountNotFoundException(ExceptionMessage.ACCOUNT_DOES_NOT_EXISTS.toString());
@@ -317,12 +323,13 @@ public class Validations {
     private static <T> boolean checkIfFieldExistsInEntityHelper(Field field, T object, String fieldName, Object content) throws IllegalAccessException {
         field.setAccessible(true);
         Object value = field.get(object);
-        if (!field.getName().equalsIgnoreCase(fieldName)) {
+
+        if (!field.getName().equalsIgnoreCase(fieldName))
             return false;
-        }
-        if (value != null && !(value.getClass().equals(content.getClass()))) {
+
+        if (value != null && !(value.getClass().equals(content.getClass())))
             value.getClass().cast(content);
-        }
+
         field.set(object, content);
         return true;
     }
