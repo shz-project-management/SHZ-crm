@@ -3,16 +3,13 @@ package CRM.utils;
 import CRM.entity.Board;
 import CRM.entity.User;
 import CRM.entity.requests.*;
-import CRM.entity.Attribute;
 import CRM.entity.requests.LoginUserRequest;
 import CRM.entity.requests.RegisterUserRequest;
 import CRM.utils.enums.ExceptionMessage;
 import CRM.utils.enums.Regex;
 import CRM.utils.enums.UpdateField;
-import io.jsonwebtoken.Claims;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.hibernate.NonUniqueObjectException;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import javax.security.auth.login.AccountNotFoundException;
@@ -95,7 +92,6 @@ public class Validations {
      * @throws IllegalArgumentException if the importance value is not within the range 0-5, or if any other field fails validation.
      */
     public static void validateCreatedItem(ItemRequest item) {
-        // validate each field of the item using validate(regex, field)
         try {
             validate(item.getParentItemId(), Regex.ID.getRegex());
         } catch (NullPointerException e) {
@@ -103,10 +99,6 @@ public class Validations {
         }
 
         Validations.validateIDs(item.getUserId(), item.getSectionId(), item.getBoardId());
-
-        // We don't have to add a status and a type to an item
-//        validate(item.getStatusId(), Regex.ID.getRegex());
-//        validate(item.getTypeId(), Regex.ID.getRegex());
 
         if (item.getName() == null)
             throw new NullPointerException(ExceptionMessage.VALIDATION_FAILED.toString());
@@ -120,26 +112,41 @@ public class Validations {
      * @throws NullPointerException     if the title is null.
      */
     public static void validateCreatedComment(CommentRequest comment, Long userId, Long boardId) {
-        // validate each field of the item using validate(regex, field)
         Validations.validateIDs(comment.getParentItemId(), userId, boardId);
 
         if (comment.getName() == null)
             throw new NullPointerException(ExceptionMessage.VALIDATION_FAILED.toString());
     }
 
+    /**
+     * Validates the shared content of a Trello object.
+     *
+     * @param obj the Trello object containing the shared content to validate
+     */
     public static void validateSharedContent(ObjectsIdsRequest obj) {
         Validations.validateIDs(obj.getBoardId(), obj.getSectionId(), obj.getUpdateObjId());
         if (obj.getParentId() != null)
             Validations.validate(obj.getParentId(), Regex.ID.getRegex());
     }
 
-    //TODO documentation
+    /**
+     * Validates a list of Trello object IDs.
+     *
+     * @param ids the Trello object IDs to validate
+     */
     public static void validateIDs(Long... ids) {
         for (Long id : ids) {
             validate(id, Regex.ID.getRegex());
         }
     }
 
+    /**
+     * Validates an update to a user's permissions on a Trello board.
+     *
+     * @param boardId the ID of the Trello board
+     * @param userId the ID of the user being updated
+     * @param permissionId the ID of the user's new permissions
+     */
     public static void validateUpdateUserToBoard(Long boardId, Long userId, Long permissionId) {
         if (userId != null) validate(userId, Regex.ID.getRegex());
         validate(boardId, Regex.ID.getRegex());
