@@ -41,7 +41,6 @@ public class AuthFacade {
      */
     public Response<UserDTO> register(RegisterUserRequest user) {
         logger.info("in FacadeAuthController -> register");
-//        throw new IllegalArgumentException(ExceptionMessage.NO_DOCUMENT_IN_DATABASE.toString());
         Validations.validateRegisteredUser(user);
         return Response.<UserDTO>builder()
                 .data(UserDTO.createUserDTO(authService.register(user)))

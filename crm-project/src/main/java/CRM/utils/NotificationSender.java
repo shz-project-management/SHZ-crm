@@ -75,16 +75,18 @@ public class NotificationSender {
         Long kind = notificationRequest.getNotificationType().getId();
         Board board = notificationRequest.getBoard();
         Item item = null;
+        Long attributeId = null;
         if (kind != 5 && kind != 7)
             item = notificationRequest.getBoard().getItemById(notificationRequest.getItemId(), notificationRequest.getSectionId());
-        Long attributeId = notificationRequest.getPresentContent() != null ? Long.valueOf((Integer) notificationRequest.getPresentContent()) : null;
         switch (kind.intValue()) {
             case 1:
                 return "Item id: " + notificationRequest.getItemId() + " has been assigned to you in board " + board.getName();
             case 2:
+                attributeId = notificationRequest.getPresentContent() != null ? Long.valueOf((Integer) notificationRequest.getPresentContent()) : null;
                 Status status = board.getAttributeById(attributeId, Status.class);
                 return "The item's '" + item.getName() + "' status has been changed to '" + status.getName() + "'";
             case 3:
+                attributeId = notificationRequest.getPresentContent() != null ? Long.valueOf((Integer) notificationRequest.getPresentContent()) : null;
                 Type type = board.getAttributeById(attributeId, Type.class);
                 return "The item's '" + item.getName() + "' type has been changed to " + type.getName();
             case 4:
