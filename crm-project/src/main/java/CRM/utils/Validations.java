@@ -114,7 +114,7 @@ public class Validations {
     public static void validateCreatedComment(CommentRequest comment, Long userId, Long boardId) {
         Validations.validateIDs(comment.getParentItemId(), userId, boardId);
 
-        if (comment.getName() == null)
+        if (comment.getDescription() == null)
             throw new NullPointerException(ExceptionMessage.VALIDATION_FAILED.toString());
     }
 

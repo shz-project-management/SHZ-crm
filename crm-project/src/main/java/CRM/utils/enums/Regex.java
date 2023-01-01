@@ -7,7 +7,7 @@ public enum Regex {
     PASSWORD("^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d]{8,}$"),
     ID("^[0-9]*"),
     FILE_NAME("^[A-Za-z0-9 .]{1,255}$"),
-    BOARD_NAME("^[A-Za-z0-9 _:]*");
+    BOARD_NAME("^[A-Za-z0-9_:!? -]*");
 
     private final String regex;
 
